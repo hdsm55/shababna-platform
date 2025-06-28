@@ -1,0 +1,146 @@
+{
+  "nav": {
+    "home": "Ana Sayfa",
+    "events": "Etkinlikler",
+    "programs": "Programlar",
+    "joinUs": "Bize Katıl",
+    "contact": "İletişim",
+    "login": "Giriş Yap",
+    "dashboard": "Kontrol Paneli",
+    "logout": "Çıkış Yap"
+  },
+  "home": {
+    "hero": {
+      "title": "Gençleri Güçlendirmek, Geleceği İnşa Etmek",
+      "subtitle": "Yenilikçi programlar ve toplum katılımı ile pozitif değişim yaratmak için Shababna Global'e katılın.",
+      "cta": "Dahil Ol",
+      "learn": "Daha Fazla Öğren"
+    },
+    "features": {
+      "title": "Ne Yapıyoruz",
+      "events": {
+        "title": "Etkinlikler ve Atölyeler",
+        "description": "Beceri geliştirme ve bağlantı kurma için tasarlanmış interaktif oturumlar, atölyeler ve networking etkinlikleri."
+      },
+      "programs": {
+        "title": "Geliştirme Programları",
+        "description": "Liderlik geliştirme, beceri kazanma ve toplumsal etki odaklı uzun vadeli programlar."
+      },
+      "community": {
+        "title": "Küresel Topluluk",
+        "description": "Dünya çapında benzer düşünceli gençlerle bağlantı kurun ve kalıcı dostluklar edinin."
+      }
+    }
+  },
+  "events": {
+    "title": "Yaklaşan Etkinlikler",
+    "subtitle": "Gençlik gelişimi için tasarlanmış heyecan verici etkinlik ve atölyeleri keşfedin",
+    "filter": {
+      "all": "Tüm Etkinlikler",
+      "workshop": "Atölyeler",
+      "conference": "Konferanslar",
+      "networking": "Networking"
+    },
+    "register": "Şimdi Kayıt Ol",
+    "learnMore": "Daha Fazla Öğren",
+    "date": "Tarih",
+    "location": "Konum",
+    "category": "Kategori"
+  },
+  "programs": {
+    "title": "Programlarımız",
+    "subtitle": "Gelecek nesil liderleri geliştirmek için tasarlanmış kapsamlı programlar",
+    "support": "Bu Programı Destekle",
+    "donate": "Bağış Yap",
+    "sponsor": "Sponsor Ol"
+  },
+  "joinUs": {
+    "title": "Topluluğumuza Katıl",
+    "subtitle": "Genç değişim yaratıcılarının küresel ağının bir parçası ol",
+    "form": {
+      "firstName": "Ad",
+      "lastName": "Soyad",
+      "email": "E-posta Adresi",
+      "phone": "Telefon Numarası",
+      "country": "Ülke",
+      "age": "Yaş",
+      "interests": "İlgi Alanları",
+      "motivation": "Neden bize katılmak istiyorsun?",
+      "submit": "Başvuruyu Gönder"
+    }
+  },
+  "contact": {
+    "title": "İletişime Geç",
+    "subtitle": "Sizden haber almayı seviyoruz. Bize mesaj gönderin, en kısa sürede yanıtlayalım.",
+    "form": {
+      "name": "Ad Soyad",
+      "email": "E-posta Adresi",
+      "subject": "Konu",
+      "message": "Mesaj",
+      "send": "Mesaj Gönder"
+    },
+    "info": {
+      "address": "123 Gençlik Sokağı, Küresel Şehir",
+      "phone": "+1 (555) 123-4567",
+      "email": "info@shababnaglobal.org"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Tekrar Hoşgeldin",
+      "subtitle": "Hesabınıza giriş yapın",
+      "email": "E-posta Adresi",
+      "password": "Şifre",
+      "submit": "Giriş Yap",
+      "noAccount": "Hesabınız yok mu?",
+      "register": "Buradan kayıt olun"
+    },
+    "register": {
+      "title": "Hesap Oluştur",
+      "subtitle": "Topluluğumuza katıl",
+      "firstName": "Ad",
+      "lastName": "Soyad",
+      "email": "E-posta Adresi",
+      "password": "Şifre",
+      "confirmPassword": "Şifre Tekrar",
+      "submit": "Hesap Oluştur",
+      "hasAccount": "Zaten hesabınız var mı?",
+      "login": "Buradan giriş yapın"
+    }
+  },
+  "dashboard": {
+    "title": "Kontrol Paneli",
+    "welcome": "Tekrar hoşgeldin",
+    "stats": {
+      "events": "Toplam Etkinlik",
+      "programs": "Aktif Programlar",
+      "members": "Topluluk Üyeleri",
+      "donations": "Toplam Bağışlar"
+    },
+    "menu": {
+      "overview": "Genel Bakış",
+      "events": "Etkinlik Yönetimi",
+      "programs": "Program Yönetimi",
+      "users": "Kullanıcılar",
+      "donations": "Bağışlar",
+      "settings": "Ayarlar"
+    }
+  },
+  "common": {
+    "loading": "Yükleniyor...",
+    "error": "Bir şeyler yanlış gitti",
+    "retry": "Tekrar Dene",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "view": "Görüntüle",
+    "back": "Geri",
+    "next": "İleri",
+    "previous": "Önceki",
+    "search": "Ara",
+    "filter": "Filtrele",
+    "clear": "Temizle",
+    "apply": "Uygula"
+  }
+}

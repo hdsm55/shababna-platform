@@ -1,0 +1,146 @@
+{
+  "nav": {
+    "home": "Home",
+    "events": "Events",
+    "programs": "Programs", 
+    "joinUs": "Join Us",
+    "contact": "Contact",
+    "login": "Login",
+    "dashboard": "Dashboard",
+    "logout": "Logout"
+  },
+  "home": {
+    "hero": {
+      "title": "Empowering Youth, Building Tomorrow",
+      "subtitle": "Join Shababna Global in creating positive change through innovative programs and community engagement.",
+      "cta": "Get Involved",
+      "learn": "Learn More"
+    },
+    "features": {
+      "title": "What We Do",
+      "events": {
+        "title": "Events & Workshops",
+        "description": "Interactive sessions, workshops, and networking events designed to develop skills and build connections."
+      },
+      "programs": {
+        "title": "Development Programs",
+        "description": "Long-term programs focused on leadership development, skill building, and community impact."
+      },
+      "community": {
+        "title": "Global Community",
+        "description": "Connect with like-minded youth from around the world and make lasting friendships."
+      }
+    }
+  },
+  "events": {
+    "title": "Upcoming Events",
+    "subtitle": "Discover exciting events and workshops designed for youth development",
+    "filter": {
+      "all": "All Events",
+      "workshop": "Workshops",
+      "conference": "Conferences",
+      "networking": "Networking"
+    },
+    "register": "Register Now",
+    "learnMore": "Learn More",
+    "date": "Date",
+    "location": "Location",
+    "category": "Category"
+  },
+  "programs": {
+    "title": "Our Programs",
+    "subtitle": "Comprehensive programs designed to develop the next generation of leaders",
+    "support": "Support This Program",
+    "donate": "Donate",
+    "sponsor": "Become a Sponsor"
+  },
+  "joinUs": {
+    "title": "Join Our Community",
+    "subtitle": "Become part of a global network of young changemakers",
+    "form": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "country": "Country",
+      "age": "Age",
+      "interests": "Areas of Interest",
+      "motivation": "Why do you want to join us?",
+      "submit": "Submit Application"
+    }
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "We'd love to hear from you. Send us a message and we'll respond as soon as possible.",
+    "form": {
+      "name": "Full Name",
+      "email": "Email Address",
+      "subject": "Subject",
+      "message": "Message",
+      "send": "Send Message"
+    },
+    "info": {
+      "address": "123 Youth Street, Global City",
+      "phone": "+1 (555) 123-4567",
+      "email": "info@shababnaglobal.org"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to your account",
+      "email": "Email Address",
+      "password": "Password",
+      "submit": "Sign In",
+      "noAccount": "Don't have an account?",
+      "register": "Register here"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Join our community",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "submit": "Create Account",
+      "hasAccount": "Already have an account?",
+      "login": "Sign in here"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "stats": {
+      "events": "Total Events",
+      "programs": "Active Programs",
+      "members": "Community Members",
+      "donations": "Total Donations"
+    },
+    "menu": {
+      "overview": "Overview",
+      "events": "Manage Events",
+      "programs": "Manage Programs",
+      "users": "Users",
+      "donations": "Donations",
+      "settings": "Settings"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try Again",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "apply": "Apply"
+  }
+}
