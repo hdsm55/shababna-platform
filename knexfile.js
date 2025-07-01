@@ -6,29 +6,33 @@ console.log('✅ DB_PASSWORD is:', process.env.DB_PASSWORD);
 
 // Validate required environment variables
 const validateDatabaseConfig = () => {
-  const requiredVars = {
-    DB_PASSWORD: process.env.DB_PASSWORD,
-    DB_NAME: process.env.DB_NAME,
-    DB_USER: process.env.DB_USER
+  // Set default values for local development if .env is not present
+  const config = {
+    DB_NAME: process.env.DB_NAME || 'shababna',
+    DB_USER: process.env.DB_USER || 'postgres',
+    DB_PASSWORD: process.env.DB_PASSWORD || ''
   };
 
-  for (const [varName, value] of Object.entries(requiredVars)) {
-    if (value === undefined || value === null || value === '') {
+  // Only validate if we're in production or if specific values are provided
+  if (process.env.NODE_ENV === 'production') {
+    if (!config.DB_NAME || !config.DB_USER || !config.DB_PASSWORD) {
       throw new Error(
-        `❌ Database configuration error: ${varName} is required but not defined or empty.\n` +
-        `Please check your .env file and ensure ${varName} is set with a valid value.\n` +
-        `Example: ${varName}=your_password_here`
-      );
-    }
-
-    // Ensure password is always a string
-    if (varName === 'DB_PASSWORD' && typeof value !== 'string') {
-      throw new Error(
-        `❌ Database configuration error: DB_PASSWORD must be a string, but got ${typeof value}.\n` +
-        `Please check your .env file and ensure DB_PASSWORD is properly quoted if needed.`
+        `❌ Production database configuration error: All database variables are required in production.\n` +
+        `Please set DB_NAME, DB_USER, and DB_PASSWORD in your .env file.`
       );
     }
   }
+
+  // Validate password type if provided
+  if (config.DB_PASSWORD !== undefined && typeof config.DB_PASSWORD !== 'string') {
+    throw new Error(
+      `❌ Database configuration error: DB_PASSWORD must be a string, but got ${typeof config.DB_PASSWORD}.\n` +
+      `Please check your .env file and ensure DB_PASSWORD is properly quoted if needed.`
+    );
+  }
+
+  console.log('✅ Database configuration validated successfully');
+  console.log(`📊 Using database: ${config.DB_NAME} on ${config.DB_USER}@${process.env.DB_HOST || 'localhost'}`);
 };
 
 // Validate configuration before exporting
@@ -46,9 +50,9 @@ export default {
     connection: {
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT) || 5432,
-      database: process.env.DB_NAME,
-      user: process.env.DB_USER,
-      password: String(process.env.DB_PASSWORD), // Ensure password is always a string
+      database: process.env.DB_NAME || 'shababna',
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD || '', // Allow empty password for local dev
       ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
     },
     migrations: {
