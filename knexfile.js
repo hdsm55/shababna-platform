@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 console.log('✅ DB_PASSWORD is:', process.env.DB_PASSWORD);
+console.log('DB_USER=', process.env.DB_USER);
+console.log('DB_PASSWORD=', process.env.DB_PASSWORD);
 
 // Validate required environment variables
 const validateDatabaseConfig = () => {
