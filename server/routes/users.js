@@ -3,7 +3,7 @@ import { body, validationResult } from 'express-validator';
 
 const router = express.Router();
 
-// Mock users database
+// Users API routes
 const users = [];
 
 // Join organization

@@ -20,16 +20,21 @@ const Register: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const login = useAuthStore((state) => state.login);
-  const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<RegisterFormData>();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormData>();
 
   const password = watch('password');
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock successful registration
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // TODO: Replace with actual API call
       const newUser = {
         id: '1',
         email: data.email,
@@ -37,10 +42,11 @@ const Register: React.FC = () => {
         lastName: data.lastName,
         role: 'member' as const,
       };
-      
-      const mockToken = 'mock-jwt-token';
-      login(newUser, mockToken);
-      
+
+      // TODO: Get actual JWT token from API response
+      const token = 'temp-jwt-token';
+      login(newUser, token);
+
       navigate('/');
     } catch (error) {
       console.error('Registration failed:', error);
@@ -64,9 +70,7 @@ const Register: React.FC = () => {
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             {t('auth.register.title')}
           </h2>
-          <p className="text-gray-600">
-            {t('auth.register.subtitle')}
-          </p>
+          <p className="text-gray-600">{t('auth.register.subtitle')}</p>
         </div>
 
         <Card className="p-8">
@@ -80,13 +84,17 @@ const Register: React.FC = () => {
                   <User className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input
                     type="text"
-                    {...register('firstName', { required: 'First name is required' })}
+                    {...register('firstName', {
+                      required: 'First name is required',
+                    })}
                     className="w-full pl-10 rtl:pr-10 rtl:pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="First name"
                   />
                 </div>
                 {errors.firstName && (
-                  <p className="text-red-600 text-sm mt-1">{errors.firstName.message}</p>
+                  <p className="text-red-600 text-sm mt-1">
+                    {errors.firstName.message}
+                  </p>
                 )}
               </div>
 
@@ -98,13 +106,17 @@ const Register: React.FC = () => {
                   <User className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input
                     type="text"
-                    {...register('lastName', { required: 'Last name is required' })}
+                    {...register('lastName', {
+                      required: 'Last name is required',
+                    })}
                     className="w-full pl-10 rtl:pr-10 rtl:pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="Last name"
                   />
                 </div>
                 {errors.lastName && (
-                  <p className="text-red-600 text-sm mt-1">{errors.lastName.message}</p>
+                  <p className="text-red-600 text-sm mt-1">
+                    {errors.lastName.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -117,19 +129,21 @@ const Register: React.FC = () => {
                 <Mail className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="email"
-                  {...register('email', { 
+                  {...register('email', {
                     required: 'Email is required',
                     pattern: {
                       value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: 'Invalid email address'
-                    }
+                      message: 'Invalid email address',
+                    },
                   })}
                   className="w-full pl-10 rtl:pr-10 rtl:pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Enter your email"
                 />
               </div>
               {errors.email && (
-                <p className="text-red-600 text-sm mt-1">{errors.email.message}</p>
+                <p className="text-red-600 text-sm mt-1">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
@@ -141,19 +155,21 @@ const Register: React.FC = () => {
                 <Lock className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="password"
-                  {...register('password', { 
+                  {...register('password', {
                     required: 'Password is required',
                     minLength: {
                       value: 6,
-                      message: 'Password must be at least 6 characters'
-                    }
+                      message: 'Password must be at least 6 characters',
+                    },
                   })}
                   className="w-full pl-10 rtl:pr-10 rtl:pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Enter your password"
                 />
               </div>
               {errors.password && (
-                <p className="text-red-600 text-sm mt-1">{errors.password.message}</p>
+                <p className="text-red-600 text-sm mt-1">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
@@ -165,16 +181,19 @@ const Register: React.FC = () => {
                 <Lock className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="password"
-                  {...register('confirmPassword', { 
+                  {...register('confirmPassword', {
                     required: 'Please confirm your password',
-                    validate: value => value === password || 'Passwords do not match'
+                    validate: (value) =>
+                      value === password || 'Passwords do not match',
                   })}
                   className="w-full pl-10 rtl:pr-10 rtl:pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Confirm your password"
                 />
               </div>
               {errors.confirmPassword && (
-                <p className="text-red-600 text-sm mt-1">{errors.confirmPassword.message}</p>
+                <p className="text-red-600 text-sm mt-1">
+                  {errors.confirmPassword.message}
+                </p>
               )}
             </div>
 
@@ -193,7 +212,10 @@ const Register: React.FC = () => {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               {t('auth.register.hasAccount')}{' '}
-              <Link to="/login" className="text-primary-600 hover:text-primary-700 font-medium">
+              <Link
+                to="/login"
+                className="text-primary-600 hover:text-primary-700 font-medium"
+              >
                 {t('auth.register.login')}
               </Link>
             </p>

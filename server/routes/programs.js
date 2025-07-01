@@ -3,7 +3,7 @@ import { body, validationResult } from 'express-validator';
 
 const router = express.Router();
 
-// Mock programs database
+// Programs API routes
 const programs = [
   {
     id: 1,
@@ -51,28 +51,28 @@ const programs = [
 router.get('/', (req, res) => {
   try {
     const { category, search, limit = 10, offset = 0 } = req.query;
-    
+
     let filteredPrograms = [...programs];
-    
+
     if (category && category !== 'all') {
-      filteredPrograms = filteredPrograms.filter(program => 
+      filteredPrograms = filteredPrograms.filter(program =>
         program.category.toLowerCase() === category.toLowerCase()
       );
     }
-    
+
     if (search) {
       const searchLower = search.toLowerCase();
-      filteredPrograms = filteredPrograms.filter(program => 
+      filteredPrograms = filteredPrograms.filter(program =>
         program.title.toLowerCase().includes(searchLower) ||
         program.description.toLowerCase().includes(searchLower)
       );
     }
-    
+
     const paginatedPrograms = filteredPrograms.slice(
-      parseInt(offset), 
+      parseInt(offset),
       parseInt(offset) + parseInt(limit)
     );
-    
+
     res.json({
       programs: paginatedPrograms,
       total: filteredPrograms.length,
@@ -118,7 +118,7 @@ router.post('/:id/support', [
     }
 
     // In a real app, you'd save the support request to database
-    res.json({ 
+    res.json({
       message: 'Support request submitted successfully',
       program: {
         id: program.id,

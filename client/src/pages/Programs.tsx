@@ -1,76 +1,91 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Target, Users, Clock, ArrowRight, Heart, HandHeart } from 'lucide-react';
+import {
+  Target,
+  Users,
+  Clock,
+  ArrowRight,
+  Heart,
+  HandHeart,
+} from 'lucide-react';
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
 
 const Programs: React.FC = () => {
   const { t } = useTranslation();
 
-  // Mock data - would come from API in real implementation
+  // Programs data - will be fetched from API
   const programs = [
     {
       id: 1,
       title: 'Future Leaders Initiative',
-      description: 'A comprehensive 6-month program designed to develop leadership skills, strategic thinking, and project management capabilities among young professionals.',
+      description:
+        'A comprehensive 6-month program designed to develop leadership skills, strategic thinking, and project management capabilities among young professionals.',
       duration: '6 months',
       participants: 50,
       category: 'Leadership',
-      image: 'https://images.pexels.com/photos/3183153/pexels-photo-3183153.jpeg',
+      image:
+        'https://images.pexels.com/photos/3183153/pexels-photo-3183153.jpeg',
       goals: [
         'Develop advanced leadership skills',
         'Build strategic thinking capabilities',
         'Create impactful community projects',
-        'Network with global leaders'
+        'Network with global leaders',
       ],
       impact: 'Over 500 graduates leading initiatives worldwide',
     },
     {
       id: 2,
       title: 'Digital Innovation Academy',
-      description: 'An intensive program focusing on emerging technologies, digital transformation, and innovation management for the next generation of tech leaders.',
+      description:
+        'An intensive program focusing on emerging technologies, digital transformation, and innovation management for the next generation of tech leaders.',
       duration: '4 months',
       participants: 30,
       category: 'Technology',
-      image: 'https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg',
+      image:
+        'https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg',
       goals: [
         'Master emerging technologies',
         'Develop innovative solutions',
         'Build tech startups',
-        'Connect with industry experts'
+        'Connect with industry experts',
       ],
       impact: '12 successful startups launched by alumni',
     },
     {
       id: 3,
       title: 'Global Citizenship Program',
-      description: 'A transformative program that develops cultural competency, global awareness, and social responsibility among young changemakers.',
+      description:
+        'A transformative program that develops cultural competency, global awareness, and social responsibility among young changemakers.',
       duration: '8 months',
       participants: 40,
       category: 'Social Impact',
-      image: 'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg',
+      image:
+        'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg',
       goals: [
         'Develop cultural competency',
         'Build global networks',
         'Create social impact projects',
-        'Promote international cooperation'
+        'Promote international cooperation',
       ],
       impact: 'Programs active in 25+ countries',
     },
     {
       id: 4,
       title: 'Entrepreneurship Accelerator',
-      description: 'A fast-track program for young entrepreneurs to develop business skills, validate ideas, and launch successful ventures.',
+      description:
+        'A fast-track program for young entrepreneurs to develop business skills, validate ideas, and launch successful ventures.',
       duration: '3 months',
       participants: 25,
       category: 'Business',
-      image: 'https://images.pexels.com/photos/3182834/pexels-photo-3182834.jpeg',
+      image:
+        'https://images.pexels.com/photos/3182834/pexels-photo-3182834.jpeg',
       goals: [
         'Validate business ideas',
         'Develop MVP products',
         'Secure funding',
-        'Scale operations'
+        'Scale operations',
       ],
       impact: '$2M+ in funding raised by participants',
     },
@@ -133,34 +148,46 @@ const Programs: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <h3 className="text-2xl font-bold text-gray-900 mb-3">
                       {program.title}
                     </h3>
-                    
+
                     <p className="text-gray-600 mb-6 leading-relaxed">
                       {program.description}
                     </p>
-                    
+
                     <div className="mb-6">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-3">Program Goals</h4>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-3">
+                        Program Goals
+                      </h4>
                       <ul className="space-y-2">
                         {program.goals.map((goal, goalIndex) => (
-                          <li key={goalIndex} className="flex items-center text-sm text-gray-600">
+                          <li
+                            key={goalIndex}
+                            className="flex items-center text-sm text-gray-600"
+                          >
                             <Target className="w-4 h-4 text-primary-600 mr-2 rtl:ml-2 rtl:mr-0 flex-shrink-0" />
                             {goal}
                           </li>
                         ))}
                       </ul>
                     </div>
-                    
+
                     <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                      <h4 className="text-sm font-semibold text-gray-900 mb-1">Impact</h4>
+                      <h4 className="text-sm font-semibold text-gray-900 mb-1">
+                        Impact
+                      </h4>
                       <p className="text-sm text-gray-600">{program.impact}</p>
                     </div>
-                    
+
                     <div className="flex flex-col sm:flex-row gap-3">
-                      <Button size="sm" icon={ArrowRight} iconPosition="right" className="flex-1">
+                      <Button
+                        size="sm"
+                        icon={ArrowRight}
+                        iconPosition="right"
+                        className="flex-1"
+                      >
                         {t('programs.support')}
                       </Button>
                       <Button variant="outline" size="sm" icon={Heart}>
@@ -190,7 +217,8 @@ const Programs: React.FC = () => {
               Ready to Support Youth Development?
             </h2>
             <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              Your support helps us create more opportunities for young leaders to make a positive impact in their communities.
+              Your support helps us create more opportunities for young leaders
+              to make a positive impact in their communities.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" icon={Heart}>

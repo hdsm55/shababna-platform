@@ -20,12 +20,16 @@ Create a `.env` file in the root directory with the following variables:
 NODE_ENV=development
 
 # Server Configuration
-PORT=5000
+PORT=5001
 CLIENT_URL=http://localhost:5173
 
-# Database Configuration (Development)
-DB_CLIENT=sqlite3
-DB_FILENAME=./server/db/dev.sqlite3
+# Database Configuration (PostgreSQL)
+DB_CLIENT=pg
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=shababna
+DB_USER=postgres
+DB_PASSWORD=your_postgres_password_here
 
 # JWT Configuration
 JWT_SECRET=your-super-secret-jwt-key-change-in-production
@@ -34,8 +38,8 @@ JWT_EXPIRES_IN=7d
 # CORS Configuration
 CORS_ORIGIN=http://localhost:5173
 
-# Logging
-LOG_LEVEL=debug
+# API Configuration
+API_URL=http://localhost:5001/api
 ```
 
 ## Database Commands
@@ -53,13 +57,14 @@ LOG_LEVEL=debug
 
 ## Development Setup
 
-1. Copy `.env.example` to `.env` and configure your environment variables
-2. Run migrations: `npm run db:migrate`
-3. Run seeds: `npm run db:seed`
-4. Start the development server: `npm run dev`
+1. Create `.env` file with PostgreSQL configuration
+2. Create PostgreSQL database: `CREATE DATABASE shababna;`
+3. Run migrations: `npm run db:migrate`
+4. Run seeds: `npm run db:seed`
+5. Start the development server: `npm run dev`
 
 ## Database Connection
 
 The database connection is configured in `server/config/database.js` and uses the environment variables from your `.env` file.
 
-For development, the default configuration uses SQLite3 with the database file located at `server/db/dev.sqlite3`.
+For development, the configuration uses PostgreSQL with proper connection pooling and SSL support for production environments.

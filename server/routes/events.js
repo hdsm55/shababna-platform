@@ -3,7 +3,7 @@ import { body, validationResult } from 'express-validator';
 
 const router = express.Router();
 
-// Mock events database
+// Events API routes
 const events = [
   {
     id: 1,
@@ -41,26 +41,26 @@ const events = [
 router.get('/', (req, res) => {
   try {
     const { category, search, limit = 10, offset = 0 } = req.query;
-    
+
     let filteredEvents = [...events];
-    
+
     if (category && category !== 'all') {
       filteredEvents = filteredEvents.filter(event => event.category === category);
     }
-    
+
     if (search) {
       const searchLower = search.toLowerCase();
-      filteredEvents = filteredEvents.filter(event => 
+      filteredEvents = filteredEvents.filter(event =>
         event.title.toLowerCase().includes(searchLower) ||
         event.description.toLowerCase().includes(searchLower)
       );
     }
-    
+
     const paginatedEvents = filteredEvents.slice(
-      parseInt(offset), 
+      parseInt(offset),
       parseInt(offset) + parseInt(limit)
     );
-    
+
     res.json({
       events: paginatedEvents,
       total: filteredEvents.length,
@@ -144,7 +144,7 @@ router.post('/:id/register', [
     event.attendees += 1;
     event.updatedAt = new Date();
 
-    res.json({ 
+    res.json({
       message: 'Registration successful',
       event: {
         id: event.id,

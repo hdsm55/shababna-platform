@@ -9,8 +9,8 @@
     "dev:server": "nodemon server/index.js",
     "build:client": "cd client && vite build",
     "build": "npm run build:client",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "preview": "cd client && vite preview",
     "db:migrate": "knex migrate:latest",
     "db:migrate:rollback": "knex migrate:rollback",
@@ -19,7 +19,8 @@
     "db:reset": "npm run db:migrate:rollback && npm run db:migrate && npm run db:seed"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.38.4",
+    "@tanstack/react-query": "^5.81.5",
+    "axios": "^1.10.0",
     "bcryptjs": "^2.4.3",
     "concurrently": "^8.2.2",
     "cors": "^2.8.5",
@@ -41,7 +42,6 @@
     "react-hook-form": "^7.48.2",
     "react-i18next": "^13.5.0",
     "react-router-dom": "^6.8.1",
-    "sqlite3": "^5.1.7",
     "zustand": "^4.4.7"
   },
   "devDependencies": {

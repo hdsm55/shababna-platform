@@ -3,7 +3,7 @@ import { body, validationResult } from 'express-validator';
 
 const router = express.Router();
 
-// Mock donations database
+// Donations API routes
 const donations = [];
 
 // Create donation intent
@@ -35,7 +35,7 @@ router.post('/create-intent', [
       message: 'Donation intent created',
       donationId: donationIntent.id,
       // In real implementation, return payment client secret
-      clientSecret: 'mock_client_secret'
+      clientSecret: process.env.PAYPAL_CLIENT_SECRET || 'your_paypal_client_secret'
     });
   } catch (error) {
     console.error('Create donation intent error:', error);
@@ -73,12 +73,12 @@ router.post('/confirm/:id', (req, res) => {
 router.get('/', (req, res) => {
   try {
     const { limit = 10, offset = 0 } = req.query;
-    
+
     const paginatedDonations = donations.slice(
-      parseInt(offset), 
+      parseInt(offset),
       parseInt(offset) + parseInt(limit)
     );
-    
+
     res.json({
       donations: paginatedDonations,
       total: donations.length,

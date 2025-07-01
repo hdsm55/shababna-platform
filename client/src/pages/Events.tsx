@@ -3,61 +3,18 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, Users, Filter, Search } from 'lucide-react';
 import { format } from 'date-fns';
+import { useQuery } from '@tanstack/react-query';
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+import { fetchEvents } from '../services/eventsApi';
+import { Event } from '../types';
 
 const Events: React.FC = () => {
   const { t } = useTranslation();
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-
-  // Mock data - would come from API in real implementation
-  const events = [
-    {
-      id: 1,
-      title: 'Youth Leadership Summit 2024',
-      description: 'A comprehensive summit bringing together young leaders from around the world to discuss leadership challenges and solutions.',
-      date: new Date('2024-03-15'),
-      location: 'Istanbul, Turkey',
-      category: 'conference',
-      attendees: 150,
-      image: 'https://images.pexels.com/photos/1181622/pexels-photo-1181622.jpeg',
-      price: 'Free',
-    },
-    {
-      id: 2,
-      title: 'Digital Marketing Workshop',
-      description: 'Learn essential digital marketing skills including social media strategy, content creation, and analytics.',
-      date: new Date('2024-02-20'),
-      location: 'Dubai, UAE',
-      category: 'workshop',
-      attendees: 50,
-      image: 'https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg',
-      price: '$25',
-    },
-    {
-      id: 3,
-      title: 'Global Youth Networking Event',
-      description: 'Connect with ambitious young professionals and entrepreneurs from diverse backgrounds and industries.',
-      date: new Date('2024-02-28'),
-      location: 'Riyadh, Saudi Arabia',
-      category: 'networking',
-      attendees: 100,
-      image: 'https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg',
-      price: 'Free',
-    },
-    {
-      id: 4,
-      title: 'Entrepreneurship Bootcamp',
-      description: 'Intensive 3-day bootcamp covering business fundamentals, startup strategies, and pitch development.',
-      date: new Date('2024-03-10'),
-      location: 'Ankara, Turkey',
-      category: 'workshop',
-      attendees: 30,
-      image: 'https://images.pexels.com/photos/3182834/pexels-photo-3182834.jpeg',
-      price: '$50',
-    },
-  ];
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filters = [
     { key: 'all', label: t('events.filter.all') },
@@ -66,12 +23,47 @@ const Events: React.FC = () => {
     { key: 'networking', label: t('events.filter.networking') },
   ];
 
-  const filteredEvents = events.filter(event => {
-    const matchesFilter = selectedFilter === 'all' || event.category === selectedFilter;
-    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.description.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesFilter && matchesSearch;
+  // Prepare query parameters
+  const queryParams = {
+    category: selectedFilter === 'all' ? undefined : selectedFilter,
+    search: searchTerm || undefined,
+    page: currentPage,
+    limit: 10,
+  };
+
+  // Fetch events using React Query
+  const {
+    data: eventsData,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['events', queryParams],
+    queryFn: () => fetchEvents(queryParams),
+    retry: 1,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  const events = eventsData?.data?.items || [];
+  const pagination = eventsData?.data?.pagination;
+
+  // Handle filter changes
+  const handleFilterChange = (filterKey: string) => {
+    setSelectedFilter(filterKey);
+    setCurrentPage(1); // Reset to first page when filter changes
+  };
+
+  // Handle search changes
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1); // Reset to first page when search changes
+  };
+
+  // Handle pagination
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -101,7 +93,7 @@ const Events: React.FC = () => {
                 type="text"
                 placeholder={t('common.search')}
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="w-full pl-10 rtl:pr-10 rtl:pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
             </div>
@@ -109,7 +101,7 @@ const Events: React.FC = () => {
               {filters.map((filter) => (
                 <button
                   key={filter.key}
-                  onClick={() => setSelectedFilter(filter.key)}
+                  onClick={() => handleFilterChange(filter.key)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                     selectedFilter === filter.key
                       ? 'bg-primary-600 text-white'
@@ -127,75 +119,150 @@ const Events: React.FC = () => {
       {/* Events Grid */}
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredEvents.map((event, index) => (
-              <motion.div
-                key={event.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <Card hover className="overflow-hidden">
-                  <div className="aspect-w-16 aspect-h-9">
-                    <img
-                      src={event.image}
-                      alt={event.title}
-                      className="w-full h-48 object-cover"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        event.category === 'workshop' ? 'bg-primary-100 text-primary-800' :
-                        event.category === 'conference' ? 'bg-secondary-100 text-secondary-800' :
-                        'bg-accent-100 text-accent-800'
-                      }`}>
-                        {event.category.charAt(0).toUpperCase() + event.category.slice(1)}
-                      </span>
-                      <span className="text-sm text-gray-500">{event.price}</span>
-                    </div>
-                    
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                      {event.title}
-                    </h3>
-                    
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                      {event.description}
-                    </p>
-                    
-                    <div className="space-y-2 mb-6">
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Calendar className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
-                        {format(event.date, 'MMM dd, yyyy')}
-                      </div>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <MapPin className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
-                        {event.location}
-                      </div>
-                      <div className="flex items-center text-sm text-gray-500">
-                        <Users className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
-                        {event.attendees} attendees
-                      </div>
-                    </div>
-                    
-                    <div className="flex gap-3">
-                      <Button size="sm" className="flex-1">
-                        {t('events.register')}
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        {t('events.learnMore')}
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-
-          {filteredEvents.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No events found matching your criteria.</p>
+          {/* Loading State */}
+          {isLoading && (
+            <div className="flex justify-center items-center py-12">
+              <LoadingSpinner size="lg" />
             </div>
+          )}
+
+          {/* Error State */}
+          {isError && (
+            <div className="text-center py-12">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
+                <p className="text-red-800 font-medium mb-2">
+                  {t('common.error.title')}
+                </p>
+                <p className="text-red-600 text-sm mb-4">
+                  {error instanceof Error
+                    ? error.message
+                    : t('common.error.message')}
+                </p>
+                <Button onClick={() => refetch()} variant="outline" size="sm">
+                  {t('common.retry')}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Events Grid */}
+          {!isLoading && !isError && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {events.map((event: Event, index: number) => (
+                  <motion.div
+                    key={event.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                  >
+                    <Card hover className="overflow-hidden">
+                      <div className="aspect-w-16 aspect-h-9">
+                        <img
+                          src={
+                            event.image ||
+                            'https://images.pexels.com/photos/1181622/pexels-photo-1181622.jpeg'
+                          }
+                          alt={event.title}
+                          className="w-full h-48 object-cover"
+                        />
+                      </div>
+                      <div className="p-6">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span
+                            className={`px-2 py-1 text-xs font-medium rounded-full ${
+                              event.category === 'workshop'
+                                ? 'bg-primary-100 text-primary-800'
+                                : event.category === 'conference'
+                                ? 'bg-secondary-100 text-secondary-800'
+                                : 'bg-accent-100 text-accent-800'
+                            }`}
+                          >
+                            {event.category.charAt(0).toUpperCase() +
+                              event.category.slice(1)}
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            {event.price === 0 ? 'Free' : `$${event.price}`}
+                          </span>
+                        </div>
+
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                          {event.title}
+                        </h3>
+
+                        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                          {event.description}
+                        </p>
+
+                        <div className="space-y-2 mb-6">
+                          <div className="flex items-center text-sm text-gray-500">
+                            <Calendar className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                            {format(new Date(event.date), 'MMM dd, yyyy')}
+                          </div>
+                          <div className="flex items-center text-sm text-gray-500">
+                            <MapPin className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                            {event.location}
+                          </div>
+                          {event.max_attendees && (
+                            <div className="flex items-center text-sm text-gray-500">
+                              <Users className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                              {event.max_attendees} max attendees
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex gap-3">
+                          <Button size="sm" className="flex-1">
+                            {t('events.register')}
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            {t('events.learnMore')}
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Empty State */}
+              {events.length === 0 && !isLoading && (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 text-lg">
+                    {searchTerm || selectedFilter !== 'all'
+                      ? 'No events found matching your criteria.'
+                      : 'No events available at the moment.'}
+                  </p>
+                </div>
+              )}
+
+              {/* Pagination */}
+              {pagination && pagination.totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-8">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </Button>
+
+                  <span className="text-sm text-gray-600">
+                    Page {currentPage} of {pagination.totalPages}
+                  </span>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === pagination.totalPages}
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>
