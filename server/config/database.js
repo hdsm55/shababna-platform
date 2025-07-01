@@ -1,25 +1,49 @@
+import { Pool } from 'pg';
 import dotenv from 'dotenv';
-import knex from 'knex';
-import knexfile from '../../knexfile.js';
 
-// Load environment variables
+// تحميل متغيرات البيئة
 dotenv.config();
 
-const environment = process.env.NODE_ENV || 'development';
-const config = knexfile[environment];
+// إعداد اتصال قاعدة البيانات
+const pool = new Pool({
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT, 10) || 5432,
+    database: process.env.DB_NAME || 'shababna',
+    user: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD || '',
+    max: 20, // الحد الأقصى لعدد الاتصالات في المجمع
+    idleTimeoutMillis: 30000, // وقت الانتظار قبل إغلاق الاتصال غير المستخدم
+    connectionTimeoutMillis: 2000, // وقت الانتظار للاتصال
+});
 
-// Create and export the database connection
-const db = knex(config);
+// اختبار الاتصال
+pool.on('connect', () => {
+    console.log('✅ تم الاتصال بقاعدة البيانات بنجاح');
+});
 
-// Test the connection
-db.raw('SELECT 1')
-    .then(() => {
-        console.log('✅ Database connection established successfully');
-    })
-    .catch((error) => {
-        console.error('❌ Database connection failed:', error.message);
-        // Don't crash the server, just log the error
-        console.log('⚠️  Server will continue without database connection');
-    });
+pool.on('error', (err) => {
+    console.error('❌ خطأ في الاتصال بقاعدة البيانات:', err);
+});
 
-export default db;
+// دالة لتنفيذ الاستعلامات
+export const query = (text, params) => pool.query(text, params);
+
+// دالة للحصول على العميل للعمليات المعقدة
+export const getClient = () => pool.connect();
+
+// دالة لإغلاق الاتصال
+export const closePool = () => pool.end();
+
+// دالة لاختبار الاتصال
+export const testConnection = async () => {
+    try {
+        const result = await query('SELECT NOW()');
+        console.log('✅ اختبار الاتصال نجح:', result.rows[0]);
+        return true;
+    } catch (error) {
+        console.error('❌ فشل اختبار الاتصال:', error.message);
+        return false;
+    }
+};
+
+export default pool;

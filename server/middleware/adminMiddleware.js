@@ -249,7 +249,7 @@ const requireAdminOrOwner = (ownerField = 'user_id') => {
 };
 
 export {
-    requireAdmin,
+    requireAdmin as adminMiddleware,
     requireSuperAdmin,
     requireAdminOrSelf,
     requireAdminOrOwner

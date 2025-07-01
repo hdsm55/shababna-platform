@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: shababna-postgres
+    environment:
+      POSTGRES_DB: shababna
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: your_password_here
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - shababna-network
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: shababna-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - shababna-network
+
+  # Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shababna-app
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: shababna
+      DB_USER: postgres
+      DB_PASSWORD: your_password_here
+      JWT_SECRET: your_jwt_secret_here_make_it_long_and_random
+      JWT_EXPIRES_IN: 7d
+      PORT: 5001
+      CLIENT_URL: http://localhost:3000
+      REDIS_URL: redis://redis:6379
+    ports:
+      - '5001:5001'
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - shababna-network
+    restart: unless-stopped
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: shababna-nginx
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app
+    networks:
+      - shababna-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  shababna-network:
+    driver: bridge

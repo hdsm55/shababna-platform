@@ -1,161 +1,444 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
+import { query } from '../config/database.js';
+import { authMiddleware } from '../middleware/authMiddleware.js';
+import { adminMiddleware } from '../middleware/adminMiddleware.js';
 
 const router = express.Router();
 
-// Events API routes
-const events = [
-  {
-    id: 1,
-    title: 'Youth Leadership Summit 2024',
-    description: 'A comprehensive summit bringing together young leaders from around the world.',
-    date: '2024-03-15T10:00:00Z',
-    location: 'Istanbul, Turkey',
-    category: 'conference',
-    attendees: 150,
-    maxAttendees: 200,
-    price: 0,
-    image: 'https://images.pexels.com/photos/1181622/pexels-photo-1181622.jpeg',
-    status: 'active',
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    id: 2,
-    title: 'Digital Marketing Workshop',
-    description: 'Learn essential digital marketing skills including social media strategy.',
-    date: '2024-02-20T14:00:00Z',
-    location: 'Dubai, UAE',
-    category: 'workshop',
-    attendees: 50,
-    maxAttendees: 60,
-    price: 25,
-    image: 'https://images.pexels.com/photos/3182812/pexels-photo-3182812.jpeg',
-    status: 'active',
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }
-];
-
-// Get all events
-router.get('/', (req, res) => {
+// Get all events with filters and pagination
+router.get('/', async (req, res) => {
   try {
-    const { category, search, limit = 10, offset = 0 } = req.query;
+    const {
+      category,
+      search,
+      page = 1,
+      limit = 10,
+      status = 'upcoming'
+    } = req.query;
 
-    let filteredEvents = [...events];
+    const offset = (parseInt(page) - 1) * parseInt(limit);
 
+    let sql = 'SELECT * FROM events WHERE 1=1';
+    const params = [];
+    let paramIndex = 1;
+
+    // Filter by category
     if (category && category !== 'all') {
-      filteredEvents = filteredEvents.filter(event => event.category === category);
+      sql += ` AND category = $${paramIndex}`;
+      params.push(category);
+      paramIndex++;
     }
 
+    // Filter by status
+    if (status && status !== 'all') {
+      sql += ` AND status = $${paramIndex}`;
+      params.push(status);
+      paramIndex++;
+    }
+
+    // Search functionality
     if (search) {
-      const searchLower = search.toLowerCase();
-      filteredEvents = filteredEvents.filter(event =>
-        event.title.toLowerCase().includes(searchLower) ||
-        event.description.toLowerCase().includes(searchLower)
-      );
+      sql += ` AND (title ILIKE $${paramIndex} OR description ILIKE $${paramIndex} OR location ILIKE $${paramIndex})`;
+      params.push(`%${search}%`);
+      paramIndex++;
     }
 
-    const paginatedEvents = filteredEvents.slice(
-      parseInt(offset),
-      parseInt(offset) + parseInt(limit)
-    );
+    // Get total count for pagination
+    const countSql = sql.replace('SELECT *', 'SELECT COUNT(*)');
+    const countResult = await query(countSql, params);
+    const total = parseInt(countResult.rows[0].count);
+
+    // Add pagination and ordering
+    sql += ` ORDER BY start_date ASC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+    params.push(parseInt(limit), offset);
+
+    const result = await query(sql, params);
+
+    // Calculate pagination info
+    const totalPages = Math.ceil(total / parseInt(limit));
 
     res.json({
-      events: paginatedEvents,
-      total: filteredEvents.length,
-      hasMore: parseInt(offset) + parseInt(limit) < filteredEvents.length
+      success: true,
+      message: 'Events retrieved successfully',
+      data: {
+        items: result.rows,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          totalPages
+        }
+      }
     });
   } catch (error) {
     console.error('Get events error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching events'
+    });
   }
 });
 
-// Get single event
-router.get('/:id', (req, res) => {
+// Get single event by ID
+router.get('/:id', async (req, res) => {
   try {
-    const event = events.find(e => e.id === parseInt(req.params.id));
-    if (!event) {
-      return res.status(404).json({ message: 'Event not found' });
+    const result = await query(
+      'SELECT * FROM events WHERE id = $1',
+      [req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Event not found'
+      });
     }
-    res.json(event);
+
+    res.json({
+      success: true,
+      message: 'Event retrieved successfully',
+      data: result.rows[0]
+    });
   } catch (error) {
     console.error('Get event error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching event'
+    });
   }
 });
 
-// Create event (admin only)
+// Create new event (admin only)
 router.post('/', [
-  body('title').trim().isLength({ min: 1 }),
-  body('description').trim().isLength({ min: 10 }),
-  body('date').isISO8601(),
-  body('location').trim().isLength({ min: 1 }),
-  body('category').isIn(['workshop', 'conference', 'networking']),
-  body('maxAttendees').isInt({ min: 1 })
-], (req, res) => {
+  authMiddleware,
+  adminMiddleware,
+  body('title').trim().isLength({ min: 1 }).withMessage('Title is required'),
+  body('description').trim().isLength({ min: 10 }).withMessage('Description must be at least 10 characters'),
+  body('location').trim().isLength({ min: 1 }).withMessage('Location is required'),
+  body('start_date').isISO8601().withMessage('Start date must be a valid date'),
+  body('end_date').isISO8601().withMessage('End date must be a valid date'),
+  body('category').isIn(['workshop', 'conference', 'networking']).withMessage('Invalid category'),
+  body('max_attendees').optional().isInt({ min: 1 }).withMessage('Max attendees must be a positive number')
+], async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array()
+      });
     }
 
-    const newEvent = {
-      id: events.length + 1,
-      ...req.body,
-      attendees: 0,
-      status: 'active',
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
+    const {
+      title,
+      description,
+      location,
+      start_date,
+      end_date,
+      category,
+      max_attendees,
+      status = 'upcoming'
+    } = req.body;
 
-    events.push(newEvent);
-    res.status(201).json(newEvent);
+    // Validate that end_date is after start_date
+    if (new Date(end_date) <= new Date(start_date)) {
+      return res.status(400).json({
+        success: false,
+        message: 'End date must be after start date'
+      });
+    }
+
+    const result = await query(
+      `INSERT INTO events (title, description, location, start_date, end_date, category, max_attendees, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING *`,
+      [title, description, location, start_date, end_date, category, max_attendees, status]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'Event created successfully',
+      data: result.rows[0]
+    });
   } catch (error) {
     console.error('Create event error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({
+      success: false,
+      message: 'Server error while creating event'
+    });
+  }
+});
+
+// Update event (admin only)
+router.put('/:id', [
+  authMiddleware,
+  adminMiddleware,
+  body('title').optional().trim().isLength({ min: 1 }),
+  body('description').optional().trim().isLength({ min: 10 }),
+  body('location').optional().trim().isLength({ min: 1 }),
+  body('start_date').optional().isISO8601(),
+  body('end_date').optional().isISO8601(),
+  body('category').optional().isIn(['workshop', 'conference', 'networking']),
+  body('max_attendees').optional().isInt({ min: 1 }),
+  body('status').optional().isIn(['upcoming', 'active', 'completed', 'cancelled'])
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array()
+      });
+    }
+
+    // Check if event exists
+    const existingEvent = await query(
+      'SELECT * FROM events WHERE id = $1',
+      [req.params.id]
+    );
+
+    if (existingEvent.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Event not found'
+      });
+    }
+
+    // Build update query dynamically
+    const updateFields = [];
+    const values = [];
+    let paramIndex = 1;
+
+    Object.keys(req.body).forEach(key => {
+      if (req.body[key] !== undefined) {
+        updateFields.push(`${key} = $${paramIndex}`);
+        values.push(req.body[key]);
+        paramIndex++;
+      }
+    });
+
+    if (updateFields.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No fields to update'
+      });
+    }
+
+    // Add updated_at timestamp
+    updateFields.push(`updated_at = NOW()`);
+
+    values.push(req.params.id);
+    const result = await query(
+      `UPDATE events SET ${updateFields.join(', ')} WHERE id = $${paramIndex} RETURNING *`,
+      values
+    );
+
+    res.json({
+      success: true,
+      message: 'Event updated successfully',
+      data: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Update event error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while updating event'
+    });
+  }
+});
+
+// Delete event (admin only)
+router.delete('/:id', [
+  authMiddleware,
+  adminMiddleware
+], async (req, res) => {
+  try {
+    const result = await query(
+      'DELETE FROM events WHERE id = $1 RETURNING *',
+      [req.params.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Event not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Event deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete event error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while deleting event'
+    });
   }
 });
 
 // Register for event
 router.post('/:id/register', [
-  body('firstName').trim().isLength({ min: 1 }),
-  body('lastName').trim().isLength({ min: 1 }),
-  body('email').isEmail().normalizeEmail(),
-  body('phone').optional().trim()
-], (req, res) => {
+  authMiddleware,
+  body('user_id').isInt().withMessage('User ID is required')
+], async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: errors.array()
+      });
     }
 
-    const event = events.find(e => e.id === parseInt(req.params.id));
-    if (!event) {
-      return res.status(404).json({ message: 'Event not found' });
+    const eventId = parseInt(req.params.id);
+    const userId = parseInt(req.body.user_id);
+
+    // Check if event exists and has available spots
+    const eventResult = await query(
+      'SELECT * FROM events WHERE id = $1',
+      [eventId]
+    );
+
+    if (eventResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Event not found'
+      });
     }
 
-    if (event.attendees >= event.maxAttendees) {
-      return res.status(400).json({ message: 'Event is full' });
+    const event = eventResult.rows[0];
+
+    // Check if event is full
+    if (event.max_attendees && event.attendees >= event.max_attendees) {
+      return res.status(400).json({
+        success: false,
+        message: 'Event is full'
+      });
     }
 
-    // In a real app, you'd save the registration to database
-    event.attendees += 1;
-    event.updatedAt = new Date();
+    // Check if user is already registered
+    const existingRegistration = await query(
+      'SELECT * FROM event_registrations WHERE user_id = $1 AND event_id = $2',
+      [userId, eventId]
+    );
+
+    if (existingRegistration.rows.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'User is already registered for this event'
+      });
+    }
+
+    // Register user for event
+    await query(
+      'INSERT INTO event_registrations (user_id, event_id) VALUES ($1, $2)',
+      [userId, eventId]
+    );
+
+    // Update event attendees count
+    await query(
+      'UPDATE events SET attendees = attendees + 1 WHERE id = $1',
+      [eventId]
+    );
 
     res.json({
+      success: true,
       message: 'Registration successful',
-      event: {
-        id: event.id,
-        title: event.title,
-        date: event.date,
-        location: event.location
+      data: {
+        event_id: eventId,
+        user_id: userId,
+        event_title: event.title,
+        event_date: event.start_date
       }
     });
   } catch (error) {
     console.error('Event registration error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({
+      success: false,
+      message: 'Server error while registering for event'
+    });
+  }
+});
+
+// Get user's event registrations
+router.get('/user/registrations', [
+  authMiddleware
+], async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const result = await query(
+      `SELECT e.*, er.registered_at
+       FROM events e
+       INNER JOIN event_registrations er ON e.id = er.event_id
+       WHERE er.user_id = $1
+       ORDER BY e.start_date ASC`,
+      [userId]
+    );
+
+    res.json({
+      success: true,
+      message: 'User registrations retrieved successfully',
+      data: result.rows
+    });
+  } catch (error) {
+    console.error('Get user registrations error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching user registrations'
+    });
+  }
+});
+
+// Cancel event registration
+router.delete('/:id/register', [
+  authMiddleware
+], async (req, res) => {
+  try {
+    const eventId = parseInt(req.params.id);
+    const userId = req.user.id;
+
+    // Check if registration exists
+    const registration = await query(
+      'SELECT * FROM event_registrations WHERE user_id = $1 AND event_id = $2',
+      [userId, eventId]
+    );
+
+    if (registration.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Registration not found'
+      });
+    }
+
+    // Delete registration
+    await query(
+      'DELETE FROM event_registrations WHERE user_id = $1 AND event_id = $2',
+      [userId, eventId]
+    );
+
+    // Update event attendees count
+    await query(
+      'UPDATE events SET attendees = attendees - 1 WHERE id = $1',
+      [eventId]
+    );
+
+    res.json({
+      success: true,
+      message: 'Registration cancelled successfully'
+    });
+  } catch (error) {
+    console.error('Cancel registration error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while cancelling registration'
+    });
   }
 });
 

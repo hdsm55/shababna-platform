@@ -1,0 +1,57 @@
+﻿import bcrypt from 'bcryptjs';
+import { query, testConnection } from '../config/database.js';
+
+async function seedDatabase() {
+    try {
+        console.log('Starting database seeding...');
+
+        const isConnected = await testConnection();
+        if (!isConnected) {
+            console.error('Database connection failed');
+            process.exit(1);
+        }
+
+        const hashedPassword = await bcrypt.hash('password123', 10);
+        const adminPassword = await bcrypt.hash('admin123', 10);
+
+        console.log('Seeding users...');
+        await query(`
+            INSERT INTO users (email, password, first_name, last_name, phone, bio, is_active, is_admin, email_verified_at, created_at, updated_at)
+            VALUES
+                ('admin@shababna.com', $1, 'Admin', 'User', '+966501234567', 'Platform Administrator', true, true, NOW(), NOW(), NOW()),
+                ('user1@example.com', $2, 'User', 'One', '+966502345678', 'Regular User', true, false, NOW(), NOW(), NOW()),
+                ('user2@example.com', $2, 'User', 'Two', '+966503456789', 'Regular User', true, false, NOW(), NOW(), NOW())
+        `, [adminPassword, hashedPassword]);
+
+        console.log('Seeding events...');
+        await query(`
+            INSERT INTO events (title, description, location, start_date, end_date, max_attendees, attendees, category, status, created_at, updated_at)
+            VALUES
+                ('Islamic Lecture', 'Valuable lecture on Quran interpretation', 'Masjid Al-Noor - Riyadh', '2024-02-15 18:00:00', '2024-02-15 20:00:00', 100, 45, 'Educational', 'upcoming', NOW(), NOW()),
+                ('Quran Memorization Course', 'Intensive course for beginners', 'Quran Center - Jeddah', '2024-02-20 16:00:00', '2024-02-20 18:00:00', 50, 30, 'Educational', 'upcoming', NOW(), NOW()),
+                ('Youth Islamic Camp', 'Summer camp with sports and spiritual activities', 'Green Mountain Resort - Taif', '2024-03-01 08:00:00', '2024-03-03 18:00:00', 200, 150, 'Recreational', 'upcoming', NOW(), NOW())
+        `);
+
+        console.log('Seeding programs...');
+        await query(`
+            INSERT INTO programs (title, description, category, goal_amount, current_amount, start_date, end_date, created_at, updated_at)
+            VALUES
+                ('Build Mosque in Remote Village', 'Project to build mosque in poor village', 'Mosque Building', 50000.00, 25000.00, '2024-01-01 00:00:00', '2024-06-30 23:59:59', NOW(), NOW()),
+                ('Orphan Sponsorship', 'Program to sponsor orphans for education and healthcare', 'Orphan Sponsorship', 30000.00, 18000.00, '2024-01-15 00:00:00', '2024-12-31 23:59:59', NOW(), NOW()),
+                ('Distribute Quran Copies', 'Project to distribute Quran and Islamic books', 'Islamic Education', 15000.00, 8000.00, '2024-02-01 00:00:00', '2024-05-31 23:59:59', NOW(), NOW())
+        `);
+
+        console.log('Database seeding completed successfully!');
+        console.log('Login credentials:');
+        console.log('   - Admin: admin@shababna.com / admin123');
+        console.log('   - User: user1@example.com / password123');
+
+        process.exit(0);
+
+    } catch (error) {
+        console.error('Error seeding database:', error.message);
+        process.exit(1);
+    }
+}
+
+seedDatabase();

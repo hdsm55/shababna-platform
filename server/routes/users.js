@@ -1,10 +1,8 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
+import { query } from '../config/database.js';
 
 const router = express.Router();
-
-// Users API routes
-const users = [];
 
 // Join organization
 router.post('/join', [
@@ -72,6 +70,48 @@ router.post('/contact', [
     });
   } catch (error) {
     console.error('Contact form error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get user profile (authenticated user)
+router.get('/profile', async (req, res) => {
+  try {
+    // This would be implemented with auth middleware
+    // For now, we'll return a placeholder
+    res.json({
+      message: 'User profile endpoint - requires authentication'
+    });
+  } catch (error) {
+    console.error('Get user profile error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get all users (admin only)
+router.get('/', async (req, res) => {
+  try {
+    const { limit = 10, offset = 0 } = req.query;
+
+    // Get total count
+    const countResult = await query('SELECT COUNT(*) FROM users');
+    const total = parseInt(countResult.rows[0].count);
+
+    // Get paginated users (excluding passwords)
+    const result = await query(`
+      SELECT id, email, first_name, last_name, phone, bio, is_active, is_admin, created_at, updated_at
+      FROM users
+      ORDER BY created_at DESC
+      LIMIT $1 OFFSET $2
+    `, [parseInt(limit), parseInt(offset)]);
+
+    res.json({
+      users: result.rows,
+      total,
+      hasMore: parseInt(offset) + parseInt(limit) < total
+    });
+  } catch (error) {
+    console.error('Get users error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

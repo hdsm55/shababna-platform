@@ -3,13 +3,14 @@ export interface Event {
   id: number;
   title: string;
   description: string;
-  date: string;
+  start_date: string;
+  end_date: string;
   location: string;
   category: 'conference' | 'workshop' | 'networking';
   image?: string;
   max_attendees?: number;
-  price: number;
-  status: 'active' | 'cancelled' | 'completed';
+  attendees: number;
+  status: 'upcoming' | 'active' | 'completed' | 'cancelled';
   created_at: string;
   updated_at: string;
 }
@@ -23,7 +24,8 @@ export interface Program {
   image?: string;
   goal_amount?: number;
   current_amount: number;
-  is_active: boolean;
+  start_date: string;
+  end_date: string;
   created_at: string;
   updated_at: string;
 }
@@ -35,10 +37,22 @@ export interface User {
   first_name: string;
   last_name: string;
   phone?: string;
+  bio?: string;
+  avatar_url?: string;
   is_admin: boolean;
   is_active: boolean;
+  email_verified_at?: string;
   created_at: string;
   updated_at: string;
+}
+
+// Event Registration types
+export interface EventRegistration {
+  id: number;
+  user_id: number;
+  event_id: number;
+  registered_at: string;
+  event?: Event;
 }
 
 // API Response types
@@ -72,6 +86,7 @@ export interface EventsQueryParams {
   search?: string;
   page?: number;
   limit?: number;
+  status?: string;
 }
 
 export interface ProgramsQueryParams {

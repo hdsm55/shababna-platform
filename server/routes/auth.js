@@ -2,7 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
-import db from '../config/database.js';
+import { query } from '../config/database.js';
 
 const router = express.Router();
 
@@ -83,11 +83,9 @@ router.post('/register', validateRegistration, async (req, res) => {
     const { email, password, first_name, last_name, phone } = req.body;
 
     // Check if user already exists
-    const existingUser = await db('users')
-      .where('email', email)
-      .first();
+    const existingUserResult = await query('SELECT * FROM users WHERE email = $1', [email]);
 
-    if (existingUser) {
+    if (existingUserResult.rows.length > 0) {
       return res.status(409).json({
         success: false,
         message: 'User with this email already exists'
@@ -99,19 +97,13 @@ router.post('/register', validateRegistration, async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // Create new user
-    const [newUser] = await db('users')
-      .insert({
-        email,
-        password: hashedPassword,
-        first_name,
-        last_name,
-        phone: phone || null,
-        is_admin: false,
-        is_active: true,
-        created_at: new Date(),
-        updated_at: new Date()
-      })
-      .returning(['id', 'email', 'first_name', 'last_name', 'phone', 'is_admin', 'is_active']);
+    const newUserResult = await query(`
+      INSERT INTO users (email, password, first_name, last_name, phone, is_admin, is_active, created_at, updated_at)
+      VALUES ($1, $2, $3, $4, $5, false, true, NOW(), NOW())
+      RETURNING id, email, first_name, last_name, phone, is_admin, is_active
+    `, [email, hashedPassword, first_name, last_name, phone || null]);
+
+    const newUser = newUserResult.rows[0];
 
     // Generate JWT token
     const token = generateToken(newUser);
@@ -152,16 +144,16 @@ router.post('/login', validateLogin, async (req, res) => {
     const { email, password } = req.body;
 
     // Find user by email
-    const user = await db('users')
-      .where('email', email)
-      .first();
+    const userResult = await query('SELECT * FROM users WHERE email = $1', [email]);
 
-    if (!user) {
+    if (userResult.rows.length === 0) {
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password'
       });
     }
+
+    const user = userResult.rows[0];
 
     // Check if user is active
     if (!user.is_active) {

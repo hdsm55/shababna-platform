@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Users, Filter, Search } from 'lucide-react';
+import { Calendar, MapPin, Users, Filter, Search, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import Button from '../components/common/Button';
@@ -29,6 +29,7 @@ const Events: React.FC = () => {
     search: searchTerm || undefined,
     page: currentPage,
     limit: 10,
+    status: 'upcoming', // Only show upcoming events by default
   };
 
   // Fetch events using React Query
@@ -63,6 +64,36 @@ const Events: React.FC = () => {
   // Handle pagination
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  // Get status badge color
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'upcoming':
+        return 'bg-blue-100 text-blue-800';
+      case 'active':
+        return 'bg-green-100 text-green-800';
+      case 'completed':
+        return 'bg-gray-100 text-gray-800';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  // Get category badge color
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'workshop':
+        return 'bg-primary-100 text-primary-800';
+      case 'conference':
+        return 'bg-secondary-100 text-secondary-800';
+      case 'networking':
+        return 'bg-accent-100 text-accent-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   };
 
   return (
@@ -170,19 +201,20 @@ const Events: React.FC = () => {
                       <div className="p-6">
                         <div className="flex items-center gap-2 mb-3">
                           <span
-                            className={`px-2 py-1 text-xs font-medium rounded-full ${
-                              event.category === 'workshop'
-                                ? 'bg-primary-100 text-primary-800'
-                                : event.category === 'conference'
-                                ? 'bg-secondary-100 text-secondary-800'
-                                : 'bg-accent-100 text-accent-800'
-                            }`}
+                            className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(
+                              event.category
+                            )}`}
                           >
                             {event.category.charAt(0).toUpperCase() +
                               event.category.slice(1)}
                           </span>
-                          <span className="text-sm text-gray-500">
-                            {event.price === 0 ? 'Free' : `$${event.price}`}
+                          <span
+                            className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+                              event.status
+                            )}`}
+                          >
+                            {event.status.charAt(0).toUpperCase() +
+                              event.status.slice(1)}
                           </span>
                         </div>
 
@@ -197,7 +229,12 @@ const Events: React.FC = () => {
                         <div className="space-y-2 mb-6">
                           <div className="flex items-center text-sm text-gray-500">
                             <Calendar className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
-                            {format(new Date(event.date), 'MMM dd, yyyy')}
+                            {format(new Date(event.start_date), 'MMM dd, yyyy')}
+                          </div>
+                          <div className="flex items-center text-sm text-gray-500">
+                            <Clock className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                            {format(new Date(event.start_date), 'HH:mm')} -{' '}
+                            {format(new Date(event.end_date), 'HH:mm')}
                           </div>
                           <div className="flex items-center text-sm text-gray-500">
                             <MapPin className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
@@ -206,14 +243,25 @@ const Events: React.FC = () => {
                           {event.max_attendees && (
                             <div className="flex items-center text-sm text-gray-500">
                               <Users className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
-                              {event.max_attendees} max attendees
+                              {event.attendees}/{event.max_attendees} attendees
                             </div>
                           )}
                         </div>
 
                         <div className="flex gap-3">
-                          <Button size="sm" className="flex-1">
-                            {t('events.register')}
+                          <Button
+                            size="sm"
+                            className="flex-1"
+                            disabled={
+                              event.status === 'cancelled' ||
+                              event.status === 'completed'
+                            }
+                          >
+                            {event.status === 'cancelled'
+                              ? 'Cancelled'
+                              : event.status === 'completed'
+                              ? 'Completed'
+                              : t('events.register')}
                           </Button>
                           <Button variant="outline" size="sm">
                             {t('events.learnMore')}
