@@ -260,6 +260,7 @@ const requireActiveUser = (req, res, next) => {
 };
 
 export {
+    authenticateToken,
     authenticateToken as authMiddleware,
     optionalAuth,
     requireAdmin,

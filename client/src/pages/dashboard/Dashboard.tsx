@@ -1,7 +1,14 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Calendar, Users, DollarSign, TrendingUp, Plus, BarChart3 } from 'lucide-react';
+import {
+  Calendar,
+  Users,
+  DollarSign,
+  TrendingUp,
+  Plus,
+  BarChart3,
+} from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
@@ -35,8 +42,8 @@ const Dashboard: React.FC = () => {
       value: '1,247',
       change: '+18%',
       icon: Users,
-      color: 'text-accent-600',
-      bgColor: 'bg-accent-50',
+      color: 'text-secondary-600',
+      bgColor: 'bg-secondary-50',
       changeColor: 'text-green-600',
     },
     {
@@ -118,9 +125,7 @@ const Dashboard: React.FC = () => {
               {t('dashboard.welcome')}, {user?.firstName}!
             </p>
           </div>
-          <Button icon={Plus}>
-            Add New Event
-          </Button>
+          <Button icon={Plus}>Add New Event</Button>
         </div>
 
         {/* Stats Grid */}
@@ -141,7 +146,9 @@ const Dashboard: React.FC = () => {
                     <p className="text-3xl font-bold text-gray-900">
                       {stat.value}
                     </p>
-                    <p className={`text-sm ${stat.changeColor} flex items-center mt-1`}>
+                    <p
+                      className={`text-sm ${stat.changeColor} flex items-center mt-1`}
+                    >
                       <TrendingUp className="w-4 h-4 mr-1" />
                       {stat.change}
                     </p>
@@ -169,13 +176,22 @@ const Dashboard: React.FC = () => {
               </h2>
               <div className="space-y-4">
                 {recentActivities.map((activity) => (
-                  <div key={activity.id} className="flex items-start space-x-3 rtl:space-x-reverse">
-                    <div className={`w-2 h-2 rounded-full mt-2 ${
-                      activity.status === 'success' ? 'bg-green-500' : 'bg-blue-500'
-                    }`} />
+                  <div
+                    key={activity.id}
+                    className="flex items-start space-x-3 rtl:space-x-reverse"
+                  >
+                    <div
+                      className={`w-2 h-2 rounded-full mt-2 ${
+                        activity.status === 'success'
+                          ? 'bg-green-500'
+                          : 'bg-blue-500'
+                      }`}
+                    />
                     <div className="flex-1">
                       <p className="text-sm text-gray-900">{activity.title}</p>
-                      <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {activity.time}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -195,17 +211,26 @@ const Dashboard: React.FC = () => {
               </h2>
               <div className="space-y-4">
                 {upcomingEvents.map((event) => (
-                  <div key={event.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div
+                    key={event.id}
+                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                  >
                     <div>
-                      <h3 className="font-medium text-gray-900">{event.title}</h3>
+                      <h3 className="font-medium text-gray-900">
+                        {event.title}
+                      </h3>
                       <p className="text-sm text-gray-600">{event.date}</p>
-                      <p className="text-xs text-gray-500">{event.attendees} attendees</p>
+                      <p className="text-xs text-gray-500">
+                        {event.attendees} attendees
+                      </p>
                     </div>
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                      event.status === 'confirmed' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        event.status === 'confirmed'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}
+                    >
                       {event.status}
                     </span>
                   </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Menu, X, Globe, User, LogOut } from 'lucide-react';
+import { Menu, X, Globe, User, LogOut, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguageStore } from '../../store/languageStore';
 import { useAuthStore } from '../../store/authStore';
@@ -43,17 +43,25 @@ const Header: React.FC = () => {
   ];
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
+    <header className="bg-white/95 backdrop-blur-md shadow-sm border-b border-neutral-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 rtl:space-x-reverse">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">SG</span>
+          <Link
+            to="/"
+            className="flex items-center space-x-3 rtl:space-x-reverse group"
+          >
+            <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+              <span className="text-white font-bold text-lg">SG</span>
             </div>
-            <span className="text-xl font-bold text-gray-900">
-              Shababna Global
-            </span>
+            <div>
+              <span className="text-xl font-bold text-neutral-900 group-hover:text-primary-600 transition-colors duration-300">
+                Shababna Global
+              </span>
+              <div className="text-xs text-neutral-500 font-medium">
+                Empowering Youth
+              </div>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
@@ -62,13 +70,20 @@ const Header: React.FC = () => {
               <Link
                 key={item.key}
                 to={item.path}
-                className={`text-sm font-medium transition-colors hover:text-primary-600 ${
+                className={`nav-link ${
                   location.pathname === item.path
-                    ? 'text-primary-600'
-                    : 'text-gray-700'
+                    ? 'nav-link-active'
+                    : 'nav-link-inactive'
                 }`}
               >
                 {t(`nav.${item.key}`)}
+                <span
+                  className={`nav-underline ${
+                    location.pathname === item.path
+                      ? 'nav-underline-active'
+                      : ''
+                  }`}
+                />
               </Link>
             ))}
           </nav>
@@ -79,28 +94,39 @@ const Header: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                className="p-2 text-gray-600 hover:text-primary-600 transition-colors"
+                className="p-2 text-neutral-600 hover:text-primary-600 transition-colors duration-300 rounded-lg hover:bg-neutral-100 flex items-center space-x-1 rtl:space-x-reverse"
               >
-                <Globe className="w-5 h-5" />
+                <Globe className="w-4 h-4" />
+                <ChevronDown
+                  className={`w-3 h-3 transition-transform duration-300 ${
+                    isLangMenuOpen ? 'rotate-180' : ''
+                  }`}
+                />
               </button>
               <AnimatePresence>
                 {isLangMenuOpen && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50`}
+                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                    className={`absolute ${
+                      isRTL ? 'left-0' : 'right-0'
+                    } mt-2 w-48 bg-white rounded-xl shadow-lg border border-neutral-200 py-2 z-50 backdrop-blur-sm`}
                   >
                     {languages.map((lang) => (
                       <button
                         key={lang.code}
-                        onClick={() => handleLanguageChange(lang.code as 'ar' | 'en' | 'tr')}
-                        className={`w-full px-4 py-2 text-left rtl:text-right flex items-center space-x-3 rtl:space-x-reverse hover:bg-gray-50 ${
-                          language === lang.code ? 'bg-primary-50 text-primary-600' : 'text-gray-700'
+                        onClick={() =>
+                          handleLanguageChange(lang.code as 'ar' | 'en' | 'tr')
+                        }
+                        className={`w-full px-4 py-2 text-left rtl:text-right flex items-center space-x-3 rtl:space-x-reverse hover:bg-neutral-50 transition-colors duration-300 ${
+                          language === lang.code
+                            ? 'bg-primary-50 text-primary-600'
+                            : 'text-neutral-700'
                         }`}
                       >
                         <span className="text-lg">{lang.flag}</span>
-                        <span className="text-sm">{lang.name}</span>
+                        <span className="text-sm font-medium">{lang.name}</span>
                       </button>
                     ))}
                   </motion.div>
@@ -114,18 +140,22 @@ const Header: React.FC = () => {
                 {user?.role === 'admin' && (
                   <Link
                     to="/dashboard"
-                    className="text-sm font-medium text-gray-700 hover:text-primary-600 transition-colors"
+                    className="text-sm font-medium text-neutral-700 hover:text-primary-600 transition-colors duration-300 px-3 py-2 rounded-lg hover:bg-neutral-100"
                   >
                     {t('nav.dashboard')}
                   </Link>
                 )}
-                <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                  <User className="w-4 h-4 text-gray-600" />
-                  <span className="text-sm text-gray-700">{user?.firstName}</span>
+                <div className="flex items-center space-x-2 rtl:space-x-reverse bg-neutral-100 px-3 py-2 rounded-lg hover:bg-neutral-200 transition-colors duration-300">
+                  <div className="w-6 h-6 bg-primary-100 rounded-full flex items-center justify-center">
+                    <User className="w-3 h-3 text-primary-600" />
+                  </div>
+                  <span className="text-sm font-medium text-neutral-700">
+                    {user?.firstName}
+                  </span>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="p-2 text-gray-600 hover:text-red-600 transition-colors"
+                  className="p-2 text-neutral-600 hover:text-error-600 transition-colors duration-300 rounded-lg hover:bg-error-50"
                   title={t('nav.logout')}
                 >
                   <LogOut className="w-4 h-4" />
@@ -134,7 +164,7 @@ const Header: React.FC = () => {
             ) : (
               <Link
                 to="/login"
-                className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
+                className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
               >
                 {t('nav.login')}
               </Link>
@@ -143,9 +173,13 @@ const Header: React.FC = () => {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 text-gray-600 hover:text-primary-600 transition-colors"
+              className="md:hidden p-2 text-neutral-600 hover:text-primary-600 transition-colors duration-300 rounded-lg hover:bg-neutral-100"
             >
-              {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {isMenuOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
             </button>
           </div>
         </div>
@@ -157,18 +191,18 @@ const Header: React.FC = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden border-t border-gray-200 py-4"
+              className="md:hidden border-t border-neutral-200 py-4"
             >
-              <nav className="flex flex-col space-y-3">
+              <nav className="flex flex-col space-y-2">
                 {navItems.map((item) => (
                   <Link
                     key={item.key}
                     to={item.path}
                     onClick={() => setIsMenuOpen(false)}
-                    className={`px-3 py-2 text-base font-medium transition-colors ${
+                    className={`px-4 py-3 text-base font-medium transition-colors duration-300 rounded-lg ${
                       location.pathname === item.path
-                        ? 'text-primary-600 bg-primary-50'
-                        : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                        ? 'bg-primary-50 text-primary-600'
+                        : 'text-neutral-700 hover:bg-neutral-100 hover:text-primary-600'
                     }`}
                   >
                     {t(`nav.${item.key}`)}

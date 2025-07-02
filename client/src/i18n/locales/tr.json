@@ -11,13 +11,21 @@
   },
   "home": {
     "hero": {
+      "badge": "Dünya Çapında Gençleri Güçlendirme",
       "title": "Gençleri Güçlendirmek, Geleceği İnşa Etmek",
       "subtitle": "Yenilikçi programlar ve toplum katılımı ile pozitif değişim yaratmak için Shababna Global'e katılın.",
       "cta": "Dahil Ol",
       "learn": "Daha Fazla Öğren"
     },
+    "stats": {
+      "members": "Aktif Üyeler",
+      "events": "Düzenlenen Etkinlikler",
+      "countries": "Ulaşılan Ülkeler",
+      "programs": "Aktif Programlar"
+    },
     "features": {
       "title": "Ne Yapıyoruz",
+      "subtitle": "Gençlik gelişimi ve toplum inşası için kapsamlı yaklaşımımızı keşfedin",
       "events": {
         "title": "Etkinlikler ve Atölyeler",
         "description": "Beceri geliştirme ve bağlantı kurma için tasarlanmış interaktif oturumlar, atölyeler ve networking etkinlikleri."
@@ -30,6 +38,26 @@
         "title": "Küresel Topluluk",
         "description": "Dünya çapında benzer düşünceli gençlerle bağlantı kurun ve kalıcı dostluklar edinin."
       }
+    },
+    "latest": {
+      "title": "Son Güncellemeler",
+      "subtitle": "Son etkinlikler ve programlarımızla güncel kalın",
+      "events": "Son Etkinlikler",
+      "programs": "Son Programlar",
+      "noEvents": "Şu anda yaklaşan etkinlik bulunmuyor.",
+      "noPrograms": "Şu anda aktif program bulunmuyor.",
+      "viewAll": "Tümünü Görüntüle",
+      "explore": "Programları Keşfet"
+    },
+    "newsletter": {
+      "title": "Bağlantıda Kalın",
+      "subtitle": "Etkinlikler, programlar ve topluluk haberleri hakkında en son güncellemeler için bültenimize abone olun",
+      "placeholder": "E-posta adresinizi girin",
+      "subscribe": "Abone Ol",
+      "success": "Abone olduğunuz için teşekkürler! Sizi güncel tutacağız.",
+      "error": "Bir şeyler yanlış gitti. Lütfen tekrar deneyin.",
+      "privacy": "Gizliliğinize saygı duyuyoruz. İstediğiniz zaman abonelikten çıkabilirsiniz.",
+      "badge": "Bültene Abone Ol"
     }
   },
   "events": {
@@ -128,7 +156,12 @@
   },
   "common": {
     "loading": "Yükleniyor...",
-    "error": "Bir şeyler yanlış gitti",
+    "learnMore": "Daha Fazla Öğren",
+    "close": "Kapat",
+    "error": {
+      "title": "Hata",
+      "message": "Bir şeyler yanlış gitti. Lütfen tekrar deneyin."
+    },
     "retry": "Tekrar Dene",
     "cancel": "İptal",
     "save": "Kaydet",

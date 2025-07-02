@@ -11,13 +11,21 @@
   },
   "home": {
     "hero": {
+      "badge": "Empowering Youth Worldwide",
       "title": "Empowering Youth, Building Tomorrow",
       "subtitle": "Join Shababna Global in creating positive change through innovative programs and community engagement.",
       "cta": "Get Involved",
       "learn": "Learn More"
     },
+    "stats": {
+      "members": "Active Members",
+      "events": "Events Hosted",
+      "countries": "Countries Reached",
+      "programs": "Active Programs"
+    },
     "features": {
       "title": "What We Do",
+      "subtitle": "Discover our comprehensive approach to youth development and community building",
       "events": {
         "title": "Events & Workshops",
         "description": "Interactive sessions, workshops, and networking events designed to develop skills and build connections."
@@ -30,6 +38,46 @@
         "title": "Global Community",
         "description": "Connect with like-minded youth from around the world and make lasting friendships."
       }
+    },
+    "latest": {
+      "title": "Latest Updates",
+      "subtitle": "Stay updated with our latest events and programs",
+      "events": "Latest Events",
+      "programs": "Latest Programs",
+      "noEvents": "No upcoming events at the moment.",
+      "noPrograms": "No active programs at the moment.",
+      "viewAll": "View All",
+      "explore": "Explore Programs"
+    },
+    "testimonials": {
+      "title": "What Our Members Say",
+      "subtitle": "Hear from our community members about their experiences",
+      "role1": "Community Member",
+      "role2": "Program Participant",
+      "role3": "Event Organizer",
+      "content1": "Shababna Global has transformed my perspective on community service and leadership. The programs are truly life-changing.",
+      "content2": "I've met incredible people from around the world and learned skills that I use every day in my career and personal life.",
+      "content3": "The events and workshops are well-organized and provide valuable networking opportunities for young professionals."
+    },
+    "newsletter": {
+      "title": "Stay Connected",
+      "subtitle": "Subscribe to our newsletter for the latest updates on events, programs, and community news",
+      "placeholder": "Enter your email address",
+      "cta": "Subscribe",
+      "success": "Thank you for subscribing! We'll keep you updated.",
+      "error": "Something went wrong. Please try again.",
+      "privacy": "We respect your privacy. Unsubscribe at any time.",
+      "badge": "Subscribe to the Newsletter"
+    },
+    "cta": {
+      "title": "Ready to Make a Difference?",
+      "subtitle": "Join thousands of young people who are already making positive changes in their communities",
+      "join": "Join Our Community",
+      "explore": "Explore Events"
+    },
+    "modal": {
+      "title": "Welcome to Shababna Global",
+      "content": "Thank you for your interest in our community. We're excited to have you join us on this journey of growth and positive change."
     }
   },
   "events": {
@@ -53,10 +101,9 @@
     "filter": {
       "all": "All Programs",
       "education": "Education",
-      "relief": "Relief",
-      "youth": "Youth",
-      "media": "Media",
-      "daawah": "Daawah"
+      "technology": "Technology",
+      "entrepreneurship": "Entrepreneurship",
+      "volunteering": "Volunteering"
     },
     "support": "Support This Program",
     "donate": "Donate",
@@ -136,6 +183,8 @@
   },
   "common": {
     "loading": "Loading...",
+    "learnMore": "Learn More",
+    "close": "Close",
     "error": {
       "title": "Error",
       "message": "Something went wrong. Please try again."

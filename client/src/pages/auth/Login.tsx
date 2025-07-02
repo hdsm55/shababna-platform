@@ -48,17 +48,18 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg')] bg-cover bg-center opacity-5"></div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="max-w-md w-full"
+        className="max-w-md w-full relative z-10"
       >
         <div className="text-center mb-8">
           <div className="flex justify-center">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center mb-4">
-              <span className="text-white font-bold text-lg">SG</span>
+            <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+              <span className="text-white font-bold text-xl">SG</span>
             </div>
           </div>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
@@ -67,7 +68,7 @@ const Login: React.FC = () => {
           <p className="text-gray-600">{t('auth.login.subtitle')}</p>
         </div>
 
-        <Card className="p-8">
+        <Card className="p-8 shadow-2xl">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -123,7 +124,7 @@ const Login: React.FC = () => {
               loading={isSubmitting}
               icon={LogIn}
               iconPosition="right"
-              className="w-full"
+              className="w-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
             >
               {t('auth.login.submit')}
             </Button>
@@ -134,7 +135,7 @@ const Login: React.FC = () => {
               {t('auth.login.noAccount')}{' '}
               <Link
                 to="/register"
-                className="text-primary-600 hover:text-primary-700 font-medium"
+                className="text-primary-600 hover:text-primary-700 font-medium transition-colors"
               >
                 {t('auth.login.register')}
               </Link>

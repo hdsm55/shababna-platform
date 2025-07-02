@@ -37,9 +37,17 @@ router.get('/', async (req, res) => {
     const result = await query(sql, params);
 
     res.json({
-      programs: result.rows,
-      total,
-      hasMore: parseInt(offset) + parseInt(limit) < total
+      success: true,
+      message: 'Programs retrieved successfully',
+      data: {
+        items: result.rows,
+        pagination: {
+          page: parseInt(req.query.page) || 1,
+          limit: parseInt(limit),
+          total,
+          totalPages: Math.ceil(total / parseInt(limit))
+        }
+      }
     });
   } catch (error) {
     console.error('Get programs error:', error);

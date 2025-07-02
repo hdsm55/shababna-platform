@@ -18,6 +18,7 @@ import eventsRoutes from './routes/events.js';
 import programsRoutes from './routes/programs.js';
 import usersRoutes from './routes/users.js';
 import donationsRoutes from './routes/donations.js';
+import formsRoutes from './routes/forms.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -26,7 +27,17 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "http://localhost:5000", "http://localhost:5173"],
+    },
+  },
+}));
 app.use(cors({
   origin: process.env.CORS_ORIGIN || process.env.CLIENT_URL || 'http://localhost:5173',
   credentials: true
@@ -40,6 +51,7 @@ app.use('/api/events', eventsRoutes);
 app.use('/api/programs', programsRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/donations', donationsRoutes);
+app.use('/api/forms', formsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

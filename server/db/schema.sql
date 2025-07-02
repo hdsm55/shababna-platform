@@ -81,3 +81,58 @@ CREATE INDEX idx_event_registrations_user_id ON event_registrations(user_id);
 CREATE INDEX idx_event_registrations_event_id ON event_registrations(event_id);
 CREATE INDEX idx_donations_user_id ON donations(user_id);
 CREATE INDEX idx_donations_program_id ON donations(program_id);
+
+-- === 8. جدول النماذج المقدمة ===
+CREATE TABLE form_submissions (
+  id SERIAL PRIMARY KEY,
+  form_type VARCHAR(50) NOT NULL, -- 'contact', 'join_us', 'newsletter'
+  first_name VARCHAR(100),
+  last_name VARCHAR(100),
+  email VARCHAR(255) NOT NULL,
+  phone VARCHAR(20),
+  country VARCHAR(100),
+  age INTEGER,
+  interests TEXT[], -- Array of interests
+  motivation TEXT,
+  subject VARCHAR(255),
+  message TEXT,
+  status VARCHAR(50) DEFAULT 'pending', -- 'pending', 'processed', 'replied', 'archived'
+  admin_notes TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- === 9. جدول الإيميلات المرسلة ===
+CREATE TABLE email_logs (
+  id SERIAL PRIMARY KEY,
+  recipient_email VARCHAR(255) NOT NULL,
+  recipient_name VARCHAR(100),
+  subject VARCHAR(255) NOT NULL,
+  email_type VARCHAR(50) NOT NULL, -- 'welcome', 'newsletter', 'contact_confirmation', 'admin_notification'
+  content TEXT NOT NULL,
+  status VARCHAR(50) DEFAULT 'sent', -- 'sent', 'failed', 'bounced'
+  error_message TEXT,
+  sent_at TIMESTAMP DEFAULT NOW()
+);
+
+-- === 10. جدول مشتركي النشرة الإخبارية ===
+CREATE TABLE newsletter_subscribers (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  first_name VARCHAR(100),
+  last_name VARCHAR(100),
+  is_active BOOLEAN DEFAULT TRUE,
+  subscribed_at TIMESTAMP DEFAULT NOW(),
+  unsubscribed_at TIMESTAMP,
+  last_email_sent_at TIMESTAMP
+);
+
+-- === 11. فهارس إضافية ===
+CREATE INDEX idx_form_submissions_form_type ON form_submissions(form_type);
+CREATE INDEX idx_form_submissions_status ON form_submissions(status);
+CREATE INDEX idx_form_submissions_created_at ON form_submissions(created_at);
+CREATE INDEX idx_email_logs_email_type ON email_logs(email_type);
+CREATE INDEX idx_email_logs_status ON email_logs(status);
+CREATE INDEX idx_email_logs_sent_at ON email_logs(sent_at);
+CREATE INDEX idx_newsletter_subscribers_email ON newsletter_subscribers(email);
+CREATE INDEX idx_newsletter_subscribers_is_active ON newsletter_subscribers(is_active);

@@ -54,4 +54,72 @@ async function seedDatabase() {
     }
 }
 
+async function seedPrograms() {
+    try {
+        console.log('🌱 Seeding programs data...');
+
+        const programs = [
+            {
+                title: 'برنامج تطوير المهارات التقنية',
+                description: 'برنامج شامل لتعليم الشباب المهارات التقنية المطلوبة في سوق العمل',
+                category: 'education',
+                goal_amount: 50000.00,
+                current_amount: 15000.00,
+                start_date: '2024-02-01 00:00:00',
+                end_date: '2024-12-31 23:59:59'
+            },
+            {
+                title: 'مشروع ريادة الأعمال للشباب',
+                description: 'دعم الشباب في إنشاء مشاريعهم الخاصة وتطوير أفكارهم الريادية',
+                category: 'entrepreneurship',
+                goal_amount: 100000.00,
+                current_amount: 35000.00,
+                start_date: '2024-01-15 00:00:00',
+                end_date: '2024-11-30 23:59:59'
+            },
+            {
+                title: 'برنامج التطوع المجتمعي',
+                description: 'تشجيع الشباب على المشاركة في الأعمال التطوعية لخدمة المجتمع',
+                category: 'volunteering',
+                goal_amount: 25000.00,
+                current_amount: 8000.00,
+                start_date: '2024-03-01 00:00:00',
+                end_date: '2024-10-31 23:59:59'
+            },
+            {
+                title: 'مشروع دعم التعليم العالي',
+                description: 'مساعدة الطلاب المتفوقين في إكمال تعليمهم العالي',
+                category: 'education',
+                goal_amount: 75000.00,
+                current_amount: 22000.00,
+                start_date: '2024-02-15 00:00:00',
+                end_date: '2024-12-15 23:59:59'
+            },
+            {
+                title: 'برنامج الابتكار والتكنولوجيا',
+                description: 'دعم المشاريع الابتكارية في مجال التكنولوجيا والذكاء الاصطناعي',
+                category: 'technology',
+                goal_amount: 150000.00,
+                current_amount: 45000.00,
+                start_date: '2024-01-01 00:00:00',
+                end_date: '2024-12-31 23:59:59'
+            }
+        ];
+
+        for (const program of programs) {
+            await query(
+                'INSERT INTO programs (title, description, category, goal_amount, current_amount, start_date, end_date) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+                [program.title, program.description, program.category, program.goal_amount, program.current_amount, program.start_date, program.end_date]
+            );
+        }
+
+        console.log('✅ Programs data seeded successfully');
+        process.exit(0);
+    } catch (error) {
+        console.error('❌ Programs seeding failed:', error);
+        process.exit(1);
+    }
+}
+
 seedDatabase();
+seedPrograms();

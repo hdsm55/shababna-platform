@@ -19,11 +19,15 @@ interface JoinUsFormData {
 
 const JoinUs: React.FC = () => {
   const { t } = useTranslation();
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<JoinUsFormData>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<JoinUsFormData>();
 
   const onSubmit = async (data: JoinUsFormData) => {
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     console.log('Form submitted:', data);
     // Handle form submission here
   };
@@ -60,8 +64,9 @@ const JoinUs: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
-      <section className="bg-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative bg-gradient-to-br from-primary-50 via-white to-accent-50 py-20 lg:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg')] bg-cover bg-center opacity-5"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -69,9 +74,11 @@ const JoinUs: React.FC = () => {
               transition={{ duration: 0.6 }}
             >
               <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-                {t('joinUs.title')}
+                <span className="bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
+                  {t('joinUs.title')}
+                </span>
               </h1>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 {t('joinUs.subtitle')}
               </p>
             </motion.div>
@@ -86,16 +93,14 @@ const JoinUs: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Card className="text-center p-6">
-                  <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-100 rounded-xl mb-4">
+                <Card className="text-center p-6 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-100 rounded-xl mb-4 group-hover:bg-primary-200 transition-colors">
                     <benefit.icon className="w-6 h-6 text-primary-600" />
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
                     {benefit.title}
                   </h3>
-                  <p className="text-gray-600 text-sm">
-                    {benefit.description}
-                  </p>
+                  <p className="text-gray-600 text-sm">{benefit.description}</p>
                 </Card>
               </motion.div>
             ))}
@@ -111,7 +116,7 @@ const JoinUs: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <Card className="p-8">
+            <Card className="p-8 shadow-xl">
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {/* Personal Information */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -121,11 +126,15 @@ const JoinUs: React.FC = () => {
                     </label>
                     <input
                       type="text"
-                      {...register('firstName', { required: 'First name is required' })}
+                      {...register('firstName', {
+                        required: 'First name is required',
+                      })}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
                     {errors.firstName && (
-                      <p className="text-red-600 text-sm mt-1">{errors.firstName.message}</p>
+                      <p className="text-red-600 text-sm mt-1">
+                        {errors.firstName.message}
+                      </p>
                     )}
                   </div>
 
@@ -135,11 +144,15 @@ const JoinUs: React.FC = () => {
                     </label>
                     <input
                       type="text"
-                      {...register('lastName', { required: 'Last name is required' })}
+                      {...register('lastName', {
+                        required: 'Last name is required',
+                      })}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
                     {errors.lastName && (
-                      <p className="text-red-600 text-sm mt-1">{errors.lastName.message}</p>
+                      <p className="text-red-600 text-sm mt-1">
+                        {errors.lastName.message}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -151,17 +164,19 @@ const JoinUs: React.FC = () => {
                     </label>
                     <input
                       type="email"
-                      {...register('email', { 
+                      {...register('email', {
                         required: 'Email is required',
                         pattern: {
                           value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                          message: 'Invalid email address'
-                        }
+                          message: 'Invalid email address',
+                        },
                       })}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
                     {errors.email && (
-                      <p className="text-red-600 text-sm mt-1">{errors.email.message}</p>
+                      <p className="text-red-600 text-sm mt-1">
+                        {errors.email.message}
+                      </p>
                     )}
                   </div>
 
@@ -171,11 +186,15 @@ const JoinUs: React.FC = () => {
                     </label>
                     <input
                       type="tel"
-                      {...register('phone', { required: 'Phone number is required' })}
+                      {...register('phone', {
+                        required: 'Phone number is required',
+                      })}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
                     {errors.phone && (
-                      <p className="text-red-600 text-sm mt-1">{errors.phone.message}</p>
+                      <p className="text-red-600 text-sm mt-1">
+                        {errors.phone.message}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -186,7 +205,9 @@ const JoinUs: React.FC = () => {
                       {t('joinUs.form.country')}
                     </label>
                     <select
-                      {...register('country', { required: 'Country is required' })}
+                      {...register('country', {
+                        required: 'Country is required',
+                      })}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     >
                       <option value="">Select a country</option>
@@ -198,7 +219,9 @@ const JoinUs: React.FC = () => {
                       <option value="other">Other</option>
                     </select>
                     {errors.country && (
-                      <p className="text-red-600 text-sm mt-1">{errors.country.message}</p>
+                      <p className="text-red-600 text-sm mt-1">
+                        {errors.country.message}
+                      </p>
                     )}
                   </div>
 
@@ -210,15 +233,23 @@ const JoinUs: React.FC = () => {
                       type="number"
                       min="16"
                       max="35"
-                      {...register('age', { 
+                      {...register('age', {
                         required: 'Age is required',
-                        min: { value: 16, message: 'Must be at least 16 years old' },
-                        max: { value: 35, message: 'Must be 35 years old or younger' }
+                        min: {
+                          value: 16,
+                          message: 'Must be at least 16 years old',
+                        },
+                        max: {
+                          value: 35,
+                          message: 'Must be 35 years old or younger',
+                        },
                       })}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
                     {errors.age && (
-                      <p className="text-red-600 text-sm mt-1">{errors.age.message}</p>
+                      <p className="text-red-600 text-sm mt-1">
+                        {errors.age.message}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -237,7 +268,9 @@ const JoinUs: React.FC = () => {
                           {...register('interests')}
                           className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
                         />
-                        <span className="ml-2 rtl:mr-2 rtl:ml-0 text-sm text-gray-700">{interest}</span>
+                        <span className="ml-2 rtl:mr-2 rtl:ml-0 text-sm text-gray-700">
+                          {interest}
+                        </span>
                       </label>
                     ))}
                   </div>
@@ -250,12 +283,16 @@ const JoinUs: React.FC = () => {
                   </label>
                   <textarea
                     rows={4}
-                    {...register('motivation', { required: 'Please tell us why you want to join' })}
+                    {...register('motivation', {
+                      required: 'Please tell us why you want to join',
+                    })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="Tell us about your motivation and what you hope to achieve..."
                   />
                   {errors.motivation && (
-                    <p className="text-red-600 text-sm mt-1">{errors.motivation.message}</p>
+                    <p className="text-red-600 text-sm mt-1">
+                      {errors.motivation.message}
+                    </p>
                   )}
                 </div>
 
@@ -266,13 +303,50 @@ const JoinUs: React.FC = () => {
                     loading={isSubmitting}
                     icon={Send}
                     iconPosition="right"
-                    className="w-full"
+                    className="w-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
                   >
                     {t('joinUs.form.submit')}
                   </Button>
                 </div>
               </form>
             </Card>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-primary-600 to-accent-600 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg')] bg-cover bg-center opacity-10"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
+              Ready to Make a Difference?
+            </h2>
+            <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
+              Join thousands of young leaders who are creating positive change
+              in their communities.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                variant="secondary"
+                size="lg"
+                icon={Users}
+                className="shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+              >
+                Explore Programs
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="border-white text-white hover:bg-white hover:text-primary-600 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+              >
+                Learn More
+              </Button>
+            </div>
           </motion.div>
         </div>
       </section>
