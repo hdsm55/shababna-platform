@@ -75,7 +75,7 @@
   }
 
   .btn-secondary {
-    @apply bg-accent-500 text-white hover:bg-accent-600 focus:ring-accent-500 border border-accent-500 shadow-sm hover:shadow-md active:bg-accent-700 hover:-translate-y-0.5 hover:shadow-lg;
+    @apply bg-secondary-600 text-white hover:bg-secondary-700 focus:ring-secondary-500 shadow-sm hover:shadow-md active:bg-secondary-800 hover:-translate-y-0.5 hover:shadow-lg;
   }
 
   .btn-outline {
@@ -83,7 +83,7 @@
   }
 
   .btn-ghost {
-    @apply text-primary-600 hover:bg-primary-50 focus:ring-primary-500 active:bg-primary-100 hover:-translate-y-0.5;
+    @apply text-secondary-600 hover:bg-secondary-50 focus:ring-secondary-500 active:bg-secondary-100 hover:-translate-y-0.5;
   }
 
   .btn-gradient {

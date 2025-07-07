@@ -13,80 +13,73 @@ import { useAuthStore } from '../../store/authStore';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
+import { useQuery } from '@tanstack/react-query';
+import {
+  getDashboardStats,
+  getRecentActivities,
+} from '../../services/dashboardApi';
 
 const Dashboard: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuthStore();
 
-  const stats = [
+  // جلب إحصائيات الداشبورد
+  const { data: statsData, isLoading: statsLoading } = useQuery({
+    queryKey: ['dashboard-stats'],
+    queryFn: getDashboardStats,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // جلب الأنشطة الحديثة
+  const { data: activitiesData, isLoading: activitiesLoading } = useQuery({
+    queryKey: ['dashboard-activities'],
+    queryFn: getRecentActivities,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // إعداد بيانات الإحصائيات
+  const stats = statsData?.data || [
+    // fallback skeleton
     {
       title: t('dashboard.stats.events'),
-      value: '24',
-      change: '+12%',
+      value: '-',
       icon: Calendar,
       color: 'text-primary-600',
       bgColor: 'bg-primary-50',
-      changeColor: 'text-green-600',
+      change: '',
+      changeColor: '',
     },
     {
       title: t('dashboard.stats.programs'),
-      value: '8',
-      change: '+2',
+      value: '-',
       icon: BarChart3,
       color: 'text-secondary-600',
       bgColor: 'bg-secondary-50',
-      changeColor: 'text-green-600',
+      change: '',
+      changeColor: '',
     },
     {
       title: t('dashboard.stats.members'),
-      value: '1,247',
-      change: '+18%',
+      value: '-',
       icon: Users,
       color: 'text-secondary-600',
       bgColor: 'bg-secondary-50',
-      changeColor: 'text-green-600',
+      change: '',
+      changeColor: '',
     },
     {
       title: t('dashboard.stats.donations'),
-      value: '$15,420',
-      change: '+25%',
+      value: '-',
       icon: DollarSign,
       color: 'text-success-600',
       bgColor: 'bg-success-50',
-      changeColor: 'text-green-600',
+      change: '',
+      changeColor: '',
     },
   ];
 
-  const recentActivities = [
-    {
-      id: 1,
-      type: 'event',
-      title: 'Youth Leadership Summit registered 25 new participants',
-      time: '2 hours ago',
-      status: 'success',
-    },
-    {
-      id: 2,
-      type: 'program',
-      title: 'Digital Innovation Academy program launched',
-      time: '5 hours ago',
-      status: 'info',
-    },
-    {
-      id: 3,
-      type: 'donation',
-      title: 'New donation of $500 received',
-      time: '1 day ago',
-      status: 'success',
-    },
-    {
-      id: 4,
-      type: 'member',
-      title: '12 new members joined this week',
-      time: '2 days ago',
-      status: 'info',
-    },
-  ];
+  // إعداد الأنشطة الحديثة
+  const recentActivities = activitiesData?.data || [];
 
   const upcomingEvents = [
     {
@@ -130,36 +123,45 @@ const Dashboard: React.FC = () => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <Card className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 mb-2">
-                      {stat.title}
-                    </p>
-                    <p className="text-3xl font-bold text-gray-900">
-                      {stat.value}
-                    </p>
-                    <p
-                      className={`text-sm ${stat.changeColor} flex items-center mt-1`}
-                    >
-                      <TrendingUp className="w-4 h-4 mr-1" />
-                      {stat.change}
-                    </p>
-                  </div>
-                  <div className={`${stat.bgColor} p-3 rounded-xl`}>
-                    <stat.icon className={`w-6 h-6 ${stat.color}`} />
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
+          {statsLoading
+            ? [...Array(4)].map((_, idx) => (
+                <div
+                  key={idx}
+                  className="animate-pulse p-6 bg-gray-100 rounded-xl h-32"
+                />
+              ))
+            : stats.map((stat: any, index: number) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Card className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600 mb-2">
+                          {stat.title}
+                        </p>
+                        <p className="text-3xl font-bold text-gray-900">
+                          {stat.value}
+                        </p>
+                        {stat.change && (
+                          <p
+                            className={`text-sm ${stat.changeColor} flex items-center mt-1`}
+                          >
+                            <TrendingUp className="w-4 h-4 mr-1" />
+                            {stat.change}
+                          </p>
+                        )}
+                      </div>
+                      <div className={`${stat.bgColor} p-3 rounded-xl`}>
+                        <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
+              ))}
         </div>
 
         {/* Content Grid */}
@@ -175,26 +177,35 @@ const Dashboard: React.FC = () => {
                 Recent Activities
               </h2>
               <div className="space-y-4">
-                {recentActivities.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-start space-x-3 rtl:space-x-reverse"
-                  >
-                    <div
-                      className={`w-2 h-2 rounded-full mt-2 ${
-                        activity.status === 'success'
-                          ? 'bg-green-500'
-                          : 'bg-blue-500'
-                      }`}
-                    />
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-900">{activity.title}</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {activity.time}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                {activitiesLoading
+                  ? [...Array(4)].map((_, idx) => (
+                      <div
+                        key={idx}
+                        className="h-8 bg-gray-100 rounded w-full animate-pulse"
+                      />
+                    ))
+                  : recentActivities.map((activity: any) => (
+                      <div
+                        key={activity.id}
+                        className="flex items-start space-x-3 rtl:space-x-reverse"
+                      >
+                        <div
+                          className={`w-2 h-2 rounded-full mt-2 ${
+                            activity.status === 'success'
+                              ? 'bg-green-500'
+                              : 'bg-blue-500'
+                          }`}
+                        />
+                        <div className="flex-1">
+                          <p className="text-sm text-gray-900">
+                            {activity.title}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {activity.time}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
               </div>
             </Card>
           </motion.div>

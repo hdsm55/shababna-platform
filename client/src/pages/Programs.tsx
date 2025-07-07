@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import SEO from '../components/common/SEO';
 import {
   Target,
   Users,
@@ -75,9 +77,15 @@ const Programs: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-neutral-50">
+      <SEO
+        title="Programs"
+        description="Explore our comprehensive youth development programs including leadership training, skill development, and community engagement initiatives."
+        type="website"
+      />
+
       {/* Header Section */}
-      <section className="relative bg-gradient-to-br from-secondary-50 via-white to-primary-50 py-20 lg:py-32 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 py-20 lg:py-32 overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/3183153/pexels-photo-3183153.jpeg')] bg-cover bg-center opacity-5"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -86,12 +94,10 @@ const Programs: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-                <span className="bg-gradient-to-r from-secondary-600 to-primary-600 bg-clip-text text-transparent">
-                  {t('programs.title')}
-                </span>
+              <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+                {t('programs.title')}
               </h1>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
                 {t('programs.subtitle')}
               </p>
             </motion.div>
@@ -105,13 +111,13 @@ const Programs: React.FC = () => {
             className="flex flex-col lg:flex-row gap-4 mb-8"
           >
             <div className="flex-1 relative">
-              <Search className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 transform -translate-y-1/2 text-white/70 w-5 h-5" />
               <input
                 type="text"
                 placeholder={t('common.search')}
                 value={searchTerm}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className="w-full pl-10 rtl:pr-10 rtl:pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-transparent shadow-sm"
+                className="w-full pl-10 rtl:pr-10 rtl:pl-4 pr-4 py-3 border border-white/20 rounded-lg focus:ring-2 focus:ring-white focus:border-transparent shadow-sm bg-white/10 backdrop-blur-sm text-white placeholder-white/70"
               />
             </div>
             <div className="flex gap-2 overflow-x-auto">
@@ -121,8 +127,8 @@ const Programs: React.FC = () => {
                   onClick={() => handleFilterChange(filter.key)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
                     selectedFilter === filter.key
-                      ? 'bg-secondary-600 text-white shadow-lg'
-                      : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 hover:border-secondary-300'
+                      ? 'bg-white text-primary-600 shadow-lg'
+                      : 'bg-white/10 text-white border border-white/20 hover:bg-white/20 backdrop-blur-sm'
                   }`}
                 >
                   {filter.label}
@@ -192,8 +198,19 @@ const Programs: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Loading State */}
           {isLoading && (
-            <div className="flex justify-center items-center py-12">
-              <LoadingSpinner size="lg" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(6)].map((_, idx) => (
+                <div key={idx} className="animate-pulse">
+                  <div className="bg-gray-200 rounded-xl h-48 w-full mb-4" />
+                  <div className="h-6 bg-gray-200 rounded w-2/3 mb-2" />
+                  <div className="h-4 bg-gray-100 rounded w-1/2 mb-2" />
+                  <div className="h-4 bg-gray-100 rounded w-1/3 mb-4" />
+                  <div className="flex gap-2">
+                    <div className="h-10 bg-gray-200 rounded w-1/2" />
+                    <div className="h-10 bg-gray-100 rounded w-1/2" />
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
@@ -219,7 +236,7 @@ const Programs: React.FC = () => {
           {/* Programs Grid */}
           {!isLoading && !isError && (
             <>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {programs.map((program: Program, index: number) => (
                   <motion.div
                     key={program.id}
@@ -229,7 +246,8 @@ const Programs: React.FC = () => {
                   >
                     <Card
                       hover
-                      className="overflow-hidden h-full shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+                      variant="elevated"
+                      className="overflow-hidden group focus-within:ring-2 focus-within:ring-secondary-400 focus-within:ring-offset-2 transition-shadow duration-300 shadow-md hover:shadow-2xl border border-transparent hover:border-secondary-200"
                     >
                       <div className="aspect-w-16 aspect-h-9">
                         <img
@@ -238,10 +256,10 @@ const Programs: React.FC = () => {
                             'https://images.pexels.com/photos/3183153/pexels-photo-3183153.jpeg'
                           }
                           alt={program.title}
-                          className="w-full h-48 object-cover hover:scale-110 transition-transform duration-300"
+                          className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
                         />
                       </div>
-                      <div className="p-8">
+                      <div className="p-6">
                         <div className="flex items-center justify-between mb-4">
                           <span className="px-3 py-1 text-sm font-medium bg-primary-100 text-primary-800 rounded-full">
                             {program.category}
@@ -298,18 +316,16 @@ const Programs: React.FC = () => {
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-3">
-                          <Button
-                            size="sm"
-                            icon={ArrowRight}
-                            iconPosition="right"
-                            className="flex-1 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-                            onClick={() => {
-                              // TODO: Navigate to program details
-                              console.log('View program details:', program.id);
-                            }}
-                          >
-                            {t('programs.support')}
-                          </Button>
+                          <Link to={`/programs/${program.id}`}>
+                            <Button
+                              size="sm"
+                              icon={ArrowRight}
+                              iconPosition="right"
+                              className="flex-1 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                            >
+                              {t('programs.support')}
+                            </Button>
+                          </Link>
                           <Button
                             variant="outline"
                             size="sm"
@@ -343,11 +359,29 @@ const Programs: React.FC = () => {
 
               {/* Empty State */}
               {programs.length === 0 && !isLoading && (
-                <div className="text-center py-12">
+                <div className="text-center py-12 flex flex-col items-center justify-center">
+                  <svg
+                    width="64"
+                    height="64"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    className="mb-4 text-gray-300"
+                  >
+                    <path
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                   <p className="text-gray-500 text-lg">
                     {searchTerm || selectedFilter !== 'all'
-                      ? 'No programs found matching your criteria.'
-                      : 'No programs available at the moment.'}
+                      ? t(
+                          'programs.emptySearch',
+                          'لا توجد برامج مطابقة للبحث أو الفلتر.'
+                        )
+                      : t('programs.empty', 'لا توجد برامج متاحة حالياً.')}
                   </p>
                 </div>
               )}

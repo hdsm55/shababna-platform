@@ -17,9 +17,12 @@ export const fetchEvents = async (params: EventsQueryParams = {}): Promise<Pagin
 };
 
 // Fetch a single event by ID
-export const fetchEventById = async (id: number): Promise<ApiResponse<Event>> => {
+export const fetchEventById = async (id: number | string): Promise<Event> => {
   const response = await http.get(`/events/${id}`);
-  return response.data;
+  if (!response.data || !response.data.data) {
+    throw new Error('404: Event not found');
+  }
+  return response.data.data;
 };
 
 // Create a new event (admin only)

@@ -1,14 +1,32 @@
 /** @type {import('tailwindcss').Config} */
+const defaultTheme = require('tailwindcss/defaultTheme');
+const plugin = require('tailwindcss/plugin');
+
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  darkMode: false,
   theme: {
     extend: {
       fontFamily: {
         'sans': ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
         'arabic': ['Tajawal', 'Noto Sans Arabic', 'system-ui', 'sans-serif'],
         'display': ['Inter', 'system-ui', 'sans-serif'],
+        heading: ["'Tajawal'", 'sans-serif'],
+        body: ["'Tajawal'", 'sans-serif'],
       },
       colors: {
+        primary: '#2563EB',
+        secondary: '#6B7280',
+        accent: '#F43F5E',
+        background: '#F9FAFB',
+        surface: '#FFFFFF',
+        textPrimary: '#111827',
+        textSecondary: '#6B7280',
+        highlight: '#A855F7',
+        info: '#0EA5E9',
+        success: '#22C55E',
+        warning: '#F59E0B',
+        error: '#EF4444',
         primary: {
           50: '#eff6ff',
           100: '#dbeafe',
@@ -39,20 +57,18 @@ export default {
           950: '#020617',
         },
         accent: {
-          50: '#fefce8',
-          100: '#fef9c3',
-          200: '#fef08a',
-          300: '#fde047',
-          400: '#facc15',
-          500: '#eab308',
-          600: '#ca8a04',
-          700: '#a16207',
-          800: '#854d0e',
-          900: '#713f12',
-          950: '#422006',
-          green: '#10b981',
-          yellow: '#f59e0b',
-          DEFAULT: '#f59e0b',
+          50: '#fef2f2',
+          100: '#fee2e2',
+          200: '#fecaca',
+          300: '#fca5a5',
+          400: '#f87171',
+          500: '#ef4444',
+          600: '#dc2626',
+          700: '#b91c1c',
+          800: '#991b1b',
+          900: '#7f1d1d',
+          950: '#450a0a',
+          DEFAULT: '#ef4444',
         },
         success: {
           50: '#f0fdf4',
@@ -137,15 +153,42 @@ export default {
           900: '#064e3b',
         },
       },
+      fontSize: {
+        xs: '12px',
+        sm: '14px',
+        base: '16px',
+        lg: '18px',
+        xl: '24px',
+        '2xl': '32px',
+        '3xl': '40px',
+        '4xl': '48px',
+      },
+      fontWeight: {
+        light: 300,
+        normal: 400,
+        medium: 500,
+        semibold: 600,
+        bold: 700,
+      },
       spacing: {
         '18': '4.5rem',
         '88': '22rem',
         '128': '32rem',
         '144': '36rem',
+        xs: '4px',
+        sm: '8px',
+        md: '16px',
+        lg: '24px',
+        xl: '32px',
+        '2xl': '40px',
       },
       borderRadius: {
         '4xl': '2rem',
         '5xl': '2.5rem',
+        sm: '4px',
+        md: '8px',
+        lg: '16px',
+        full: '9999px',
       },
       boxShadow: {
         'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
@@ -159,6 +202,9 @@ export default {
         'inner': 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
         'card': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
         'card-hover': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+        sm: '0 1px 2px rgba(0,0,0,0.05)',
+        md: '0 4px 6px rgba(0,0,0,0.1)',
+        lg: '0 10px 15px rgba(0,0,0,0.15)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
@@ -243,7 +289,21 @@ export default {
         'height': 'height',
         'spacing': 'margin, padding',
       },
+      screens: {
+        sm: '640px',
+        md: '768px',
+        lg: '1024px',
+        xl: '1280px',
+        '2xl': '1536px',
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwindcss-rtl'),
+    plugin(function ({ addBase }) {
+      addBase({
+        'html': { fontFamily: "'Tajawal', sans-serif" },
+      });
+    }),
+  ],
 };

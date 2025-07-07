@@ -1,160 +1,124 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import LoadingSpinner from './LoadingSpinner';
+import clsx from 'clsx';
 
-/**
- * Modern Button component inspired by Stripe/Linear design
- * Features smooth animations, consistent spacing, and modern styling
- */
-interface ButtonProps {
-  children: React.ReactNode;
-  variant?:
-    | 'primary'
-    | 'secondary'
-    | 'outline'
-    | 'ghost'
-    | 'gradient'
-    | 'accent'
-    | 'success'
-    | 'error'
-    | 'purple'
-    | 'emerald';
-  size?: 'sm' | 'md' | 'lg' | 'xl';
-  loading?: boolean;
-  disabled?: boolean;
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'ghost'
+  | 'icon'
+  | 'outline';
+export type ButtonSize = 'sm' | 'md' | 'lg';
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   icon?: React.ElementType;
   iconPosition?: 'left' | 'right';
-  onClick?: () => void;
-  type?: 'button' | 'submit' | 'reset';
-  className?: string;
+  loading?: boolean;
   fullWidth?: boolean;
+  children: React.ReactNode;
+  as?: React.ElementType;
+  to?: string; // for Link
+  href?: string; // for <a>
 }
 
+const baseStyles =
+  'inline-flex items-center justify-center font-semibold transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed rounded-md';
+
+const variantStyles: Record<ButtonVariant, string> = {
+  primary: 'bg-primary text-white hover:bg-primary/90 shadow-md',
+  secondary: 'bg-secondary text-white hover:bg-secondary/90',
+  ghost: 'bg-transparent text-primary hover:bg-primary/10',
+  icon: 'bg-transparent text-primary p-2 rounded-full hover:bg-primary/10',
+  outline:
+    'bg-transparent border border-primary text-primary hover:bg-primary/5',
+};
+
+const sizeStyles: Record<ButtonSize, string> = {
+  sm: 'text-sm px-3 py-1.5',
+  md: 'text-base px-4 py-2',
+  lg: 'text-lg px-6 py-3',
+};
+
 const Button: React.FC<ButtonProps> = ({
-  children,
   variant = 'primary',
   size = 'md',
-  loading = false,
-  disabled = false,
   icon: Icon,
   iconPosition = 'left',
-  onClick,
-  type = 'button',
-  className = '',
+  loading = false,
   fullWidth = false,
+  children,
+  className,
+  disabled,
+  as: Component = 'button',
+  to,
+  href,
+  ...props
 }) => {
-  const baseClasses =
-    'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group';
+  const content = (
+    <>
+      {loading ? (
+        <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 rtl:ml-2 rtl:mr-0"></span>
+      ) : Icon && iconPosition === 'left' ? (
+        <Icon className="w-5 h-5 mr-2 rtl:ml-2 rtl:mr-0" />
+      ) : null}
+      <span>{children}</span>
+      {Icon && iconPosition === 'right' && !loading && (
+        <Icon className="w-5 h-5 ml-2 rtl:mr-2 rtl:ml-0" />
+      )}
+    </>
+  );
 
-  const variantClasses = {
-    primary:
-      'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 shadow-sm hover:shadow-md active:bg-primary-800 hover:-translate-y-0.5 hover:shadow-lg',
-    secondary:
-      'bg-accent-500 text-white hover:bg-accent-600 focus:ring-accent-500 border border-accent-500 shadow-sm hover:shadow-md active:bg-accent-700 hover:-translate-y-0.5 hover:shadow-lg',
-    outline:
-      'border-2 border-primary-600 text-primary-600 hover:bg-primary-50 focus:ring-primary-500 bg-white shadow-sm hover:shadow-md active:bg-primary-100 hover:-translate-y-0.5 hover:shadow-lg',
-    ghost:
-      'text-primary-600 hover:bg-primary-50 focus:ring-primary-500 active:bg-primary-100 hover:-translate-y-0.5',
-    gradient:
-      'bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 focus:ring-primary-500 shadow-sm hover:shadow-md active:from-primary-800 active:to-primary-900 hover:-translate-y-0.5 hover:shadow-lg',
-    accent:
-      'bg-accent-500 text-white hover:bg-accent-600 focus:ring-accent-500 shadow-sm hover:shadow-md active:bg-accent-700 hover:-translate-y-0.5 hover:shadow-lg',
-    success:
-      'bg-success-500 text-white hover:bg-success-600 focus:ring-success-500 shadow-sm hover:shadow-md active:bg-success-700 hover:-translate-y-0.5 hover:shadow-lg',
-    error:
-      'bg-error-500 text-white hover:bg-error-600 focus:ring-error-500 shadow-sm hover:shadow-md active:bg-error-700 hover:-translate-y-0.5 hover:shadow-lg',
-    purple:
-      'bg-purple-500 text-white hover:bg-purple-600 focus:ring-purple-500 shadow-sm hover:shadow-md active:bg-purple-700 hover:-translate-y-0.5 hover:shadow-lg',
-    emerald:
-      'bg-emerald-500 text-white hover:bg-emerald-600 focus:ring-emerald-500 shadow-sm hover:shadow-md active:bg-emerald-700 hover:-translate-y-0.5 hover:shadow-lg',
+  const baseProps = {
+    className: clsx(
+      baseStyles,
+      variantStyles[variant],
+      sizeStyles[size],
+      fullWidth && 'w-full',
+      className
+    ),
+    ...props,
   };
 
-  const sizeClasses = {
-    sm: 'px-3 py-2 text-sm gap-1.5 min-h-[32px]',
-    md: 'px-4 py-2.5 text-sm gap-2 min-h-[40px]',
-    lg: 'px-6 py-3 text-base gap-2 min-h-[48px]',
-    xl: 'px-8 py-4 text-lg gap-3 min-h-[56px]',
-  };
-
-  const iconSizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-4 h-4',
-    lg: 'w-5 h-5',
-    xl: 'w-6 h-6',
-  };
-
-  const widthClass = fullWidth ? 'w-full' : '';
-
-  return (
-    <motion.button
-      whileHover={{
-        scale: disabled || loading ? 1 : 1.02,
-      }}
-      whileTap={{
-        scale: disabled || loading ? 1 : 0.98,
-      }}
-      type={type}
-      onClick={onClick}
-      disabled={disabled || loading}
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${widthClass} ${className}`}
-    >
-      {/* Loading overlay */}
-      {loading && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="absolute inset-0 flex items-center justify-center bg-inherit rounded-lg"
-        >
-          <LoadingSpinner size="sm" color="text-current" />
-        </motion.div>
-      )}
-
-      {/* Shimmer effect for gradient buttons */}
-      {variant === 'gradient' && !loading && (
-        <motion.div
-          className="absolute inset-0 bg-gradient-shimmer opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-          initial={{ x: '-100%' }}
-          whileHover={{ x: '100%' }}
-          transition={{ duration: 0.6 }}
-        />
-      )}
-
-      {/* Glow effect for primary and accent buttons */}
-      {(variant === 'primary' || variant === 'accent') && !loading && (
-        <motion.div
-          className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-          style={{
-            background:
-              variant === 'primary'
-                ? 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)'
-                : 'radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, transparent 70%)',
-          }}
-        />
-      )}
-
-      {/* Content */}
-      <div
-        className={`flex items-center ${
-          loading ? 'opacity-0' : 'opacity-100'
-        } transition-opacity duration-200 relative z-10`}
+  if (Component === 'button') {
+    const MotionButton = motion.button;
+    return (
+      <MotionButton
+        type="button"
+        {...baseProps}
+        disabled={disabled || loading}
+        whileTap={{ scale: 0.97 }}
       >
-        {!loading && Icon && iconPosition === 'left' && (
-          <Icon
-            className={`${iconSizeClasses[size]} ${
-              children ? 'mr-2 rtl:ml-2 rtl:mr-0' : ''
-            } transition-transform group-hover:scale-110`}
-          />
-        )}
-        {!loading && children}
-        {!loading && Icon && iconPosition === 'right' && (
-          <Icon
-            className={`${iconSizeClasses[size]} ${
-              children ? 'ml-2 rtl:mr-2 rtl:ml-0' : ''
-            } transition-transform group-hover:scale-110`}
-          />
-        )}
-      </div>
-    </motion.button>
+        {content}
+      </MotionButton>
+    );
+  }
+  // For Link or <a> or custom component
+  const MotionComponent = motion(Component);
+  // لا تمرر disabled هنا ولا onClick إذا كان معطل
+  const { onClick, disabled: _d, ...restProps } = baseProps;
+  const handleClick = (e: React.MouseEvent<any, MouseEvent>) => {
+    if (disabled || loading) {
+      e.preventDefault();
+      return;
+    }
+    if (typeof onClick === 'function') {
+      onClick(e);
+    }
+  };
+  return (
+    <MotionComponent
+      {...restProps}
+      to={to}
+      href={href}
+      tabIndex={disabled ? -1 : 0}
+      aria-disabled={disabled || loading}
+      whileTap={{ scale: 0.97 }}
+      onClick={handleClick}
+    >
+      {content}
+    </MotionComponent>
   );
 };
 

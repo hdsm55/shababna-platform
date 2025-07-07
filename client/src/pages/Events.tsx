@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import SEO from '../components/common/SEO';
 import { Calendar, MapPin, Users, Filter, Search, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
@@ -97,9 +99,15 @@ const Events: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-neutral-50">
+      <SEO
+        title="Events"
+        description="Discover upcoming events, workshops, and conferences organized by Shababna Global. Join our community events and connect with youth leaders worldwide."
+        type="website"
+      />
+
       {/* Header Section */}
-      <section className="relative bg-gradient-to-br from-primary-50 via-white to-secondary-50 py-20 lg:py-32 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 py-20 lg:py-32 overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/1181622/pexels-photo-1181622.jpeg')] bg-cover bg-center opacity-5"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -108,12 +116,10 @@ const Events: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-                <span className="bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                  {t('events.title')}
-                </span>
+              <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
+                {t('events.title')}
               </h1>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
                 {t('events.subtitle')}
               </p>
             </motion.div>
@@ -127,13 +133,13 @@ const Events: React.FC = () => {
             className="flex flex-col lg:flex-row gap-4 mb-8"
           >
             <div className="flex-1 relative">
-              <Search className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 transform -translate-y-1/2 text-white/70 w-5 h-5" />
               <input
                 type="text"
                 placeholder={t('common.search')}
                 value={searchTerm}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className="w-full pl-10 rtl:pr-10 rtl:pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent shadow-sm"
+                className="w-full pl-10 rtl:pr-10 rtl:pl-4 pr-4 py-3 border border-white/20 rounded-lg focus:ring-2 focus:ring-white focus:border-transparent shadow-sm bg-white/10 backdrop-blur-sm text-white placeholder-white/70"
               />
             </div>
             <div className="flex gap-2 overflow-x-auto">
@@ -143,8 +149,8 @@ const Events: React.FC = () => {
                   onClick={() => handleFilterChange(filter.key)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
                     selectedFilter === filter.key
-                      ? 'bg-primary-600 text-white shadow-lg'
-                      : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 hover:border-primary-300'
+                      ? 'bg-white text-primary-600 shadow-lg'
+                      : 'bg-white/10 text-white border border-white/20 hover:bg-white/20 backdrop-blur-sm'
                   }`}
                 >
                   {filter.label}
@@ -214,8 +220,19 @@ const Events: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Loading State */}
           {isLoading && (
-            <div className="flex justify-center items-center py-12">
-              <LoadingSpinner size="lg" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(6)].map((_, idx) => (
+                <div key={idx} className="animate-pulse">
+                  <div className="bg-gray-200 rounded-xl h-48 w-full mb-4" />
+                  <div className="h-6 bg-gray-200 rounded w-2/3 mb-2" />
+                  <div className="h-4 bg-gray-100 rounded w-1/2 mb-2" />
+                  <div className="h-4 bg-gray-100 rounded w-1/3 mb-4" />
+                  <div className="flex gap-2">
+                    <div className="h-10 bg-gray-200 rounded w-1/2" />
+                    <div className="h-10 bg-gray-100 rounded w-1/2" />
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
@@ -251,7 +268,8 @@ const Events: React.FC = () => {
                   >
                     <Card
                       hover
-                      className="overflow-hidden shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+                      variant="elevated"
+                      className="overflow-hidden group focus-within:ring-2 focus-within:ring-primary-400 focus-within:ring-offset-2 transition-shadow duration-300 shadow-md hover:shadow-2xl border border-transparent hover:border-primary-200"
                     >
                       <div className="aspect-w-16 aspect-h-9">
                         <img
@@ -260,7 +278,7 @@ const Events: React.FC = () => {
                             'https://images.pexels.com/photos/1181622/pexels-photo-1181622.jpeg'
                           }
                           alt={event.title}
-                          className="w-full h-48 object-cover hover:scale-110 transition-transform duration-300"
+                          className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
                         />
                       </div>
                       <div className="p-6">
@@ -332,17 +350,15 @@ const Events: React.FC = () => {
                               ? 'Completed'
                               : t('events.register')}
                           </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-                            onClick={() => {
-                              // TODO: Navigate to event details page
-                              console.log('View event details:', event.id);
-                            }}
-                          >
-                            {t('events.learnMore')}
-                          </Button>
+                          <Link to={`/events/${event.id}`}>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                            >
+                              {t('events.learnMore')}
+                            </Button>
+                          </Link>
                         </div>
                       </div>
                     </Card>
@@ -352,11 +368,29 @@ const Events: React.FC = () => {
 
               {/* Empty State */}
               {events.length === 0 && !isLoading && (
-                <div className="text-center py-12">
+                <div className="text-center py-12 flex flex-col items-center justify-center">
+                  <svg
+                    width="64"
+                    height="64"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    className="mb-4 text-gray-300"
+                  >
+                    <path
+                      d="M8 7V3m8 4V3m-9 8h10m-13 8V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                   <p className="text-gray-500 text-lg">
                     {searchTerm || selectedFilter !== 'all'
-                      ? 'No events found matching your criteria.'
-                      : 'No events available at the moment.'}
+                      ? t(
+                          'events.emptySearch',
+                          'لا توجد فعاليات مطابقة للبحث أو الفلتر.'
+                        )
+                      : t('events.empty', 'لا توجد فعاليات متاحة حالياً.')}
                   </p>
                 </div>
               )}

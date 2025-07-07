@@ -64,7 +64,11 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ message: 'Program not found' });
     }
 
-    res.json(result.rows[0]);
+    res.json({
+      success: true,
+      message: 'Program retrieved successfully',
+      data: result.rows[0]
+    });
   } catch (error) {
     console.error('Get program error:', error);
     res.status(500).json({ message: 'Server error' });

@@ -16,8 +16,11 @@ export const fetchPrograms = async (params: ProgramsQueryParams = {}): Promise<P
 };
 
 // Fetch a single program by ID
-export const fetchProgramById = async (id: number): Promise<Program> => {
+export const fetchProgramById = async (id: number | string): Promise<Program> => {
   const response = await http.get(`/programs/${id}`);
+  if (!response.data || !response.data.data) {
+    throw new Error('404: Program not found');
+  }
   return response.data.data;
 };
 
