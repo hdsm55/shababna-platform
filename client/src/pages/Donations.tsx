@@ -22,6 +22,12 @@ import Card from '../components/common/Card';
 import Input from '../components/common/Input';
 import Alert from '../components/common/Alert';
 import SectionTitle from '../components/common/SectionTitle';
+import {
+  AccessibleSection,
+  AccessibleCard,
+  AccessibleButton,
+  SkipToContent,
+} from '../components/common/AccessibleComponents';
 
 const Donations: React.FC = () => {
   const { t } = useTranslation();
@@ -125,7 +131,8 @@ const Donations: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen">
+      <SkipToContent />
       <SEO
         title="Donations"
         description="Support Shababna Global's mission to empower youth worldwide. Your donation helps fund programs, events, and initiatives that create positive change."
@@ -133,7 +140,7 @@ const Donations: React.FC = () => {
       />
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 py-20 lg:py-32 overflow-hidden">
+      <AccessibleSection variant="hero" ariaLabel="قسم رأس صفحة التبرعات">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative container">
           <div className="text-center max-w-4xl mx-auto">
@@ -159,10 +166,10 @@ const Donations: React.FC = () => {
             </motion.div>
           </div>
         </div>
-      </section>
+      </AccessibleSection>
 
       {/* Impact Stats Section */}
-      <section className="py-16 bg-white">
+      <AccessibleSection variant="content" ariaLabel="قسم إحصائيات التأثير">
         <div className="container">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {impactStats.map((stat, index) => (
@@ -188,10 +195,10 @@ const Donations: React.FC = () => {
             ))}
           </div>
         </div>
-      </section>
+      </AccessibleSection>
 
       {/* Donation Options Section */}
-      <section className="py-16 bg-neutral-50">
+      <AccessibleSection variant="neutral" ariaLabel="قسم خيارات التبرع">
         <div className="container">
           <div className="text-center mb-16">
             <SectionTitle
@@ -260,10 +267,10 @@ const Donations: React.FC = () => {
             ))}
           </div>
         </div>
-      </section>
+      </AccessibleSection>
 
       {/* Donation Form Section */}
-      <section className="py-16 bg-white">
+      <AccessibleSection variant="content" ariaLabel="قسم نموذج التبرع">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Form */}
@@ -280,7 +287,7 @@ const Donations: React.FC = () => {
                 {donationStatus === 'success' && (
                   <Alert
                     type="success"
-                    message="Thank you for your donation!"
+                    title="Thank you for your donation!"
                     className="mb-6"
                   >
                     Your generous contribution will make a real difference.
@@ -289,11 +296,7 @@ const Donations: React.FC = () => {
                 )}
 
                 {donationStatus === 'error' && (
-                  <Alert
-                    type="error"
-                    message="Donation failed"
-                    className="mb-6"
-                  >
+                  <Alert type="error" title="Donation failed" className="mb-6">
                     There was an error processing your donation. Please try
                     again.
                   </Alert>
@@ -419,7 +422,7 @@ const Donations: React.FC = () => {
 
                   <Button
                     type="submit"
-                    variant="accent"
+                    variant="primary"
                     size="lg"
                     loading={isDonating}
                     fullWidth
@@ -556,7 +559,7 @@ const Donations: React.FC = () => {
             </motion.div>
           </div>
         </div>
-      </section>
+      </AccessibleSection>
     </div>
   );
 };

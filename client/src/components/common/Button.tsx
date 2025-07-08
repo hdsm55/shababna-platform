@@ -27,12 +27,12 @@ const baseStyles =
   'inline-flex items-center justify-center font-semibold transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed rounded-md';
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: 'bg-primary text-white hover:bg-primary/90 shadow-md',
-  secondary: 'bg-secondary text-white hover:bg-secondary/90',
-  ghost: 'bg-transparent text-primary hover:bg-primary/10',
-  icon: 'bg-transparent text-primary p-2 rounded-full hover:bg-primary/10',
+  primary: 'bg-primary-600 text-white hover:bg-primary-700 shadow-md',
+  secondary: 'bg-secondary-600 text-white hover:bg-secondary-700',
+  ghost: 'bg-transparent text-primary-600 hover:bg-primary-50',
+  icon: 'bg-transparent text-primary-600 p-2 rounded-full hover:bg-primary-50',
   outline:
-    'bg-transparent border border-primary text-primary hover:bg-primary/5',
+    'bg-transparent border-2 border-primary-600 text-primary-600 hover:bg-primary-50',
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -89,6 +89,7 @@ const Button: React.FC<ButtonProps> = ({
         {...baseProps}
         disabled={disabled || loading}
         whileTap={{ scale: 0.97 }}
+        onAnimationStart={() => {}}
       >
         {content}
       </MotionButton>

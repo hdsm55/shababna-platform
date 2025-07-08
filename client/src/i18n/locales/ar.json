@@ -181,7 +181,10 @@
       "programs": "إدارة البرامج",
       "users": "المستخدمون",
       "donations": "التبرعات",
-      "settings": "الإعدادات"
+      "settings": "الإعدادات",
+      "main": "الرئيسية",
+      "management": "إدارة المحتوى",
+      "settingsSection": "الإعدادات"
     }
   },
   "common": {

@@ -36,4 +36,20 @@ http.interceptors.response.use(
   }
 );
 
+export const loginApi = async (email: string, password: string) => {
+  const { data } = await http.post('/auth/login', { email, password });
+  return data;
+};
+
+export const registerApi = async (data: {
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  phone?: string;
+}) => {
+  const res = await http.post('/auth/register', data);
+  return res.data;
+};
+
 export default http;

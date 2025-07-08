@@ -16,6 +16,12 @@ import {
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
 import { submitContactForm, ContactFormData } from '../services/formsApi';
+import {
+  AccessibleSection,
+  AccessibleCard,
+  AccessibleButton,
+  SkipToContent,
+} from '../components/common/AccessibleComponents';
 
 // Using imported ContactFormData from formsApi
 
@@ -99,9 +105,10 @@ const Contact: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
+      <SkipToContent />
       {/* Header Section */}
-      <section className="bg-white py-16">
+      <AccessibleSection variant="content" ariaLabel="قسم رأس صفحة الاتصال">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <motion.div
@@ -118,9 +125,13 @@ const Contact: React.FC = () => {
             </motion.div>
           </div>
         </div>
-      </section>
+      </AccessibleSection>
 
-      <section className="py-12">
+      {/* Contact Form & Info Section */}
+      <AccessibleSection
+        variant="neutral"
+        ariaLabel="قسم نموذج الاتصال والمعلومات"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Form */}
@@ -295,7 +306,7 @@ const Contact: React.FC = () => {
             </motion.div>
           </div>
         </div>
-      </section>
+      </AccessibleSection>
     </div>
   );
 };

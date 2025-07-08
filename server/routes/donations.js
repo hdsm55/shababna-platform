@@ -214,4 +214,131 @@ router.get('/my-donations', authMiddleware, async (req, res) => {
   }
 });
 
+// جلب جميع التبرعات
+router.get('/', async (req, res) => {
+  try {
+    const result = await query(`
+            SELECT
+                d.*,
+                u.first_name || ' ' || u.last_name as donor_name,
+                u.email as donor_email,
+                p.title as program_title
+            FROM donations d
+            LEFT JOIN users u ON d.user_id = u.id
+            LEFT JOIN programs p ON d.program_id = p.id
+            ORDER BY d.donated_at DESC
+        `);
+
+    res.json({
+      success: true,
+      data: {
+        items: result.rows,
+        total: result.rows.length
+      }
+    });
+  } catch (error) {
+    console.error('Donations fetch error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطأ في جلب التبرعات'
+    });
+  }
+});
+
+// إضافة تبرع جديد
+router.post('/', async (req, res) => {
+  try {
+    const {
+      user_id,
+      program_id,
+      amount,
+      notes
+    } = req.body;
+
+    const result = await query(`
+            INSERT INTO donations (user_id, program_id, amount, notes)
+            VALUES ($1, $2, $3, $4)
+            RETURNING *
+        `, [user_id, program_id, amount, notes]);
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+      message: 'تم إضافة التبرع بنجاح'
+    });
+  } catch (error) {
+    console.error('Donation creation error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطأ في إضافة التبرع'
+    });
+  }
+});
+
+// تحديث تبرع
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      user_id,
+      program_id,
+      amount,
+      notes
+    } = req.body;
+
+    const result = await query(`
+            UPDATE donations
+            SET user_id = $1, program_id = $2, amount = $3, notes = $4
+            WHERE id = $5
+            RETURNING *
+        `, [user_id, program_id, amount, notes, id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'التبرع غير موجود'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+      message: 'تم تحديث التبرع بنجاح'
+    });
+  } catch (error) {
+    console.error('Donation update error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطأ في تحديث التبرع'
+    });
+  }
+});
+
+// حذف تبرع
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await query('DELETE FROM donations WHERE id = $1 RETURNING *', [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'التبرع غير موجود'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'تم حذف التبرع بنجاح'
+    });
+  } catch (error) {
+    console.error('Donation deletion error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطأ في حذف التبرع'
+    });
+  }
+});
+
 export default router;

@@ -38,6 +38,12 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import { fetchEvents } from '../services/eventsApi';
 import { fetchPrograms } from '../services/programsApi';
 import { Program } from '../types';
+import {
+  AccessibleSection,
+  AccessibleCard,
+  AccessibleButton,
+  SkipToContent,
+} from '../components/common/AccessibleComponents';
 
 const Home: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -185,7 +191,8 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen">
+      <SkipToContent />
       <SEO
         title={t('home.seo.title')}
         description={t('home.seo.description')}
@@ -193,7 +200,7 @@ const Home: React.FC = () => {
       />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 py-20 lg:py-28">
+      <AccessibleSection variant="hero" ariaLabel="القسم الرئيسي">
         {/* Enhanced Background Pattern */}
         <div className="absolute inset-0 opacity-15">
           <div
@@ -333,7 +340,7 @@ const Home: React.FC = () => {
             </motion.div>
           </div>
         </div>
-      </section>
+      </AccessibleSection>
 
       {/* Stats Section */}
       <section className="py-16 bg-white">

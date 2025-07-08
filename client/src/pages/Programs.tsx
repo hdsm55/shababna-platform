@@ -19,6 +19,12 @@ import Card from '../components/common/Card';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { fetchPrograms } from '../services/programsApi';
 import { Program } from '../types';
+import {
+  AccessibleSection,
+  AccessibleCard,
+  AccessibleButton,
+  SkipToContent,
+} from '../components/common/AccessibleComponents';
 
 const Programs: React.FC = () => {
   const { t } = useTranslation();
@@ -77,7 +83,8 @@ const Programs: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen">
+      <SkipToContent />
       <SEO
         title="Programs"
         description="Explore our comprehensive youth development programs including leadership training, skill development, and community engagement initiatives."
@@ -85,7 +92,7 @@ const Programs: React.FC = () => {
       />
 
       {/* Header Section */}
-      <section className="relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 py-20 lg:py-32 overflow-hidden">
+      <AccessibleSection variant="hero" ariaLabel="قسم رأس صفحة البرامج">
         <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/3183153/pexels-photo-3183153.jpeg')] bg-cover bg-center opacity-5"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -137,10 +144,10 @@ const Programs: React.FC = () => {
             </div>
           </motion.div>
         </div>
-      </section>
+      </AccessibleSection>
 
       {/* Stats Section */}
-      <section className="py-16 bg-white">
+      <AccessibleSection variant="content" ariaLabel="قسم إحصائيات البرامج">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {[
@@ -191,10 +198,10 @@ const Programs: React.FC = () => {
             ))}
           </div>
         </div>
-      </section>
+      </AccessibleSection>
 
       {/* Programs Grid */}
-      <section className="py-12">
+      <AccessibleSection variant="neutral" ariaLabel="قسم شبكة البرامج">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Loading State */}
           {isLoading && (
@@ -415,10 +422,10 @@ const Programs: React.FC = () => {
             </>
           )}
         </div>
-      </section>
+      </AccessibleSection>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-secondary-600 to-primary-600 relative overflow-hidden">
+      <AccessibleSection variant="primary" ariaLabel="قسم دعوة للعمل">
         <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/3183153/pexels-photo-3183153.jpeg')] bg-cover bg-center opacity-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
@@ -452,7 +459,7 @@ const Programs: React.FC = () => {
             </div>
           </motion.div>
         </div>
-      </section>
+      </AccessibleSection>
     </div>
   );
 };

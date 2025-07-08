@@ -111,6 +111,97 @@ INSERT INTO events (title, description, location, start_date, end_date, max_atte
   'upcoming'
 );
 
+-- Seed data for users table
+INSERT INTO users (email, password, first_name, last_name, phone, bio, is_active, is_admin, created_at) VALUES
+(
+  'admin@shababna.org',
+  '$2b$10$rQZ8K9mN2pL4vX7yJ1hG3qR5tU8wE0fA1sB2cD3eF4gH5iI6jK7lM8nO9pQ',
+  'أحمد',
+  'محمد',
+  '+966501234567',
+  'مدير المنظمة',
+  true,
+  true,
+  '2024-01-01 00:00:00'
+),
+(
+  'sara@example.com',
+  '$2b$10$rQZ8K9mN2pL4vX7yJ1hG3qR5tU8wE0fA1sB2cD3eF4gH5iI6jK7lM8nO9pQ',
+  'سارة',
+  'علي',
+  '+966502345678',
+  'مطور برمجيات',
+  true,
+  false,
+  '2024-01-15 00:00:00'
+),
+(
+  'omar@example.com',
+  '$2b$10$rQZ8K9mN2pL4vX7yJ1hG3qR5tU8wE0fA1sB2cD3eF4gH5iI6jK7lM8nO9pQ',
+  'عمر',
+  'خالد',
+  '+966503456789',
+  'مصمم جرافيك',
+  true,
+  false,
+  '2024-01-20 00:00:00'
+),
+(
+  'fatima@example.com',
+  '$2b$10$rQZ8K9mN2pL4vX7yJ1hG3qR5tU8wE0fA1sB2cD3eF4gH5iI6jK7lM8nO9pQ',
+  'فاطمة',
+  'أحمد',
+  '+966504567890',
+  'مدير مشاريع',
+  true,
+  false,
+  '2024-02-01 00:00:00'
+),
+(
+  'khalid@example.com',
+  '$2b$10$rQZ8K9mN2pL4vX7yJ1hG3qR5tU8wE0fA1sB2cD3eF4gH5iI6jK7lM8nO9pQ',
+  'خالد',
+  'علي',
+  '+966505678901',
+  'محلل بيانات',
+  true,
+  false,
+  '2024-02-10 00:00:00'
+),
+(
+  'noor@example.com',
+  '$2b$10$rQZ8K9mN2pL4vX7yJ1hG3qR5tU8wE0fA1sB2cD3eF4gH5iI6jK7lM8nO9pQ',
+  'نور',
+  'محمد',
+  '+966506789012',
+  'مترجم',
+  true,
+  false,
+  '2024-02-15 00:00:00'
+),
+(
+  'yousef@example.com',
+  '$2b$10$rQZ8K9mN2pL4vX7yJ1hG3qR5tU8wE0fA1sB2cD3eF4gH5iI6jK7lM8nO9pQ',
+  'يوسف',
+  'عبدالله',
+  '+966507890123',
+  'مصور',
+  true,
+  false,
+  '2024-02-20 00:00:00'
+),
+(
+  'laila@example.com',
+  '$2b$10$rQZ8K9mN2pL4vX7yJ1hG3qR5tU8wE0fA1sB2cD3eF4gH5iI6jK7lM8nO9pQ',
+  'ليلى',
+  'علي',
+  '+966508901234',
+  'كاتبة محتوى',
+  true,
+  false,
+  '2024-02-25 00:00:00'
+);
+
 -- Seed data for programs table
 INSERT INTO programs (title, description, category, goal_amount, current_amount, start_date, end_date) VALUES
 (
@@ -158,3 +249,21 @@ INSERT INTO programs (title, description, category, goal_amount, current_amount,
   '2024-01-01 00:00:00',
   '2024-12-31 23:59:59'
 );
+
+-- Seed data for donations table
+INSERT INTO donations (user_id, program_id, amount, donated_at) VALUES
+(2, 1, 1000.00, '2024-01-15 10:30:00'),
+(3, 1, 500.00, '2024-01-16 14:20:00'),
+(4, 2, 2000.00, '2024-01-17 09:15:00'),
+(5, 2, 1500.00, '2024-01-18 16:45:00'),
+(6, 3, 800.00, '2024-01-19 11:30:00'),
+(7, 3, 1200.00, '2024-01-20 13:20:00'),
+(8, 4, 3000.00, '2024-01-21 15:10:00'),
+(2, 4, 1000.00, '2024-01-22 10:45:00'),
+(3, 5, 2500.00, '2024-01-23 12:30:00'),
+(4, 5, 1800.00, '2024-01-24 14:15:00'),
+(5, 1, 600.00, '2024-01-25 16:20:00'),
+(6, 2, 900.00, '2024-01-26 08:30:00'),
+(7, 3, 700.00, '2024-01-27 17:45:00'),
+(8, 4, 1500.00, '2024-01-28 11:20:00'),
+(2, 5, 2200.00, '2024-01-29 13:10:00');

@@ -20,7 +20,9 @@ import JoinUs from './pages/JoinUs';
 import Contact from './pages/Contact';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
-import Dashboard from './pages/dashboard/Dashboard';
+import DashboardOverview from './pages/dashboard/Dashboard';
+import ProgramsDashboard from './pages/dashboard/Programs';
+import EventsDashboard from './pages/dashboard/Events';
 
 function App() {
   const { i18n } = useTranslation();
@@ -48,7 +50,12 @@ function App() {
                 path="/dashboard/*"
                 element={
                   <ProtectedRoute requiredRole="admin">
-                    <Dashboard />
+                    <Routes>
+                      <Route path="" element={<DashboardOverview />} />
+                      <Route path="programs" element={<ProgramsDashboard />} />
+                      <Route path="events" element={<EventsDashboard />} />
+                      {/* يمكن إضافة فروع أخرى هنا لاحقًا */}
+                    </Routes>
                   </ProtectedRoute>
                 }
               />

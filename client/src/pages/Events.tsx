@@ -11,6 +11,12 @@ import Card from '../components/common/Card';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { fetchEvents } from '../services/eventsApi';
 import { Event } from '../types';
+import {
+  AccessibleSection,
+  AccessibleCard,
+  AccessibleButton,
+  SkipToContent,
+} from '../components/common/AccessibleComponents';
 
 const Events: React.FC = () => {
   const { t } = useTranslation();
@@ -99,7 +105,8 @@ const Events: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen">
+      <SkipToContent />
       <SEO
         title="Events"
         description="Discover upcoming events, workshops, and conferences organized by Shababna Global. Join our community events and connect with youth leaders worldwide."
@@ -107,7 +114,7 @@ const Events: React.FC = () => {
       />
 
       {/* Header Section */}
-      <section className="relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 py-20 lg:py-32 overflow-hidden">
+      <AccessibleSection variant="hero" ariaLabel="قسم رأس صفحة الفعاليات">
         <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/1181622/pexels-photo-1181622.jpeg')] bg-cover bg-center opacity-5"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -159,10 +166,10 @@ const Events: React.FC = () => {
             </div>
           </motion.div>
         </div>
-      </section>
+      </AccessibleSection>
 
       {/* Stats Section */}
-      <section className="py-16 bg-white">
+      <AccessibleSection variant="content" ariaLabel="قسم الإحصائيات">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {[
@@ -213,10 +220,10 @@ const Events: React.FC = () => {
             ))}
           </div>
         </div>
-      </section>
+      </AccessibleSection>
 
       {/* Events Grid */}
-      <section className="py-12">
+      <AccessibleSection variant="neutral" ariaLabel="قسم شبكة الفعاليات">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Loading State */}
           {isLoading && (
@@ -424,10 +431,10 @@ const Events: React.FC = () => {
             </>
           )}
         </div>
-      </section>
+      </AccessibleSection>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary-600 to-secondary-600 relative overflow-hidden">
+      <AccessibleSection variant="primary" ariaLabel="قسم دعوة للعمل">
         <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/1181622/pexels-photo-1181622.jpeg')] bg-cover bg-center opacity-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
@@ -461,7 +468,7 @@ const Events: React.FC = () => {
             </div>
           </motion.div>
         </div>
-      </section>
+      </AccessibleSection>
     </div>
   );
 };

@@ -26,6 +26,12 @@ import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { fetchEventById } from '../services/eventsApi';
 import { Event } from '../types';
+import {
+  AccessibleSection,
+  AccessibleCard,
+  AccessibleButton,
+  SkipToContent,
+} from '../components/common/AccessibleComponents';
 
 const EventDetail: React.FC = () => {
   const { t } = useTranslation();
@@ -114,7 +120,7 @@ const EventDetail: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="w-full max-w-4xl mx-auto animate-pulse">
           <div className="h-56 bg-gray-200 rounded-2xl mb-8" />
           <div className="h-10 bg-gray-200 rounded w-2/3 mb-4" />
@@ -134,12 +140,14 @@ const EventDetail: React.FC = () => {
       errorMsg = t('events.notFound', 'عذراً، لم يتم العثور على هذه الفعالية.');
     }
     return (
-      <div className="min-h-screen bg-neutral-50">
+      <div className="min-h-screen">
+        <SkipToContent />
         <div className="container py-16">
-          <Alert type="error" className="max-w-2xl mx-auto">
-            <div className="font-bold mb-2">
-              {t('common.error.title', 'حدث خطأ')}
-            </div>
+          <Alert
+            type="error"
+            title={t('common.error.title', 'حدث خطأ')}
+            className="max-w-2xl mx-auto"
+          >
             {errorMsg}
           </Alert>
           <div className="text-center mt-8">
@@ -155,9 +163,10 @@ const EventDetail: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen">
+      <SkipToContent />
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 py-20 lg:py-32 overflow-hidden">
+      <AccessibleSection variant="hero" ariaLabel="قسم رأس تفاصيل الفعالية">
         <div className="absolute inset-0 bg-black/20"></div>
         {/* Event Banner Image */}
         {event.image && (
@@ -264,10 +273,10 @@ const EventDetail: React.FC = () => {
             </motion.div>
           </div>
         </div>
-      </section>
+      </AccessibleSection>
 
       {/* Content Section */}
-      <section className="py-16">
+      <AccessibleSection variant="neutral" ariaLabel="قسم محتوى الفعالية">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
@@ -382,14 +391,22 @@ const EventDetail: React.FC = () => {
                   </h3>
 
                   {registrationStatus === 'success' && (
-                    <Alert type="success" className="mb-6">
+                    <Alert
+                      type="success"
+                      title="Registration Successful!"
+                      className="mb-6"
+                    >
                       You have been successfully registered for this event.
                       We'll send you a confirmation email shortly.
                     </Alert>
                   )}
 
                   {registrationStatus === 'error' && (
-                    <Alert type="error" className="mb-6">
+                    <Alert
+                      type="error"
+                      title="Registration Error"
+                      className="mb-6"
+                    >
                       There was an error processing your registration. Please
                       try again.
                     </Alert>
@@ -557,7 +574,7 @@ const EventDetail: React.FC = () => {
             </div>
           </div>
         </div>
-      </section>
+      </AccessibleSection>
 
       {/* Toast for registration status */}
       {registrationStatus === 'success' && (
@@ -575,7 +592,7 @@ const EventDetail: React.FC = () => {
       )}
 
       {/* Suggested Events Section */}
-      <section className="py-16 bg-neutral-50 border-t mt-16">
+      <AccessibleSection variant="content" ariaLabel="قسم الفعاليات المقترحة">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold mb-8 text-primary-700 flex items-center gap-2">
             <Calendar className="w-6 h-6" />
@@ -593,7 +610,7 @@ const EventDetail: React.FC = () => {
             ))}
           </div>
         </div>
-      </section>
+      </AccessibleSection>
     </div>
   );
 };

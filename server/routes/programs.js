@@ -7,51 +7,30 @@ const router = express.Router();
 // Get all programs
 router.get('/', async (req, res) => {
   try {
-    const { category, search, limit = 10, offset = 0 } = req.query;
-
-    let sql = 'SELECT * FROM programs WHERE 1=1';
-    const params = [];
-    let paramIndex = 1;
-
-    if (category && category !== 'all') {
-      sql += ` AND category = $${paramIndex}`;
-      params.push(category);
-      paramIndex++;
-    }
-
-    if (search) {
-      sql += ` AND (title ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`;
-      params.push(`%${search}%`);
-      paramIndex++;
-    }
-
-    // Get total count
-    const countSql = sql.replace('SELECT *', 'SELECT COUNT(*)');
-    const countResult = await query(countSql, params);
-    const total = parseInt(countResult.rows[0].count);
-
-    // Add pagination
-    sql += ` ORDER BY created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
-    params.push(parseInt(limit), parseInt(offset));
-
-    const result = await query(sql, params);
+    const result = await query(`
+      SELECT
+        p.*,
+        COALESCE(SUM(d.amount), 0) as current_amount,
+        COUNT(DISTINCT d.user_id) as participants_count
+      FROM programs p
+      LEFT JOIN donations d ON p.id = d.program_id
+      GROUP BY p.id
+      ORDER BY p.created_at DESC
+    `);
 
     res.json({
       success: true,
-      message: 'Programs retrieved successfully',
       data: {
         items: result.rows,
-        pagination: {
-          page: parseInt(req.query.page) || 1,
-          limit: parseInt(limit),
-          total,
-          totalPages: Math.ceil(total / parseInt(limit))
-        }
+        total: result.rows.length
       }
     });
   } catch (error) {
-    console.error('Get programs error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Programs fetch error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطأ في جلب البرامج'
+    });
   }
 });
 
@@ -105,6 +84,107 @@ router.post('/:id/support', [
   } catch (error) {
     console.error('Program support error:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Add a new program
+router.post('/', async (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      category,
+      goal_amount,
+      start_date,
+      end_date
+    } = req.body;
+
+    const result = await query(`
+      INSERT INTO programs (title, description, category, goal_amount, start_date, end_date)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING *
+    `, [title, description, category, goal_amount, start_date, end_date]);
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+      message: 'تم إضافة البرنامج بنجاح'
+    });
+  } catch (error) {
+    console.error('Program creation error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطأ في إضافة البرنامج'
+    });
+  }
+});
+
+// Update a program
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      title,
+      description,
+      category,
+      goal_amount,
+      start_date,
+      end_date
+    } = req.body;
+
+    const result = await query(`
+      UPDATE programs
+      SET title = $1, description = $2, category = $3, goal_amount = $4,
+          start_date = $5, end_date = $6, updated_at = NOW()
+      WHERE id = $7
+      RETURNING *
+    `, [title, description, category, goal_amount, start_date, end_date, id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'البرنامج غير موجود'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+      message: 'تم تحديث البرنامج بنجاح'
+    });
+  } catch (error) {
+    console.error('Program update error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطأ في تحديث البرنامج'
+    });
+  }
+});
+
+// Delete a program
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await query('DELETE FROM programs WHERE id = $1 RETURNING *', [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'البرنامج غير موجود'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'تم حذف البرنامج بنجاح'
+    });
+  } catch (error) {
+    console.error('Program deletion error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطأ في حذف البرنامج'
+    });
   }
 });
 

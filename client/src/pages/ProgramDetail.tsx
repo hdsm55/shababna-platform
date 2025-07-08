@@ -30,6 +30,12 @@ import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { fetchProgramById } from '../services/programsApi';
 import { Program } from '../types';
+import {
+  AccessibleSection,
+  AccessibleCard,
+  AccessibleButton,
+  SkipToContent,
+} from '../components/common/AccessibleComponents';
 
 const ProgramDetail: React.FC = () => {
   const { t } = useTranslation();
@@ -113,7 +119,7 @@ const ProgramDetail: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="w-full max-w-4xl mx-auto animate-pulse">
           <div className="h-56 bg-gray-200 rounded-2xl mb-8" />
           <div className="h-10 bg-gray-200 rounded w-2/3 mb-4" />
@@ -136,11 +142,12 @@ const ProgramDetail: React.FC = () => {
       );
     }
     return (
-      <div className="min-h-screen bg-neutral-50">
+      <div className="min-h-screen">
+        <SkipToContent />
         <div className="container py-16">
           <Alert
             type="error"
-            message={t('common.error.title', 'حدث خطأ')}
+            title={t('common.error.title', 'حدث خطأ')}
             className="max-w-2xl mx-auto"
           >
             {errorMsg}
@@ -162,9 +169,10 @@ const ProgramDetail: React.FC = () => {
     : 0;
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen">
+      <SkipToContent />
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 py-20 lg:py-32 overflow-hidden">
+      <AccessibleSection variant="hero" ariaLabel="قسم رأس تفاصيل البرنامج">
         <div className="absolute inset-0 bg-black/20"></div>
         {/* Program Banner Image */}
         {program.image && (
@@ -248,10 +256,10 @@ const ProgramDetail: React.FC = () => {
             </motion.div>
           </div>
         </div>
-      </section>
+      </AccessibleSection>
 
       {/* Content Section */}
-      <section className="py-16">
+      <AccessibleSection variant="neutral" ariaLabel="قسم محتوى البرنامج">
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Main Content */}
@@ -476,7 +484,7 @@ const ProgramDetail: React.FC = () => {
                   {donationStatus === 'success' && (
                     <Alert
                       type="success"
-                      message="Donation successful!"
+                      title="Donation successful!"
                       className="mb-6"
                     >
                       Thank you for your generous support! We'll send you a
@@ -487,7 +495,7 @@ const ProgramDetail: React.FC = () => {
                   {donationStatus === 'error' && (
                     <Alert
                       type="error"
-                      message="Donation failed"
+                      title="Donation failed"
                       className="mb-6"
                     >
                       There was an error processing your donation. Please try
@@ -574,7 +582,7 @@ const ProgramDetail: React.FC = () => {
 
                     <Button
                       type="submit"
-                      variant="accent"
+                      variant="primary"
                       size="lg"
                       loading={isDonating}
                       fullWidth
@@ -655,7 +663,7 @@ const ProgramDetail: React.FC = () => {
             </div>
           </div>
         </div>
-      </section>
+      </AccessibleSection>
 
       {/* Toast for donation status */}
       {donationStatus === 'success' && (
@@ -670,7 +678,7 @@ const ProgramDetail: React.FC = () => {
       )}
 
       {/* Suggested Programs Section */}
-      <section className="py-16 bg-neutral-50 border-t mt-16">
+      <AccessibleSection variant="content" ariaLabel="قسم البرامج المقترحة">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold mb-8 text-primary-700 flex items-center gap-2">
             <Target className="w-6 h-6" />
@@ -688,7 +696,7 @@ const ProgramDetail: React.FC = () => {
             ))}
           </div>
         </div>
-      </section>
+      </AccessibleSection>
     </div>
   );
 };

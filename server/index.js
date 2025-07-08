@@ -19,6 +19,7 @@ import programsRoutes from './routes/programs.js';
 import usersRoutes from './routes/users.js';
 import donationsRoutes from './routes/donations.js';
 import formsRoutes from './routes/forms.js';
+import dashboardRoutes from './routes/dashboard.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -52,6 +53,7 @@ app.use('/api/programs', programsRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/donations', donationsRoutes);
 app.use('/api/forms', formsRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -442,4 +442,139 @@ router.delete('/:id/register', [
   }
 });
 
+// جلب جميع الفعاليات
+router.get('/all', async (req, res) => {
+  try {
+    const result = await query(`
+            SELECT
+                e.*,
+                COUNT(er.user_id) as registered_count
+            FROM events e
+            LEFT JOIN event_registrations er ON e.id = er.event_id
+            GROUP BY e.id
+            ORDER BY e.created_at DESC
+        `);
+
+    res.json({
+      success: true,
+      data: {
+        items: result.rows,
+        total: result.rows.length
+      }
+    });
+  } catch (error) {
+    console.error('Events fetch error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطأ في جلب الفعاليات'
+    });
+  }
+});
+
+// إضافة فعالية جديدة
+router.post('/', async (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      location,
+      start_date,
+      end_date,
+      max_attendees,
+      category,
+      status = 'upcoming'
+    } = req.body;
+
+    const result = await query(`
+            INSERT INTO events (title, description, location, start_date, end_date, max_attendees, category, status)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            RETURNING *
+        `, [title, description, location, start_date, end_date, max_attendees, category, status]);
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+      message: 'تم إضافة الفعالية بنجاح'
+    });
+  } catch (error) {
+    console.error('Event creation error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطأ في إضافة الفعالية'
+    });
+  }
+});
+
+// تحديث فعالية
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      title,
+      description,
+      location,
+      start_date,
+      end_date,
+      max_attendees,
+      category,
+      status
+    } = req.body;
+
+    const result = await query(`
+            UPDATE events
+            SET title = $1, description = $2, location = $3, start_date = $4,
+                end_date = $5, max_attendees = $6, category = $7, status = $8,
+                updated_at = NOW()
+            WHERE id = $9
+            RETURNING *
+        `, [title, description, location, start_date, end_date, max_attendees, category, status, id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'الفعالية غير موجودة'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+      message: 'تم تحديث الفعالية بنجاح'
+    });
+  } catch (error) {
+    console.error('Event update error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطأ في تحديث الفعالية'
+    });
+  }
+});
+
+// حذف فعالية
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await query('DELETE FROM events WHERE id = $1 RETURNING *', [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'الفعالية غير موجودة'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'تم حذف الفعالية بنجاح'
+    });
+  } catch (error) {
+    console.error('Event deletion error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطأ في حذف الفعالية'
+    });
+  }
+});
+
 export default router;

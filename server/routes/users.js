@@ -1,6 +1,7 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
 import { query } from '../config/database.js';
+import bcrypt from 'bcryptjs';
 
 const router = express.Router();
 
@@ -91,28 +92,148 @@ router.get('/profile', async (req, res) => {
 // Get all users (admin only)
 router.get('/', async (req, res) => {
   try {
-    const { limit = 10, offset = 0 } = req.query;
-
-    // Get total count
-    const countResult = await query('SELECT COUNT(*) FROM users');
-    const total = parseInt(countResult.rows[0].count);
-
-    // Get paginated users (excluding passwords)
     const result = await query(`
-      SELECT id, email, first_name, last_name, phone, bio, is_active, is_admin, created_at, updated_at
-      FROM users
-      ORDER BY created_at DESC
-      LIMIT $1 OFFSET $2
-    `, [parseInt(limit), parseInt(offset)]);
+      SELECT
+        u.id,
+        u.first_name,
+        u.last_name,
+        u.email,
+        u.phone,
+        u.bio,
+        u.is_admin,
+        u.is_active,
+        u.created_at,
+        u.updated_at,
+        COUNT(DISTINCT er.event_id) as events_attended,
+        COUNT(DISTINCT d.program_id) as programs_participated,
+        COALESCE(SUM(d.amount), 0) as total_donations
+      FROM users u
+      LEFT JOIN event_registrations er ON u.id = er.user_id
+      LEFT JOIN donations d ON u.id = d.user_id
+      GROUP BY u.id
+      ORDER BY u.created_at DESC
+    `);
 
     res.json({
-      users: result.rows,
-      total,
-      hasMore: parseInt(offset) + parseInt(limit) < total
+      success: true,
+      data: {
+        items: result.rows,
+        total: result.rows.length
+      }
     });
   } catch (error) {
-    console.error('Get users error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Users fetch error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطأ في جلب المستخدمين'
+    });
+  }
+});
+
+// إضافة مستخدم جديد
+router.post('/', async (req, res) => {
+  try {
+    const {
+      first_name,
+      last_name,
+      email,
+      phone,
+      bio,
+      password,
+      is_admin = false,
+      is_active = true
+    } = req.body;
+
+    // تشفير كلمة المرور
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await query(`
+      INSERT INTO users (first_name, last_name, email, phone, bio, password, is_admin, is_active)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING id, first_name, last_name, email, phone, bio, is_admin, is_active, created_at
+    `, [first_name, last_name, email, phone, bio, hashedPassword, is_admin, is_active]);
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+      message: 'تم إضافة المستخدم بنجاح'
+    });
+  } catch (error) {
+    console.error('User creation error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطأ في إضافة المستخدم'
+    });
+  }
+});
+
+// تحديث مستخدم
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      first_name,
+      last_name,
+      email,
+      phone,
+      bio,
+      is_admin,
+      is_active
+    } = req.body;
+
+    const result = await query(`
+      UPDATE users
+      SET first_name = $1, last_name = $2, email = $3, phone = $4,
+        bio = $5, is_admin = $6, is_active = $7, updated_at = NOW()
+      WHERE id = $8
+      RETURNING id, first_name, last_name, email, phone, bio, is_admin, is_active, created_at, updated_at
+    `, [first_name, last_name, email, phone, bio, is_admin, is_active, id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'المستخدم غير موجود'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result.rows[0],
+      message: 'تم تحديث المستخدم بنجاح'
+    });
+  } catch (error) {
+    console.error('User update error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطأ في تحديث المستخدم'
+    });
+  }
+});
+
+// حذف مستخدم
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await query('DELETE FROM users WHERE id = $1 RETURNING *', [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'المستخدم غير موجود'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'تم حذف المستخدم بنجاح'
+    });
+  } catch (error) {
+    console.error('User deletion error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'خطأ في حذف المستخدم'
+    });
   }
 });
 

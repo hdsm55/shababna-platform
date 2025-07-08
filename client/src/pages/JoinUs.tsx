@@ -5,6 +5,12 @@ import { motion } from 'framer-motion';
 import { Send, Users, Globe, Heart } from 'lucide-react';
 import Button from '../components/common/Button';
 import Card from '../components/common/Card';
+import {
+  AccessibleSection,
+  AccessibleCard,
+  AccessibleButton,
+  SkipToContent,
+} from '../components/common/AccessibleComponents';
 
 interface JoinUsFormData {
   firstName: string;
@@ -62,9 +68,10 @@ const JoinUs: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
+      <SkipToContent />
       {/* Header Section */}
-      <section className="relative bg-gradient-to-br from-primary-50 via-white to-accent-50 py-20 lg:py-32 overflow-hidden">
+      <AccessibleSection variant="hero" ariaLabel="قسم رأس صفحة الانضمام">
         <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg')] bg-cover bg-center opacity-5"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -106,10 +113,10 @@ const JoinUs: React.FC = () => {
             ))}
           </div>
         </div>
-      </section>
+      </AccessibleSection>
 
       {/* Form Section */}
-      <section className="py-12">
+      <AccessibleSection variant="neutral" ariaLabel="قسم نموذج الانضمام">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -312,10 +319,10 @@ const JoinUs: React.FC = () => {
             </Card>
           </motion.div>
         </div>
-      </section>
+      </AccessibleSection>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary-600 to-accent-600 relative overflow-hidden">
+      <AccessibleSection variant="primary" ariaLabel="قسم دعوة للعمل">
         <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg')] bg-cover bg-center opacity-10"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
@@ -349,7 +356,7 @@ const JoinUs: React.FC = () => {
             </div>
           </motion.div>
         </div>
-      </section>
+      </AccessibleSection>
     </div>
   );
 };
