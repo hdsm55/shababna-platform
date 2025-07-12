@@ -49,7 +49,8 @@ CREATE TABLE programs (
   start_date TIMESTAMP NOT NULL,
   end_date TIMESTAMP NOT NULL,
   created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
+  updated_at TIMESTAMP DEFAULT NOW(),
+  image_url TEXT
 );
 
 -- === 5. جدول التسجيل في الفعاليات ===

@@ -3,116 +3,18 @@ import { body, validationResult } from 'express-validator';
 import { query } from '../config/database.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import { adminMiddleware } from '../middleware/adminMiddleware.js';
+import { getAllEvents, getEventById, createEvent, updateEvent, deleteEvent } from '../controllers/eventsController.js';
 
 const router = express.Router();
 
-// Get all events with filters and pagination
-router.get('/', async (req, res) => {
-  try {
-    const {
-      category,
-      search,
-      page = 1,
-      limit = 10,
-      status = 'upcoming'
-    } = req.query;
+// Get all events (public)
+router.get('/', getAllEvents);
 
-    const offset = (parseInt(page) - 1) * parseInt(limit);
-
-    let sql = 'SELECT * FROM events WHERE 1=1';
-    const params = [];
-    let paramIndex = 1;
-
-    // Filter by category
-    if (category && category !== 'all') {
-      sql += ` AND category = $${paramIndex}`;
-      params.push(category);
-      paramIndex++;
-    }
-
-    // Filter by status
-    if (status && status !== 'all') {
-      sql += ` AND status = $${paramIndex}`;
-      params.push(status);
-      paramIndex++;
-    }
-
-    // Search functionality
-    if (search) {
-      sql += ` AND (title ILIKE $${paramIndex} OR description ILIKE $${paramIndex} OR location ILIKE $${paramIndex})`;
-      params.push(`%${search}%`);
-      paramIndex++;
-    }
-
-    // Get total count for pagination
-    const countSql = sql.replace('SELECT *', 'SELECT COUNT(*)');
-    const countResult = await query(countSql, params);
-    const total = parseInt(countResult.rows[0].count);
-
-    // Add pagination and ordering
-    sql += ` ORDER BY start_date ASC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
-    params.push(parseInt(limit), offset);
-
-    const result = await query(sql, params);
-
-    // Calculate pagination info
-    const totalPages = Math.ceil(total / parseInt(limit));
-
-    res.json({
-      success: true,
-      message: 'Events retrieved successfully',
-      data: {
-        items: result.rows,
-        pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
-          total,
-          totalPages
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Get events error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching events'
-    });
-  }
-});
-
-// Get single event by ID
-router.get('/:id', async (req, res) => {
-  try {
-    const result = await query(
-      'SELECT * FROM events WHERE id = $1',
-      [req.params.id]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'Event not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      message: 'Event retrieved successfully',
-      data: result.rows[0]
-    });
-  } catch (error) {
-    console.error('Get event error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching event'
-    });
-  }
-});
+// Get single event (public)
+router.get('/:id', getEventById);
 
 // Create new event (admin only)
-router.post('/', [
-  authMiddleware,
-  adminMiddleware,
+router.post('/', authMiddleware, adminMiddleware, [
   body('title').trim().isLength({ min: 1 }).withMessage('Title is required'),
   body('description').trim().isLength({ min: 10 }).withMessage('Description must be at least 10 characters'),
   body('location').trim().isLength({ min: 1 }).withMessage('Location is required'),
@@ -120,61 +22,10 @@ router.post('/', [
   body('end_date').isISO8601().withMessage('End date must be a valid date'),
   body('category').isIn(['workshop', 'conference', 'networking']).withMessage('Invalid category'),
   body('max_attendees').optional().isInt({ min: 1 }).withMessage('Max attendees must be a positive number')
-], async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array()
-      });
-    }
-
-    const {
-      title,
-      description,
-      location,
-      start_date,
-      end_date,
-      category,
-      max_attendees,
-      status = 'upcoming'
-    } = req.body;
-
-    // Validate that end_date is after start_date
-    if (new Date(end_date) <= new Date(start_date)) {
-      return res.status(400).json({
-        success: false,
-        message: 'End date must be after start date'
-      });
-    }
-
-    const result = await query(
-      `INSERT INTO events (title, description, location, start_date, end_date, category, max_attendees, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING *`,
-      [title, description, location, start_date, end_date, category, max_attendees, status]
-    );
-
-    res.status(201).json({
-      success: true,
-      message: 'Event created successfully',
-      data: result.rows[0]
-    });
-  } catch (error) {
-    console.error('Create event error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while creating event'
-    });
-  }
-});
+], createEvent);
 
 // Update event (admin only)
-router.put('/:id', [
-  authMiddleware,
-  adminMiddleware,
+router.put('/:id', authMiddleware, adminMiddleware, [
   body('title').optional().trim().isLength({ min: 1 }),
   body('description').optional().trim().isLength({ min: 10 }),
   body('location').optional().trim().isLength({ min: 1 }),
@@ -183,103 +34,10 @@ router.put('/:id', [
   body('category').optional().isIn(['workshop', 'conference', 'networking']),
   body('max_attendees').optional().isInt({ min: 1 }),
   body('status').optional().isIn(['upcoming', 'active', 'completed', 'cancelled'])
-], async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: errors.array()
-      });
-    }
-
-    // Check if event exists
-    const existingEvent = await query(
-      'SELECT * FROM events WHERE id = $1',
-      [req.params.id]
-    );
-
-    if (existingEvent.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'Event not found'
-      });
-    }
-
-    // Build update query dynamically
-    const updateFields = [];
-    const values = [];
-    let paramIndex = 1;
-
-    Object.keys(req.body).forEach(key => {
-      if (req.body[key] !== undefined) {
-        updateFields.push(`${key} = $${paramIndex}`);
-        values.push(req.body[key]);
-        paramIndex++;
-      }
-    });
-
-    if (updateFields.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'No fields to update'
-      });
-    }
-
-    // Add updated_at timestamp
-    updateFields.push(`updated_at = NOW()`);
-
-    values.push(req.params.id);
-    const result = await query(
-      `UPDATE events SET ${updateFields.join(', ')} WHERE id = $${paramIndex} RETURNING *`,
-      values
-    );
-
-    res.json({
-      success: true,
-      message: 'Event updated successfully',
-      data: result.rows[0]
-    });
-  } catch (error) {
-    console.error('Update event error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while updating event'
-    });
-  }
-});
+], updateEvent);
 
 // Delete event (admin only)
-router.delete('/:id', [
-  authMiddleware,
-  adminMiddleware
-], async (req, res) => {
-  try {
-    const result = await query(
-      'DELETE FROM events WHERE id = $1 RETURNING *',
-      [req.params.id]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'Event not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      message: 'Event deleted successfully'
-    });
-  } catch (error) {
-    console.error('Delete event error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error while deleting event'
-    });
-  }
-});
+router.delete('/:id', authMiddleware, adminMiddleware, deleteEvent);
 
 // Register for event
 router.post('/:id/register', [

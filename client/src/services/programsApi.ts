@@ -35,3 +35,15 @@ export const fetchUserDonations = async (): Promise<any[]> => {
   const response = await http.get('/donations/my-donations');
   return response.data.data;
 };
+
+// Create a new program (admin only)
+export const createProgram = async (programData: Partial<Program>): Promise<Program> => {
+  const response = await http.post('/programs', programData);
+  return response.data.data;
+};
+
+// Update an existing program (admin only)
+export const updateProgram = async (id: number | string, programData: Partial<Program>): Promise<Program> => {
+  const response = await http.put(`/programs/${id}`, programData);
+  return response.data.data;
+};

@@ -23,6 +23,11 @@ import Register from './pages/auth/Register';
 import DashboardOverview from './pages/dashboard/Dashboard';
 import ProgramsDashboard from './pages/dashboard/Programs';
 import EventsDashboard from './pages/dashboard/Events';
+import NewEvent from './pages/dashboard/events/NewEvent';
+import NewProgram from './pages/dashboard/programs/NewProgram';
+import NewDonation from './pages/dashboard/donations/NewDonation';
+import NewUser from './pages/dashboard/users/NewUser';
+import DonationsDashboard from './pages/dashboard/Donations';
 
 function App() {
   const { i18n } = useTranslation();
@@ -54,6 +59,15 @@ function App() {
                       <Route path="" element={<DashboardOverview />} />
                       <Route path="programs" element={<ProgramsDashboard />} />
                       <Route path="events" element={<EventsDashboard />} />
+                      <Route
+                        path="donations"
+                        element={<DonationsDashboard />}
+                      />
+                      {/* صفحات الإجراءات السريعة */}
+                      <Route path="events/new" element={<NewEvent />} />
+                      <Route path="programs/new" element={<NewProgram />} />
+                      <Route path="donations/new" element={<NewDonation />} />
+                      <Route path="users/new" element={<NewUser />} />
                       {/* يمكن إضافة فروع أخرى هنا لاحقًا */}
                     </Routes>
                   </ProtectedRoute>

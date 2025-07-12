@@ -48,9 +48,15 @@ const Login: React.FC = () => {
         return;
       }
       const { user, token } = response.data;
-      login(user, token);
+      // أضف role بناءً على is_admin
+      const userWithRole = { ...user, role: user.is_admin ? 'admin' : 'user' };
+      login(userWithRole, token);
       localStorage.setItem('token', token);
-      navigate('/dashboard');
+      if (userWithRole.role === 'admin') {
+        navigate('/dashboard');
+      } else {
+        navigate('/');
+      }
     } catch (error: any) {
       console.error('Login error:', error);
       if (

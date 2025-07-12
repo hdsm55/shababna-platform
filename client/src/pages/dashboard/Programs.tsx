@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchPrograms } from '../../services/programsApi';
+import {
+  fetchPrograms,
+  createProgram,
+  updateProgram,
+} from '../../services/programsApi';
 import { deleteProgram } from '../../services/dashboardApi';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
@@ -45,6 +49,7 @@ interface Program {
   participants_count: number;
   created_at: string;
   updated_at: string;
+  image_url?: string; // Added image_url to the interface
 }
 
 const ProgramsDashboard: React.FC = () => {
@@ -94,6 +99,7 @@ const ProgramsDashboard: React.FC = () => {
       participants_count: 45,
       created_at: '2024-05-15',
       updated_at: '2024-05-20',
+      image_url: '/default-program.png', // Added image_url for mock data
     },
     {
       id: '2',
@@ -108,6 +114,7 @@ const ProgramsDashboard: React.FC = () => {
       participants_count: 32,
       created_at: '2024-02-15',
       updated_at: '2024-05-01',
+      image_url: '/default-program.png', // Added image_url for mock data
     },
     {
       id: '3',
@@ -122,6 +129,7 @@ const ProgramsDashboard: React.FC = () => {
       participants_count: 25,
       created_at: '2024-06-01',
       updated_at: '2024-06-01',
+      image_url: '/default-program.png', // Added image_url for mock data
     },
   ];
 
@@ -186,7 +194,7 @@ const ProgramsDashboard: React.FC = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (
       !form.title ||
@@ -198,20 +206,46 @@ const ProgramsDashboard: React.FC = () => {
       return;
     }
 
-    // محاكاة عملية الإضافة/التعديل
-    if (modalType === 'add') {
-      console.log('إضافة برنامج جديد:', form);
-      // هنا سيتم إرسال البيانات إلى API
-      setModalMsg('تم إضافة البرنامج بنجاح!');
-    } else if (modalType === 'edit' && selectedProgram) {
-      console.log('تعديل البرنامج:', { id: selectedProgram.id, ...form });
-      // هنا سيتم إرسال البيانات إلى API
-      setModalMsg('تم تحديث البرنامج بنجاح!');
+    setFormError('');
+    setModalMsg('');
+    try {
+      // تحويل category إلى النوع الصحيح
+      const validCategories = [
+        'education',
+        'relief',
+        'youth',
+        'media',
+        'daawah',
+      ];
+      const categoryValue = validCategories.includes(form.category)
+        ? form.category
+        : 'education';
+      if (modalType === 'add') {
+        await createProgram({
+          title: form.title,
+          description: form.description,
+          category: categoryValue as Program['category'],
+          goal_amount: Number(form.goal_amount),
+          start_date: form.start_date,
+          end_date: form.end_date,
+        });
+        setModalMsg('تم إضافة البرنامج بنجاح!');
+      } else if (modalType === 'edit' && selectedProgram) {
+        await updateProgram(selectedProgram.id, {
+          title: form.title,
+          description: form.description,
+          category: categoryValue as Program['category'],
+          goal_amount: Number(form.goal_amount),
+          start_date: form.start_date,
+          end_date: form.end_date,
+        });
+        setModalMsg('تم تحديث البرنامج بنجاح!');
+      }
+      setModalOpen(false);
+      queryClient.invalidateQueries(['dashboard-programs']);
+    } catch (error) {
+      setFormError('حدث خطأ أثناء حفظ البرنامج');
     }
-
-    setModalOpen(false);
-    // إعادة تحميل البيانات
-    // queryClient.invalidateQueries(['dashboard-programs']);
   };
 
   const getStatusColor = (status: string) => {
@@ -257,7 +291,7 @@ const ProgramsDashboard: React.FC = () => {
         setModalMsg('تم حذف البرنامج بنجاح!');
         setModalOpen(true);
         // إعادة تحميل البيانات
-        queryClient.invalidateQueries({ queryKey: ['programs'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboard-programs'] });
       } catch (error) {
         console.error('خطأ في حذف البرنامج:', error);
         setFormError('حدث خطأ أثناء حذف البرنامج');
@@ -438,6 +472,16 @@ const ProgramsDashboard: React.FC = () => {
                   key={program.id}
                   className="hover:shadow-lg transition-shadow"
                 >
+                  {program.image_url && (
+                    <img
+                      src={program.image_url}
+                      alt={program.title}
+                      className="w-full h-40 object-cover rounded-t-lg mb-4"
+                      onError={(e) => {
+                        e.currentTarget.src = '/default-program.png';
+                      }} // صورة افتراضية إذا لم تظهر الصورة
+                    />
+                  )}
                   <div className="p-6">
                     {/* Header */}
                     <div className="flex items-start justify-between mb-4">

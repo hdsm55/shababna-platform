@@ -39,6 +39,8 @@ const NewEvent: React.FC = () => {
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
   const [success, setSuccess] = useState(false);
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -48,6 +50,16 @@ const NewEvent: React.FC = () => {
     setTimeout(() => {
       navigate('/dashboard/events');
     }, 1200);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -77,6 +89,22 @@ const NewEvent: React.FC = () => {
               rows={3}
               required
             />
+          </div>
+          <div>
+            <label className="block mb-1 font-medium">صورة الفعالية</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full"
+            />
+            {imagePreview && (
+              <img
+                src={imagePreview}
+                alt="معاينة الصورة"
+                className="mt-2 rounded shadow w-32 h-32 object-cover"
+              />
+            )}
           </div>
           <div>
             <label className="block mb-1 font-medium">تاريخ الفعالية</label>

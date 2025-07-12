@@ -8,6 +8,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import path from 'path';
 
 // Import database configuration
 import './config/database.js';
@@ -20,6 +21,7 @@ import usersRoutes from './routes/users.js';
 import donationsRoutes from './routes/donations.js';
 import formsRoutes from './routes/forms.js';
 import dashboardRoutes from './routes/dashboard.js';
+import errorHandler from './middleware/errorHandler.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -46,6 +48,9 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// جعل مجلد uploads متاحاً للقراءة عبر HTTP
+app.use('/uploads', express.static(path.join(process.cwd(), 'server', 'uploads')));
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventsRoutes);
@@ -55,6 +60,9 @@ app.use('/api/donations', donationsRoutes);
 app.use('/api/forms', formsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
+// Error handling middleware
+app.use(errorHandler);
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({
@@ -62,15 +70,6 @@ app.get('/api/health', (req, res) => {
     message: 'Shababna Global API is running',
     environment: process.env.NODE_ENV || 'development',
     timestamp: new Date().toISOString()
-  });
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : {}
   });
 });
 

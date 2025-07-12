@@ -63,7 +63,7 @@ const generateToken = (user) => {
 const handleValidationErrors = (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    res.status(400).json({
       success: false,
       message: 'Validation failed',
       errors: errors.array().map(error => ({
@@ -71,14 +71,16 @@ const handleValidationErrors = (req, res) => {
         message: error.msg
       }))
     });
+    return true;
   }
+  return false;
 };
 
 // POST /register - Register a new user
 router.post('/register', validateRegistration, async (req, res) => {
   try {
     // Check for validation errors
-    handleValidationErrors(req, res);
+    if (handleValidationErrors(req, res)) return;
 
     const { email, password, first_name, last_name, phone } = req.body;
 
@@ -99,7 +101,7 @@ router.post('/register', validateRegistration, async (req, res) => {
     // Create new user
     const newUserResult = await query(`
       INSERT INTO users (email, password, first_name, last_name, phone, is_admin, is_active, created_at, updated_at)
-      VALUES ($1, $2, $3, $4, $5, false, true, NOW(), NOW())
+      VALUES ($1, $2, $3, $4, $5, true, true, NOW(), NOW())
       RETURNING id, email, first_name, last_name, phone, is_admin, is_active
     `, [email, hashedPassword, first_name, last_name, phone || null]);
 
@@ -139,7 +141,7 @@ router.post('/register', validateRegistration, async (req, res) => {
 router.post('/login', validateLogin, async (req, res) => {
   try {
     // Check for validation errors
-    handleValidationErrors(req, res);
+    if (handleValidationErrors(req, res)) return;
 
     const { email, password } = req.body;
 
@@ -223,18 +225,18 @@ router.get('/me', async (req, res) => {
     );
 
     // Get user from database
-    const user = await db('users')
-      .where('id', decoded.id)
-      .first();
+    const user = await query('SELECT * FROM users WHERE id = $1', [decoded.id]);
 
-    if (!user) {
+    if (user.rows.length === 0) {
       return res.status(401).json({
         success: false,
         message: 'User not found'
       });
     }
 
-    if (!user.is_active) {
+    const userData = user.rows[0];
+
+    if (!userData.is_active) {
       return res.status(401).json({
         success: false,
         message: 'Account is deactivated'
@@ -246,15 +248,15 @@ router.get('/me', async (req, res) => {
       success: true,
       data: {
         user: {
-          id: user.id,
-          email: user.email,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          phone: user.phone,
-          is_admin: user.is_admin,
-          is_active: user.is_active,
-          created_at: user.created_at,
-          updated_at: user.updated_at
+          id: userData.id,
+          email: userData.email,
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+          phone: userData.phone,
+          is_admin: userData.is_admin,
+          is_active: userData.is_active,
+          created_at: userData.created_at,
+          updated_at: userData.updated_at
         }
       }
     });

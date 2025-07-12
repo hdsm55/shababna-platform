@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import db from '../config/database.js';
+import { query } from '../config/database.js';
 
 /**
  * Authentication middleware that verifies JWT tokens
@@ -77,9 +77,8 @@ const authenticateToken = async (req, res, next) => {
         }
 
         // Fetch the user from database to ensure they still exist and are active
-        const user = await db('users')
-            .where('id', decoded.id)
-            .first();
+        const userResult = await query('SELECT * FROM users WHERE id = $1', [decoded.id]);
+        const user = userResult.rows[0];
 
         if (!user) {
             return res.status(401).json({
@@ -174,9 +173,8 @@ const optionalAuth = async (req, res, next) => {
             );
 
             // Fetch user from database
-            const user = await db('users')
-                .where('id', decoded.id)
-                .first();
+            const userResult = await query('SELECT * FROM users WHERE id = $1', [decoded.id]);
+            const user = userResult.rows[0];
 
             if (user && user.is_active && user.email === decoded.email) {
                 req.user = {

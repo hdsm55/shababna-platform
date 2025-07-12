@@ -46,6 +46,11 @@ import {
   Info,
   AlertTriangle,
 } from 'lucide-react';
+import ProfileSettingsSection from './Settings/ProfileSettingsSection';
+import SecuritySettingsSection from './Settings/SecuritySettingsSection';
+import NotificationsSettingsSection from './Settings/NotificationsSettingsSection';
+import PreferencesSettingsSection from './Settings/PreferencesSettingsSection';
+import DangerZoneSection from './Settings/DangerZoneSection';
 
 interface UserSettings {
   profile: {
@@ -306,6 +311,7 @@ const SettingsDashboard: React.FC = () => {
     { id: 'security', label: 'الأمان', icon: Shield },
     { id: 'preferences', label: 'التفضيلات', icon: SettingsIcon },
     { id: 'privacy', label: 'الخصوصية', icon: Lock },
+    { id: 'danger', label: 'إدارة الحساب', icon: Trash2 },
   ];
 
   return (
@@ -357,474 +363,22 @@ const SettingsDashboard: React.FC = () => {
                   <div className="p-6">
                     {/* Profile Settings */}
                     {activeTab === 'profile' && (
-                      <div className="space-y-6">
-                        <div className="flex items-center justify-between">
-                          <h2 className="text-xl font-semibold text-gray-900">
-                            الملف الشخصي
-                          </h2>
-                          <Button
-                            onClick={() => handleOpenModal('profile')}
-                            icon={Edit}
-                            size="sm"
-                          >
-                            تعديل
-                          </Button>
-                        </div>
-
-                        <div className="flex items-center gap-4 mb-6">
-                          <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-bold text-2xl">
-                            {settings.profile.avatar}
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-semibold text-gray-900">
-                              {settings.profile.firstName}{' '}
-                              {settings.profile.lastName}
-                            </h3>
-                            <p className="text-gray-600">
-                              {settings.profile.email}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              {settings.profile.location}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              الاسم الأول
-                            </label>
-                            <p className="text-gray-900">
-                              {settings.profile.firstName}
-                            </p>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              الاسم الأخير
-                            </label>
-                            <p className="text-gray-900">
-                              {settings.profile.lastName}
-                            </p>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              البريد الإلكتروني
-                            </label>
-                            <p className="text-gray-900">
-                              {settings.profile.email}
-                            </p>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              رقم الهاتف
-                            </label>
-                            <p className="text-gray-900">
-                              {settings.profile.phone}
-                            </p>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              الموقع
-                            </label>
-                            <p className="text-gray-900">
-                              {settings.profile.location}
-                            </p>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              الموقع الإلكتروني
-                            </label>
-                            <p className="text-gray-900">
-                              {settings.profile.website}
-                            </p>
-                          </div>
-                          <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              السيرة الذاتية
-                            </label>
-                            <p className="text-gray-900">
-                              {settings.profile.bio}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+                      <ProfileSettingsSection settings={settings} />
                     )}
 
                     {/* Notification Settings */}
                     {activeTab === 'notifications' && (
-                      <div className="space-y-6">
-                        <h2 className="text-xl font-semibold text-gray-900">
-                          إعدادات الإشعارات
-                        </h2>
-
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                            <div className="flex items-center">
-                              <Mail className="w-5 h-5 text-gray-600 mr-3 rtl:ml-3 rtl:mr-0" />
-                              <div>
-                                <h3 className="font-medium text-gray-900">
-                                  إشعارات البريد الإلكتروني
-                                </h3>
-                                <p className="text-sm text-gray-600">
-                                  استلام إشعارات عبر البريد الإلكتروني
-                                </p>
-                              </div>
-                            </div>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={settings.notifications.email}
-                                onChange={(e) =>
-                                  handleNotificationChange(
-                                    'email',
-                                    e.target.checked
-                                  )
-                                }
-                                className="sr-only peer"
-                              />
-                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                            </label>
-                          </div>
-
-                          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                            <div className="flex items-center">
-                              <Smartphone className="w-5 h-5 text-gray-600 mr-3 rtl:ml-3 rtl:mr-0" />
-                              <div>
-                                <h3 className="font-medium text-gray-900">
-                                  إشعارات الرسائل النصية
-                                </h3>
-                                <p className="text-sm text-gray-600">
-                                  استلام إشعارات عبر الرسائل النصية
-                                </p>
-                              </div>
-                            </div>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={settings.notifications.sms}
-                                onChange={(e) =>
-                                  handleNotificationChange(
-                                    'sms',
-                                    e.target.checked
-                                  )
-                                }
-                                className="sr-only peer"
-                              />
-                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                            </label>
-                          </div>
-
-                          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                            <div className="flex items-center">
-                              <Bell className="w-5 h-5 text-gray-600 mr-3 rtl:ml-3 rtl:mr-0" />
-                              <div>
-                                <h3 className="font-medium text-gray-900">
-                                  إشعارات الموقع
-                                </h3>
-                                <p className="text-sm text-gray-600">
-                                  استلام إشعارات فورية في الموقع
-                                </p>
-                              </div>
-                            </div>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={settings.notifications.push}
-                                onChange={(e) =>
-                                  handleNotificationChange(
-                                    'push',
-                                    e.target.checked
-                                  )
-                                }
-                                className="sr-only peer"
-                              />
-                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                            </label>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                              <div className="flex items-center">
-                                <Calendar className="w-5 h-5 text-gray-600 mr-3 rtl:ml-3 rtl:mr-0" />
-                                <div>
-                                  <h3 className="font-medium text-gray-900">
-                                    الفعاليات
-                                  </h3>
-                                  <p className="text-sm text-gray-600">
-                                    إشعارات الفعاليات الجديدة
-                                  </p>
-                                </div>
-                              </div>
-                              <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={settings.notifications.events}
-                                  onChange={(e) =>
-                                    handleNotificationChange(
-                                      'events',
-                                      e.target.checked
-                                    )
-                                  }
-                                  className="sr-only peer"
-                                />
-                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                              </label>
-                            </div>
-
-                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                              <div className="flex items-center">
-                                <SettingsIcon className="w-5 h-5 text-gray-600 mr-3 rtl:ml-3 rtl:mr-0" />
-                                <div>
-                                  <h3 className="font-medium text-gray-900">
-                                    البرامج
-                                  </h3>
-                                  <p className="text-sm text-gray-600">
-                                    إشعارات البرامج الجديدة
-                                  </p>
-                                </div>
-                              </div>
-                              <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={settings.notifications.programs}
-                                  onChange={(e) =>
-                                    handleNotificationChange(
-                                      'programs',
-                                      e.target.checked
-                                    )
-                                  }
-                                  className="sr-only peer"
-                                />
-                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <NotificationsSettingsSection settings={settings} />
                     )}
 
                     {/* Security Settings */}
                     {activeTab === 'security' && (
-                      <div className="space-y-6">
-                        <div className="flex items-center justify-between">
-                          <h2 className="text-xl font-semibold text-gray-900">
-                            إعدادات الأمان
-                          </h2>
-                          <Button
-                            onClick={() => handleOpenModal('security')}
-                            icon={Key}
-                            size="sm"
-                          >
-                            تغيير كلمة المرور
-                          </Button>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div className="p-4 bg-green-50 rounded-lg">
-                            <div className="flex items-center mb-2">
-                              <CheckCircle className="w-5 h-5 text-green-600 mr-2 rtl:ml-2 rtl:mr-0" />
-                              <h3 className="font-medium text-green-900">
-                                المصادقة الثنائية
-                              </h3>
-                            </div>
-                            <p className="text-sm text-green-700">
-                              {settings.security.twoFactorEnabled
-                                ? 'مفعلة'
-                                : 'غير مفعلة'}
-                            </p>
-                          </div>
-
-                          <div className="p-4 bg-blue-50 rounded-lg">
-                            <div className="flex items-center mb-2">
-                              <Bell className="w-5 h-5 text-blue-600 mr-2 rtl:ml-2 rtl:mr-0" />
-                              <h3 className="font-medium text-blue-900">
-                                إشعارات تسجيل الدخول
-                              </h3>
-                            </div>
-                            <p className="text-sm text-blue-700">
-                              {settings.security.loginNotifications
-                                ? 'مفعلة'
-                                : 'غير مفعلة'}
-                            </p>
-                          </div>
-
-                          <div className="p-4 bg-gray-50 rounded-lg">
-                            <div className="flex items-center mb-2">
-                              <Lock className="w-5 h-5 text-gray-600 mr-2 rtl:ml-2 rtl:mr-0" />
-                              <h3 className="font-medium text-gray-900">
-                                آخر تغيير لكلمة المرور
-                              </h3>
-                            </div>
-                            <p className="text-sm text-gray-700">
-                              {formatDate(
-                                settings.security.passwordLastChanged
-                              )}
-                            </p>
-                          </div>
-
-                          <div className="p-4 bg-gray-50 rounded-lg">
-                            <div className="flex items-center mb-2">
-                              <Monitor className="w-5 h-5 text-gray-600 mr-2 rtl:ml-2 rtl:mr-0" />
-                              <h3 className="font-medium text-gray-900">
-                                الجلسات النشطة
-                              </h3>
-                            </div>
-                            <p className="text-sm text-gray-700">
-                              {settings.security.activeSessions} جلسة نشطة
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="border-t pt-6">
-                          <h3 className="text-lg font-medium text-gray-900 mb-4">
-                            خيارات متقدمة
-                          </h3>
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <h4 className="font-medium text-gray-900">
-                                  مهلة انتهاء الجلسة
-                                </h4>
-                                <p className="text-sm text-gray-600">
-                                  الوقت قبل انتهاء صلاحية الجلسة
-                                </p>
-                              </div>
-                              <select
-                                value={settings.security.sessionTimeout}
-                                onChange={(e) =>
-                                  handlePreferenceChange(
-                                    'sessionTimeout',
-                                    e.target.value
-                                  )
-                                }
-                                className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                              >
-                                <option value={15}>15 دقيقة</option>
-                                <option value={30}>30 دقيقة</option>
-                                <option value={60}>ساعة واحدة</option>
-                                <option value={120}>ساعتين</option>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <SecuritySettingsSection settings={settings} />
                     )}
 
                     {/* Preferences Settings */}
                     {activeTab === 'preferences' && (
-                      <div className="space-y-6">
-                        <h2 className="text-xl font-semibold text-gray-900">
-                          التفضيلات
-                        </h2>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              اللغة
-                            </label>
-                            <select
-                              value={settings.preferences.language}
-                              onChange={(e) =>
-                                handlePreferenceChange(
-                                  'language',
-                                  e.target.value
-                                )
-                              }
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                            >
-                              <option value="ar">العربية</option>
-                              <option value="en">English</option>
-                              <option value="tr">Türkçe</option>
-                            </select>
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              المظهر
-                            </label>
-                            <select
-                              value={settings.preferences.theme}
-                              onChange={(e) =>
-                                handlePreferenceChange('theme', e.target.value)
-                              }
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                            >
-                              <option value="light">فاتح</option>
-                              <option value="dark">داكن</option>
-                              <option value="auto">تلقائي</option>
-                            </select>
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              المنطقة الزمنية
-                            </label>
-                            <select
-                              value={settings.preferences.timezone}
-                              onChange={(e) =>
-                                handlePreferenceChange(
-                                  'timezone',
-                                  e.target.value
-                                )
-                              }
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                            >
-                              <option value="Asia/Riyadh">
-                                الرياض (GMT+3)
-                              </option>
-                              <option value="Asia/Jeddah">جدة (GMT+3)</option>
-                              <option value="Asia/Dammam">
-                                الدمام (GMT+3)
-                              </option>
-                            </select>
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              العملة
-                            </label>
-                            <select
-                              value={settings.preferences.currency}
-                              onChange={(e) =>
-                                handlePreferenceChange(
-                                  'currency',
-                                  e.target.value
-                                )
-                              }
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                            >
-                              <option value="SAR">ريال سعودي (SAR)</option>
-                              <option value="USD">دولار أمريكي (USD)</option>
-                              <option value="EUR">يورو (EUR)</option>
-                            </select>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                          <div className="flex items-center">
-                            <Languages className="w-5 h-5 text-gray-600 mr-3 rtl:ml-3 rtl:mr-0" />
-                            <div>
-                              <h3 className="font-medium text-gray-900">
-                                اتجاه النص من اليمين لليسار
-                              </h3>
-                              <p className="text-sm text-gray-600">
-                                تفعيل دعم اللغة العربية
-                              </p>
-                            </div>
-                          </div>
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={settings.preferences.rtl}
-                              onChange={(e) =>
-                                handlePreferenceChange('rtl', e.target.checked)
-                              }
-                              className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                          </label>
-                        </div>
-                      </div>
+                      <PreferencesSettingsSection settings={settings} />
                     )}
 
                     {/* Privacy Settings */}
@@ -970,6 +524,11 @@ const SettingsDashboard: React.FC = () => {
                           </div>
                         </div>
                       </div>
+                    )}
+
+                    {/* Danger Zone */}
+                    {activeTab === 'danger' && (
+                      <DangerZoneSection settings={settings} />
                     )}
                   </div>
                 </Card>

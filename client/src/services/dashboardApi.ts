@@ -65,3 +65,9 @@ export const deleteDonation = async (id: string) => {
   const { data } = await api.delete(`/dashboard/donations/${id}`);
   return data;
 };
+
+// إضافة تبرع جديد
+export const createDonation = async (donationData: any) => {
+  const { data } = await api.post('/dashboard/donations', donationData);
+  return data;
+};

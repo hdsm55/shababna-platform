@@ -7,9 +7,16 @@ interface ProtectedRouteProps {
   requiredRole?: 'admin' | 'staff' | 'member';
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  requiredRole 
+function isAllowed(user: any, requiredRole?: string) {
+  if (!requiredRole) return true;
+  if (requiredRole === 'admin') return !!user?.is_admin;
+  if (user?.role === requiredRole || user?.role === 'admin') return true;
+  return false;
+}
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  requiredRole,
 }) => {
   const { isAuthenticated, user } = useAuthStore();
   const location = useLocation();
@@ -18,7 +25,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (requiredRole && user?.role !== requiredRole && user?.role !== 'admin') {
+  if (!isAllowed(user, requiredRole)) {
     return <Navigate to="/" replace />;
   }
 
