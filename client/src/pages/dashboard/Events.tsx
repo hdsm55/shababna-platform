@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchEvents } from '../../services/eventsApi';
+import {
+  fetchEvents,
+  createEvent,
+  updateEvent,
+} from '../../services/eventsApi';
 import { deleteEvent } from '../../services/dashboardApi';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
@@ -155,7 +159,7 @@ const EventsDashboard: React.FC = () => {
     },
   ];
 
-  const events = data?.data?.items || mockEvents;
+  const events = data?.data?.items || [];
 
   // فلترة الفعاليات
   const filteredEvents = events.filter((event: any) => {
@@ -220,27 +224,55 @@ const EventsDashboard: React.FC = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title || !form.description || !form.category || !form.location) {
       setFormError('جميع الحقول المطلوبة يجب ملؤها');
       return;
     }
-
-    // محاكاة عملية الإضافة/التعديل
-    if (modalType === 'add') {
-      console.log('إضافة فعالية جديدة:', form);
-      // هنا سيتم إرسال البيانات إلى API
-      setModalMsg('تم إضافة الفعالية بنجاح!');
-    } else if (modalType === 'edit' && selectedEvent) {
-      console.log('تعديل الفعالية:', { id: selectedEvent.id, ...form });
-      // هنا سيتم إرسال البيانات إلى API
-      setModalMsg('تم تحديث الفعالية بنجاح!');
+    setFormError('');
+    setModalMsg('');
+    try {
+      // معالجة category
+      const validCategories = ['conference', 'workshop', 'networking'];
+      const categoryValue = validCategories.includes(form.category)
+        ? form.category
+        : 'conference';
+      // معالجة capacity و price
+      const capacityValue = Number(form.capacity) || 0;
+      const priceValue = Number(form.price) || 0;
+      if (modalType === 'add') {
+        await createEvent({
+          title: form.title,
+          description: form.description,
+          category: categoryValue,
+          location: form.location,
+          start_date: form.start_date,
+          end_date: form.end_date,
+          capacity: capacityValue,
+          price: priceValue,
+          organizer: form.organizer,
+        });
+        setModalMsg('تم إضافة الفعالية بنجاح!');
+      } else if (modalType === 'edit' && selectedEvent) {
+        await updateEvent(selectedEvent.id, {
+          title: form.title,
+          description: form.description,
+          category: categoryValue,
+          location: form.location,
+          start_date: form.start_date,
+          end_date: form.end_date,
+          capacity: capacityValue,
+          price: priceValue,
+          organizer: form.organizer,
+        });
+        setModalMsg('تم تحديث الفعالية بنجاح!');
+      }
+      setModalOpen(false);
+      queryClient.invalidateQueries(['dashboard-events']);
+    } catch (error) {
+      setFormError('حدث خطأ أثناء حفظ الفعالية');
     }
-
-    setModalOpen(false);
-    // إعادة تحميل البيانات
-    // queryClient.invalidateQueries(['dashboard-events']);
   };
 
   const getStatusColor = (status: string) => {
@@ -339,16 +371,23 @@ const EventsDashboard: React.FC = () => {
     },
   ];
 
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex justify-center items-center h-96">
+          <LoadingSpinner size="lg" />
+        </div>
+      </DashboardLayout>
+    );
+  }
   if (error) {
     return (
       <DashboardLayout>
-        <QuickActions actions={quickActions} className="mb-8" />
-        <SkipToContent />
-        <AccessibleSection>
+        <div className="flex justify-center items-center h-96">
           <Alert type="error" title="خطأ في تحميل البيانات">
             حدث خطأ أثناء جلب قائمة الفعاليات. يرجى المحاولة مرة أخرى.
           </Alert>
-        </AccessibleSection>
+        </div>
       </DashboardLayout>
     );
   }
@@ -646,11 +685,9 @@ const EventsDashboard: React.FC = () => {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   <option value="">اختر الفئة</option>
-                  <option value="اجتماعي">اجتماعي</option>
-                  <option value="تعليمي">تعليمي</option>
-                  <option value="قيادي">قيادي</option>
-                  <option value="ثقافي">ثقافي</option>
-                  <option value="رياضي">رياضي</option>
+                  <option value="conference">مؤتمر</option>
+                  <option value="workshop">ورشة عمل</option>
+                  <option value="networking">شبكة</option>
                 </select>
               </div>
               <div>
