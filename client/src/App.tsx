@@ -28,6 +28,8 @@ import NewProgram from './pages/dashboard/programs/NewProgram';
 import NewDonation from './pages/dashboard/donations/NewDonation';
 import NewUser from './pages/dashboard/users/NewUser';
 import DonationsDashboard from './pages/dashboard/Donations';
+import ContactForms from './pages/dashboard/ContactForms';
+import RegistrantsDashboard from './pages/dashboard/Registrants';
 
 function App() {
   const { i18n } = useTranslation();
@@ -62,6 +64,11 @@ function App() {
                       <Route
                         path="donations"
                         element={<DonationsDashboard />}
+                      />
+                      <Route path="contact-forms" element={<ContactForms />} />
+                      <Route
+                        path="registrants"
+                        element={<RegistrantsDashboard />}
                       />
                       {/* صفحات الإجراءات السريعة */}
                       <Route path="events/new" element={<NewEvent />} />

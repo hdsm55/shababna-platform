@@ -248,28 +248,14 @@ router.get('/pending', authenticateToken, requireAdmin, async (req, res) => {
 router.patch('/:formId/status', authenticateToken, requireAdmin, async (req, res) => {
     try {
         const { formId } = req.params;
-        const { status, admin_notes } = req.body;
+        const { status, notes } = req.body;
 
-        if (!status) {
-            return res.status(400).json({
-                success: false,
-                message: 'حالة النموذج مطلوبة'
-            });
-        }
+        const updatedForm = await emailService.updateFormStatus(formId, status, notes);
 
-        const success = await emailService.updateFormStatus(formId, status, admin_notes);
-
-        if (success) {
-            res.json({
-                success: true,
-                message: 'تم تحديث حالة النموذج بنجاح'
-            });
-        } else {
-            res.status(404).json({
-                success: false,
-                message: 'لم يتم العثور على النموذج'
-            });
-        }
+        res.json({
+            success: true,
+            data: updatedForm
+        });
 
     } catch (error) {
         console.error('Update form status error:', error);
@@ -280,50 +266,290 @@ router.patch('/:formId/status', authenticateToken, requireAdmin, async (req, res
     }
 });
 
-// إرسال النشرة الإخبارية (للمدير فقط)
-router.post('/newsletter/send', authenticateToken, requireAdmin, async (req, res) => {
-    try {
-        const { subject, content } = req.body;
+// === مسارات البيانات للداشبورد ===
 
-        if (!subject || !content) {
-            return res.status(400).json({
-                success: false,
-                message: 'الموضوع والمحتوى مطلوبان'
-            });
+// جلب جميع رسائل التواصل (للمدير فقط)
+router.get('/contact-forms', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { page = 1, limit = 10, status } = req.query;
+        const offset = (page - 1) * limit;
+
+        let queryStr = `
+            SELECT id, name, email, subject, message, created_at, is_read, status
+            FROM contact_forms
+        `;
+
+        const params = [];
+        if (status) {
+            queryStr += ` WHERE status = $1`;
+            params.push(status);
         }
 
-        // الحصول على جميع المشتركين النشطين
-        const { query } = await import('../config/database.js');
-        const result = await query(`
-      SELECT * FROM newsletter_subscribers
-      WHERE is_active = TRUE
-    `);
+        queryStr += ` ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+        params.push(limit, offset);
 
-        const subscribers = result.rows;
-        const newsletterData = { subject, content };
+        const result = await query(queryStr, params);
 
-        // إرسال النشرة الإخبارية
-        const results = await emailService.sendNewsletter(subscribers, newsletterData);
-
-        const successCount = results.filter(r => r.success).length;
-        const failureCount = results.length - successCount;
+        // جلب العدد الإجمالي
+        let countQuery = `SELECT COUNT(*) as total FROM contact_forms`;
+        if (status) {
+            countQuery += ` WHERE status = $1`;
+        }
+        const countResult = await query(countQuery, status ? [status] : []);
 
         res.json({
             success: true,
-            message: `تم إرسال النشرة الإخبارية إلى ${successCount} مشترك`,
             data: {
-                total: results.length,
-                success: successCount,
-                failed: failureCount,
-                results
+                forms: result.rows,
+                pagination: {
+                    page: parseInt(page),
+                    limit: parseInt(limit),
+                    total: parseInt(countResult.rows[0].total),
+                    pages: Math.ceil(parseInt(countResult.rows[0].total) / parseInt(limit))
+                }
             }
         });
 
     } catch (error) {
-        console.error('Send newsletter error:', error);
+        console.error('Get contact forms error:', error);
         res.status(500).json({
             success: false,
-            message: 'حدث خطأ أثناء إرسال النشرة الإخبارية'
+            message: 'حدث خطأ أثناء جلب رسائل التواصل'
+        });
+    }
+});
+
+// تحديث حالة قراءة رسالة التواصل (للمدير فقط)
+router.patch('/contact-forms/:id/read', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { is_read } = req.body;
+
+        const result = await query(
+            'UPDATE contact_forms SET is_read = $1 WHERE id = $2 RETURNING *',
+            [is_read, id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'الرسالة غير موجودة'
+            });
+        }
+
+        res.json({
+            success: true,
+            data: result.rows[0]
+        });
+
+    } catch (error) {
+        console.error('Update contact form read status error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'حدث خطأ أثناء تحديث حالة القراءة'
+        });
+    }
+});
+
+// جلب جميع طلبات الانضمام (للمدير فقط)
+router.get('/join-requests', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { page = 1, limit = 10, status } = req.query;
+        const offset = (page - 1) * limit;
+
+        let queryStr = `
+            SELECT id, first_name, last_name, email, phone, country, age, motivation, created_at, status
+            FROM join_requests
+        `;
+
+        const params = [];
+        if (status) {
+            queryStr += ` WHERE status = $1`;
+            params.push(status);
+        }
+
+        queryStr += ` ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+        params.push(limit, offset);
+
+        const result = await query(queryStr, params);
+
+        // جلب العدد الإجمالي
+        let countQuery = `SELECT COUNT(*) as total FROM join_requests`;
+        if (status) {
+            countQuery += ` WHERE status = $1`;
+        }
+        const countResult = await query(countQuery, status ? [status] : []);
+
+        res.json({
+            success: true,
+            data: {
+                requests: result.rows,
+                pagination: {
+                    page: parseInt(page),
+                    limit: parseInt(limit),
+                    total: parseInt(countResult.rows[0].total),
+                    pages: Math.ceil(parseInt(countResult.rows[0].total) / parseInt(limit))
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('Get join requests error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'حدث خطأ أثناء جلب طلبات الانضمام'
+        });
+    }
+});
+
+// تحديث حالة طلب الانضمام (للمدير فقط)
+router.patch('/join-requests/:id/status', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status, notes } = req.body;
+
+        const result = await query(
+            'UPDATE join_requests SET status = $1, notes = $2 WHERE id = $3 RETURNING *',
+            [status, notes, id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'طلب الانضمام غير موجود'
+            });
+        }
+
+        res.json({
+            success: true,
+            data: result.rows[0]
+        });
+
+    } catch (error) {
+        console.error('Update join request status error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'حدث خطأ أثناء تحديث حالة طلب الانضمام'
+        });
+    }
+});
+
+// جلب جميع التسجيلات في البرامج (للمدير فقط)
+router.get('/program-registrations', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { page = 1, limit = 10, program_id } = req.query;
+        const offset = (page - 1) * limit;
+
+        let queryStr = `
+            SELECT pr.id, pr.created_at,
+                   p.title as program_title, p.description as program_description,
+                   u.first_name || ' ' || u.last_name as user_name, u.email as user_email
+            FROM program_registrations pr
+            JOIN programs p ON pr.program_id = p.id
+            JOIN users u ON pr.user_id = u.id
+        `;
+
+        const params = [];
+        if (program_id) {
+            queryStr += ` WHERE pr.program_id = $1`;
+            params.push(program_id);
+        }
+
+        queryStr += ` ORDER BY pr.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+        params.push(limit, offset);
+
+        const result = await query(queryStr, params);
+
+        // جلب العدد الإجمالي
+        let countQuery = `
+            SELECT COUNT(*) as total
+            FROM program_registrations pr
+            JOIN programs p ON pr.program_id = p.id
+            JOIN users u ON pr.user_id = u.id
+        `;
+        if (program_id) {
+            countQuery += ` WHERE pr.program_id = $1`;
+        }
+        const countResult = await query(countQuery, program_id ? [program_id] : []);
+
+        res.json({
+            success: true,
+            data: {
+                registrations: result.rows,
+                pagination: {
+                    page: parseInt(page),
+                    limit: parseInt(limit),
+                    total: parseInt(countResult.rows[0].total),
+                    pages: Math.ceil(parseInt(countResult.rows[0].total) / parseInt(limit))
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('Get program registrations error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'حدث خطأ أثناء جلب تسجيلات البرامج'
+        });
+    }
+});
+
+// جلب جميع التسجيلات في الفعاليات (للمدير فقط)
+router.get('/event-registrations', authenticateToken, requireAdmin, async (req, res) => {
+    try {
+        const { page = 1, limit = 10, event_id } = req.query;
+        const offset = (page - 1) * limit;
+
+        let queryStr = `
+            SELECT er.id, er.created_at,
+                   e.title as event_title, e.description as event_description,
+                   u.first_name || ' ' || u.last_name as user_name, u.email as user_email
+            FROM event_registrations er
+            JOIN events e ON er.event_id = e.id
+            JOIN users u ON er.user_id = u.id
+        `;
+
+        const params = [];
+        if (event_id) {
+            queryStr += ` WHERE er.event_id = $1`;
+            params.push(event_id);
+        }
+
+        queryStr += ` ORDER BY er.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+        params.push(limit, offset);
+
+        const result = await query(queryStr, params);
+
+        // جلب العدد الإجمالي
+        let countQuery = `
+            SELECT COUNT(*) as total
+            FROM event_registrations er
+            JOIN events e ON er.event_id = e.id
+            JOIN users u ON er.user_id = u.id
+        `;
+        if (event_id) {
+            countQuery += ` WHERE er.event_id = $1`;
+        }
+        const countResult = await query(countQuery, event_id ? [event_id] : []);
+
+        res.json({
+            success: true,
+            data: {
+                registrations: result.rows,
+                pagination: {
+                    page: parseInt(page),
+                    limit: parseInt(limit),
+                    total: parseInt(countResult.rows[0].total),
+                    pages: Math.ceil(parseInt(countResult.rows[0].total) / parseInt(limit))
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('Get event registrations error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'حدث خطأ أثناء جلب تسجيلات الفعاليات'
         });
     }
 });

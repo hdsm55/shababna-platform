@@ -32,6 +32,8 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
+  Upload,
+  X,
 } from 'lucide-react';
 import QuickActions from '../../components/common/QuickActions';
 import { Link } from 'react-router-dom';
@@ -49,7 +51,7 @@ interface Program {
   participants_count: number;
   created_at: string;
   updated_at: string;
-  image_url?: string; // Added image_url to the interface
+  image_url?: string;
 }
 
 const ProgramsDashboard: React.FC = () => {
@@ -80,6 +82,8 @@ const ProgramsDashboard: React.FC = () => {
     end_date: '',
   });
   const [formError, setFormError] = useState('');
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // حالة التنبيه
   const [modalMsg, setModalMsg] = useState('');
@@ -99,7 +103,7 @@ const ProgramsDashboard: React.FC = () => {
       participants_count: 45,
       created_at: '2024-05-15',
       updated_at: '2024-05-20',
-      image_url: '/default-program.png', // Added image_url for mock data
+      image_url: '/default-program.png',
     },
     {
       id: '2',
@@ -114,7 +118,7 @@ const ProgramsDashboard: React.FC = () => {
       participants_count: 32,
       created_at: '2024-02-15',
       updated_at: '2024-05-01',
-      image_url: '/default-program.png', // Added image_url for mock data
+      image_url: '/default-program.png',
     },
     {
       id: '3',
@@ -129,7 +133,7 @@ const ProgramsDashboard: React.FC = () => {
       participants_count: 25,
       created_at: '2024-06-01',
       updated_at: '2024-06-01',
-      image_url: '/default-program.png', // Added image_url for mock data
+      image_url: '/default-program.png',
     },
   ];
 
@@ -154,6 +158,8 @@ const ProgramsDashboard: React.FC = () => {
   ) => {
     setModalType(type);
     setFormError('');
+    setImage(null);
+    setImagePreview(null);
 
     if (type === 'add') {
       setForm({
@@ -175,6 +181,9 @@ const ProgramsDashboard: React.FC = () => {
         start_date: program.start_date,
         end_date: program.end_date,
       });
+      if (program.image_url) {
+        setImagePreview(program.image_url);
+      }
     }
 
     setModalOpen(true);
@@ -184,6 +193,8 @@ const ProgramsDashboard: React.FC = () => {
     setModalOpen(false);
     setSelectedProgram(null);
     setFormError('');
+    setImage(null);
+    setImagePreview(null);
   };
 
   const handleChange = (
@@ -194,13 +205,30 @@ const ProgramsDashboard: React.FC = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setImage(null);
+    setImagePreview(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (
       !form.title ||
       !form.description ||
       !form.category ||
-      !form.goal_amount
+      !form.goal_amount ||
+      !form.start_date ||
+      !form.end_date
     ) {
       setFormError('جميع الحقول المطلوبة يجب ملؤها');
       return;
@@ -208,41 +236,32 @@ const ProgramsDashboard: React.FC = () => {
 
     setFormError('');
     setModalMsg('');
+
     try {
-      // تحويل category إلى النوع الصحيح
-      const validCategories = [
-        'education',
-        'relief',
-        'youth',
-        'media',
-        'daawah',
-      ];
-      const categoryValue = validCategories.includes(form.category)
-        ? form.category
-        : 'education';
+      const formData = new FormData();
+      formData.append('title', form.title);
+      formData.append('description', form.description);
+      formData.append('category', form.category);
+      formData.append('goal_amount', form.goal_amount);
+      formData.append('start_date', form.start_date);
+      formData.append('end_date', form.end_date);
+
+      if (image) {
+        formData.append('image', image);
+      }
+
       if (modalType === 'add') {
-        await createProgram({
-          title: form.title,
-          description: form.description,
-          category: categoryValue as Program['category'],
-          goal_amount: Number(form.goal_amount),
-          start_date: form.start_date,
-          end_date: form.end_date,
-        });
+        await createProgram(formData);
         setModalMsg('تم إضافة البرنامج بنجاح!');
       } else if (modalType === 'edit' && selectedProgram) {
-        await updateProgram(selectedProgram.id, {
-          title: form.title,
-          description: form.description,
-          category: categoryValue as Program['category'],
-          goal_amount: Number(form.goal_amount),
-          start_date: form.start_date,
-          end_date: form.end_date,
-        });
+        await updateProgram(selectedProgram.id, formData);
         setModalMsg('تم تحديث البرنامج بنجاح!');
       }
-      setModalOpen(false);
-      queryClient.invalidateQueries(['dashboard-programs']);
+
+      setTimeout(() => {
+        setModalOpen(false);
+        queryClient.invalidateQueries({ queryKey: ['dashboard-programs'] });
+      }, 1500);
     } catch (error) {
       setFormError('حدث خطأ أثناء حفظ البرنامج');
     }
@@ -358,15 +377,15 @@ const ProgramsDashboard: React.FC = () => {
       <AccessibleSection>
         <div className="max-w-7xl mx-auto py-6 px-2 sm:px-4 lg:px-8">
           {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                إدارة البرامج
-              </h1>
-              <p className="text-gray-600">إدارة وتتبع جميع البرامج والأنشطة</p>
-            </div>
-            <Link to="/dashboard/programs/new">
-              <Button icon={Plus}>إضافة برنامج</Button>
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">إدارة البرامج</h1>
+            <Link to="/programs">
+              <Button
+                variant="outline"
+                className="font-bold text-primary-600 border-primary-300"
+              >
+                عرض جميع البرامج
+              </Button>
             </Link>
           </div>
 
@@ -523,8 +542,14 @@ const ProgramsDashboard: React.FC = () => {
                       <div className="flex items-center justify-between text-sm mb-1">
                         <span className="text-gray-600">التقدم</span>
                         <span className="font-medium">
-                          ${program.current_amount.toLocaleString()} / $
-                          {program.goal_amount.toLocaleString()}
+                          $
+                          {typeof program.current_amount === 'number'
+                            ? program.current_amount.toLocaleString()
+                            : '0'}{' '}
+                          / $
+                          {typeof program.goal_amount === 'number'
+                            ? program.goal_amount.toLocaleString()
+                            : '0'}
                         </span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
@@ -576,7 +601,10 @@ const ProgramsDashboard: React.FC = () => {
                           <DollarSign className="w-4 h-4" />
                         </div>
                         <div className="text-sm font-medium text-gray-900">
-                          ${program.current_amount.toLocaleString()}
+                          $
+                          {typeof program.current_amount === 'number'
+                            ? program.current_amount.toLocaleString()
+                            : '0'}
                         </div>
                         <div className="text-xs text-gray-500">
                           المبلغ الحالي
@@ -692,7 +720,10 @@ const ProgramsDashboard: React.FC = () => {
                       الهدف المالي
                     </label>
                     <p className="text-gray-900">
-                      ${selectedProgram.goal_amount.toLocaleString()}
+                      $
+                      {typeof selectedProgram.goal_amount === 'number'
+                        ? selectedProgram.goal_amount.toLocaleString()
+                        : '0'}
                     </p>
                   </div>
                   <div>
@@ -700,7 +731,10 @@ const ProgramsDashboard: React.FC = () => {
                       المبلغ الحالي
                     </label>
                     <p className="text-gray-900">
-                      ${selectedProgram.current_amount.toLocaleString()}
+                      $
+                      {typeof selectedProgram.current_amount === 'number'
+                        ? selectedProgram.current_amount.toLocaleString()
+                        : '0'}
                     </p>
                   </div>
                 </div>
@@ -861,6 +895,58 @@ const ProgramsDashboard: React.FC = () => {
                       onChange={handleChange}
                       required
                     />
+                  </div>
+                </div>
+
+                {/* Image Upload */}
+                <div>
+                  <label
+                    htmlFor="image"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    صورة البرنامج
+                  </label>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        id="image"
+                        name="image"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="image"
+                        className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                      >
+                        <Upload className="w-4 h-4" />
+                        <span>اختر صورة</span>
+                      </label>
+                      {imagePreview && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={removeImage}
+                          icon={X}
+                        >
+                          إزالة
+                        </Button>
+                      )}
+                    </div>
+                    {imagePreview && (
+                      <div className="relative">
+                        <img
+                          src={imagePreview}
+                          alt="معاينة الصورة"
+                          className="w-32 h-32 object-cover rounded-lg border"
+                        />
+                      </div>
+                    )}
+                    <p className="text-xs text-gray-500">
+                      المقاس المفضل: 400×400 بكسل (مربع). الحد الأقصى: 2MB
+                    </p>
                   </div>
                 </div>
 

@@ -76,7 +76,7 @@ const authenticateToken = async (req, res, next) => {
             });
         }
 
-        // Fetch the user from database to ensure they still exist and are active
+        // Fetch the user from database to ensure they still exist
         const userResult = await query('SELECT * FROM users WHERE id = $1', [decoded.id]);
         const user = userResult.rows[0];
 
@@ -85,15 +85,6 @@ const authenticateToken = async (req, res, next) => {
                 success: false,
                 message: 'User not found. Token may be invalid.',
                 code: 'USER_NOT_FOUND'
-            });
-        }
-
-        // Check if user account is active
-        if (!user.is_active) {
-            return res.status(401).json({
-                success: false,
-                message: 'Account is deactivated. Please contact support.',
-                code: 'ACCOUNT_DEACTIVATED'
             });
         }
 
@@ -112,19 +103,15 @@ const authenticateToken = async (req, res, next) => {
             email: user.email,
             first_name: user.first_name,
             last_name: user.last_name,
-            phone: user.phone,
-            is_admin: user.is_admin,
-            is_active: user.is_active,
-            created_at: user.created_at,
-            updated_at: user.updated_at
+            role: user.role,
+            created_at: user.created_at
         };
 
         // Add token info to request for debugging/logging purposes
         req.token = {
             id: decoded.id,
             email: decoded.email,
-            is_admin: decoded.is_admin,
-            is_active: decoded.is_active,
+            role: decoded.role,
             iat: decoded.iat, // issued at
             exp: decoded.exp  // expiration
         };
@@ -176,17 +163,14 @@ const optionalAuth = async (req, res, next) => {
             const userResult = await query('SELECT * FROM users WHERE id = $1', [decoded.id]);
             const user = userResult.rows[0];
 
-            if (user && user.is_active && user.email === decoded.email) {
+            if (user && user.email === decoded.email) {
                 req.user = {
                     id: user.id,
                     email: user.email,
                     first_name: user.first_name,
                     last_name: user.last_name,
-                    phone: user.phone,
-                    is_admin: user.is_admin,
-                    is_active: user.is_active,
-                    created_at: user.created_at,
-                    updated_at: user.updated_at
+                    role: user.role,
+                    created_at: user.created_at
                 };
                 req.token = decoded;
             } else {
@@ -222,7 +206,7 @@ const requireAdmin = (req, res, next) => {
         });
     }
 
-    if (!req.user.is_admin) {
+    if (req.user.role !== 'admin') {
         return res.status(403).json({
             success: false,
             message: 'Admin access required. Insufficient permissions.',
@@ -233,34 +217,9 @@ const requireAdmin = (req, res, next) => {
     next();
 };
 
-/**
- * Active user middleware
- * Must be used after authenticateToken middleware
- * Ensures the user account is active
- */
-const requireActiveUser = (req, res, next) => {
-    if (!req.user) {
-        return res.status(401).json({
-            success: false,
-            message: 'Authentication required'
-        });
-    }
-
-    if (!req.user.is_active) {
-        return res.status(403).json({
-            success: false,
-            message: 'Account is deactivated. Please contact support.',
-            code: 'ACCOUNT_DEACTIVATED'
-        });
-    }
-
-    next();
-};
-
 export {
     authenticateToken,
     authenticateToken as authMiddleware,
     optionalAuth,
-    requireAdmin,
-    requireActiveUser
+    requireAdmin
 };

@@ -34,6 +34,8 @@ import {
   Star,
   TrendingUp,
   DollarSign,
+  Upload,
+  X,
 } from 'lucide-react';
 import QuickActions from '../../components/common/QuickActions';
 import { Link } from 'react-router-dom';
@@ -53,6 +55,7 @@ interface Event {
   organizer: string;
   created_at: string;
   updated_at: string;
+  image_url?: string;
 }
 
 const EventsDashboard: React.FC = () => {
@@ -86,6 +89,8 @@ const EventsDashboard: React.FC = () => {
     organizer: '',
   });
   const [formError, setFormError] = useState('');
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // حالة التنبيه
   const [modalMsg, setModalMsg] = useState('');
@@ -178,6 +183,8 @@ const EventsDashboard: React.FC = () => {
   const handleOpenModal = (type: 'add' | 'edit' | 'view', event?: Event) => {
     setModalType(type);
     setFormError('');
+    setImage(null);
+    setImagePreview(null);
 
     if (type === 'add') {
       setForm({
@@ -205,6 +212,9 @@ const EventsDashboard: React.FC = () => {
         price: event.price.toString(),
         organizer: event.organizer,
       });
+      if (event.image_url) {
+        setImagePreview(event.image_url);
+      }
     }
 
     setModalOpen(true);
@@ -214,6 +224,8 @@ const EventsDashboard: React.FC = () => {
     setModalOpen(false);
     setSelectedEvent(null);
     setFormError('');
+    setImage(null);
+    setImagePreview(null);
   };
 
   const handleChange = (
@@ -222,6 +234,21 @@ const EventsDashboard: React.FC = () => {
     >
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setImage(null);
+    setImagePreview(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -233,43 +260,33 @@ const EventsDashboard: React.FC = () => {
     setFormError('');
     setModalMsg('');
     try {
-      // معالجة category
-      const validCategories = ['conference', 'workshop', 'networking'];
-      const categoryValue = validCategories.includes(form.category)
-        ? form.category
-        : 'conference';
-      // معالجة capacity و price
-      const capacityValue = Number(form.capacity) || 0;
-      const priceValue = Number(form.price) || 0;
+      const formData = new FormData();
+      formData.append('title', form.title);
+      formData.append('description', form.description);
+      formData.append('category', form.category);
+      formData.append('location', form.location);
+      formData.append('start_date', form.start_date);
+      formData.append('end_date', form.end_date);
+      formData.append('capacity', form.capacity);
+      formData.append('price', form.price);
+      formData.append('organizer', form.organizer);
+
+      if (image) {
+        formData.append('image', image);
+      }
+
       if (modalType === 'add') {
-        await createEvent({
-          title: form.title,
-          description: form.description,
-          category: categoryValue,
-          location: form.location,
-          start_date: form.start_date,
-          end_date: form.end_date,
-          capacity: capacityValue,
-          price: priceValue,
-          organizer: form.organizer,
-        });
+        await createEvent(formData);
         setModalMsg('تم إضافة الفعالية بنجاح!');
       } else if (modalType === 'edit' && selectedEvent) {
-        await updateEvent(selectedEvent.id, {
-          title: form.title,
-          description: form.description,
-          category: categoryValue,
-          location: form.location,
-          start_date: form.start_date,
-          end_date: form.end_date,
-          capacity: capacityValue,
-          price: priceValue,
-          organizer: form.organizer,
-        });
+        await updateEvent(Number(selectedEvent.id), formData);
         setModalMsg('تم تحديث الفعالية بنجاح!');
       }
-      setModalOpen(false);
-      queryClient.invalidateQueries(['dashboard-events']);
+
+      setTimeout(() => {
+        setModalOpen(false);
+        queryClient.invalidateQueries({ queryKey: ['dashboard-events'] });
+      }, 1500);
     } catch (error) {
       setFormError('حدث خطأ أثناء حفظ الفعالية');
     }
@@ -405,16 +422,16 @@ const EventsDashboard: React.FC = () => {
 
         {/* قائمة الفعاليات */}
         <Card className="shadow-md rounded-2xl p-6 bg-white border-0 mb-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+          <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-gray-900">
               قائمة الفعاليات
             </h1>
-            <Link to="/dashboard/events/new">
+            <Link to="/events">
               <Button
-                icon={Plus}
-                className="font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg px-5 py-2 shadow"
+                variant="outline"
+                className="font-bold text-primary-600 border-primary-300"
               >
-                إضافة فعالية
+                عرض جميع الفعاليات
               </Button>
             </Link>
           </div>
@@ -795,6 +812,58 @@ const EventsDashboard: React.FC = () => {
                   required
                   placeholder="اسم المنظم"
                 />
+              </div>
+            </div>
+
+            {/* Image Upload */}
+            <div>
+              <label
+                htmlFor="image"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                صورة الفعالية
+              </label>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <input
+                    id="image"
+                    name="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="image"
+                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                  >
+                    <Upload className="w-4 h-4" />
+                    <span>اختر صورة</span>
+                  </label>
+                  {imagePreview && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={removeImage}
+                      icon={X}
+                    >
+                      إزالة
+                    </Button>
+                  )}
+                </div>
+                {imagePreview && (
+                  <div className="relative">
+                    <img
+                      src={imagePreview}
+                      alt="معاينة الصورة"
+                      className="w-32 h-32 object-cover rounded-lg border"
+                    />
+                  </div>
+                )}
+                <p className="text-xs text-gray-500">
+                  المقاس المفضل: 400×400 بكسل (مربع). الحد الأقصى: 2MB
+                </p>
               </div>
             </div>
 

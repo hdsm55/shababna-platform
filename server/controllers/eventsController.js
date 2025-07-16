@@ -6,35 +6,23 @@ import { successResponse, errorResponse } from '../utils/response.js';
 export const getAllEvents = async (req, res) => {
     try {
         const {
-            category,
             search,
             page = 1,
-            limit = 10,
-            status = 'upcoming'
+            limit = 10
         } = req.query;
         const offset = (parseInt(page) - 1) * parseInt(limit);
-        let sql = 'SELECT * FROM events WHERE 1=1';
+        let sql = 'SELECT id, title, description, event_date, location, created_at FROM events WHERE 1=1';
         const params = [];
         let paramIndex = 1;
-        if (category && category !== 'all') {
-            sql += ` AND category = $${paramIndex}`;
-            params.push(category);
-            paramIndex++;
-        }
-        if (status && status !== 'all') {
-            sql += ` AND status = $${paramIndex}`;
-            params.push(status);
-            paramIndex++;
-        }
         if (search) {
             sql += ` AND (title ILIKE $${paramIndex} OR description ILIKE $${paramIndex} OR location ILIKE $${paramIndex})`;
             params.push(`%${search}%`);
             paramIndex++;
         }
-        const countSql = sql.replace('SELECT *', 'SELECT COUNT(*)');
+        const countSql = sql.replace('SELECT id, title, description, event_date, location, created_at', 'SELECT COUNT(*)');
         const countResult = await query(countSql, params);
         const total = parseInt(countResult.rows[0].count);
-        sql += ` ORDER BY start_date ASC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+        sql += ` ORDER BY event_date ASC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
         params.push(parseInt(limit), offset);
         const result = await query(sql, params);
         const totalPages = Math.ceil(total / parseInt(limit));
@@ -150,5 +138,27 @@ export const deleteEvent = async (req, res) => {
     } catch (error) {
         console.error('Delete event error:', error);
         return errorResponse(res, 'خطأ في حذف الفعالية', 500, error);
+    }
+};
+
+// تسجيل مستخدم في فعالية
+export const registerForEvent = async (req, res) => {
+    try {
+        console.log('BODY:', req.body); // طباعة محتوى البيانات القادمة
+        const { id } = req.params; // event_id
+        const { first_name, last_name, email, phone } = req.body;
+        if (!first_name || !last_name || !email) {
+            console.log('❌ بيانات ناقصة: ', { first_name, last_name, email });
+            return res.status(400).json({ success: false, message: 'الاسم والبريد الإلكتروني مطلوبان' });
+        }
+        const result = await query(
+            `INSERT INTO event_registrations (event_id, first_name, last_name, email, phone, created_at) VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING *`,
+            [id, first_name, last_name, email, phone || null]
+        );
+        return res.json({ success: true, data: result.rows[0], message: 'تم التسجيل في الفعالية بنجاح' });
+    } catch (error) {
+        console.error('Event registration error:', error);
+        console.log('BODY عند الخطأ:', req.body);
+        return res.status(500).json({ success: false, message: 'خطأ في التسجيل في الفعالية' });
     }
 };

@@ -3,7 +3,7 @@ import { body, validationResult } from 'express-validator';
 import { query } from '../config/database.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import { adminMiddleware } from '../middleware/adminMiddleware.js';
-import { getAllEvents, getEventById, createEvent, updateEvent, deleteEvent } from '../controllers/eventsController.js';
+import { getAllEvents, getEventById, createEvent, updateEvent, deleteEvent, registerForEvent } from '../controllers/eventsController.js';
 
 const router = express.Router();
 
@@ -271,21 +271,15 @@ router.put('/:id', async (req, res) => {
       title,
       description,
       location,
-      start_date,
-      end_date,
-      max_attendees,
-      category,
-      status
+      event_date
     } = req.body;
 
     const result = await query(`
             UPDATE events
-            SET title = $1, description = $2, location = $3, start_date = $4,
-                end_date = $5, max_attendees = $6, category = $7, status = $8,
-                updated_at = NOW()
-            WHERE id = $9
-            RETURNING *
-        `, [title, description, location, start_date, end_date, max_attendees, category, status, id]);
+            SET title = $1, description = $2, location = $3, event_date = $4
+            WHERE id = $5
+            RETURNING id, title, description, event_date, location, created_at
+        `, [title, description, location, event_date, id]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({

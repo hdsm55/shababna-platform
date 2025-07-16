@@ -53,7 +53,7 @@ export const emailConfig = {
 export const emailSettings = {
     fromEmail: process.env.FROM_EMAIL || 'noreply@shababna-global.com',
     fromName: process.env.FROM_NAME || 'Shababna Global',
-    adminEmails: process.env.ADMIN_EMAILS?.split(',') || ['admin@shababna-global.com'],
+    adminEmails: (process.env.ADMIN_EMAILS && process.env.ADMIN_EMAILS.split(',').filter(Boolean)) || ['admin@shababna-global.com'],
     replyTo: process.env.REPLY_TO_EMAIL || 'contact@shababna-global.com',
 };
 

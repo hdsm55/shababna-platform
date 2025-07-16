@@ -9,6 +9,7 @@ import {
   DollarSign,
   Settings,
   LogOut,
+  MessageCircle,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useLanguageStore } from '../../store/languageStore';
@@ -51,10 +52,22 @@ const sidebarSections = [
         label: 'التبرعات',
       },
       {
+        key: 'registrants',
+        path: '/dashboard/registrants',
+        icon: Users,
+        label: 'المسجلون',
+      },
+      {
         key: 'users',
         path: '/dashboard/users',
         icon: Users,
         label: 'المستخدمون',
+      },
+      {
+        key: 'contact-forms',
+        path: '/dashboard/contact-forms',
+        icon: MessageCircle,
+        label: 'رسائل التواصل',
       },
     ],
   },
@@ -138,11 +151,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         <div className="px-4 pb-4 border-t border-gray-200">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-9 h-9 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-bold text-lg">
-              {user?.firstName?.charAt(0) || 'J'}
+              {user?.first_name?.charAt(0) || 'J'}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-gray-900 truncate">
-                {user?.firstName} {user?.lastName}
+                {user?.first_name} {user?.last_name}
               </p>
               <p className="text-xs text-gray-500 truncate">{user?.email}</p>
             </div>

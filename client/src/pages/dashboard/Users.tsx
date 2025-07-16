@@ -440,15 +440,17 @@ const UsersDashboard: React.FC = () => {
       <AccessibleSection>
         <div className="max-w-7xl mx-auto py-6 px-2 sm:px-4 lg:px-8">
           {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                إدارة المستخدمين
-              </h1>
-              <p className="text-gray-600">إدارة أعضاء المنظمة وصلاحياتهم</p>
-            </div>
-            <Link to="/dashboard/users/new">
-              <Button icon={UserPlus}>إضافة عضو</Button>
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">
+              إدارة المستخدمين
+            </h1>
+            <Link to="/join-us">
+              <Button
+                variant="outline"
+                className="font-bold text-primary-600 border-primary-300"
+              >
+                انضم إلينا
+              </Button>
             </Link>
           </div>
 

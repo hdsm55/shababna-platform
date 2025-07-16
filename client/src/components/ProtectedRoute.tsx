@@ -9,8 +9,7 @@ interface ProtectedRouteProps {
 
 function isAllowed(user: any, requiredRole?: string) {
   if (!requiredRole) return true;
-  if (requiredRole === 'admin') return !!user?.is_admin;
-  if (user?.role === requiredRole || user?.role === 'admin') return true;
+  if (requiredRole === 'admin') return user?.role === 'admin';
   return false;
 }
 

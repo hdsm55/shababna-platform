@@ -24,7 +24,7 @@ import Card from '../components/common/Card';
 import Input from '../components/common/Input';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import { fetchEventById } from '../services/eventsApi';
+import { fetchEventById, registerForEvent } from '../services/eventsApi';
 import { Event } from '../types';
 import {
   AccessibleSection,
@@ -73,16 +73,20 @@ const EventDetail: React.FC = () => {
     setRegistrationStatus('idle');
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setRegistrationStatus('success');
-      setRegistrationForm({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        organization: '',
-      });
+      if (!id) throw new Error('No event ID');
+      const res = await registerForEvent(id, registrationForm);
+      if (res.success) {
+        setRegistrationStatus('success');
+        setRegistrationForm({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          organization: '',
+        });
+      } else {
+        setRegistrationStatus('error');
+      }
     } catch (err) {
       setRegistrationStatus('error');
     } finally {
@@ -169,14 +173,15 @@ const EventDetail: React.FC = () => {
       <AccessibleSection variant="hero" ariaLabel="قسم رأس تفاصيل الفعالية">
         <div className="absolute inset-0 bg-black/20"></div>
         {/* Event Banner Image */}
-        {event.image && (
-          <img
-            src={event.image}
-            alt={event.title}
-            className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none select-none"
-            style={{ zIndex: 0 }}
-          />
-        )}
+        <img
+          src={
+            event.image ||
+            'https://images.pexels.com/photos/1181622/pexels-photo-1181622.jpeg'
+          }
+          alt={event.title}
+          className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none select-none"
+          style={{ zIndex: 0 }}
+        />
         <div className="relative container">
           <div className="max-w-4xl mx-auto">
             <motion.div
@@ -197,21 +202,31 @@ const EventDetail: React.FC = () => {
 
               {/* Event Header */}
               <div className="flex flex-wrap items-start gap-4 mb-6">
-                <span
-                  className={`px-3 py-1 text-sm font-medium rounded-full ${getCategoryColor(
-                    event.category
-                  )}`}
-                >
-                  {event.category.charAt(0).toUpperCase() +
-                    event.category.slice(1)}
-                </span>
-                <span
-                  className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(
-                    event.status
-                  )}`}
-                >
-                  {event.status.charAt(0).toUpperCase() + event.status.slice(1)}
-                </span>
+                {/* التصنيفات والحالة */}
+                {event.category && (
+                  <span
+                    className={`px-3 py-1 text-sm font-medium rounded-full ${getCategoryColor(
+                      event.category
+                    )}`}
+                  >
+                    {typeof event.category === 'string'
+                      ? event.category.charAt(0).toUpperCase() +
+                        event.category.slice(1)
+                      : ''}
+                  </span>
+                )}
+                {event.status && (
+                  <span
+                    className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusColor(
+                      event.status
+                    )}`}
+                  >
+                    {typeof event.status === 'string'
+                      ? event.status.charAt(0).toUpperCase() +
+                        event.status.slice(1)
+                      : ''}
+                  </span>
+                )}
               </div>
 
               <h1 className="text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
@@ -224,18 +239,31 @@ const EventDetail: React.FC = () => {
 
               {/* Event Meta */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="flex items-center text-white/90">
-                  <Calendar className="w-5 h-5 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
-                  <div>
-                    <div className="font-medium">
-                      {format(new Date(event.start_date), 'MMM dd, yyyy')}
-                    </div>
-                    <div className="text-sm opacity-80">
-                      {format(new Date(event.start_date), 'HH:mm')} -{' '}
-                      {format(new Date(event.end_date), 'HH:mm')}
+                {/* التاريخ والوقت */}
+                {event.start_date && (
+                  <div className="flex items-center text-white/90">
+                    <Calendar className="w-5 h-5 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
+                    <div>
+                      <div className="font-medium">
+                        {event.start_date &&
+                        !isNaN(new Date(event.start_date).getTime())
+                          ? format(new Date(event.start_date), 'MMM dd, yyyy')
+                          : ''}
+                      </div>
+                      <div className="text-sm opacity-80">
+                        {event.start_date &&
+                        !isNaN(new Date(event.start_date).getTime())
+                          ? format(new Date(event.start_date), 'HH:mm')
+                          : ''}
+                        {' - '}
+                        {event.end_date &&
+                        !isNaN(new Date(event.end_date).getTime())
+                          ? format(new Date(event.end_date), 'HH:mm')
+                          : ''}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
 
                 <div className="flex items-center text-white/90">
                   <MapPin className="w-5 h-5 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
@@ -245,30 +273,45 @@ const EventDetail: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center text-white/90">
-                  <Users className="w-5 h-5 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
-                  <div>
-                    <div className="font-medium">
-                      {event.attendees}/{event.max_attendees || '∞'}
+                {/* عدد الحضور */}
+                {event.attendees !== undefined && (
+                  <div className="flex items-center text-white/90">
+                    <Users className="w-5 h-5 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
+                    <div>
+                      <div className="font-medium">
+                        {typeof event.attendees === 'number'
+                          ? event.attendees
+                          : 0}
+                        /
+                        {typeof event.max_attendees === 'number'
+                          ? event.max_attendees
+                          : '∞'}
+                      </div>
+                      <div className="text-sm opacity-80">Attendees</div>
                     </div>
-                    <div className="text-sm opacity-80">Attendees</div>
                   </div>
-                </div>
+                )}
 
-                <div className="flex items-center text-white/90">
-                  <Clock className="w-5 h-5 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
-                  <div>
-                    <div className="font-medium">
-                      {Math.round(
-                        (new Date(event.end_date).getTime() -
-                          new Date(event.start_date).getTime()) /
-                          (1000 * 60 * 60)
-                      )}
-                      h
+                {/* مدة الفعالية */}
+                {event.start_date &&
+                  event.end_date &&
+                  !isNaN(new Date(event.start_date).getTime()) &&
+                  !isNaN(new Date(event.end_date).getTime()) && (
+                    <div className="flex items-center text-white/90">
+                      <Clock className="w-5 h-5 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
+                      <div>
+                        <div className="font-medium">
+                          {Math.round(
+                            (new Date(event.end_date).getTime() -
+                              new Date(event.start_date).getTime()) /
+                              (1000 * 60 * 60)
+                          )}
+                          h
+                        </div>
+                        <div className="text-sm opacity-80">Duration</div>
+                      </div>
                     </div>
-                    <div className="text-sm opacity-80">Duration</div>
-                  </div>
-                </div>
+                  )}
               </div>
             </motion.div>
           </div>
@@ -282,22 +325,16 @@ const EventDetail: React.FC = () => {
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-8">
               {/* Event Image */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-              >
+              {/* تم حذف عرض الصورة هنا لأنها تظهر بالفعل في الـ Banner العلوي */}
+              {/* <motion.div>
                 <Card className="overflow-hidden">
                   <img
-                    src={
-                      event.image ||
-                      'https://images.pexels.com/photos/1181622/pexels-photo-1181622.jpeg'
-                    }
+                    src={event.image || 'https://images.pexels.com/photos/1181622/pexels-photo-1181622.jpeg'}
                     alt={event.title}
                     className="w-full h-64 lg:h-80 object-cover"
                   />
                 </Card>
-              </motion.div>
+              </motion.div> */}
 
               {/* Event Details */}
               <motion.div
@@ -330,7 +367,10 @@ const EventDetail: React.FC = () => {
                   <div className="space-y-4">
                     <div className="flex items-start space-x-4 rtl:space-x-reverse">
                       <div className="flex-shrink-0 w-16 text-sm font-medium text-primary-600">
-                        {format(new Date(event.start_date), 'HH:mm')}
+                        {event.start_date &&
+                        !isNaN(new Date(event.start_date).getTime())
+                          ? format(new Date(event.start_date), 'HH:mm')
+                          : ''}
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-neutral-900">
@@ -343,12 +383,16 @@ const EventDetail: React.FC = () => {
                     </div>
                     <div className="flex items-start space-x-4 rtl:space-x-reverse">
                       <div className="flex-shrink-0 w-16 text-sm font-medium text-primary-600">
-                        {format(
-                          new Date(
-                            new Date(event.start_date).getTime() + 30 * 60000
-                          ),
-                          'HH:mm'
-                        )}
+                        {event.start_date &&
+                        !isNaN(new Date(event.start_date).getTime())
+                          ? format(
+                              new Date(
+                                new Date(event.start_date).getTime() +
+                                  30 * 60000
+                              ),
+                              'HH:mm'
+                            )
+                          : ''}
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-neutral-900">
@@ -361,7 +405,10 @@ const EventDetail: React.FC = () => {
                     </div>
                     <div className="flex items-start space-x-4 rtl:space-x-reverse">
                       <div className="flex-shrink-0 w-16 text-sm font-medium text-primary-600">
-                        {format(new Date(event.end_date), 'HH:mm')}
+                        {event.end_date &&
+                        !isNaN(new Date(event.end_date).getTime())
+                          ? format(new Date(event.end_date), 'HH:mm')
+                          : ''}
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-neutral-900">
@@ -508,33 +555,54 @@ const EventDetail: React.FC = () => {
                     Event Information
                   </h3>
                   <div className="space-y-4">
-                    <div className="flex items-center text-neutral-600">
-                      <Calendar className="w-4 h-4 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
-                      <span className="text-sm">
-                        {format(
-                          new Date(event.start_date),
-                          'EEEE, MMMM dd, yyyy'
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex items-center text-neutral-600">
-                      <Clock className="w-4 h-4 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
-                      <span className="text-sm">
-                        {format(new Date(event.start_date), 'HH:mm')} -{' '}
-                        {format(new Date(event.end_date), 'HH:mm')}
-                      </span>
-                    </div>
+                    {/* معلومات الفعالية */}
+                    {event.start_date && (
+                      <div className="flex items-center text-neutral-600">
+                        <Calendar className="w-4 h-4 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
+                        <span className="text-sm">
+                          {event.start_date &&
+                          !isNaN(new Date(event.start_date).getTime())
+                            ? format(
+                                new Date(event.start_date),
+                                'EEEE, MMMM dd, yyyy'
+                              )
+                            : ''}
+                        </span>
+                      </div>
+                    )}
+                    {event.start_date && event.end_date && (
+                      <div className="flex items-center text-neutral-600">
+                        <Clock className="w-4 h-4 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
+                        <span className="text-sm">
+                          {event.start_date &&
+                          !isNaN(new Date(event.start_date).getTime())
+                            ? format(new Date(event.start_date), 'HH:mm')
+                            : ''}
+                          {' - '}
+                          {event.end_date &&
+                          !isNaN(new Date(event.end_date).getTime())
+                            ? format(new Date(event.end_date), 'HH:mm')
+                            : ''}
+                        </span>
+                      </div>
+                    )}
                     <div className="flex items-center text-neutral-600">
                       <MapPin className="w-4 h-4 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
                       <span className="text-sm">{event.location}</span>
                     </div>
-                    <div className="flex items-center text-neutral-600">
-                      <Users className="w-4 h-4 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
-                      <span className="text-sm">
-                        {event.attendees} registered
-                        {event.max_attendees && ` / ${event.max_attendees} max`}
-                      </span>
-                    </div>
+                    {event.attendees !== undefined && (
+                      <div className="flex items-center text-neutral-600">
+                        <Users className="w-4 h-4 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
+                        <span className="text-sm">
+                          {typeof event.attendees === 'number'
+                            ? event.attendees
+                            : 0}
+                          {event.max_attendees
+                            ? ` / ${event.max_attendees} max`
+                            : ''}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </Card>
               </motion.div>

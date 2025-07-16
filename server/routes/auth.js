@@ -14,25 +14,15 @@ const validateRegistration = [
     .withMessage('Please provide a valid email address'),
   body('password')
     .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters long')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number'),
+    .withMessage('Password must be at least 6 characters long'),
   body('first_name')
     .trim()
     .isLength({ min: 2, max: 50 })
-    .withMessage('First name must be between 2 and 50 characters')
-    .matches(/^[a-zA-Z\s]+$/)
-    .withMessage('First name can only contain letters and spaces'),
+    .withMessage('First name must be between 2 and 50 characters'),
   body('last_name')
     .trim()
     .isLength({ min: 2, max: 50 })
-    .withMessage('Last name must be between 2 and 50 characters')
-    .matches(/^[a-zA-Z\s]+$/)
-    .withMessage('Last name can only contain letters and spaces'),
-  body('phone')
-    .optional()
-    .isMobilePhone('any')
-    .withMessage('Please provide a valid phone number')
+    .withMessage('Last name must be between 2 and 50 characters'),
 ];
 
 const validateLogin = [
@@ -51,8 +41,7 @@ const generateToken = (user) => {
     {
       id: user.id,
       email: user.email,
-      is_admin: user.is_admin,
-      is_active: user.is_active
+      role: user.role
     },
     process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production',
     { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
@@ -82,7 +71,7 @@ router.post('/register', validateRegistration, async (req, res) => {
     // Check for validation errors
     if (handleValidationErrors(req, res)) return;
 
-    const { email, password, first_name, last_name, phone } = req.body;
+    const { email, password, first_name, last_name } = req.body;
 
     // Check if user already exists
     const existingUserResult = await query('SELECT * FROM users WHERE email = $1', [email]);
@@ -98,12 +87,17 @@ router.post('/register', validateRegistration, async (req, res) => {
     const saltRounds = 12;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+    // Check if this is the first user (make them admin)
+    const userCountResult = await query('SELECT COUNT(*) as count FROM users');
+    const userCount = parseInt(userCountResult.rows[0].count);
+    const role = userCount === 0 ? 'admin' : 'user';
+
     // Create new user
     const newUserResult = await query(`
-      INSERT INTO users (email, password, first_name, last_name, phone, is_admin, is_active, created_at, updated_at)
-      VALUES ($1, $2, $3, $4, $5, true, true, NOW(), NOW())
-      RETURNING id, email, first_name, last_name, phone, is_admin, is_active
-    `, [email, hashedPassword, first_name, last_name, phone || null]);
+      INSERT INTO users (email, password, first_name, last_name, role)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id, email, first_name, last_name, role
+    `, [email, hashedPassword, first_name, last_name, role]);
 
     const newUser = newUserResult.rows[0];
 
@@ -113,16 +107,14 @@ router.post('/register', validateRegistration, async (req, res) => {
     // Return success response
     res.status(201).json({
       success: true,
-      message: 'User registered successfully',
+      message: userCount === 0 ? 'Admin user registered successfully' : 'User registered successfully',
       data: {
         user: {
           id: newUser.id,
           email: newUser.email,
           first_name: newUser.first_name,
           last_name: newUser.last_name,
-          phone: newUser.phone,
-          is_admin: newUser.is_admin,
-          is_active: newUser.is_active
+          role: newUser.role
         },
         token
       }
@@ -157,14 +149,6 @@ router.post('/login', validateLogin, async (req, res) => {
 
     const user = userResult.rows[0];
 
-    // Check if user is active
-    if (!user.is_active) {
-      return res.status(401).json({
-        success: false,
-        message: 'Account is deactivated. Please contact support.'
-      });
-    }
-
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
@@ -187,9 +171,7 @@ router.post('/login', validateLogin, async (req, res) => {
           email: user.email,
           first_name: user.first_name,
           last_name: user.last_name,
-          phone: user.phone,
-          is_admin: user.is_admin,
-          is_active: user.is_active
+          role: user.role
         },
         token
       }
@@ -236,13 +218,6 @@ router.get('/me', async (req, res) => {
 
     const userData = user.rows[0];
 
-    if (!userData.is_active) {
-      return res.status(401).json({
-        success: false,
-        message: 'Account is deactivated'
-      });
-    }
-
     // Return user profile
     res.json({
       success: true,
@@ -252,11 +227,8 @@ router.get('/me', async (req, res) => {
           email: userData.email,
           first_name: userData.first_name,
           last_name: userData.last_name,
-          phone: userData.phone,
-          is_admin: userData.is_admin,
-          is_active: userData.is_active,
-          created_at: userData.created_at,
-          updated_at: userData.updated_at
+          role: userData.role,
+          created_at: userData.created_at
         }
       }
     });

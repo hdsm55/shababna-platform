@@ -27,6 +27,14 @@ import {
   Edit,
   Trash2,
   MoreHorizontal,
+  Download,
+  FileText,
+  Activity,
+  Bell,
+  Settings,
+  ArrowUpRight,
+  ArrowDownRight,
+  Minus,
 } from 'lucide-react';
 
 interface Activity {
@@ -36,6 +44,9 @@ interface Activity {
   date: string;
   status: 'completed' | 'pending' | 'warning' | 'info';
   icon: string;
+  priority?: 'high' | 'medium' | 'low';
+  user?: string;
+  details?: string;
 }
 
 const ActivitiesDashboard: React.FC = () => {
@@ -50,7 +61,9 @@ const ActivitiesDashboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState('all');
 
   // بيانات افتراضية للأنشطة
   const mockActivities: Activity[] = [
@@ -61,6 +74,9 @@ const ActivitiesDashboard: React.FC = () => {
       date: 'منذ ساعتين',
       status: 'completed',
       icon: 'Calendar',
+      priority: 'high',
+      user: 'أحمد محمد',
+      details: 'تم إنشاء فعالية جديدة في قسم ورشات العمل',
     },
     {
       id: 2,
@@ -69,6 +85,9 @@ const ActivitiesDashboard: React.FC = () => {
       date: 'منذ 3 ساعات',
       status: 'completed',
       icon: 'DollarSign',
+      priority: 'medium',
+      user: 'فاطمة علي',
+      details: 'تبرع نقدي عبر البطاقة الائتمانية',
     },
     {
       id: 3,
@@ -77,6 +96,9 @@ const ActivitiesDashboard: React.FC = () => {
       date: 'منذ 5 ساعات',
       status: 'pending',
       icon: 'TrendingUp',
+      priority: 'low',
+      user: 'عمر خالد',
+      details: 'تحديث في محتوى البرنامج وإضافة مواد جديدة',
     },
     {
       id: 4,
@@ -85,6 +107,9 @@ const ActivitiesDashboard: React.FC = () => {
       date: 'منذ يوم واحد',
       status: 'completed',
       icon: 'Users',
+      priority: 'medium',
+      user: 'النظام',
+      details: 'سارة أحمد، يوسف عبدالله، ليلى محمد',
     },
     {
       id: 5,
@@ -93,6 +118,20 @@ const ActivitiesDashboard: React.FC = () => {
       date: 'منذ يومين',
       status: 'warning',
       icon: 'AlertCircle',
+      priority: 'high',
+      user: 'النظام',
+      details: 'البيانات غير مكتملة - مطلوب تحديث الصور والمعلومات',
+    },
+    {
+      id: 6,
+      type: 'system',
+      message: 'تم تحديث النظام إلى الإصدار الجديد',
+      date: 'منذ 3 أيام',
+      status: 'completed',
+      icon: 'Settings',
+      priority: 'low',
+      user: 'النظام',
+      details: 'إصلاحات وتحسينات في الأداء',
     },
   ];
 
@@ -105,11 +144,15 @@ const ActivitiesDashboard: React.FC = () => {
   const filteredActivities = activities.filter((activity: Activity) => {
     const matchesSearch =
       activity.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      activity.type.toLowerCase().includes(searchTerm.toLowerCase());
+      activity.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (activity.user &&
+        activity.user.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesType = typeFilter === 'all' || activity.type === typeFilter;
     const matchesStatus =
       statusFilter === 'all' || activity.status === statusFilter;
-    return matchesSearch && matchesType && matchesStatus;
+    const matchesPriority =
+      priorityFilter === 'all' || activity.priority === priorityFilter;
+    return matchesSearch && matchesType && matchesStatus && matchesPriority;
   });
 
   // دالة جلب الأيقونة
@@ -129,8 +172,10 @@ const ActivitiesDashboard: React.FC = () => {
         return <CheckCircle className="w-5 h-5 text-green-600" />;
       case 'Clock':
         return <Clock className="w-5 h-5 text-gray-600" />;
+      case 'Settings':
+        return <Settings className="w-5 h-5 text-purple-600" />;
       default:
-        return <Eye className="w-5 h-5 text-gray-400" />;
+        return <Activity className="w-5 h-5 text-gray-400" />;
     }
   };
 
@@ -147,6 +192,86 @@ const ActivitiesDashboard: React.FC = () => {
       default:
         return 'text-gray-600 bg-gray-50';
     }
+  };
+
+  const getPriorityColor = (priority?: string) => {
+    switch (priority) {
+      case 'high':
+        return 'border-l-red-500';
+      case 'medium':
+        return 'border-l-yellow-500';
+      case 'low':
+        return 'border-l-green-500';
+      default:
+        return 'border-l-gray-500';
+    }
+  };
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'event':
+        return 'bg-blue-100 text-blue-800';
+      case 'donation':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'program':
+        return 'bg-green-100 text-green-800';
+      case 'user':
+        return 'bg-purple-100 text-purple-800';
+      case 'alert':
+        return 'bg-red-100 text-red-800';
+      case 'system':
+        return 'bg-gray-100 text-gray-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getTypeText = (type: string) => {
+    switch (type) {
+      case 'event':
+        return 'فعالية';
+      case 'donation':
+        return 'تبرع';
+      case 'program':
+        return 'برنامج';
+      case 'user':
+        return 'مستخدم';
+      case 'alert':
+        return 'تنبيه';
+      case 'system':
+        return 'نظام';
+      default:
+        return type;
+    }
+  };
+
+  const exportActivities = () => {
+    const csvContent = [
+      ['النوع', 'الرسالة', 'التاريخ', 'الحالة', 'الأولوية', 'المستخدم'],
+      ...filteredActivities.map((activity: Activity) => [
+        getTypeText(activity.type),
+        activity.message,
+        activity.date,
+        activity.status,
+        activity.priority || 'غير محدد',
+        activity.user || 'النظام',
+      ]),
+    ]
+      .map((row) => row.join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute(
+      'download',
+      `activities-${new Date().toISOString().split('T')[0]}.csv`
+    );
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   if (error) {
@@ -166,7 +291,7 @@ const ActivitiesDashboard: React.FC = () => {
     <DashboardLayout>
       <SkipToContent />
       <AccessibleSection>
-        <div className="max-w-5xl mx-auto py-6 px-2 sm:px-4 lg:px-8">
+        <div className="max-w-7xl mx-auto py-6 px-2 sm:px-4 lg:px-8">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div>
@@ -178,6 +303,14 @@ const ActivitiesDashboard: React.FC = () => {
               </p>
             </div>
             <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                icon={Download}
+                onClick={exportActivities}
+                aria-label="تصدير الأنشطة"
+              >
+                تصدير
+              </Button>
               <Button
                 variant="secondary"
                 icon={RefreshCw}
@@ -220,19 +353,22 @@ const ActivitiesDashboard: React.FC = () => {
                     setSearchTerm('');
                     setTypeFilter('all');
                     setStatusFilter('all');
+                    setPriorityFilter('all');
+                    setSelectedPeriod('all');
                   }}
                 >
                   إعادة تعيين
                 </Button>
               </div>
             </div>
+
             {/* Advanced Filters */}
             {showFilters && (
               <div className="mt-4 pt-4 border-t border-gray-200">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      نوع النشاط
+                      النوع
                     </label>
                     <select
                       value={typeFilter}
@@ -243,8 +379,9 @@ const ActivitiesDashboard: React.FC = () => {
                       <option value="event">فعالية</option>
                       <option value="donation">تبرع</option>
                       <option value="program">برنامج</option>
-                      <option value="user">عضو</option>
+                      <option value="user">مستخدم</option>
                       <option value="alert">تنبيه</option>
+                      <option value="system">نظام</option>
                     </select>
                   </div>
                   <div>
@@ -258,9 +395,39 @@ const ActivitiesDashboard: React.FC = () => {
                     >
                       <option value="all">جميع الحالات</option>
                       <option value="completed">مكتمل</option>
-                      <option value="pending">قيد التنفيذ</option>
+                      <option value="pending">قيد الانتظار</option>
                       <option value="warning">تحذير</option>
                       <option value="info">معلومات</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      الأولوية
+                    </label>
+                    <select
+                      value={priorityFilter}
+                      onChange={(e) => setPriorityFilter(e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      <option value="all">جميع الأولويات</option>
+                      <option value="high">عالية</option>
+                      <option value="medium">متوسطة</option>
+                      <option value="low">منخفضة</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      الفترة
+                    </label>
+                    <select
+                      value={selectedPeriod}
+                      onChange={(e) => setSelectedPeriod(e.target.value)}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      <option value="all">جميع الفترات</option>
+                      <option value="today">اليوم</option>
+                      <option value="week">الأسبوع</option>
+                      <option value="month">الشهر</option>
                     </select>
                   </div>
                 </div>
@@ -277,62 +444,113 @@ const ActivitiesDashboard: React.FC = () => {
             <div className="space-y-4">
               {filteredActivities.length === 0 ? (
                 <Card className="text-center py-12">
-                  <Eye className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <Activity className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    لا يوجد أنشطة حديثة
+                    لا توجد أنشطة
                   </h3>
-                  <p className="text-gray-500 mb-4">
+                  <p className="text-gray-500">
                     {searchTerm ||
                     typeFilter !== 'all' ||
-                    statusFilter !== 'all'
-                      ? 'لا يوجد أنشطة تطابق معايير البحث المحددة'
-                      : 'ابدأ بإضافة أنشطة جديدة'}
+                    statusFilter !== 'all' ||
+                    priorityFilter !== 'all'
+                      ? 'لا توجد أنشطة تطابق معايير البحث المحددة'
+                      : 'لا توجد أنشطة حديثة لعرضها'}
                   </p>
                 </Card>
               ) : (
                 filteredActivities.map((activity: Activity) => (
                   <Card
                     key={activity.id}
-                    className="flex items-center gap-4 p-4"
+                    className={`hover:shadow-lg transition-shadow border-l-4 ${getPriorityColor(
+                      activity.priority
+                    )}`}
                   >
-                    <div className="flex-shrink-0">
-                      {getIcon(activity.icon)}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                    <div className="p-4">
+                      <div className="flex items-start gap-4">
+                        <div
+                          className={`p-2 rounded-full ${getStatusColor(
                             activity.status
                           )}`}
                         >
-                          {activity.status === 'completed'
-                            ? 'مكتمل'
-                            : activity.status === 'pending'
-                            ? 'قيد التنفيذ'
-                            : activity.status === 'warning'
-                            ? 'تحذير'
-                            : 'معلومات'}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {activity.date}
-                        </span>
+                          {getIcon(activity.icon)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(
+                                  activity.type
+                                )}`}
+                              >
+                                {getTypeText(activity.type)}
+                              </span>
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                                  activity.status
+                                )}`}
+                              >
+                                {activity.status === 'completed'
+                                  ? 'مكتمل'
+                                  : activity.status === 'pending'
+                                  ? 'قيد الانتظار'
+                                  : activity.status === 'warning'
+                                  ? 'تحذير'
+                                  : 'معلومات'}
+                              </span>
+                            </div>
+                            <span className="text-xs text-gray-500">
+                              {activity.date}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-900 font-medium mb-1">
+                            {activity.message}
+                          </p>
+                          {activity.details && (
+                            <p className="text-xs text-gray-600 mb-2">
+                              {activity.details}
+                            </p>
+                          )}
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-gray-500">
+                              بواسطة: {activity.user || 'النظام'}
+                            </span>
+                            <div className="flex gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                icon={Eye}
+                                aria-label="عرض التفاصيل"
+                                onClick={() => {
+                                  // يمكن إضافة منطق عرض التفاصيل هنا
+                                }}
+                              >
+                                عرض
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-900 font-medium">
-                        {activity.message}
-                      </div>
-                    </div>
-                    <div className="flex-shrink-0">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        aria-label="خيارات النشاط"
-                      >
-                        <MoreHorizontal className="w-4 h-4" />
-                      </Button>
                     </div>
                   </Card>
                 ))
               )}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {filteredActivities.length > 0 && (
+            <div className="mt-6 flex items-center justify-between">
+              <p className="text-sm text-gray-600">
+                عرض {filteredActivities.length} من {activities.length} نشاط
+              </p>
+              <div className="flex gap-2">
+                <Button variant="secondary" size="sm">
+                  السابق
+                </Button>
+                <Button variant="secondary" size="sm">
+                  التالي
+                </Button>
+              </div>
             </div>
           )}
         </div>

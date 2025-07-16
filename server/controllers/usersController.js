@@ -68,19 +68,9 @@ export const getAllUsers = async (req, res) => {
         u.first_name,
         u.last_name,
         u.email,
-        u.phone,
-        u.bio,
-        u.is_admin,
-        u.is_active,
-        u.created_at,
-        u.updated_at,
-        COUNT(DISTINCT er.event_id) as events_attended,
-        COUNT(DISTINCT d.program_id) as programs_participated,
-        COALESCE(SUM(d.amount), 0) as total_donations
+        u.role,
+        u.created_at
       FROM users u
-      LEFT JOIN event_registrations er ON u.id = er.user_id
-      LEFT JOIN donations d ON u.id = d.user_id
-      GROUP BY u.id
       ORDER BY u.created_at DESC
     `);
         return successResponse(res, { items: result.rows, total: result.rows.length }, 'تم جلب المستخدمين بنجاح');
@@ -97,18 +87,15 @@ export const createUser = async (req, res) => {
             first_name,
             last_name,
             email,
-            phone,
-            bio,
             password,
-            is_admin = false,
-            is_active = true
+            role = 'user'
         } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
         const result = await query(`
-      INSERT INTO users (first_name, last_name, email, phone, bio, password, is_admin, is_active)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      RETURNING id, first_name, last_name, email, phone, bio, is_admin, is_active, created_at
-    `, [first_name, last_name, email, phone, bio, hashedPassword, is_admin, is_active]);
+      INSERT INTO users (first_name, last_name, email, password, role)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id, first_name, last_name, email, role, created_at
+    `, [first_name, last_name, email, hashedPassword, role]);
         return successResponse(res, result.rows[0], 'تم إضافة المستخدم بنجاح');
     } catch (error) {
         console.error('User creation error:', error);
@@ -124,18 +111,27 @@ export const updateUser = async (req, res) => {
             first_name,
             last_name,
             email,
-            phone,
-            bio,
-            is_admin,
-            is_active
+            password,
+            role
         } = req.body;
-        const result = await query(`
+        let updateFields = [first_name, last_name, email, role, id];
+        let queryStr = `
       UPDATE users
-      SET first_name = $1, last_name = $2, email = $3, phone = $4,
-        bio = $5, is_admin = $6, is_active = $7, updated_at = NOW()
-      WHERE id = $8
-      RETURNING id, first_name, last_name, email, phone, bio, is_admin, is_active, created_at, updated_at
-    `, [first_name, last_name, email, phone, bio, is_admin, is_active, id]);
+      SET first_name = $1, last_name = $2, email = $3, role = $4
+      WHERE id = $5
+      RETURNING id, first_name, last_name, email, role, created_at
+    `;
+        if (password) {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            updateFields = [first_name, last_name, email, hashedPassword, role, id];
+            queryStr = `
+        UPDATE users
+        SET first_name = $1, last_name = $2, email = $3, password = $4, role = $5
+        WHERE id = $6
+        RETURNING id, first_name, last_name, email, role, created_at
+      `;
+        }
+        const result = await query(queryStr, updateFields);
         if (result.rows.length === 0) {
             return errorResponse(res, 'المستخدم غير موجود', 404);
         }

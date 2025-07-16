@@ -9,6 +9,7 @@ import helmet from 'helmet';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import path from 'path';
+import bodyParser from 'body-parser';
 
 // Import database configuration
 import './config/database.js';
@@ -45,8 +46,8 @@ app.use(cors({
   origin: process.env.CORS_ORIGIN || process.env.CLIENT_URL || 'http://localhost:5173',
   credentials: true
 }));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // جعل مجلد uploads متاحاً للقراءة عبر HTTP
 app.use('/uploads', express.static(path.join(process.cwd(), 'server', 'uploads')));
@@ -59,6 +60,12 @@ app.use('/api/users', usersRoutes);
 app.use('/api/donations', donationsRoutes);
 app.use('/api/forms', formsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+
+// Additional routes for dashboard data
+app.use('/api/contact-forms', formsRoutes);
+app.use('/api/join-requests', formsRoutes);
+app.use('/api/program-registrations', formsRoutes);
+app.use('/api/event-registrations', formsRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

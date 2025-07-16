@@ -25,15 +25,23 @@ export const fetchEventById = async (id: number | string): Promise<Event> => {
   return response.data.data;
 };
 
-// Create a new event (admin only)
-export const createEvent = async (eventData: Partial<Event>): Promise<ApiResponse<Event>> => {
-  const response = await http.post('/events', eventData);
+// Create a new event (admin only) - supports FormData for image upload
+export const createEvent = async (eventData: Partial<Event> | FormData): Promise<ApiResponse<Event>> => {
+  const headers = eventData instanceof FormData
+    ? { 'Content-Type': 'multipart/form-data' }
+    : { 'Content-Type': 'application/json' };
+
+  const response = await http.post('/events', eventData, { headers });
   return response.data;
 };
 
-// Update an event (admin only)
-export const updateEvent = async (id: number, eventData: Partial<Event>): Promise<ApiResponse<Event>> => {
-  const response = await http.put(`/events/${id}`, eventData);
+// Update an event (admin only) - supports FormData for image upload
+export const updateEvent = async (id: number, eventData: Partial<Event> | FormData): Promise<ApiResponse<Event>> => {
+  const headers = eventData instanceof FormData
+    ? { 'Content-Type': 'multipart/form-data' }
+    : { 'Content-Type': 'application/json' };
+
+  const response = await http.put(`/events/${id}`, eventData, { headers });
   return response.data;
 };
 
@@ -44,8 +52,25 @@ export const deleteEvent = async (id: number): Promise<ApiResponse<void>> => {
 };
 
 // Register for an event
-export const registerForEvent = async (eventId: number, userId: number): Promise<ApiResponse<any>> => {
-  const response = await http.post(`/events/${eventId}/register`, { user_id: userId });
+export const registerForEvent = async (
+  eventId: number | string,
+  registrationData: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone?: string;
+    organization?: string;
+  }
+): Promise<ApiResponse<any>> => {
+  // تحويل الحقول إلى snake_case
+  const payload = {
+    first_name: registrationData.firstName,
+    last_name: registrationData.lastName,
+    email: registrationData.email,
+    phone: registrationData.phone,
+    organization: registrationData.organization,
+  };
+  const response = await http.post(`/events/${eventId}/register`, payload);
   return response.data;
 };
 

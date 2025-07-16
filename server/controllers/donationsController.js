@@ -86,10 +86,9 @@ export const getAllDonations = async (req, res) => {
         const countResult = await query('SELECT COUNT(*) FROM donations');
         const total = parseInt(countResult.rows[0].count);
         const result = await query(`
-      SELECT d.*, u.first_name, u.last_name, u.email as donor_email, p.title as program_title
+      SELECT d.id, d.amount, d.donated_at, u.first_name, u.last_name, u.email as donor_email
       FROM donations d
       JOIN users u ON d.user_id = u.id
-      JOIN programs p ON d.program_id = p.id
       ORDER BY d.donated_at DESC
       LIMIT $1 OFFSET $2
     `, [parseInt(limit), parseInt(offset)]);

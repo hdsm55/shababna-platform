@@ -14,6 +14,7 @@
     "preview": "cd client && vite preview",
     "db:setup": "node server/db/setup.js",
     "db:seed": "node server/db/seed.js",
+    "db:setup-forms": "node server/db/setup_contact_forms.js",
     "test:api": "node server/test-api.js",
     "test": "jest",
     "test:watch": "jest --watch",

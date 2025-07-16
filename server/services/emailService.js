@@ -248,31 +248,45 @@ class EmailService {
     // حفظ نموذج مقدم
     async saveFormSubmission(formData) {
         try {
-            const sqlQuery = `
-        INSERT INTO form_submissions (
-          form_type, first_name, last_name, email, phone, country,
-          age, interests, motivation, subject, message
+            if (formData.form_type === 'contact') {
+                // نموذج التواصل
+                const sqlQuery = `
+        INSERT INTO contact_forms (
+          name, email, phone, subject, message
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING *
       `;
-
-            const result = await query(sqlQuery, [
-                formData.form_type,
-                formData.first_name,
-                formData.last_name,
-                formData.email,
-                formData.phone,
-                formData.country,
-                formData.age,
-                formData.interests,
-                formData.motivation,
-                formData.subject,
-                formData.message
-            ]);
-
-            return result.rows[0];
-
+                const result = await query(sqlQuery, [
+                    formData.first_name + (formData.last_name ? ' ' + formData.last_name : ''),
+                    formData.email,
+                    formData.phone,
+                    formData.subject,
+                    formData.message
+                ]);
+                return result.rows[0];
+            } else if (formData.form_type === 'join_us') {
+                // نموذج الانضمام
+                const sqlQuery = `
+        INSERT INTO join_requests (
+          first_name, last_name, email, phone, country, age, motivation
+        )
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING *
+      `;
+                const result = await query(sqlQuery, [
+                    formData.first_name,
+                    formData.last_name,
+                    formData.email,
+                    formData.phone,
+                    formData.country,
+                    formData.age,
+                    formData.motivation
+                ]);
+                return result.rows[0];
+            } else {
+                throw new Error('نوع النموذج غير مدعوم');
+            }
         } catch (error) {
             console.error('Failed to save form submission:', error);
             throw error;
@@ -298,15 +312,15 @@ class EmailService {
     }
 
     // تحديث حالة النموذج
-    async updateFormStatus(formId, status, adminNotes = null) {
+    async updateFormStatus(formId, status) {
         try {
             const sqlQuery = `
         UPDATE form_submissions
-        SET status = $2, admin_notes = $3, updated_at = NOW()
+        SET status = $2
         WHERE id = $1
       `;
 
-            const result = await query(sqlQuery, [formId, status, adminNotes]);
+            const result = await query(sqlQuery, [formId, status]);
             return result.rowCount > 0;
 
         } catch (error) {

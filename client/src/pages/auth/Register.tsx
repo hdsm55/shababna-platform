@@ -16,8 +16,8 @@ import Alert from '../../components/common/Alert';
 import { registerApi } from '../../services/api';
 
 interface RegisterFormData {
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -47,19 +47,17 @@ const Register: React.FC = () => {
       const response = await registerApi({
         email: data.email,
         password: data.password,
-        first_name: data.firstName,
-        last_name: data.lastName,
+        first_name: data.first_name,
+        last_name: data.last_name,
       });
       if (!response.success) {
         setRegisterError(response.message || 'فشل في إنشاء الحساب.');
         return;
       }
       const { user, token } = response.data;
-      // أضف role بناءً على is_admin
-      const userWithRole = { ...user, role: user.is_admin ? 'admin' : 'user' };
-      login(userWithRole, token);
+      login(user, token);
       localStorage.setItem('token', token);
-      if (userWithRole.role === 'admin') {
+      if (user.role === 'admin') {
         navigate('/dashboard');
       } else {
         navigate('/');
@@ -128,7 +126,7 @@ const Register: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label
-                    htmlFor="firstName"
+                    htmlFor="first_name"
                     className="block text-sm font-medium text-gray-700 mb-2"
                   >
                     {t('auth.register.firstName')}
@@ -139,30 +137,30 @@ const Register: React.FC = () => {
                       aria-hidden="true"
                     />
                     <Input
-                      id="firstName"
+                      id="first_name"
                       type="text"
-                      {...register('firstName', {
+                      {...register('first_name', {
                         required: 'الاسم الأول مطلوب',
                       })}
                       className="pl-10 rtl:pr-10 rtl:pl-4"
                       placeholder="الاسم الأول"
-                      aria-describedby="firstName-error"
+                      aria-describedby="first_name-error"
                     />
                   </div>
-                  {errors.firstName && (
+                  {errors.first_name && (
                     <p
-                      id="firstName-error"
+                      id="first_name-error"
                       className="text-red-600 text-sm mt-1"
                       role="alert"
                     >
-                      {errors.firstName.message}
+                      {errors.first_name.message}
                     </p>
                   )}
                 </div>
 
                 <div>
                   <label
-                    htmlFor="lastName"
+                    htmlFor="last_name"
                     className="block text-sm font-medium text-gray-700 mb-2"
                   >
                     {t('auth.register.lastName')}
@@ -173,23 +171,23 @@ const Register: React.FC = () => {
                       aria-hidden="true"
                     />
                     <Input
-                      id="lastName"
+                      id="last_name"
                       type="text"
-                      {...register('lastName', {
-                        required: 'الاسم الأخير مطلوب',
+                      {...register('last_name', {
+                        required: 'اسم العائلة مطلوب',
                       })}
                       className="pl-10 rtl:pr-10 rtl:pl-4"
-                      placeholder="الاسم الأخير"
-                      aria-describedby="lastName-error"
+                      placeholder="اسم العائلة"
+                      aria-describedby="last_name-error"
                     />
                   </div>
-                  {errors.lastName && (
+                  {errors.last_name && (
                     <p
-                      id="lastName-error"
+                      id="last_name-error"
                       className="text-red-600 text-sm mt-1"
                       role="alert"
                     >
-                      {errors.lastName.message}
+                      {errors.last_name.message}
                     </p>
                   )}
                 </div>

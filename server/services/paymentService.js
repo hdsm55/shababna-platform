@@ -98,21 +98,15 @@ class PaymentService {
     async saveDonation(donationData) {
         try {
             const result = await query(`
-        INSERT INTO donations (user_id, program_id, amount, donated_at)
-        VALUES ($1, $2, $3, NOW())
+        INSERT INTO donations (user_id, amount, donated_at)
+        VALUES ($1, $2, NOW())
         RETURNING *
       `, [
                 donationData.userId,
-                donationData.programId,
                 donationData.amount
             ]);
 
-            // Update program current amount
-            await query(`
-        UPDATE programs
-        SET current_amount = current_amount + $1, updated_at = NOW()
-        WHERE id = $2
-      `, [donationData.amount, donationData.programId]);
+            // لا يوجد تحديث لمبلغ البرنامج لأن العمود غير موجود
 
             return {
                 success: true,

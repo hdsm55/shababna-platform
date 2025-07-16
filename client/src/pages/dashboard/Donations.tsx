@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchDonations } from '../../services/dashboardApi';
+import Button from '../../components/common/Button';
 
 const DonationsDashboard: React.FC = () => {
   const [donations, setDonations] = useState<any[]>([]);
@@ -27,12 +28,22 @@ const DonationsDashboard: React.FC = () => {
     <div className="container mx-auto max-w-5xl py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">لوحة التبرعات</h1>
-        <Link
-          to="/dashboard/donations/new"
-          className="bg-blue-600 text-white px-4 py-2 rounded font-bold hover:bg-blue-700 transition"
-        >
-          + تسجيل تبرع جديد
-        </Link>
+        <div className="flex gap-2">
+          <Link to="/donations">
+            <Button
+              variant="outline"
+              className="font-bold text-primary-600 border-primary-300"
+            >
+              صفحة التبرعات العامة
+            </Button>
+          </Link>
+          <Link
+            to="/dashboard/donations/new"
+            className="bg-blue-600 text-white px-4 py-2 rounded font-bold hover:bg-blue-700 transition"
+          >
+            + تسجيل تبرع جديد
+          </Link>
+        </div>
       </div>
       <div className="bg-white rounded-xl shadow p-4 overflow-x-auto">
         {loading ? (

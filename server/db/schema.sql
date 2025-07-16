@@ -1,139 +1,127 @@
 -- === 1. حذف أي جداول قديمة (إن وجدت) ===
-DROP TABLE IF EXISTS donations CASCADE;
 DROP TABLE IF EXISTS event_registrations CASCADE;
+DROP TABLE IF EXISTS program_supporters CASCADE;
+DROP TABLE IF EXISTS program_registrations CASCADE;
+DROP TABLE IF EXISTS donations CASCADE;
 DROP TABLE IF EXISTS events CASCADE;
 DROP TABLE IF EXISTS programs CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS join_requests CASCADE;
+DROP TABLE IF EXISTS contact_forms CASCADE;
 
--- === 2. جدول المستخدمين ===
-CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  email VARCHAR(255) NOT NULL UNIQUE,
-  password VARCHAR(255) NOT NULL,
-  first_name VARCHAR(100) NOT NULL,
-  last_name VARCHAR(100) NOT NULL,
-  phone VARCHAR(20),
-  bio TEXT,
-  avatar_url TEXT,
-  is_active BOOLEAN DEFAULT TRUE,
-  is_admin BOOLEAN DEFAULT FALSE,
-  email_verified_at TIMESTAMP,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
+-- === 1. جدول المستخدمين ===
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(50) DEFAULT 'user',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- === 2. جدول البرامج ===
+CREATE TABLE IF NOT EXISTS programs (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    start_date DATE,
+    end_date DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- === 3. جدول الفعاليات ===
-CREATE TABLE events (
-  id SERIAL PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  description TEXT,
-  location VARCHAR(255),
-  start_date TIMESTAMP NOT NULL,
-  end_date TIMESTAMP NOT NULL,
-  max_attendees INT,
-  attendees INT DEFAULT 0,
-  category VARCHAR(100),
-  status VARCHAR(50) DEFAULT 'upcoming',
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
+CREATE TABLE IF NOT EXISTS events (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    event_date DATE,
+    location VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- === 4. جدول البرامج ===
-CREATE TABLE programs (
-  id SERIAL PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  description TEXT,
-  category VARCHAR(100),
-  goal_amount DECIMAL(10,2),
-  current_amount DECIMAL(10,2) DEFAULT 0,
-  start_date TIMESTAMP NOT NULL,
-  end_date TIMESTAMP NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW(),
-  image_url TEXT
+-- === 4. جدول التبرعات ===
+CREATE TABLE IF NOT EXISTS donations (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    amount NUMERIC(10,2) NOT NULL,
+    donated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- === 5. جدول التسجيل في الفعاليات ===
-CREATE TABLE event_registrations (
-  id SERIAL PRIMARY KEY,
-  user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  event_id INT NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-  registered_at TIMESTAMP DEFAULT NOW(),
-  UNIQUE (user_id, event_id)
+-- === 5. جدول تسجيلات البرامج ===
+CREATE TABLE IF NOT EXISTS program_registrations (
+    id SERIAL PRIMARY KEY,
+    program_id INTEGER REFERENCES programs(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- === 6. جدول التبرعات ===
-CREATE TABLE donations (
-  id SERIAL PRIMARY KEY,
-  user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  program_id INT NOT NULL REFERENCES programs(id) ON DELETE CASCADE,
-  amount DECIMAL(10,2) NOT NULL,
-  donated_at TIMESTAMP DEFAULT NOW()
+-- === 6. جدول داعمي البرامج ===
+CREATE TABLE IF NOT EXISTS program_supporters (
+    id SERIAL PRIMARY KEY,
+    program_id INTEGER REFERENCES programs(id) ON DELETE CASCADE,
+    supporter_name VARCHAR(255) NOT NULL,
+    supporter_email VARCHAR(255),
+    amount NUMERIC(10,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- === 7. إنشاء فهارس لتحسين الأداء ===
+-- === 7. جدول تسجيلات الفعاليات ===
+CREATE TABLE IF NOT EXISTS event_registrations (
+    id SERIAL PRIMARY KEY,
+    event_id INTEGER REFERENCES events(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- === 8. جدول طلبات الانضمام ===
+CREATE TABLE IF NOT EXISTS join_requests (
+    id SERIAL PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(50),
+    country VARCHAR(100) NOT NULL,
+    age INTEGER,
+    motivation TEXT,
+    status VARCHAR(50) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- === 9. جدول رسائل التواصل ===
+CREATE TABLE IF NOT EXISTS contact_forms (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(50),
+    subject VARCHAR(500) NOT NULL,
+    message TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    status VARCHAR(50) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- === 10. إنشاء فهارس لتحسين الأداء ===
 CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_is_admin ON users(is_admin);
-CREATE INDEX idx_events_category ON events(category);
-CREATE INDEX idx_events_status ON events(status);
-CREATE INDEX idx_events_start_date ON events(start_date);
-CREATE INDEX idx_programs_category ON programs(category);
+CREATE INDEX idx_users_role ON users(role);
+CREATE INDEX idx_events_event_date ON events(event_date);
+CREATE INDEX idx_programs_start_date ON programs(start_date);
+CREATE INDEX idx_donations_user_id ON donations(user_id);
+CREATE INDEX idx_program_registrations_user_id ON program_registrations(user_id);
+CREATE INDEX idx_program_registrations_program_id ON program_registrations(program_id);
 CREATE INDEX idx_event_registrations_user_id ON event_registrations(user_id);
 CREATE INDEX idx_event_registrations_event_id ON event_registrations(event_id);
-CREATE INDEX idx_donations_user_id ON donations(user_id);
-CREATE INDEX idx_donations_program_id ON donations(program_id);
 
--- === 8. جدول النماذج المقدمة ===
-CREATE TABLE form_submissions (
-  id SERIAL PRIMARY KEY,
-  form_type VARCHAR(50) NOT NULL, -- 'contact', 'join_us', 'newsletter'
-  first_name VARCHAR(100),
-  last_name VARCHAR(100),
-  email VARCHAR(255) NOT NULL,
-  phone VARCHAR(20),
-  country VARCHAR(100),
-  age INTEGER,
-  interests TEXT[], -- Array of interests
-  motivation TEXT,
-  subject VARCHAR(255),
-  message TEXT,
-  status VARCHAR(50) DEFAULT 'pending', -- 'pending', 'processed', 'replied', 'archived'
-  admin_notes TEXT,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
+-- === 11. جدول تسجيل رسائل البريد الإلكتروني ===
+CREATE TABLE IF NOT EXISTS email_logs (
+    id SERIAL PRIMARY KEY,
+    recipient_email VARCHAR(255) NOT NULL,
+    recipient_name VARCHAR(255),
+    subject VARCHAR(500),
+    email_type VARCHAR(100),
+    content TEXT,
+    status VARCHAR(50),
+    error_message TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
--- === 9. جدول الإيميلات المرسلة ===
-CREATE TABLE email_logs (
-  id SERIAL PRIMARY KEY,
-  recipient_email VARCHAR(255) NOT NULL,
-  recipient_name VARCHAR(100),
-  subject VARCHAR(255) NOT NULL,
-  email_type VARCHAR(50) NOT NULL, -- 'welcome', 'newsletter', 'contact_confirmation', 'admin_notification'
-  content TEXT NOT NULL,
-  status VARCHAR(50) DEFAULT 'sent', -- 'sent', 'failed', 'bounced'
-  error_message TEXT,
-  sent_at TIMESTAMP DEFAULT NOW()
-);
-
--- === 10. جدول مشتركي النشرة الإخبارية ===
-CREATE TABLE newsletter_subscribers (
-  id SERIAL PRIMARY KEY,
-  email VARCHAR(255) NOT NULL UNIQUE,
-  first_name VARCHAR(100),
-  last_name VARCHAR(100),
-  is_active BOOLEAN DEFAULT TRUE,
-  subscribed_at TIMESTAMP DEFAULT NOW(),
-  unsubscribed_at TIMESTAMP,
-  last_email_sent_at TIMESTAMP
-);
-
--- === 11. فهارس إضافية ===
-CREATE INDEX idx_form_submissions_form_type ON form_submissions(form_type);
-CREATE INDEX idx_form_submissions_status ON form_submissions(status);
-CREATE INDEX idx_form_submissions_created_at ON form_submissions(created_at);
-CREATE INDEX idx_email_logs_email_type ON email_logs(email_type);
-CREATE INDEX idx_email_logs_status ON email_logs(status);
-CREATE INDEX idx_email_logs_sent_at ON email_logs(sent_at);
-CREATE INDEX idx_newsletter_subscribers_email ON newsletter_subscribers(email);
-CREATE INDEX idx_newsletter_subscribers_is_active ON newsletter_subscribers(is_active);

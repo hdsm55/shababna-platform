@@ -290,54 +290,74 @@ const Events: React.FC = () => {
                       </div>
                       <div className="p-6">
                         <div className="flex items-center gap-2 mb-3">
-                          <span
-                            className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(
-                              event.category
-                            )}`}
-                          >
-                            {event.category.charAt(0).toUpperCase() +
-                              event.category.slice(1)}
-                          </span>
-                          <span
-                            className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
-                              event.status
-                            )}`}
-                          >
-                            {event.status.charAt(0).toUpperCase() +
-                              event.status.slice(1)}
-                          </span>
+                          {event.category && (
+                            <span
+                              className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(
+                                event.category
+                              )}`}
+                            >
+                              {typeof event.category === 'string'
+                                ? event.category.charAt(0).toUpperCase() +
+                                  event.category.slice(1)
+                                : ''}
+                            </span>
+                          )}
+                          {event.status && (
+                            <span
+                              className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+                                event.status
+                              )}`}
+                            >
+                              {typeof event.status === 'string'
+                                ? event.status.charAt(0).toUpperCase() +
+                                  event.status.slice(1)
+                                : ''}
+                            </span>
+                          )}
                         </div>
-
                         <h3 className="text-xl font-semibold text-gray-900 mb-2">
                           {event.title}
                         </h3>
-
                         <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                           {event.description}
                         </p>
-
                         <div className="space-y-2 mb-6">
                           <div className="flex items-center text-sm text-gray-500">
                             <Calendar className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
-                            {format(new Date(event.start_date), 'MMM dd, yyyy')}
+                            {event.start_date &&
+                            !isNaN(new Date(event.start_date).getTime())
+                              ? format(
+                                  new Date(event.start_date),
+                                  'MMM dd, yyyy'
+                                )
+                              : ''}
                           </div>
-                          <div className="flex items-center text-sm text-gray-500">
-                            <Clock className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
-                            {format(new Date(event.start_date), 'HH:mm')} -{' '}
-                            {format(new Date(event.end_date), 'HH:mm')}
-                          </div>
+                          {(event.start_date || event.end_date) && (
+                            <div className="flex items-center text-sm text-gray-500">
+                              <Clock className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                              {event.start_date
+                                ? format(new Date(event.start_date), 'HH:mm')
+                                : ''}{' '}
+                              -{' '}
+                              {event.end_date
+                                ? format(new Date(event.end_date), 'HH:mm')
+                                : ''}
+                            </div>
+                          )}
                           <div className="flex items-center text-sm text-gray-500">
                             <MapPin className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
                             {event.location}
                           </div>
-                          {event.max_attendees && (
+                          {typeof event.max_attendees === 'number' && (
                             <div className="flex items-center text-sm text-gray-500">
                               <Users className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
-                              {event.attendees}/{event.max_attendees} attendees
+                              {typeof event.attendees === 'number'
+                                ? event.attendees
+                                : 0}
+                              /{event.max_attendees} مشارك
                             </div>
                           )}
                         </div>
-
                         <div className="flex gap-3">
                           <Button
                             size="sm"
@@ -352,9 +372,9 @@ const Events: React.FC = () => {
                             }}
                           >
                             {event.status === 'cancelled'
-                              ? 'Cancelled'
+                              ? 'ملغاة'
                               : event.status === 'completed'
-                              ? 'Completed'
+                              ? 'مكتملة'
                               : t('events.register')}
                           </Button>
                           <Link to={`/events/${event.id}`}>

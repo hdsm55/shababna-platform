@@ -28,7 +28,7 @@ import Card from '../components/common/Card';
 import Input from '../components/common/Input';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import { fetchProgramById } from '../services/programsApi';
+import { fetchProgramById, registerForProgram } from '../services/programsApi';
 import { Program } from '../types';
 import {
   AccessibleSection,
@@ -72,23 +72,27 @@ const ProgramDetail: React.FC = () => {
     console.log('isLoading:', isLoading, 'isError:', isError, 'error:', error);
   }, [program, isLoading, isError, error]);
 
-  const handleDonation = async (e: React.FormEvent) => {
+  const handleRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsDonating(true);
     setDonationStatus('idle');
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setDonationStatus('success');
-      setDonationForm({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        amount: '',
-        message: '',
-      });
+      if (!id) throw new Error('No program ID');
+      const res = await registerForProgram(id, donationForm);
+      if (res.success) {
+        setDonationStatus('success');
+        setDonationForm({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          amount: '',
+          message: '',
+        });
+      } else {
+        setDonationStatus('error');
+      }
     } catch (err) {
       setDonationStatus('error');
     } finally {
@@ -208,8 +212,10 @@ const ProgramDetail: React.FC = () => {
                     program.category
                   )}`}
                 >
-                  {program.category.charAt(0).toUpperCase() +
-                    program.category.slice(1)}
+                  {typeof program.category === 'string'
+                    ? program.category.charAt(0).toUpperCase() +
+                      program.category.slice(1)
+                    : ''}
                 </span>
               </div>
 
@@ -227,7 +233,10 @@ const ProgramDetail: React.FC = () => {
                   <DollarSign className="w-5 h-5 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
                   <div>
                     <div className="font-medium">
-                      ${program.current_amount.toLocaleString()}
+                      $
+                      {typeof program.current_amount === 'number'
+                        ? program.current_amount.toLocaleString()
+                        : '0'}
                     </div>
                     <div className="text-sm opacity-80">Raised</div>
                   </div>
@@ -237,7 +246,10 @@ const ProgramDetail: React.FC = () => {
                   <Target className="w-5 h-5 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
                   <div>
                     <div className="font-medium">
-                      ${program.goal_amount?.toLocaleString() || '∞'}
+                      $
+                      {typeof program.goal_amount === 'number'
+                        ? program.goal_amount.toLocaleString()
+                        : '∞'}
                     </div>
                     <div className="text-sm opacity-80">Goal</div>
                   </div>
@@ -246,9 +258,7 @@ const ProgramDetail: React.FC = () => {
                 <div className="flex items-center text-white/90">
                   <Users className="w-5 h-5 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
                   <div>
-                    <div className="font-medium">
-                      {program.beneficiaries || 'Unlimited'}
-                    </div>
+                    <div className="font-medium">{'—'}</div>
                     <div className="text-sm opacity-80">Beneficiaries</div>
                   </div>
                 </div>
@@ -296,11 +306,6 @@ const ProgramDetail: React.FC = () => {
                     <p className="text-neutral-600 leading-relaxed mb-6">
                       {program.description}
                     </p>
-                    {program.long_description && (
-                      <p className="text-neutral-600 leading-relaxed">
-                        {program.long_description}
-                      </p>
-                    )}
                   </div>
                 </Card>
               </motion.div>
@@ -473,10 +478,18 @@ const ProgramDetail: React.FC = () => {
                     </div>
                     <div className="flex justify-between text-sm text-neutral-600 mt-2">
                       <span>
-                        ${program.current_amount.toLocaleString()} raised
+                        $
+                        {typeof program.current_amount === 'number'
+                          ? program.current_amount.toLocaleString()
+                          : '0'}{' '}
+                        raised
                       </span>
                       <span>
-                        ${program.goal_amount?.toLocaleString() || '∞'} goal
+                        $
+                        {typeof program.goal_amount === 'number'
+                          ? program.goal_amount.toLocaleString()
+                          : '∞'}{' '}
+                        goal
                       </span>
                     </div>
                   </div>
@@ -503,7 +516,7 @@ const ProgramDetail: React.FC = () => {
                     </Alert>
                   )}
 
-                  <form onSubmit={handleDonation} className="space-y-4">
+                  <form onSubmit={handleRegistration} className="space-y-4">
                     <Input
                       label="First Name"
                       value={donationForm.firstName}
@@ -611,14 +624,16 @@ const ProgramDetail: React.FC = () => {
                     <div className="flex items-center text-neutral-600">
                       <DollarSign className="w-4 h-4 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
                       <span className="text-sm">
-                        ${program.current_amount.toLocaleString()} raised
+                        $
+                        {typeof program.current_amount === 'number'
+                          ? program.current_amount.toLocaleString()
+                          : '0'}{' '}
+                        raised
                       </span>
                     </div>
                     <div className="flex items-center text-neutral-600">
                       <Users className="w-4 h-4 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
-                      <span className="text-sm">
-                        {program.beneficiaries || 'Unlimited'} beneficiaries
-                      </span>
+                      <span className="text-sm">— beneficiaries</span>
                     </div>
                     <div className="flex items-center text-neutral-600">
                       <Calendar className="w-4 h-4 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />

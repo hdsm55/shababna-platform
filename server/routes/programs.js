@@ -1,7 +1,7 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
 import { query } from '../config/database.js';
-import { getAllPrograms, getProgramById, supportProgram, createProgram, updateProgram, deleteProgram } from '../controllers/programsController.js';
+import { getAllPrograms, getProgramById, registerForProgram, supportProgram, createProgram, updateProgram, deleteProgram } from '../controllers/programsController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import { adminMiddleware } from '../middleware/adminMiddleware.js';
 import multer from 'multer';
@@ -27,7 +27,9 @@ router.get('/', getAllPrograms);
 // Get single program (public)
 router.get('/:id', getProgramById);
 
-// Support program (public)
+// تسجيل مستخدم في برنامج
+router.post('/:id/register', registerForProgram);
+// دعم/تبرع لبرنامج
 router.post('/:id/support', supportProgram);
 
 // Add a new program (admin only)

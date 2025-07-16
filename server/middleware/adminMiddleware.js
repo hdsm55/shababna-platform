@@ -14,31 +14,22 @@ const requireAdmin = (req, res, next) => {
         });
     }
 
-    // Check if user account is active
-    if (!req.user.is_active) {
-        return res.status(403).json({
-            success: false,
-            message: 'Account is deactivated. Please contact support to reactivate your account.',
-            code: 'ACCOUNT_DEACTIVATED'
-        });
-    }
-
     // Check if user has admin privileges
-    if (!req.user.is_admin) {
+    if (req.user.role !== 'admin') {
         return res.status(403).json({
             success: false,
             message: 'Admin access required. You do not have permission to access this resource.',
             code: 'INSUFFICIENT_PERMISSIONS',
             details: {
                 required_role: 'admin',
-                current_role: 'user',
+                current_role: req.user.role,
                 user_id: req.user.id,
                 email: req.user.email
             }
         });
     }
 
-    // User is authenticated, active, and has admin privileges
+    // User is authenticated and has admin privileges
     // Add admin-specific information to request for logging/debugging
     req.isAdmin = true;
     req.adminUser = {
@@ -66,24 +57,15 @@ const requireSuperAdmin = (req, res, next) => {
         });
     }
 
-    // Check if user account is active
-    if (!req.user.is_active) {
-        return res.status(403).json({
-            success: false,
-            message: 'Account is deactivated. Please contact support to reactivate your account.',
-            code: 'ACCOUNT_DEACTIVATED'
-        });
-    }
-
     // Check if user has admin privileges
-    if (!req.user.is_admin) {
+    if (req.user.role !== 'admin') {
         return res.status(403).json({
             success: false,
             message: 'Super admin access required. You do not have permission to access this resource.',
             code: 'INSUFFICIENT_PERMISSIONS',
             details: {
                 required_role: 'super_admin',
-                current_role: 'user',
+                current_role: req.user.role,
                 user_id: req.user.id,
                 email: req.user.email
             }
@@ -94,7 +76,7 @@ const requireSuperAdmin = (req, res, next) => {
     // In the future, you can add additional checks here
     // For example: check for a super_admin field in the users table
 
-    // User is authenticated, active, and has super admin privileges
+    // User is authenticated and has super admin privileges
     req.isSuperAdmin = true;
     req.superAdminUser = {
         id: req.user.id,
@@ -122,15 +104,6 @@ const requireAdminOrSelf = (userIdParam = 'id') => {
             });
         }
 
-        // Check if user account is active
-        if (!req.user.is_active) {
-            return res.status(403).json({
-                success: false,
-                message: 'Account is deactivated. Please contact support to reactivate your account.',
-                code: 'ACCOUNT_DEACTIVATED'
-            });
-        }
-
         // Get the user ID from the request (from params, body, or query)
         const targetUserId = req.params[userIdParam] || req.body[userIdParam] || req.query[userIdParam];
 
@@ -143,7 +116,7 @@ const requireAdminOrSelf = (userIdParam = 'id') => {
         }
 
         // Allow access if user is admin OR if they're accessing their own data
-        const isAdmin = req.user.is_admin;
+        const isAdmin = req.user.role === 'admin';
         const isSelf = parseInt(req.user.id) === parseInt(targetUserId);
 
         if (!isAdmin && !isSelf) {
@@ -190,17 +163,8 @@ const requireAdminOrOwner = (ownerField = 'user_id') => {
                 });
             }
 
-            // Check if user account is active
-            if (!req.user.is_active) {
-                return res.status(403).json({
-                    success: false,
-                    message: 'Account is deactivated. Please contact support to reactivate your account.',
-                    code: 'ACCOUNT_DEACTIVATED'
-                });
-            }
-
             // If user is admin, allow access
-            if (req.user.is_admin) {
+            if (req.user.role === 'admin') {
                 req.accessInfo = {
                     user_id: req.user.id,
                     is_admin: true,

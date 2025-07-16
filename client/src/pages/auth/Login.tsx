@@ -48,11 +48,9 @@ const Login: React.FC = () => {
         return;
       }
       const { user, token } = response.data;
-      // أضف role بناءً على is_admin
-      const userWithRole = { ...user, role: user.is_admin ? 'admin' : 'user' };
-      login(userWithRole, token);
+      login(user, token);
       localStorage.setItem('token', token);
-      if (userWithRole.role === 'admin') {
+      if (user.role === 'admin') {
         navigate('/dashboard');
       } else {
         navigate('/');
