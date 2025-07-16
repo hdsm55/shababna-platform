@@ -55,18 +55,3 @@ export const updateProgram = async (id: number | string, programData: Partial<Pr
   const response = await http.put(`/programs/${id}`, programData, { headers });
   return response.data.data;
 };
-
-// Register for a program
-export const registerForProgram = async (
-  programId: number | string,
-  registrationData: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone?: string;
-    message?: string;
-  }
-): Promise<{ success: boolean; message: string }> => {
-  const response = await http.post(`/programs/${programId}/register`, registrationData);
-  return response.data;
-};

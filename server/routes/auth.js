@@ -3,6 +3,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
 import { query } from '../config/database.js';
+import crypto from 'crypto';
+import EmailService from '../services/emailService.js';
+const emailService = new EmailService();
 
 const router = express.Router();
 
@@ -183,6 +186,95 @@ router.post('/login', validateLogin, async (req, res) => {
       success: false,
       message: 'Internal server error during login'
     });
+  }
+});
+
+// POST /forgot-password - إرسال رمز استعادة كلمة المرور
+router.post('/forgot-password', [body('email').isEmail().normalizeEmail()], async (req, res) => {
+  try {
+    if (handleValidationErrors(req, res)) return;
+    const { email } = req.body;
+    const userResult = await query('SELECT * FROM users WHERE email = $1', [email]);
+    if (userResult.rows.length === 0) {
+      // لا تكشف أن الإيميل غير موجود لأسباب أمنية
+      return res.json({ success: true, message: 'إذا كان البريد الإلكتروني مسجلاً ستصلك رسالة استعادة كلمة المرور.' });
+    }
+    const user = userResult.rows[0];
+    // توليد رمز عشوائي
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 15); // 15 دقيقة
+    // حذف أي رموز سابقة
+    await query('DELETE FROM password_resets WHERE user_id = $1', [user.id]);
+    // حفظ الرمز في قاعدة البيانات
+    await query('INSERT INTO password_resets (user_id, token, expires_at) VALUES ($1, $2, $3)', [user.id, token, expiresAt]);
+    // إرسال الإيميل
+    const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+    const subject = 'إعادة تعيين كلمة المرور - منصة شبابنا';
+    const content = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #14b8a6;">طلب إعادة تعيين كلمة المرور</h2>
+        <p>مرحباً ${user.first_name || ''}،</p>
+        <p>لقد تم تقديم طلب لإعادة تعيين كلمة المرور الخاصة بحسابك في منصة شبابنا.</p>
+        <p>إذا لم تقم بهذا الطلب، يمكنك تجاهل هذه الرسالة.</p>
+        <p>لإعادة تعيين كلمة المرور، اضغط على الرابط التالي أو انسخه في متصفحك:</p>
+        <a href="${resetLink}" style="color: #14b8a6;">إعادة تعيين كلمة المرور</a>
+        <p>هذا الرابط صالح لمدة 15 دقيقة فقط.</p>
+        <p>مع تحيات فريق شبابنا</p>
+      </div>
+    `;
+    await emailService.sendEmail(email, user.first_name, subject, content, 'password_reset');
+    return res.json({ success: true, message: 'إذا كان البريد الإلكتروني مسجلاً ستصلك رسالة استعادة كلمة المرور.' });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ success: false, message: 'حدث خطأ أثناء معالجة الطلب.' });
+  }
+});
+
+// POST /reset-password - إعادة تعيين كلمة المرور
+router.post('/reset-password', [
+  body('email').isEmail().normalizeEmail(),
+  body('token').isLength({ min: 32 }),
+  body('password').isLength({ min: 6 })
+], async (req, res) => {
+  try {
+    if (handleValidationErrors(req, res)) return;
+    const { email, token, password } = req.body;
+    const userResult = await query('SELECT * FROM users WHERE email = $1', [email]);
+    if (userResult.rows.length === 0) {
+      return res.status(400).json({ success: false, message: 'بيانات غير صحيحة.' });
+    }
+    const user = userResult.rows[0];
+    // تحقق من الرمز
+    const resetResult = await query('SELECT * FROM password_resets WHERE user_id = $1 AND token = $2', [user.id, token]);
+    if (resetResult.rows.length === 0) {
+      return res.status(400).json({ success: false, message: 'رمز الاستعادة غير صالح أو منتهي.' });
+    }
+    const reset = resetResult.rows[0];
+    if (new Date(reset.expires_at) < new Date()) {
+      await query('DELETE FROM password_resets WHERE user_id = $1', [user.id]);
+      return res.status(400).json({ success: false, message: 'انتهت صلاحية رمز الاستعادة. يرجى طلب رمز جديد.' });
+    }
+    // تحديث كلمة المرور
+    const hashedPassword = await bcrypt.hash(password, 12);
+    await query('UPDATE users SET password = $1 WHERE id = $2', [hashedPassword, user.id]);
+    // حذف الرمز
+    await query('DELETE FROM password_resets WHERE user_id = $1', [user.id]);
+    // إشعار المستخدم
+    const subject = 'تم تغيير كلمة المرور بنجاح - منصة شبابنا';
+    const content = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #14b8a6;">تم تغيير كلمة المرور</h2>
+        <p>مرحباً ${user.first_name || ''}،</p>
+        <p>تم تغيير كلمة المرور الخاصة بحسابك بنجاح.</p>
+        <p>إذا لم تقم بهذا التغيير، يرجى التواصل مع الدعم فوراً.</p>
+        <p>مع تحيات فريق شبابنا</p>
+      </div>
+    `;
+    await emailService.sendEmail(email, user.first_name, subject, content, 'password_reset_success');
+    return res.json({ success: true, message: 'تم تغيير كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول.' });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ success: false, message: 'حدث خطأ أثناء إعادة تعيين كلمة المرور.' });
   }
 });
 

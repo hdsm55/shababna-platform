@@ -151,10 +151,9 @@ const requireAdminOrSelf = (userIdParam = 'id') => {
  * Allows access if user is admin OR if they own the resource
  * Useful for resource management routes
  */
-const requireAdminOrOwner = (ownerField = 'user_id') => {
+const requireAdminOrOwner = (resourceType, ownerField = 'user_id') => {
     return async (req, res, next) => {
         try {
-            // First, ensure user is authenticated
             if (!req.user) {
                 return res.status(401).json({
                     success: false,
@@ -163,7 +162,6 @@ const requireAdminOrOwner = (ownerField = 'user_id') => {
                 });
             }
 
-            // If user is admin, allow access
             if (req.user.role === 'admin') {
                 req.accessInfo = {
                     user_id: req.user.id,
@@ -173,11 +171,7 @@ const requireAdminOrOwner = (ownerField = 'user_id') => {
                 return next();
             }
 
-            // For non-admin users, check if they own the resource
-            // This would typically involve querying the database to check ownership
-            // For now, we'll assume the resource ID is in the request
             const resourceId = req.params.id || req.body.id || req.query.id;
-
             if (!resourceId) {
                 return res.status(400).json({
                     success: false,
@@ -186,21 +180,61 @@ const requireAdminOrOwner = (ownerField = 'user_id') => {
                 });
             }
 
-            // Note: In a real implementation, you would query the database here
-            // to check if the user owns the resource
-            // For example:
-            // const resource = await db('resources').where('id', resourceId).first();
-            // if (!resource || resource[ownerField] !== req.user.id) {
-            //   return res.status(403).json({ ... });
-            // }
-
-            // For now, we'll return an error indicating this needs implementation
-            return res.status(501).json({
-                success: false,
-                message: 'Admin or owner check not implemented for this resource.',
-                code: 'NOT_IMPLEMENTED'
-            });
-
+            // تحقق من ملكية المورد حسب نوعه
+            let queryStr = '';
+            let params = [resourceId];
+            switch (resourceType) {
+                case 'users':
+                    queryStr = 'SELECT id FROM users WHERE id = $1';
+                    ownerField = 'id';
+                    break;
+                case 'events':
+                    queryStr = 'SELECT id, user_id FROM events WHERE id = $1';
+                    break;
+                case 'programs':
+                    queryStr = 'SELECT id, user_id FROM programs WHERE id = $1';
+                    break;
+                case 'donations':
+                    queryStr = 'SELECT id, user_id FROM donations WHERE id = $1';
+                    break;
+                default:
+                    return res.status(501).json({
+                        success: false,
+                        message: 'Admin or owner check not implemented for this resource type.',
+                        code: 'NOT_IMPLEMENTED'
+                    });
+            }
+            const { query } = require('../config/database.js');
+            const result = await query(queryStr, params);
+            if (!result.rows.length) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Resource not found.',
+                    code: 'RESOURCE_NOT_FOUND'
+                });
+            }
+            const resource = result.rows[0];
+            // تحقق من الملكية
+            if ((resource[ownerField] || resource.id) != req.user.id) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Access denied. You do not own this resource.',
+                    code: 'ACCESS_DENIED',
+                    details: {
+                        user_id: req.user.id,
+                        resource_id: resourceId,
+                        owner_id: resource[ownerField] || resource.id
+                    }
+                });
+            }
+            req.accessInfo = {
+                user_id: req.user.id,
+                resource_id: resourceId,
+                is_admin: false,
+                is_owner: true,
+                access_type: 'owner'
+            };
+            next();
         } catch (error) {
             console.error('Admin or owner middleware error:', error);
             return res.status(500).json({

@@ -7,16 +7,11 @@ import {
   updateEvent,
 } from '../../services/eventsApi';
 import { deleteEvent } from '../../services/dashboardApi';
-import Button from '../../components/common/Button';
-import Modal from '../../components/common/Modal';
-import {
-  AccessibleSection,
-  SkipToContent,
-} from '../../components/common/AccessibleComponents';
-import Card from '../../components/common/Card';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import Alert from '../../components/common/Alert';
-import Input from '../../components/common/Input';
+import { Button } from '../../components/ui/Button';
+import { Modal } from '../../components/ui/Modal';
+import { Card } from '../../components/ui/Card';
+import { Alert } from '../../components/ui/Alert';
+import { Input } from '../../components/ui/Input';
 import {
   Search,
   Filter,
@@ -37,7 +32,7 @@ import {
   Upload,
   X,
 } from 'lucide-react';
-import QuickActions from '../../components/common/QuickActions';
+import { QuickActions } from '../../components/ui/QuickActions';
 import { Link } from 'react-router-dom';
 
 interface Event {
@@ -392,7 +387,7 @@ const EventsDashboard: React.FC = () => {
     return (
       <DashboardLayout>
         <div className="flex justify-center items-center h-96">
-          <LoadingSpinner size="lg" />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
         </div>
       </DashboardLayout>
     );
@@ -401,7 +396,7 @@ const EventsDashboard: React.FC = () => {
     return (
       <DashboardLayout>
         <div className="flex justify-center items-center h-96">
-          <Alert type="error" title="خطأ في تحميل البيانات">
+          <Alert variant="error" title="خطأ في تحميل البيانات">
             حدث خطأ أثناء جلب قائمة الفعاليات. يرجى المحاولة مرة أخرى.
           </Alert>
         </div>
@@ -417,7 +412,45 @@ const EventsDashboard: React.FC = () => {
           <h2 className="text-xl md:text-2xl font-extrabold text-gray-900 mb-6 tracking-tight text-center md:text-right">
             إجراءات سريعة
           </h2>
-          <QuickActions actions={quickActions} className="mb-0" />
+          <QuickActions>
+            {/* هنا ضع أزرار الإجراءات السريعة كـ children */}
+            <Button
+              variant="outline"
+              className="font-bold text-primary-600 border-primary-300"
+              onClick={() => handleOpenModal('add')}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              إضافة فعالية جديدة
+            </Button>
+            <Button
+              variant="outline"
+              className="font-bold text-success-600 border-success-300"
+              onClick={() => handleOpenModal('add', mockEvents[0])}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              إضافة مثال
+            </Button>
+            <Button
+              variant="outline"
+              className="font-bold text-warning-600 border-warning-300"
+              onClick={() =>
+                handleUnavailable('هذه الخاصية قيد التطوير، قريبًا!')
+              }
+            >
+              <TrendingUp className="mr-2 h-4 w-4" />
+              إضافة برنامج
+            </Button>
+            <Button
+              variant="outline"
+              className="font-bold text-info-600 border-info-300"
+              onClick={() =>
+                handleUnavailable('هذه الخاصية قيد التطوير، قريبًا!')
+              }
+            >
+              <Users className="mr-2 h-4 w-4" />
+              إضافة عضو
+            </Button>
+          </QuickActions>
         </Card>
 
         {/* قائمة الفعاليات */}
@@ -643,7 +676,7 @@ const EventsDashboard: React.FC = () => {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             {formError && (
-              <Alert type="error" className="mb-4">
+              <Alert variant="error" className="mb-4">
                 {formError}
               </Alert>
             )}

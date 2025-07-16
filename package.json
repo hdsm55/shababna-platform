@@ -31,6 +31,7 @@
     "date-fns": "^2.30.0",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "express-rate-limit": "^8.0.0",
     "express-validator": "^7.0.1",
     "framer-motion": "^10.16.16",
     "helmet": "^7.1.0",
@@ -51,6 +52,7 @@
     "react-router-dom": "^6.8.1",
     "sharp": "^0.33.2",
     "stripe": "^14.21.0",
+    "swagger-ui-express": "^5.0.1",
     "tailwindcss-rtl": "^0.9.0",
     "zustand": "^4.4.7"
   },

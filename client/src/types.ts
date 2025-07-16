@@ -6,13 +6,13 @@ export interface Event {
   start_date: string;
   end_date: string;
   location: string;
-  category: 'conference' | 'workshop' | 'networking';
-  image?: string;
-  max_attendees?: number;
-  attendees: number;
+  category: 'workshop' | 'conference' | 'networking';
   status: 'upcoming' | 'active' | 'completed' | 'cancelled';
+  max_attendees?: number;
+  current_attendees?: number;
+  image_url?: string;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
 }
 
 // Program types
@@ -20,14 +20,29 @@ export interface Program {
   id: number;
   title: string;
   description: string;
-  category: 'education' | 'relief' | 'youth' | 'media' | 'daawah';
-  image?: string;
-  goal_amount?: number;
-  current_amount: number;
   start_date: string;
   end_date: string;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
+  category?: string;
+  supporters?: ProgramSupporter[];
+  registrations?: ProgramRegistration[];
+}
+
+export interface ProgramSupporter {
+  id: number;
+  program_id: number;
+  supporter_name: string;
+  supporter_email?: string;
+  amount?: number;
+  created_at: string;
+}
+
+export interface ProgramRegistration {
+  id: number;
+  program_id: number;
+  user_id: number;
+  created_at: string;
 }
 
 // User types
@@ -57,27 +72,25 @@ export interface EventRegistration {
 
 // API Response types
 export interface ApiResponse<T> {
-  success: boolean;
+  data: T;
   message: string;
-  data?: T;
-  errors?: Array<{
-    field: string;
-    message: string;
-  }>;
+  success: boolean;
 }
 
 export interface PaginatedResponse<T> {
-  success: boolean;
-  message: string;
   data: {
     items: T[];
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
-    };
+    pagination: Pagination;
   };
+  message: string;
+  success: boolean;
+}
+
+export interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
 }
 
 // Query parameters

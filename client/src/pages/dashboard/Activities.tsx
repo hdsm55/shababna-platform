@@ -2,15 +2,11 @@ import React, { useState } from 'react';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import { useQuery } from '@tanstack/react-query';
 import { getRecentActivities } from '../../services/dashboardApi';
-import Button from '../../components/common/Button';
-import Card from '../../components/common/Card';
+import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import Alert from '../../components/common/Alert';
-import Input from '../../components/common/Input';
-import {
-  AccessibleSection,
-  SkipToContent,
-} from '../../components/common/AccessibleComponents';
+import { Alert } from '../../components/ui/Alert';
+import { Input } from '../../components/ui/Input';
 import {
   Search,
   Filter,
@@ -277,21 +273,16 @@ const ActivitiesDashboard: React.FC = () => {
   if (error) {
     return (
       <DashboardLayout>
-        <SkipToContent />
-        <AccessibleSection>
-          <Alert type="error" title="خطأ في تحميل الأنشطة">
-            حدث خطأ أثناء جلب الأنشطة الحديثة. يرجى المحاولة مرة أخرى.
-          </Alert>
-        </AccessibleSection>
+        <Alert variant="error" title="خطأ في تحميل البيانات">
+          حدث خطأ أثناء تحميل الأنشطة. يرجى المحاولة مرة أخرى.
+        </Alert>
       </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout>
-      <SkipToContent />
-      <AccessibleSection>
-        <div className="max-w-7xl mx-auto py-6 px-2 sm:px-4 lg:px-8">
+      <div className="max-w-7xl mx-auto py-6 px-2 sm:px-4 lg:px-8">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div>
@@ -554,8 +545,6 @@ const ActivitiesDashboard: React.FC = () => {
             </div>
           )}
         </div>
-      </AccessibleSection>
-    </DashboardLayout>
   );
 };
 

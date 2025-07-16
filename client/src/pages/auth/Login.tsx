@@ -5,10 +5,10 @@ import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
-import Button from '../../components/common/Button';
-import Card from '../../components/common/Card';
-import Input from '../../components/common/Input';
-import Alert from '../../components/common/Alert';
+import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
+import { Input } from '../../components/ui/Input';
+import { Alert } from '../../components/ui/Alert';
 import { loginApi } from '../../services/api';
 
 interface LoginFormData {
@@ -111,7 +111,7 @@ const Login: React.FC = () => {
           </div>
 
           {loginError && (
-            <Alert type="error" className="mb-6 text-center">
+            <Alert variant="error" className="mb-6 text-center">
               {loginError}
             </Alert>
           )}

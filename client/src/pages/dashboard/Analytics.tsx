@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import { useQuery } from '@tanstack/react-query';
 import { fetchAnalytics } from '../../services/dashboardApi';
-import Button from '../../components/common/Button';
-import Modal from '../../components/common/Modal';
+import { Card } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Modal } from '../../components/ui/Modal';
+import { Alert } from '../../components/ui/Alert';
 import {
   AccessibleSection,
   SkipToContent,
 } from '../../components/common/AccessibleComponents';
-import Card from '../../components/common/Card';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import Alert from '../../components/common/Alert';
 import {
   BarChart3,
   PieChart,
@@ -283,12 +283,9 @@ const AnalyticsDashboard: React.FC = () => {
   if (error) {
     return (
       <DashboardLayout>
-        <SkipToContent />
-        <AccessibleSection>
-          <Alert type="error" title="خطأ في تحميل البيانات">
-            حدث خطأ أثناء جلب بيانات التحليلات. يرجى المحاولة مرة أخرى.
-          </Alert>
-        </AccessibleSection>
+        <Alert variant="error" title="خطأ في تحميل البيانات">
+          حدث خطأ أثناء تحميل بيانات التحليلات. يرجى المحاولة مرة أخرى.
+        </Alert>
       </DashboardLayout>
     );
   }

@@ -2,16 +2,11 @@ import React, { useState } from 'react';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchUsers, deleteUser } from '../../services/dashboardApi';
-import Button from '../../components/common/Button';
-import Modal from '../../components/common/Modal';
-import {
-  AccessibleSection,
-  SkipToContent,
-} from '../../components/common/AccessibleComponents';
-import Card from '../../components/common/Card';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import Alert from '../../components/common/Alert';
-import Input from '../../components/common/Input';
+import { Button } from '../../components/ui/Button';
+import { Modal } from '../../components/ui/Modal';
+import { Card } from '../../components/ui/Card';
+import { Alert } from '../../components/ui/Alert';
+import { Input } from '../../components/ui/Input';
 import {
   Search,
   Filter,
@@ -421,24 +416,23 @@ const UsersDashboard: React.FC = () => {
   if (error) {
     return (
       <DashboardLayout>
-        <QuickActions actions={quickActions} className="mb-8" />
-        <SkipToContent />
-        <AccessibleSection>
-          <Alert type="error" title="خطأ في تحميل البيانات">
-            حدث خطأ أثناء جلب قائمة المستخدمين. يرجى المحاولة مرة أخرى.
-          </Alert>
-        </AccessibleSection>
+        <QuickActions>
+          <div />
+        </QuickActions>
+        <Alert variant="error" title="خطأ في تحميل البيانات">
+          حدث خطأ أثناء جلب قائمة المستخدمين. يرجى المحاولة مرة أخرى.
+        </Alert>
       </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout>
-      <QuickActions actions={quickActions} className="mb-8" />
-      <SkipToContent />
+      <QuickActions>
+        <div />
+      </QuickActions>
 
-      <AccessibleSection>
-        <div className="max-w-7xl mx-auto py-6 px-2 sm:px-4 lg:px-8">
+      <div className="max-w-7xl mx-auto py-6 px-2 sm:px-4 lg:px-8">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-gray-900">
@@ -925,8 +919,6 @@ const UsersDashboard: React.FC = () => {
             )}
           </Modal>
         </div>
-      </AccessibleSection>
-    </DashboardLayout>
   );
 };
 

@@ -28,14 +28,22 @@ const Header: React.FC = () => {
     navigate('/');
   };
 
+  // تحديث navItems لإزالة donations
   const navItems = [
     { key: 'home', path: '/' },
     { key: 'events', path: '/events' },
     { key: 'programs', path: '/programs' },
-    { key: 'donations', path: '/donations' },
     { key: 'joinUs', path: '/join-us' },
     { key: 'contact', path: '/contact' },
   ];
+
+  // جعل الروابط ديناميكية حسب حالة المصادقة
+  const filteredNavItems = navItems.filter((item) => {
+    // مثال: إذا أردت إخفاء صفحة joinUs عن المصادقين
+    if (item.key === 'joinUs' && isAuthenticated) return false;
+    // يمكن إضافة قواعد أخرى حسب الحاجة
+    return true;
+  });
 
   const languages = [
     { code: 'ar', name: 'العربية', flag: '🇸🇦' },
@@ -67,7 +75,7 @@ const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8 rtl:space-x-reverse">
-            {navItems.map((item) => (
+            {filteredNavItems.map((item) => (
               <Link
                 key={item.key}
                 to={item.path}
@@ -195,7 +203,7 @@ const Header: React.FC = () => {
               className="md:hidden border-t border-neutral-200 py-4"
             >
               <nav className="flex flex-col space-y-2">
-                {navItems.map((item) => (
+                {filteredNavItems.map((item) => (
                   <Link
                     key={item.key}
                     to={item.path}
