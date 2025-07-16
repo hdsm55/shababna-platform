@@ -8,14 +8,9 @@ import {
   getRecentActivities,
 } from '../../services/dashboardApi';
 import { Link } from 'react-router-dom';
-import {
-  AccessibleSection,
-  SkipToContent,
-} from '../../components/common/AccessibleComponents';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { Alert } from '../../components/ui/Alert';
+import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
 import {
   Calendar,
   Users,
@@ -76,146 +71,9 @@ const DashboardOverview: React.FC = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  // بيانات افتراضية للإحصائيات
-  const mockStats = {
-    overview: [
-      {
-        title: 'إجمالي الفعاليات',
-        value: 24,
-        change: '+12 نشط',
-        changeType: 'increase',
-        icon: Calendar,
-        color: 'primary',
-        details: {
-          active: 12,
-          upcoming: 8,
-          completed: 4,
-        },
-      },
-      {
-        title: 'البرامج النشطة',
-        value: 8,
-        change: '+3 نشط',
-        changeType: 'increase',
-        icon: TrendingUp,
-        color: 'success',
-        details: {
-          active: 5,
-          total: 8,
-        },
-      },
-      {
-        title: 'إجمالي الأعضاء',
-        value: 156,
-        change: '+8%',
-        changeType: 'increase',
-        icon: Users,
-        color: 'info',
-        details: {
-          new: 12,
-          total: 156,
-        },
-      },
-      {
-        title: 'إجمالي التبرعات',
-        value: '$12,450',
-        change: '+15%',
-        changeType: 'increase',
-        icon: DollarSign,
-        color: 'warning',
-        details: {
-          monthly: 2500,
-          total: 12450,
-        },
-      },
-    ],
-    engagement: [
-      {
-        title: 'تسجيل البرامج',
-        value: 45,
-        icon: Users,
-        color: 'primary',
-      },
-      {
-        title: 'دعم البرامج',
-        value: 23,
-        icon: Heart,
-        color: 'success',
-      },
-      {
-        title: 'تسجيل الفعاليات',
-        value: 67,
-        icon: Calendar,
-        color: 'info',
-      },
-      {
-        title: 'رسائل التواصل',
-        value: 12,
-        icon: MessageCircle,
-        color: 'warning',
-        alert: '3 غير مقروءة',
-      },
-    ],
-  };
-
-  // بيانات افتراضية للأنشطة
-  const mockActivities = [
-    {
-      id: 1,
-      type: 'event',
-      message: 'تم إضافة فعالية جديدة: ورشة عمل الشباب',
-      date: 'منذ ساعتين',
-      status: 'completed',
-      icon: CheckCircle,
-      priority: 'high',
-      user: 'النظام',
-      details: 'فعالية نشطة',
-    },
-    {
-      id: 2,
-      type: 'donation',
-      message: 'تم استلام تبرع جديد بقيمة $500',
-      date: 'منذ 3 ساعات',
-      status: 'completed',
-      icon: CheckCircle,
-      priority: 'medium',
-      user: 'أحمد محمد',
-      details: 'تبرع نقدي - 500 ريال',
-    },
-    {
-      id: 3,
-      type: 'program',
-      message: 'تم تحديث برنامج التوعية الصحية',
-      date: 'منذ 5 ساعات',
-      status: 'pending',
-      icon: Clock,
-      priority: 'low',
-      user: 'النظام',
-      details: 'برنامج قيد الانتظار',
-    },
-    {
-      id: 4,
-      type: 'user',
-      message: 'انضم عضو جديد: سارة أحمد',
-      date: 'منذ يوم واحد',
-      status: 'completed',
-      icon: CheckCircle,
-      priority: 'medium',
-      user: 'سارة أحمد',
-      details: 'البريد الإلكتروني: sara@example.com',
-    },
-    {
-      id: 5,
-      type: 'contact',
-      message: 'رسالة جديدة من محمد علي: استفسار عن البرامج',
-      date: 'منذ يومين',
-      status: 'pending',
-      icon: MessageCircle,
-      priority: 'high',
-      user: 'محمد علي',
-      details: 'البريد: mohammed@example.com',
-    },
-  ];
+  // تم حذف جميع البيانات الافتراضية (mockStats, mockActivities) وأي استخدام لها
+  // يجب الإبقاء فقط على ما يتم جلبه فعليًا من الباكند عبر getDashboardStats وgetRecentActivities
+  // حذف أي أقسام أو بطاقات تعرض بيانات غير مدعومة فعليًا (مثل التبرعات أو دعم البرامج)
 
   // بيانات افتراضية للرسوم البيانية
   const mockChartData = {
@@ -225,8 +83,8 @@ const DashboardOverview: React.FC = () => {
   };
 
   // استخدام البيانات الحقيقية أو الافتراضية
-  const stats = statsData?.data || mockStats;
-  const recentActivities = activitiesData?.data || mockActivities;
+  const stats = statsData?.data;
+  const recentActivities = activitiesData?.data;
 
   const quickActions = [
     {
@@ -243,13 +101,7 @@ const DashboardOverview: React.FC = () => {
       color: 'success' as const,
       description: 'إنشاء برنامج جديد',
     },
-    {
-      to: '/dashboard/donations/new',
-      label: 'تسجيل تبرع',
-      icon: DollarSign,
-      color: 'warning' as const,
-      description: 'تسجيل تبرع جديد',
-    },
+    // تم حذف إجراء تسجيل تبرع لأنه غير مدعوم
     {
       to: '/dashboard/users/new',
       label: 'إضافة عضو',
@@ -426,7 +278,7 @@ const DashboardOverview: React.FC = () => {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.overview?.map((stat: any, index: number) => {
+            {stats?.overview?.map((stat: any, index: number) => {
               const IconComponent = stat.icon;
               return (
                 <div
@@ -480,7 +332,7 @@ const DashboardOverview: React.FC = () => {
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.engagement?.map((stat: any, index: number) => {
+            {stats?.engagement?.map((stat: any, index: number) => {
               const IconComponent = stat.icon;
               return (
                 <div
@@ -557,7 +409,7 @@ const DashboardOverview: React.FC = () => {
               </Link>
             </div>
             <div className="space-y-4">
-              {recentActivities.slice(0, 5).map((activity: any) => {
+              {recentActivities?.slice(0, 5).map((activity: any) => {
                 const StatusIcon = getStatusIcon(activity.status);
                 return (
                   <div

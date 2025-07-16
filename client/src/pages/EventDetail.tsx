@@ -238,23 +238,11 @@ const EventDetail: React.FC = () => {
             </span>
           </div>
           <div className="flex gap-4 mt-6">
-            <Button
-              variant="primary"
-              disabled={!canRegister}
-              onClick={handleRegistration}
-            >
-              {t('events.register')}
-            </Button>
+            {/* تم حذف زر التسجيل */}
             <Button variant="outline">{t('events.share')}</Button>
           </div>
         </Card>
-        {/* Registration Form */}
-        <Card variant="base" dir={isRTL ? 'rtl' : 'ltr'}>
-          <h2 className="text-xl font-semibold mb-4">
-            {t('events.registration.title')}
-          </h2>
-          {renderRegistrationForm()}
-        </Card>
+        {/* تم حذف نموذج التسجيل بالكامل */}
       </div>
     </div>
   );

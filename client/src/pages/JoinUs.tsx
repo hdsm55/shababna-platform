@@ -5,13 +5,14 @@ import { motion } from 'framer-motion';
 import { Send, Users, Globe, Heart } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
+import { submitJoinUsForm } from '../services/formsApi';
 // import { AccessibleSection, AccessibleCard, AccessibleButton, SkipToContent } from '../components/common/AccessibleComponents';
 
 interface JoinUsFormData {
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  phone: string;
+  phone?: string;
   country: string;
   age: number;
   interests: string[];
@@ -27,10 +28,12 @@ const JoinUs: React.FC = () => {
   } = useForm<JoinUsFormData>();
 
   const onSubmit = async (data: JoinUsFormData) => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log('Form submitted:', data);
-    // Handle form submission here
+    try {
+      await submitJoinUsForm(data);
+      // يمكن إضافة إشعار نجاح هنا
+    } catch (error) {
+      // يمكن إضافة إشعار خطأ هنا
+    }
   };
 
   const interestOptions = [
@@ -128,14 +131,14 @@ const JoinUs: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    {...register('firstName', {
+                    {...register('first_name', {
                       required: 'First name is required',
                     })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   />
-                  {errors.firstName && (
+                  {errors.first_name && (
                     <p className="text-red-600 text-sm mt-1">
-                      {errors.firstName.message}
+                      {errors.first_name.message}
                     </p>
                   )}
                 </div>
@@ -146,14 +149,14 @@ const JoinUs: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    {...register('lastName', {
+                    {...register('last_name', {
                       required: 'Last name is required',
                     })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   />
-                  {errors.lastName && (
+                  {errors.last_name && (
                     <p className="text-red-600 text-sm mt-1">
-                      {errors.lastName.message}
+                      {errors.last_name.message}
                     </p>
                   )}
                 </div>
@@ -188,9 +191,7 @@ const JoinUs: React.FC = () => {
                   </label>
                   <input
                     type="tel"
-                    {...register('phone', {
-                      required: 'Phone number is required',
-                    })}
+                    {...register('phone')}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   />
                   {errors.phone && (
