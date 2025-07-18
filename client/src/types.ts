@@ -20,14 +20,12 @@ export interface Program {
   id: number;
   title: string;
   description: string;
-  category: 'education' | 'relief' | 'youth' | 'media' | 'daawah';
-  image?: string;
-  goal_amount?: number;
-  current_amount: number;
+  category: string;
+  image_url?: string;
   start_date: string;
   end_date: string;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
 }
 
 // User types

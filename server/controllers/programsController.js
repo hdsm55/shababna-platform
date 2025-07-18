@@ -56,25 +56,6 @@ export const registerForProgram = async (req, res) => {
     }
 };
 
-// دعم/تبرع لبرنامج
-export const supportProgram = async (req, res) => {
-    try {
-        const { id } = req.params; // program_id
-        const { name, email, amount } = req.body;
-        if (!name || !email || !amount) {
-            return errorResponse(res, 'جميع الحقول مطلوبة (الاسم، البريد، المبلغ)', 400);
-        }
-        const result = await query(
-            `INSERT INTO program_supporters (program_id, name, email, amount, payment_status) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-            [id, name, email, amount, 'pending']
-        );
-        return successResponse(res, result.rows[0], 'تم تسجيل الدعم بنجاح');
-    } catch (error) {
-        console.error('Program support error:', error);
-        return errorResponse(res, 'خطأ في تسجيل الدعم', 500, error);
-    }
-};
-
 // Add a new program (admin only)
 export const createProgram = async (req, res) => {
     try {

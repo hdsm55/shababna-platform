@@ -260,11 +260,12 @@ const Programs: React.FC = () => {
                       <div className="aspect-w-16 aspect-h-9">
                         <img
                           src={
-                            program.image ||
+                            program.image_url ||
                             'https://images.pexels.com/photos/3183153/pexels-photo-3183153.jpeg'
                           }
                           alt={program.title}
                           className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                          loading="lazy"
                         />
                       </div>
                       <div className="p-6">
@@ -272,93 +273,22 @@ const Programs: React.FC = () => {
                           <span className="px-3 py-1 text-sm font-medium bg-primary-100 text-primary-800 rounded-full">
                             {program.category}
                           </span>
-                          <div className="flex items-center space-x-4 rtl:space-x-reverse text-sm text-gray-500">
-                            <div className="flex items-center">
-                              <Target className="w-4 h-4 mr-1 rtl:ml-1 rtl:mr-0" />
-                              {/* {program.is_active ? 'Active' : 'Inactive'} */}
-                            </div>
-                            {program.goal_amount && (
-                              <div className="flex items-center">
-                                <Heart className="w-4 h-4 mr-1 rtl:ml-1 rtl:mr-0" />
-                                ${program.current_amount}/${program.goal_amount}
-                              </div>
-                            )}
-                          </div>
                         </div>
-
                         <h3 className="text-2xl font-bold text-gray-900 mb-3">
                           {program.title}
                         </h3>
-
                         <p className="text-gray-600 mb-6 leading-relaxed">
                           {program.description}
                         </p>
-
-                        <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                          <h4 className="text-sm font-semibold text-gray-900 mb-1">
-                            Progress
-                          </h4>
-                          <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                            <div
-                              className="bg-primary-600 h-2 rounded-full"
-                              style={{
-                                width: `${
-                                  program.goal_amount
-                                    ? (program.current_amount /
-                                        program.goal_amount) *
-                                      100
-                                    : 0
-                                }%`,
-                              }}
-                            ></div>
-                          </div>
-                          <p className="text-sm text-gray-600">
-                            {program.goal_amount
-                              ? `${Math.round(
-                                  (program.current_amount /
-                                    program.goal_amount) *
-                                    100
-                                )}% of goal reached`
-                              : 'No funding goal set'}
-                          </p>
-                        </div>
-
                         <div className="flex flex-col sm:flex-row gap-3">
                           <Button
                             size="sm"
                             icon={ArrowRight}
                             iconPosition="right"
                             className="flex-1 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-                            onClick={() => {
-                              // فتح مودال دعم البرنامج أو الانتقال لصفحة التفاصيل
-                              navigate(`/programs/${program.id}`);
-                            }}
+                            onClick={() => navigate(`/programs/${program.id}`)}
                           >
-                            {t('programs.support')}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            icon={Heart}
-                            className="shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-                            onClick={() => {
-                              // TODO: Open donation modal
-                              console.log('Donate to program:', program.id);
-                            }}
-                          >
-                            {t('programs.donate')}
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            icon={HandHeart}
-                            className="shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-                            onClick={() => {
-                              // TODO: Open sponsorship modal
-                              console.log('Sponsor program:', program.id);
-                            }}
-                          >
-                            {t('programs.sponsor')}
+                            {t('programs.learnMore')}
                           </Button>
                         </div>
                       </div>
