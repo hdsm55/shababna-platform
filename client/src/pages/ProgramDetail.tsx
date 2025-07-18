@@ -83,8 +83,17 @@ const ProgramDetail: React.FC = () => {
     setSupportStatus('idle');
     try {
       if (!id) throw new Error('No program ID');
-      // استدعاء API لدعم البرنامج حسب النوع
-      const res = await supportProgram(Number(id), supportForm);
+      // أرسل الحقول بـ snake_case فقط
+      const payload: any = {
+        supporter_name: supportForm.firstName + ' ' + supportForm.lastName,
+        supporter_email: supportForm.email,
+        phone: supportForm.phone,
+      };
+      if (supportForm.supportType === 'donation' && supportForm.amount) {
+        payload.amount = supportForm.amount;
+      }
+      // أرسل program_id من useParams إذا احتاجه الباكند
+      const res = await supportProgram(Number(id), payload);
       if (res.success) {
         setSupportStatus('success');
         setSupportForm({
@@ -503,18 +512,16 @@ const ProgramDetail: React.FC = () => {
                   {supportStatus === 'success' && (
                     <Alert
                       type="success"
-                      title="Support successful!"
+                      title="تم الدعم بنجاح!"
                       className="mb-6"
                     >
-                      Thank you for your generous support! We'll send you a
-                      confirmation email shortly.
+                      تم دعم البرنامج بنجاح. شكرًا لمساهمتك!
                     </Alert>
                   )}
 
                   {supportStatus === 'error' && (
-                    <Alert type="error" title="Support failed" className="mb-6">
-                      There was an error processing your support. Please try
-                      again.
+                    <Alert type="error" title="خطأ في الدعم" className="mb-6">
+                      حدث خطأ أثناء معالجة الدعم. يرجى المحاولة مرة أخرى.
                     </Alert>
                   )}
 

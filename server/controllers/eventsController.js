@@ -74,14 +74,15 @@ export const createEvent = async (req, res) => {
             image_url = '',
             status = 'upcoming'
         } = req.body;
-        if (new Date(end_date) <= new Date(start_date)) {
+        if (new Date(end_date) < new Date(start_date)) {
             return errorResponse(res, 'يجب أن يكون تاريخ النهاية بعد تاريخ البداية', 400);
         }
+        const finalImageUrl = image_url && image_url.trim() !== '' ? image_url : null;
         const result = await query(
-            `INSERT INTO events (title, description, location, start_date, end_date, category, max_attendees, attendees, image_url, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            `INSERT INTO events (title, description, start_date, end_date, location, max_attendees, attendees, category, image_url, status, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())
        RETURNING id, title, description, start_date, end_date, location, max_attendees, attendees, category, image_url, status, created_at, updated_at`,
-            [title, description, location, start_date, end_date, category, max_attendees, attendees, image_url, status]
+            [title, description, start_date, end_date, location, max_attendees, attendees, category, finalImageUrl, status]
         );
         return successResponse(res, result.rows[0], 'تم إنشاء الفعالية بنجاح', 201);
     } catch (error) {
@@ -103,7 +104,7 @@ export const updateEvent = async (req, res) => {
             return errorResponse(res, 'الفعالية غير موجودة', 404);
         }
         // Build update query dynamically (يسمح فقط بالحقول الفعلية)
-        const allowedFields = ['title', 'description', 'location', 'start_date', 'end_date', 'category', 'max_attendees', 'attendees', 'image_url', 'status'];
+        const allowedFields = ['title', 'description', 'start_date', 'end_date', 'location', 'max_attendees', 'attendees', 'category', 'image_url', 'status'];
         const updateFields = [];
         const values = [];
         let paramIndex = 1;

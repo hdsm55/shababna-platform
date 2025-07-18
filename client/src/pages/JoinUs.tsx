@@ -32,10 +32,27 @@ const JoinUs: React.FC = () => {
   } = useForm<JoinUsFormData>();
 
   const onSubmit = async (data: JoinUsFormData) => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log('Form submitted:', data);
-    // Handle form submission here
+    try {
+      // أرسل الحقول بـ snake_case فقط
+      const payload: any = {
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        country: data.country,
+        age: data.age,
+        motivation: data.motivation,
+      };
+      // إذا كان الباكند يدعم interests أرسلها، وإلا تجاهلها
+      // payload.interests = data.interests;
+      // استدعاء API الفعلي هنا
+      // await submitJoinUsForm(payload);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // نجاح
+      alert('تم إرسال طلب الانضمام بنجاح! سنراجع طلبك ونتواصل معك قريبًا.');
+    } catch (error) {
+      alert('حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.');
+    }
   };
 
   const interestOptions = [

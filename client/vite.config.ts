@@ -11,4 +11,13 @@ export default defineConfig({
     // Expose environment variables to the client
     'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL),
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 });

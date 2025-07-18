@@ -16,12 +16,8 @@ const NewEvent: React.FC = () => {
     location: '',
     start_date: '',
     end_date: '',
-    capacity: '',
-    price: '',
-    organizer: '',
+    capacity: '1', // القيمة الافتراضية 1
   });
-  const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -35,27 +31,6 @@ const NewEvent: React.FC = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // التحقق من حجم الملف (2MB)
-      if (file.size > 2 * 1024 * 1024) {
-        setError('حجم الصورة يجب أن يكون أقل من 2MB');
-        return;
-      }
-      setImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result as string);
-      reader.readAsDataURL(file);
-      setError(null);
-    }
-  };
-
-  const removeImage = () => {
-    setImage(null);
-    setImagePreview(null);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -67,7 +42,13 @@ const NewEvent: React.FC = () => {
       !form.start_date ||
       !form.end_date
     ) {
-      setError('جميع الحقول المطلوبة يجب ملؤها');
+      setError(
+        'جميع الحقول التي بجانبها * مطلوبة. يرجى تعبئة جميع البيانات الأساسية.'
+      );
+      return;
+    }
+    if (form.description.length < 10) {
+      setError('الوصف يجب أن يكون 10 أحرف على الأقل.');
       return;
     }
 
@@ -75,22 +56,19 @@ const NewEvent: React.FC = () => {
     setError(null);
 
     try {
-      const formData = new FormData();
-      formData.append('title', form.title);
-      formData.append('description', form.description);
-      formData.append('category', form.category);
-      formData.append('location', form.location);
-      formData.append('start_date', form.start_date);
-      formData.append('end_date', form.end_date);
-      formData.append('capacity', form.capacity);
-      formData.append('price', form.price);
-      formData.append('organizer', form.organizer);
-
-      if (image) {
-        formData.append('image', image);
-      }
-
-      await createEvent(formData);
+      // بناء جسم الطلب كـ JSON فقط
+      const payload = {
+        title: form.title,
+        description: form.description,
+        category: form.category,
+        location: form.location,
+        start_date: form.start_date,
+        end_date: form.end_date,
+        max_attendees: Number(form.capacity),
+        attendees: 0,
+        status: 'upcoming' as const,
+      };
+      await createEvent(payload);
       setSuccess(true);
       setTimeout(() => {
         navigate('/dashboard/events');
@@ -194,9 +172,6 @@ const NewEvent: React.FC = () => {
                     <option value="conference">مؤتمر</option>
                     <option value="workshop">ورشة عمل</option>
                     <option value="networking">شبكة</option>
-                    <option value="seminar">ندوة</option>
-                    <option value="exhibition">معرض</option>
-                    <option value="competition">مسابقة</option>
                   </select>
                 </div>
                 <div>
@@ -279,93 +254,10 @@ const NewEvent: React.FC = () => {
                     type="number"
                     value={form.capacity}
                     onChange={handleChange}
-                    placeholder="0"
-                    min="0"
+                    placeholder="1"
+                    min="1"
                   />
                 </div>
-                <div>
-                  <label
-                    htmlFor="price"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    السعر
-                  </label>
-                  <Input
-                    id="price"
-                    name="price"
-                    type="number"
-                    value={form.price}
-                    onChange={handleChange}
-                    placeholder="0"
-                    min="0"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="organizer"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    المنظم
-                  </label>
-                  <Input
-                    id="organizer"
-                    name="organizer"
-                    type="text"
-                    value={form.organizer}
-                    onChange={handleChange}
-                    placeholder="اسم المنظم"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Image Upload */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900">
-                صورة الفعالية
-              </h3>
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <input
-                    id="image"
-                    name="image"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
-                  <label
-                    htmlFor="image"
-                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-                  >
-                    <Upload className="w-4 h-4" />
-                    <span>اختر صورة</span>
-                  </label>
-                  {imagePreview && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={removeImage}
-                      icon={X}
-                    >
-                      إزالة
-                    </Button>
-                  )}
-                </div>
-                {imagePreview && (
-                  <div className="relative">
-                    <img
-                      src={imagePreview}
-                      alt="معاينة الصورة"
-                      className="w-32 h-32 object-cover rounded-lg border"
-                    />
-                  </div>
-                )}
-                <p className="text-xs text-gray-500">
-                  المقاس المفضل: 400×400 بكسل (مربع). الحد الأقصى: 2MB
-                </p>
               </div>
             </div>
 

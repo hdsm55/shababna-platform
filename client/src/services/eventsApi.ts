@@ -20,9 +20,10 @@ export const fetchEvents = async (params: EventsQueryParams = {}): Promise<Pagin
 export const fetchEventById = async (id: number | string): Promise<Event> => {
   const response = await http.get(`/events/${id}`);
   if (!response.data || !response.data.data) {
-    throw new Error('404: Event not found');
+    throw new Error('لم يتم العثور على الفعالية أو حدث خطأ في الاتصال');
   }
-  return response.data.data;
+  // تأكد من وجود image_url حتى لو كانت فارغة
+  return { ...response.data.data, image_url: response.data.data.image_url || '' };
 };
 
 // Create a new event (admin only) - supports FormData for image upload
@@ -31,7 +32,36 @@ export const createEvent = async (eventData: Partial<Event> | FormData): Promise
     ? { 'Content-Type': 'multipart/form-data' }
     : { 'Content-Type': 'application/json' };
 
-  const response = await http.post('/events', eventData, { headers });
+  // إذا كان eventData كائن عادي (وليس FormData)، فلنرسل فقط الحقول الفعلية المطلوبة
+  let payload = eventData;
+  if (!(eventData instanceof FormData)) {
+    const {
+      title,
+      description,
+      location,
+      start_date,
+      end_date,
+      category,
+      max_attendees,
+      attendees = 0,
+      image_url = null,
+      status = 'upcoming',
+    } = eventData as any;
+    payload = {
+      title,
+      description,
+      location,
+      start_date,
+      end_date,
+      category,
+      max_attendees,
+      attendees,
+      image_url,
+      status,
+    };
+  }
+
+  const response = await http.post('/events', payload, { headers });
   return response.data;
 };
 

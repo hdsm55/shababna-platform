@@ -27,6 +27,8 @@ import NewProgram from './pages/dashboard/programs/NewProgram';
 import NewUser from './pages/dashboard/users/NewUser';
 import ContactForms from './pages/dashboard/ContactForms';
 import RegistrantsDashboard from './pages/dashboard/Registrants';
+import EditEvent from './pages/dashboard/events/EditEvent';
+import DashboardEventDetail from './pages/dashboard/events/EventDetail';
 
 function App() {
   const { i18n } = useTranslation();
@@ -67,6 +69,11 @@ function App() {
                       <Route path="events/new" element={<NewEvent />} />
                       <Route path="programs/new" element={<NewProgram />} />
                       <Route path="users/new" element={<NewUser />} />
+                      <Route path="events/:id/edit" element={<EditEvent />} />
+                      <Route
+                        path="events/:id"
+                        element={<DashboardEventDetail />}
+                      />
                       {/* يمكن إضافة فروع أخرى هنا لاحقًا */}
                     </Routes>
                   </ProtectedRoute>

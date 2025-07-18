@@ -35,9 +35,16 @@ CREATE TABLE IF NOT EXISTS events (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    event_date DATE,
+    start_date DATE,
+    end_date DATE,
     location VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    max_attendees INTEGER,
+    attendees INTEGER DEFAULT 0,
+    category VARCHAR(100),
+    image_url VARCHAR(500),
+    status VARCHAR(50) DEFAULT 'upcoming',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- === 4. جدول التبرعات ===

@@ -71,10 +71,19 @@ const EventDetail: React.FC = () => {
     e.preventDefault();
     setIsRegistering(true);
     setRegistrationStatus('idle');
-
     try {
       if (!id) throw new Error('No event ID');
-      const res = await registerForEvent(id, registrationForm);
+      // أرسل الحقول بـ snake_case فقط
+      const payload: any = {
+        first_name: registrationForm.firstName,
+        last_name: registrationForm.lastName,
+        email: registrationForm.email,
+        phone: registrationForm.phone,
+      };
+      if (registrationForm.organization) {
+        payload.organization = registrationForm.organization;
+      }
+      const res = await registerForEvent(id, payload);
       if (res.success) {
         setRegistrationStatus('success');
         setRegistrationForm({
@@ -440,22 +449,17 @@ const EventDetail: React.FC = () => {
                   {registrationStatus === 'success' && (
                     <Alert
                       type="success"
-                      title="Registration Successful!"
+                      title="تم التسجيل بنجاح!"
                       className="mb-6"
                     >
-                      You have been successfully registered for this event.
-                      We'll send you a confirmation email shortly.
+                      تم تسجيلك في الفعالية بنجاح. سنرسل لك رسالة تأكيد عبر
+                      البريد الإلكتروني قريبًا.
                     </Alert>
                   )}
 
                   {registrationStatus === 'error' && (
-                    <Alert
-                      type="error"
-                      title="Registration Error"
-                      className="mb-6"
-                    >
-                      There was an error processing your registration. Please
-                      try again.
+                    <Alert type="error" title="خطأ في التسجيل" className="mb-6">
+                      حدث خطأ أثناء معالجة التسجيل. يرجى المحاولة مرة أخرى.
                     </Alert>
                   )}
 

@@ -54,6 +54,9 @@ const Events: React.FC = () => {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
+  // طباعة البيانات في الكونسول للتشخيص
+  console.log('public-events data:', eventsData);
+
   const events = eventsData?.data?.items || [];
   const pagination = eventsData?.data?.pagination;
 
@@ -225,6 +228,21 @@ const Events: React.FC = () => {
       {/* Events Grid */}
       <AccessibleSection variant="neutral" ariaLabel="قسم شبكة الفعاليات">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {isLoading && (
+            <div className="text-center py-8 text-lg text-gray-500">
+              جاري تحميل الفعاليات...
+            </div>
+          )}
+          {isError && (
+            <div className="text-center py-8 text-lg text-red-600">
+              حدث خطأ أثناء جلب الفعاليات
+            </div>
+          )}
+          {!isLoading && !isError && events.length === 0 && (
+            <div className="text-center py-8 text-lg text-gray-500">
+              لا توجد فعاليات متاحة
+            </div>
+          )}
           {/* Loading State */}
           {isLoading && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -295,10 +313,7 @@ const Events: React.FC = () => {
                                 event.category
                               )}`}
                             >
-                              {typeof event.category === 'string'
-                                ? event.category.charAt(0).toUpperCase() +
-                                  event.category.slice(1)
-                                : ''}
+                              {event.category}
                             </span>
                           )}
                           {event.status && (
@@ -307,10 +322,7 @@ const Events: React.FC = () => {
                                 event.status
                               )}`}
                             >
-                              {typeof event.status === 'string'
-                                ? event.status.charAt(0).toUpperCase() +
-                                  event.status.slice(1)
-                                : ''}
+                              {event.status}
                             </span>
                           )}
                         </div>
@@ -341,18 +353,6 @@ const Events: React.FC = () => {
                               </>
                             )}
                           </div>
-                          {(event.start_date || event.end_date) && (
-                            <div className="flex items-center text-sm text-gray-500">
-                              <Clock className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
-                              {event.start_date
-                                ? format(new Date(event.start_date), 'HH:mm')
-                                : ''}{' '}
-                              -{' '}
-                              {event.end_date
-                                ? format(new Date(event.end_date), 'HH:mm')
-                                : ''}
-                            </div>
-                          )}
                           {event.location && (
                             <div className="flex items-center gap-2 mb-2">
                               <MapPin className="w-4 h-4 text-primary-500" />

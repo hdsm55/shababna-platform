@@ -41,21 +41,19 @@ import QuickActions from '../../components/common/QuickActions';
 import { Link } from 'react-router-dom';
 
 interface Event {
-  id: string;
+  id: number;
   title: string;
   description: string;
   category: string;
   location: string;
   start_date: string;
   end_date: string;
-  status: 'upcoming' | 'active' | 'completed' | 'cancelled';
-  capacity: number;
-  registered_count: number;
-  price: number;
-  organizer: string;
+  status: string;
+  max_attendees?: number;
+  attendees?: number;
+  image_url?: string;
   created_at: string;
   updated_at: string;
-  image_url?: string;
 }
 
 const EventsDashboard: React.FC = () => {
@@ -64,6 +62,9 @@ const EventsDashboard: React.FC = () => {
     queryKey: ['dashboard-events'],
     queryFn: () => fetchEvents(),
   });
+
+  // طباعة البيانات في الكونسول للتشخيص
+  console.log('dashboard-events data:', data);
 
   // حالة النافذة المنبثقة
   const [modalOpen, setModalOpen] = useState(false);
@@ -84,9 +85,10 @@ const EventsDashboard: React.FC = () => {
     location: '',
     start_date: '',
     end_date: '',
-    capacity: '',
-    price: '',
-    organizer: '',
+    max_attendees: '',
+    attendees: '',
+    image_url: '',
+    status: 'upcoming',
   });
   const [formError, setFormError] = useState('');
   const [image, setImage] = useState<File | null>(null);
@@ -98,7 +100,7 @@ const EventsDashboard: React.FC = () => {
   // بيانات افتراضية للفعاليات
   const mockEvents: Event[] = [
     {
-      id: '1',
+      id: 1,
       title: 'ملتقى الشباب العربي',
       description:
         'ملتقى سنوي يجمع الشباب العربي لمناقشة قضاياهم وتطوير مهاراتهم',
@@ -107,15 +109,14 @@ const EventsDashboard: React.FC = () => {
       start_date: '2024-07-15',
       end_date: '2024-07-17',
       status: 'upcoming',
-      capacity: 200,
-      registered_count: 150,
-      price: 0,
-      organizer: 'جمعية شبابنا',
+      max_attendees: 200,
+      attendees: 150,
+      image_url: 'https://via.placeholder.com/150',
       created_at: '2024-05-01',
       updated_at: '2024-05-15',
     },
     {
-      id: '2',
+      id: 2,
       title: 'ورشة عمل التكنولوجيا',
       description: 'ورشة عمل مكثفة في مجال التكنولوجيا والبرمجة للشباب',
       category: 'تعليمي',
@@ -123,15 +124,14 @@ const EventsDashboard: React.FC = () => {
       start_date: '2024-06-20',
       end_date: '2024-06-22',
       status: 'active',
-      capacity: 50,
-      registered_count: 45,
-      price: 100,
-      organizer: 'مركز التطوير التقني',
+      max_attendees: 50,
+      attendees: 45,
+      image_url: 'https://via.placeholder.com/150',
       created_at: '2024-04-15',
       updated_at: '2024-06-01',
     },
     {
-      id: '3',
+      id: 3,
       title: 'مؤتمر القيادة الشبابية',
       description: 'مؤتمر سنوي لتطوير مهارات القيادة لدى الشباب',
       category: 'قيادي',
@@ -139,15 +139,14 @@ const EventsDashboard: React.FC = () => {
       start_date: '2024-08-10',
       end_date: '2024-08-12',
       status: 'upcoming',
-      capacity: 300,
-      registered_count: 120,
-      price: 200,
-      organizer: 'مؤسسة القيادة',
+      max_attendees: 300,
+      attendees: 120,
+      image_url: 'https://via.placeholder.com/150',
       created_at: '2024-06-01',
       updated_at: '2024-06-01',
     },
     {
-      id: '4',
+      id: 4,
       title: 'معرض الفنون الشبابية',
       description: 'معرض سنوي لعرض إبداعات الشباب في مجال الفنون',
       category: 'ثقافي',
@@ -155,10 +154,9 @@ const EventsDashboard: React.FC = () => {
       start_date: '2024-05-01',
       end_date: '2024-05-03',
       status: 'completed',
-      capacity: 100,
-      registered_count: 95,
-      price: 50,
-      organizer: 'جمعية الفنون',
+      max_attendees: 100,
+      attendees: 95,
+      image_url: 'https://via.placeholder.com/150',
       created_at: '2024-03-01',
       updated_at: '2024-05-03',
     },
@@ -194,9 +192,10 @@ const EventsDashboard: React.FC = () => {
         location: '',
         start_date: '',
         end_date: '',
-        capacity: '',
-        price: '',
-        organizer: '',
+        max_attendees: '',
+        attendees: '',
+        image_url: '',
+        status: 'upcoming',
       });
       setSelectedEvent(null);
     } else if (event) {
@@ -208,9 +207,10 @@ const EventsDashboard: React.FC = () => {
         location: event.location,
         start_date: event.start_date,
         end_date: event.end_date,
-        capacity: event.capacity.toString(),
-        price: event.price.toString(),
-        organizer: event.organizer,
+        max_attendees: event.max_attendees?.toString() || '',
+        attendees: event.attendees?.toString() || '',
+        image_url: event.image_url || '',
+        status: event.status,
       });
       if (event.image_url) {
         setImagePreview(event.image_url);
@@ -253,33 +253,61 @@ const EventsDashboard: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title || !form.description || !form.category || !form.location) {
-      setFormError('جميع الحقول المطلوبة يجب ملؤها');
-      return;
-    }
     setFormError('');
     setModalMsg('');
+
+    // تحقق من الحقول المطلوبة
+    if (
+      !form.title ||
+      !form.start_date ||
+      !form.end_date ||
+      !form.category ||
+      !form.status
+    ) {
+      setFormError(
+        'جميع الحقول الأساسية مطلوبة. يرجى تعبئة جميع الحقول بشكل صحيح.'
+      );
+      return;
+    }
+
+    // تحقق من صحة التواريخ
+    if (new Date(form.end_date) < new Date(form.start_date)) {
+      setFormError('تاريخ النهاية يجب أن يكون بعد تاريخ البداية.');
+      return;
+    }
+
+    // بناء الـ payload مع تحويل القيم الرقمية
+    const allowedStatuses = [
+      'upcoming',
+      'active',
+      'completed',
+      'cancelled',
+    ] as const;
+    const payload = {
+      ...form,
+      max_attendees:
+        form.max_attendees && !isNaN(Number(form.max_attendees))
+          ? Number(form.max_attendees)
+          : undefined,
+      attendees:
+        form.attendees && !isNaN(Number(form.attendees))
+          ? Number(form.attendees)
+          : 0,
+      status: allowedStatuses.includes(form.status as any)
+        ? (form.status as (typeof allowedStatuses)[number])
+        : 'upcoming',
+      image_url:
+        form.image_url && form.image_url.trim() !== ''
+          ? form.image_url
+          : undefined,
+    };
+
     try {
-      const formData = new FormData();
-      formData.append('title', form.title);
-      formData.append('description', form.description);
-      formData.append('category', form.category);
-      formData.append('location', form.location);
-      formData.append('start_date', form.start_date);
-      formData.append('end_date', form.end_date);
-      formData.append('capacity', form.capacity);
-      formData.append('price', form.price);
-      formData.append('organizer', form.organizer);
-
-      if (image) {
-        formData.append('image', image);
-      }
-
       if (modalType === 'add') {
-        await createEvent(formData);
+        await createEvent(payload);
         setModalMsg('تم إضافة الفعالية بنجاح!');
       } else if (modalType === 'edit' && selectedEvent) {
-        await updateEvent(Number(selectedEvent.id), formData);
+        await updateEvent(Number(selectedEvent.id), payload);
         setModalMsg('تم تحديث الفعالية بنجاح!');
       }
 
@@ -411,6 +439,21 @@ const EventsDashboard: React.FC = () => {
 
   return (
     <DashboardLayout>
+      {isLoading && (
+        <div className="text-center py-8 text-lg text-gray-500">
+          جاري تحميل الفعاليات...
+        </div>
+      )}
+      {error && (
+        <div className="text-center py-8 text-lg text-red-600">
+          حدث خطأ أثناء جلب الفعاليات
+        </div>
+      )}
+      {!isLoading && !error && filteredEvents.length === 0 && (
+        <div className="text-center py-8 text-lg text-gray-500">
+          لا توجد فعاليات متاحة
+        </div>
+      )}
       <div className="container mx-auto px-2 md:px-6 py-8">
         {/* Quick Actions */}
         <Card className="mb-10 shadow-lg rounded-2xl p-6 bg-gradient-to-tr from-blue-50 to-white border-0">
@@ -513,15 +556,11 @@ const EventsDashboard: React.FC = () => {
                         >
                           عرض
                         </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          as={Link}
-                          to={`/dashboard/events/${event.id}/edit`}
-                          className="rounded-md"
-                        >
-                          تعديل
-                        </Button>
+                        <Link to={`/dashboard/events/${event.id}/edit`}>
+                          <Button variant="outline" size="sm" icon={Edit}>
+                            تعديل
+                          </Button>
+                        </Link>
                       </td>
                     </tr>
                   ))
@@ -587,9 +626,11 @@ const EventsDashboard: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  المنظم
+                  السعة
                 </label>
-                <p className="text-gray-900">{selectedEvent.organizer}</p>
+                <p className="text-gray-900">
+                  {selectedEvent.max_attendees} شخص
+                </p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -613,15 +654,27 @@ const EventsDashboard: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  السعة
+                  المتأهلين
                 </label>
-                <p className="text-gray-900">{selectedEvent.capacity} شخص</p>
+                <p className="text-gray-900">{selectedEvent.attendees} شخص</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  السعر
+                  الصورة
                 </label>
-                <p className="text-gray-900">${selectedEvent.price}</p>
+                <div className="relative">
+                  {selectedEvent.image_url ? (
+                    <img
+                      src={selectedEvent.image_url}
+                      alt="صورة الفعالية"
+                      className="w-32 h-32 object-cover rounded-lg border"
+                    />
+                  ) : (
+                    <div className="w-32 h-32 bg-gray-200 flex items-center justify-center rounded-lg border text-gray-500 text-sm">
+                      لا يوجد صورة
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             <div className="flex gap-2 pt-4">
@@ -764,16 +817,16 @@ const EventsDashboard: React.FC = () => {
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <label
-                  htmlFor="capacity"
+                  htmlFor="max_attendees"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
                   السعة
                 </label>
                 <Input
-                  id="capacity"
-                  name="capacity"
+                  id="max_attendees"
+                  name="max_attendees"
                   type="number"
-                  value={form.capacity}
+                  value={form.max_attendees}
                   onChange={handleChange}
                   required
                   placeholder="0"
@@ -781,16 +834,16 @@ const EventsDashboard: React.FC = () => {
               </div>
               <div>
                 <label
-                  htmlFor="price"
+                  htmlFor="attendees"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  السعر
+                  المتأهلين
                 </label>
                 <Input
-                  id="price"
-                  name="price"
+                  id="attendees"
+                  name="attendees"
                   type="number"
-                  value={form.price}
+                  value={form.attendees}
                   onChange={handleChange}
                   required
                   placeholder="0"
@@ -798,20 +851,43 @@ const EventsDashboard: React.FC = () => {
               </div>
               <div>
                 <label
-                  htmlFor="organizer"
+                  htmlFor="image_url"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  المنظم
+                  الصورة
                 </label>
                 <Input
-                  id="organizer"
-                  name="organizer"
+                  id="image_url"
+                  name="image_url"
                   type="text"
-                  value={form.organizer}
+                  value={form.image_url}
+                  onChange={handleChange}
+                  placeholder="رابط صورة الفعالية"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="status"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  الحالة
+                </label>
+                <select
+                  id="status"
+                  name="status"
+                  value={form.status}
                   onChange={handleChange}
                   required
-                  placeholder="اسم المنظم"
-                />
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="upcoming">قادم</option>
+                  <option value="active">نشط</option>
+                  <option value="completed">مكتمل</option>
+                  <option value="cancelled">ملغي</option>
+                </select>
               </div>
             </div>
 
