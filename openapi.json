@@ -1,0 +1,138 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Shababna Platform API",
+    "version": "1.0.0",
+    "description": "توثيق REST API لمنصة شبابنا | Shababna Platform API Documentation"
+  },
+  "servers": [
+    { "url": "http://localhost:5001/api", "description": "Local server" }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "تسجيل مستخدم جديد | Register new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "user@mail.com" },
+                  "password": { "type": "string", "example": "Test@1234" },
+                  "first_name": { "type": "string", "example": "أحمد" },
+                  "last_name": { "type": "string", "example": "العتيبي" }
+                },
+                "required": ["email", "password", "first_name", "last_name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "تم التسجيل بنجاح | Registered successfully" },
+          "409": { "description": "البريد مستخدم مسبقاً | Email already exists" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "تسجيل الدخول | Login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "user@mail.com" },
+                  "password": { "type": "string", "example": "Test@1234" }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "تم تسجيل الدخول | Login successful" },
+          "401": { "description": "بيانات غير صحيحة | Invalid credentials" }
+        }
+      }
+    },
+    "/events": {
+      "get": {
+        "summary": "جلب جميع الفعاليات | Get all events",
+        "responses": {
+          "200": { "description": "قائمة الفعاليات | List of events" }
+        }
+      },
+      "post": {
+        "summary": "إنشاء فعالية جديدة (أدمن) | Create new event (admin)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string", "example": "ورشة عمل شبابية" },
+                  "description": { "type": "string", "example": "تفاصيل الفعالية..." },
+                  "location": { "type": "string", "example": "الرياض" },
+                  "start_date": { "type": "string", "format": "date", "example": "2024-07-01" },
+                  "end_date": { "type": "string", "format": "date", "example": "2024-07-02" },
+                  "category": { "type": "string", "example": "workshop" }
+                },
+                "required": ["title", "description", "location", "start_date", "end_date", "category"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "تم إنشاء الفعالية | Event created" },
+          "400": { "description": "بيانات غير صالحة | Invalid data" }
+        }
+      }
+    },
+    "/programs": {
+      "get": {
+        "summary": "جلب جميع البرامج | Get all programs",
+        "responses": {
+          "200": { "description": "قائمة البرامج | List of programs" }
+        }
+      },
+      "post": {
+        "summary": "إنشاء برنامج جديد (أدمن) | Create new program (admin)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string", "example": "برنامج القيادة" },
+                  "description": { "type": "string", "example": "تفاصيل البرنامج..." },
+                  "start_date": { "type": "string", "format": "date", "example": "2024-07-10" },
+                  "end_date": { "type": "string", "format": "date", "example": "2024-07-20" }
+                },
+                "required": ["title", "description", "start_date", "end_date"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "تم إنشاء البرنامج | Program created" },
+          "400": { "description": "بيانات غير صالحة | Invalid data" }
+        }
+      }
+    },
+    "/dashboard/stats": {
+      "get": {
+        "summary": "إحصائيات الداشبورد (أدمن فقط) | Dashboard stats (admin only)",
+        "responses": {
+          "200": { "description": "إحصائيات | Stats" },
+          "403": { "description": "غير مصرح | Forbidden" }
+        }
+      }
+    }
+  }
+}

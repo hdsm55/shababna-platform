@@ -6,13 +6,13 @@ export interface Event {
   start_date: string;
   end_date: string;
   location: string;
-  category: string; // دعم جميع الفئات
-  image_url?: string; // تحديث الحقل ليكون مطابقاً لقاعدة البيانات
+  category: string;
+  image_url?: string;
   max_attendees?: number;
   attendees: number;
   status: 'upcoming' | 'active' | 'completed' | 'cancelled';
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
 }
 
 // Program types
@@ -20,14 +20,19 @@ export interface Program {
   id: number;
   title: string;
   description: string;
-  category: 'education' | 'relief' | 'youth' | 'media' | 'daawah';
-  image?: string;
-  goal_amount?: number;
-  current_amount: number;
+  category: string;
+  image_url?: string;
   start_date: string;
   end_date: string;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
+}
+
+export interface ProgramRegistration {
+  id: number;
+  program_id: number;
+  user_id: number;
+  created_at: string;
 }
 
 // User types
@@ -57,27 +62,25 @@ export interface EventRegistration {
 
 // API Response types
 export interface ApiResponse<T> {
-  success: boolean;
+  data: T;
   message: string;
-  data?: T;
-  errors?: Array<{
-    field: string;
-    message: string;
-  }>;
+  success: boolean;
 }
 
 export interface PaginatedResponse<T> {
-  success: boolean;
-  message: string;
   data: {
     items: T[];
-    pagination: {
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
-    };
+    pagination: Pagination;
   };
+  message: string;
+  success: boolean;
+}
+
+export interface Pagination {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
 }
 
 // Query parameters

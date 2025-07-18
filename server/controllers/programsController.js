@@ -5,35 +5,59 @@ import { successResponse, errorResponse } from '../utils/response.js';
 // Get all programs (public)
 export const getAllPrograms = async (req, res) => {
     try {
-        const result = await query(`
-      SELECT
-        id,
-        title,
-        description,
-        start_date,
-        end_date,
-        created_at
-        FROM programs
-        ORDER BY created_at DESC
-    `);
-        return successResponse(res, { items: result.rows, total: result.rows.length }, 'تم جلب البرامج بنجاح');
+        const {
+            search,
+            category,
+            page = 1,
+            limit = 10
+        } = req.query;
+        const offset = (parseInt(page) - 1) * parseInt(limit);
+        let sql = 'SELECT id, title, description, category, image_url, start_date, end_date, created_at, updated_at FROM programs WHERE 1=1';
+        const params = [];
+        let paramIndex = 1;
+        if (search) {
+            sql += ` AND (title ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`;
+            params.push(`%${search}%`);
+            paramIndex++;
+        }
+        if (category) {
+            sql += ` AND category = $${paramIndex}`;
+            params.push(category);
+            paramIndex++;
+        }
+        const countSql = sql.replace('SELECT id, title, description, category, image_url, start_date, end_date, created_at, updated_at', 'SELECT COUNT(*)');
+        const countResult = await query(countSql, params);
+        const total = parseInt(countResult.rows[0].count);
+        sql += ` ORDER BY start_date DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+        params.push(parseInt(limit), offset);
+        const result = await query(sql, params);
+        const totalPages = Math.ceil(total / parseInt(limit));
+        return successResponse(res, {
+            items: result.rows,
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total,
+                totalPages
+            }
+        }, 'تم جلب البرامج بنجاح');
     } catch (error) {
         console.error('Programs fetch error:', error);
-        return errorResponse(res, 'خطأ في جلب البرامج', 500, error);
+        return errorResponse(res, 'حدث خطأ أثناء جلب البرامج. يرجى المحاولة لاحقًا.', 500, error);
     }
 };
 
 // Get single program (public)
 export const getProgramById = async (req, res) => {
     try {
-        const result = await query('SELECT * FROM programs WHERE id = $1', [req.params.id]);
+        const result = await query('SELECT id, title, description, category, image_url, start_date, end_date, created_at, updated_at FROM programs WHERE id = $1', [req.params.id]);
         if (result.rows.length === 0) {
             return errorResponse(res, 'البرنامج غير موجود', 404);
         }
         return successResponse(res, result.rows[0], 'تم جلب البرنامج بنجاح');
     } catch (error) {
         console.error('Get program error:', error);
-        return errorResponse(res, 'خطأ في جلب البرنامج', 500, error);
+        return errorResponse(res, 'حدث خطأ أثناء جلب البرنامج. يرجى المحاولة لاحقًا.', 500, error);
     }
 };
 
@@ -81,18 +105,20 @@ export const createProgram = async (req, res) => {
         const {
             title,
             description,
+            category,
+            image_url = '',
             start_date,
             end_date
         } = req.body;
         const result = await query(`
-      INSERT INTO programs (title, description, start_date, end_date)
-      VALUES ($1, $2, $3, $4)
-      RETURNING id, title, description, start_date, end_date, created_at
-    `, [title, description, start_date, end_date]);
+      INSERT INTO programs (title, description, category, image_url, start_date, end_date)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING id, title, description, category, image_url, start_date, end_date, created_at, updated_at
+    `, [title, description, category, image_url, start_date, end_date]);
         return successResponse(res, result.rows[0], 'تم إضافة البرنامج بنجاح');
     } catch (error) {
         console.error('Program creation error:', error);
-        return errorResponse(res, 'خطأ في إضافة البرنامج', 500, error);
+        return errorResponse(res, 'حدث خطأ أثناء إضافة البرنامج. يرجى المحاولة لاحقًا.', 500, error);
     }
 };
 
@@ -100,25 +126,33 @@ export const createProgram = async (req, res) => {
 export const updateProgram = async (req, res) => {
     try {
         const { id } = req.params;
-        const {
-            title,
-            description,
-            start_date,
-            end_date
-        } = req.body;
-        const result = await query(`
-      UPDATE programs
-      SET title = $1, description = $2, start_date = $3, end_date = $4
-      WHERE id = $5
-      RETURNING id, title, description, start_date, end_date, created_at
-    `, [title, description, start_date, end_date, id]);
+        const allowedFields = ['title', 'description', 'category', 'image_url', 'start_date', 'end_date'];
+        const updateFields = [];
+        const values = [];
+        let paramIndex = 1;
+        Object.keys(req.body).forEach(key => {
+            if (allowedFields.includes(key) && req.body[key] !== undefined) {
+                updateFields.push(`${key} = $${paramIndex}`);
+                values.push(req.body[key]);
+                paramIndex++;
+            }
+        });
+        if (updateFields.length === 0) {
+            return errorResponse(res, 'لا توجد بيانات لتحديثها', 400);
+        }
+        updateFields.push(`updated_at = NOW()`);
+        values.push(id);
+        const result = await query(
+            `UPDATE programs SET ${updateFields.join(', ')} WHERE id = $${paramIndex} RETURNING id, title, description, category, image_url, start_date, end_date, created_at, updated_at`,
+            values
+        );
         if (result.rows.length === 0) {
             return errorResponse(res, 'البرنامج غير موجود', 404);
         }
         return successResponse(res, result.rows[0], 'تم تحديث البرنامج بنجاح');
     } catch (error) {
         console.error('Program update error:', error);
-        return errorResponse(res, 'خطأ في تحديث البرنامج', 500, error);
+        return errorResponse(res, 'حدث خطأ أثناء تحديث البرنامج. يرجى المحاولة لاحقًا.', 500, error);
     }
 };
 

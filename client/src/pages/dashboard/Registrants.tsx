@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
-import Card from '../../components/common/Card';
-import Button from '../../components/common/Button';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import Alert from '../../components/common/Alert';
+import { Card } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Alert } from '../../components/ui/Alert';
 import { Eye } from 'lucide-react';
 import {
   fetchUsers,
@@ -146,10 +145,10 @@ const RegistrantsDashboard: React.FC = () => {
         </Card>
         {loading ? (
           <div className="flex justify-center py-8">
-            <LoadingSpinner size="lg" />
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
           </div>
         ) : error ? (
-          <Alert type="error" title="خطأ في تحميل البيانات">
+          <Alert variant="error" title="خطأ في تحميل البيانات">
             {error}
           </Alert>
         ) : (

@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createProgram } from '../../../services/programsApi';
 import DashboardLayout from '../../../components/dashboard/DashboardLayout';
-import Button from '../../../components/common/Button';
-import Input from '../../../components/common/Input';
-import Alert from '../../../components/common/Alert';
+import { Button } from '../../../components/ui/Button';
+import { Input } from '../../../components/ui/Input';
+import { Alert } from '../../../components/ui/Alert';
 import { Upload, X, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -117,13 +117,9 @@ const NewProgram: React.FC = () => {
         {/* Form */}
         <div className="bg-white rounded-xl shadow-sm border">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            {error && <Alert type="error">{error}</Alert>}
+            {error && <Alert variant="error">{error}</Alert>}
 
-            {success && (
-              <Alert type="success">
-                تم إضافة البرنامج بنجاح! جاري التوجيه...
-              </Alert>
-            )}
+            {success && <Alert variant="success">{success}</Alert>}
 
             {/* Basic Information */}
             <div className="space-y-4">

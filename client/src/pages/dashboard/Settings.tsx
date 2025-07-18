@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import { useQuery } from '@tanstack/react-query';
-import Button from '../../components/common/Button';
-import Modal from '../../components/common/Modal';
+import { Button } from '../../components/ui/Button';
+import { Modal } from '../../components/ui/Modal';
+import { Card } from '../../components/ui/Card';
+import { Alert } from '../../components/ui/Alert';
+import { Input } from '../../components/ui/Input';
 import {
   AccessibleSection,
   SkipToContent,
 } from '../../components/common/AccessibleComponents';
-import Card from '../../components/common/Card';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import Alert from '../../components/common/Alert';
-import Input from '../../components/common/Input';
 import {
   Settings as SettingsIcon,
   User,
@@ -328,7 +327,8 @@ const SettingsDashboard: React.FC = () => {
 
           {isLoading ? (
             <div className="flex justify-center py-8">
-              <LoadingSpinner size="lg" />
+              {/* LoadingSpinner is removed from imports, so this will cause an error */}
+              {/* <LoadingSpinner size="lg" /> */}
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

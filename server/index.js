@@ -10,6 +10,9 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import path from 'path';
 import bodyParser from 'body-parser';
+import rateLimit from 'express-rate-limit';
+import swaggerUi from 'swagger-ui-express';
+import fs from 'fs';
 
 // Import database configuration
 import './config/database.js';
@@ -31,6 +34,25 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// تحقق من وجود مفتاح JWT في الإنتاج
+if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+  console.error('❌ خطأ أمني: يجب تعيين متغير البيئة JWT_SECRET في الإنتاج. أوقف التشغيل.');
+  process.exit(1);
+}
+
+// إعداد rate limiting
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 دقيقة
+  max: 100, // 100 طلب لكل IP
+  message: {
+    success: false,
+    message: 'لقد تجاوزت الحد المسموح من الطلبات. يرجى المحاولة لاحقًا.'
+  },
+  standardHeaders: true, // يعرض الهيدر القياسي
+  legacyHeaders: false, // لا يعرض الهيدر القديم
+});
+app.use(apiLimiter);
+
 // Middleware
 app.use(helmet({
   contentSecurityPolicy: {
@@ -44,7 +66,9 @@ app.use(helmet({
   },
 }));
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: process.env.NODE_ENV === 'production'
+    ? process.env.CLIENT_URL || 'https://shaababna.com'
+    : process.env.CORS_ORIGIN || 'http://localhost:5173',
   credentials: true
 }));
 app.use(bodyParser.json());
@@ -86,6 +110,9 @@ app.get('/api/health', (req, res) => {
 app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
+
+const swaggerDocument = JSON.parse(fs.readFileSync('./openapi.json', 'utf8'));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

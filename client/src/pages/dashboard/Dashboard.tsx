@@ -8,14 +8,9 @@ import {
   getRecentActivities,
 } from '../../services/dashboardApi';
 import { Link } from 'react-router-dom';
-import {
-  AccessibleSection,
-  SkipToContent,
-} from '../../components/common/AccessibleComponents';
-import Card from '../../components/common/Card';
-import Button from '../../components/common/Button';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import Alert from '../../components/common/Alert';
+import { Alert } from '../../components/ui/Alert';
+import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
 import {
   Calendar,
   Users,
@@ -42,8 +37,8 @@ import {
   Download,
   MessageCircle,
 } from 'lucide-react';
-import Modal from '../../components/common/Modal';
-import QuickActions from '../../components/common/QuickActions';
+import { Modal } from '../../components/ui/Modal';
+import { QuickActions } from '../../components/ui/QuickActions';
 
 const DashboardOverview: React.FC = () => {
   const { t } = useTranslation();
@@ -76,135 +71,6 @@ const DashboardOverview: React.FC = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  // بيانات افتراضية للإحصائيات
-  const mockStats = {
-    overview: [
-      {
-        title: 'إجمالي الفعاليات',
-        value: 24,
-        change: '+12 نشط',
-        changeType: 'increase',
-        icon: Calendar,
-        color: 'primary',
-        details: {
-          active: 12,
-          upcoming: 8,
-          completed: 4,
-        },
-      },
-      {
-        title: 'البرامج النشطة',
-        value: 8,
-        change: '+3 نشط',
-        changeType: 'increase',
-        icon: TrendingUp,
-        color: 'success',
-        details: {
-          active: 5,
-          total: 8,
-        },
-      },
-      {
-        title: 'إجمالي الأعضاء',
-        value: 156,
-        change: '+8%',
-        changeType: 'increase',
-        icon: Users,
-        color: 'info',
-        details: {
-          new: 12,
-          total: 156,
-        },
-      },
-    ],
-    engagement: [
-      {
-        title: 'تسجيل البرامج',
-        value: 45,
-        icon: Users,
-        color: 'primary',
-      },
-      {
-        title: 'دعم البرامج',
-        value: 23,
-        icon: Heart,
-        color: 'success',
-      },
-      {
-        title: 'تسجيل الفعاليات',
-        value: 67,
-        icon: Calendar,
-        color: 'info',
-      },
-      {
-        title: 'رسائل التواصل',
-        value: 12,
-        icon: MessageCircle,
-        color: 'warning',
-        alert: '3 غير مقروءة',
-      },
-    ],
-  };
-
-  // بيانات افتراضية للأنشطة
-  const mockActivities = [
-    {
-      id: 1,
-      type: 'event',
-      message: 'تم إضافة فعالية جديدة: ورشة عمل الشباب',
-      date: 'منذ ساعتين',
-      status: 'completed',
-      icon: CheckCircle,
-      priority: 'high',
-      user: 'النظام',
-      details: 'فعالية نشطة',
-    },
-    {
-      id: 2,
-      type: 'donation',
-      message: 'تم استلام تبرع جديد بقيمة $500',
-      date: 'منذ 3 ساعات',
-      status: 'completed',
-      icon: CheckCircle,
-      priority: 'medium',
-      user: 'أحمد محمد',
-      details: 'تبرع نقدي - 500 ريال',
-    },
-    {
-      id: 3,
-      type: 'program',
-      message: 'تم تحديث برنامج التوعية الصحية',
-      date: 'منذ 5 ساعات',
-      status: 'pending',
-      icon: Clock,
-      priority: 'low',
-      user: 'النظام',
-      details: 'برنامج قيد الانتظار',
-    },
-    {
-      id: 4,
-      type: 'user',
-      message: 'انضم عضو جديد: سارة أحمد',
-      date: 'منذ يوم واحد',
-      status: 'completed',
-      icon: CheckCircle,
-      priority: 'medium',
-      user: 'سارة أحمد',
-      details: 'البريد الإلكتروني: sara@example.com',
-    },
-    {
-      id: 5,
-      type: 'contact',
-      message: 'رسالة جديدة من محمد علي: استفسار عن البرامج',
-      date: 'منذ يومين',
-      status: 'pending',
-      icon: MessageCircle,
-      priority: 'high',
-      user: 'محمد علي',
-      details: 'البريد: mohammed@example.com',
-    },
-  ];
-
   // بيانات افتراضية للرسوم البيانية
   const mockChartData = {
     donations: [1200, 1800, 1500, 2200, 1900, 2400, 2100],
@@ -213,8 +79,8 @@ const DashboardOverview: React.FC = () => {
   };
 
   // استخدام البيانات الحقيقية أو الافتراضية
-  const stats = statsData?.data || mockStats;
-  const recentActivities = activitiesData?.data || mockActivities;
+  const stats = statsData?.data;
+  const recentActivities = activitiesData?.data;
 
   const quickActions = [
     {
@@ -231,13 +97,7 @@ const DashboardOverview: React.FC = () => {
       color: 'success' as const,
       description: 'إنشاء برنامج جديد',
     },
-    {
-      to: '/dashboard/donations/new',
-      label: 'تسجيل تبرع',
-      icon: DollarSign,
-      color: 'warning' as const,
-      description: 'تسجيل تبرع جديد',
-    },
+    // تم حذف إجراء تسجيل تبرع لأنه غير مدعوم
     {
       to: '/dashboard/users/new',
       label: 'إضافة عضو',
@@ -327,12 +187,9 @@ const DashboardOverview: React.FC = () => {
   if (statsError || activitiesError) {
     return (
       <DashboardLayout>
-        <SkipToContent />
-        <AccessibleSection>
-          <Alert type="error" title="خطأ في تحميل البيانات">
-            حدث خطأ أثناء تحميل بيانات لوحة التحكم. يرجى المحاولة مرة أخرى.
-          </Alert>
-        </AccessibleSection>
+        <Alert variant="error" title="خطأ في تحميل البيانات">
+          حدث خطأ أثناء تحميل بيانات لوحة التحكم. يرجى المحاولة مرة أخرى.
+        </Alert>
       </DashboardLayout>
     );
   }
@@ -354,329 +211,335 @@ const DashboardOverview: React.FC = () => {
       </div>
       <div className="container mx-auto px-2 md:px-6 py-8">
         {/* Quick Actions */}
-        <AccessibleSection>
-          <Card className="mb-10 shadow-lg rounded-2xl p-6 bg-gradient-to-tr from-blue-50 to-white border-0">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl md:text-2xl font-extrabold text-gray-900 tracking-tight">
-                إجراءات سريعة
-              </h2>
-              <Button
-                variant="ghost"
-                size="sm"
-                icon={RefreshCw}
-                onClick={() => {
-                  refetchStats();
-                  refetchActivities();
-                }}
-                aria-label="تحديث البيانات"
-              >
-                تحديث
-              </Button>
-            </div>
-            <QuickActions actions={quickActions} className="mb-0" />
-          </Card>
-        </AccessibleSection>
+        <Card className="mb-10 shadow-lg rounded-2xl p-6 bg-gradient-to-tr from-blue-50 to-white border-0">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl md:text-2xl font-extrabold text-gray-900 tracking-tight">
+              إجراءات سريعة
+            </h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              icon={RefreshCw}
+              onClick={() => {
+                refetchStats();
+                refetchActivities();
+              }}
+              aria-label="تحديث البيانات"
+            >
+              تحديث
+            </Button>
+          </div>
+          <QuickActions className="mb-0">
+            {quickActions.map((action, idx) => {
+              const Icon = action.icon;
+              return (
+                <Link
+                  to={action.to}
+                  key={action.label}
+                  className={`flex-1 min-w-[200px] max-w-xs border rounded-xl px-6 py-5 flex flex-col items-center transition-all duration-150 shadow-sm bg-white border-${action.color}-300 text-${action.color}-500 hover:bg-${action.color}-50 cursor-pointer`}
+                  tabIndex={0}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icon className="w-7 h-7" />
+                    <span className="text-lg font-semibold">
+                      {action.label}
+                    </span>
+                  </div>
+                  <span className="text-sm text-gray-400 font-light">
+                    {action.description}
+                  </span>
+                </Link>
+              );
+            })}
+          </QuickActions>
+        </Card>
 
         {/* Stats Overview */}
-        <AccessibleSection>
-          <Card className="mb-8 shadow-md rounded-2xl p-6 bg-white border-0">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg md:text-xl font-bold text-gray-800">
-                نظرة عامة على الإحصائيات
-              </h2>
-              <div className="flex gap-2">
-                <select
-                  value={selectedPeriod}
-                  onChange={(e) => setSelectedPeriod(e.target.value)}
-                  className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-primary-500"
+        <Card className="mb-8 shadow-md rounded-2xl p-6 bg-white border-0">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg md:text-xl font-bold text-gray-800">
+              نظرة عامة على الإحصائيات
+            </h2>
+            <div className="flex gap-2">
+              <select
+                value={selectedPeriod}
+                onChange={(e) => setSelectedPeriod(e.target.value)}
+                className="text-sm border border-gray-300 rounded-lg px-3 py-1 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="week">الأسبوع</option>
+                <option value="month">الشهر</option>
+                <option value="quarter">الربع</option>
+                <option value="year">السنة</option>
+              </select>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {stats?.overview?.map((stat: any, index: number) => {
+              const IconComponent = stat.icon;
+              return (
+                <div
+                  key={index}
+                  className="p-4 bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
                 >
-                  <option value="week">الأسبوع</option>
-                  <option value="month">الشهر</option>
-                  <option value="quarter">الربع</option>
-                  <option value="year">السنة</option>
-                </select>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {stats.overview?.map((stat: any, index: number) => {
-                const IconComponent = stat.icon;
-                return (
-                  <div
-                    key={index}
-                    className="p-4 bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <div className={`p-2 rounded-lg bg-${stat.color}-100`}>
-                        <IconComponent
-                          className={`w-6 h-6 text-${stat.color}-600`}
-                          aria-hidden="true"
-                        />
-                      </div>
-                      {getGrowthIcon(stat.changeType)}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className={`p-2 rounded-lg bg-${stat.color}-100`}>
+                      <IconComponent
+                        className={`w-6 h-6 text-${stat.color}-600`}
+                        aria-hidden="true"
+                      />
                     </div>
-                    <div className="mb-2">
-                      <p className="text-sm text-gray-600 font-medium">
-                        {stat.title}
-                      </p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {stat.value}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`text-sm font-medium ${
-                          stat.changeType === 'increase'
-                            ? 'text-green-600'
-                            : stat.changeType === 'decrease'
-                            ? 'text-red-600'
-                            : 'text-gray-600'
-                        }`}
-                      >
-                        {stat.change}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        من الفترة السابقة
-                      </span>
-                    </div>
+                    {getGrowthIcon(stat.changeType)}
                   </div>
-                );
-              })}
-            </div>
-          </Card>
-        </AccessibleSection>
+                  <div className="mb-2">
+                    <p className="text-sm text-gray-600 font-medium">
+                      {stat.title}
+                    </p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {stat.value}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`text-sm font-medium ${
+                        stat.changeType === 'increase'
+                          ? 'text-green-600'
+                          : stat.changeType === 'decrease'
+                          ? 'text-red-600'
+                          : 'text-gray-600'
+                      }`}
+                    >
+                      {stat.change}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      من الفترة السابقة
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
 
         {/* Engagement Stats */}
-        <AccessibleSection>
-          <Card className="mb-8 shadow-md rounded-2xl p-6 bg-white border-0">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg md:text-xl font-bold text-gray-800">
-                إحصائيات التفاعل
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {stats.engagement?.map((stat: any, index: number) => {
-                const IconComponent = stat.icon;
-                return (
-                  <div
-                    key={index}
-                    className="p-4 bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <div className={`p-2 rounded-lg bg-${stat.color}-100`}>
-                        <IconComponent
-                          className={`w-6 h-6 text-${stat.color}-600`}
-                          aria-hidden="true"
-                        />
-                      </div>
-                      {stat.alert && (
-                        <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">
-                          {stat.alert}
-                        </span>
-                      )}
+        <Card className="mb-8 shadow-md rounded-2xl p-6 bg-white border-0">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg md:text-xl font-bold text-gray-800">
+              إحصائيات التفاعل
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {stats?.engagement?.map((stat: any, index: number) => {
+              const IconComponent = stat.icon;
+              return (
+                <div
+                  key={index}
+                  className="p-4 bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className={`p-2 rounded-lg bg-${stat.color}-100`}>
+                      <IconComponent
+                        className={`w-6 h-6 text-${stat.color}-600`}
+                        aria-hidden="true"
+                      />
                     </div>
-                    <div className="mb-2">
-                      <p className="text-sm text-gray-600 font-medium">
-                        {stat.title}
-                      </p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {stat.value}
-                      </p>
-                    </div>
+                    {stat.alert && (
+                      <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">
+                        {stat.alert}
+                      </span>
+                    )}
                   </div>
-                );
-              })}
-            </div>
-          </Card>
-        </AccessibleSection>
+                  <div className="mb-2">
+                    <p className="text-sm text-gray-600 font-medium">
+                      {stat.title}
+                    </p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {stat.value}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
 
         {/* Charts & Activities */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Simple Chart */}
-          <AccessibleSection>
-            <Card className="mb-8 shadow-md rounded-2xl p-6 bg-white border-0">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg md:text-xl font-bold text-gray-800">
-                  نشاط التبرعات
-                </h2>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  icon={Download}
-                  onClick={() =>
-                    handleUnavailable('سيتم إضافة تصدير البيانات قريبًا')
-                  }
-                >
-                  تصدير
-                </Button>
-              </div>
-              <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-                <div className="text-center">
-                  <BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">
-                    سيتم إضافة الرسوم البيانية التفاعلية قريبًا
-                  </p>
-                </div>
-              </div>
-            </Card>
-          </AccessibleSection>
-
-          {/* Recent Activities */}
-          <AccessibleSection>
-            <Card className="mb-8 shadow-md rounded-2xl p-6 bg-white border-0">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg md:text-xl font-bold text-gray-800">
-                  الأنشطة الحديثة
-                </h2>
-                <Link
-                  to="/dashboard/activities"
-                  className="text-sm text-primary-600 hover:text-primary-700 font-medium"
-                >
-                  عرض الكل
-                </Link>
-              </div>
-              <div className="space-y-4">
-                {recentActivities.slice(0, 5).map((activity: any) => {
-                  const StatusIcon = getStatusIcon(activity.status);
-                  return (
-                    <div
-                      key={activity.id}
-                      className={`p-4 rounded-lg border-l-4 ${getPriorityColor(
-                        activity.priority
-                      )} bg-gray-50 hover:bg-gray-100 transition-colors`}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-3 flex-1">
-                          <div className="flex-shrink-0">
-                            <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
-                              {getActivityIcon(activity.type)}
-                            </div>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 mb-1">
-                              {activity.message}
-                            </p>
-                            <div className="flex items-center gap-4 text-xs text-gray-500">
-                              <span>{activity.date}</span>
-                              {activity.user && (
-                                <span className="font-medium">
-                                  {activity.user}
-                                </span>
-                              )}
-                              {activity.details && (
-                                <span className="text-gray-400">
-                                  {activity.details}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                              activity.status
-                            )}`}
-                          >
-                            <StatusIcon className="w-3 h-3" />
-                            {activity.status === 'completed'
-                              ? 'مكتمل'
-                              : activity.status === 'pending'
-                              ? 'قيد الانتظار'
-                              : 'تحذير'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </Card>
-          </AccessibleSection>
-        </div>
-
-        {/* Quick Tasks */}
-        <AccessibleSection>
           <Card className="mb-8 shadow-md rounded-2xl p-6 bg-white border-0">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg md:text-xl font-bold text-gray-800">
-                المهام السريعة
+                نشاط التبرعات
               </h2>
               <Button
                 variant="ghost"
                 size="sm"
-                icon={Settings}
+                icon={Download}
                 onClick={() =>
-                  handleUnavailable('سيتم إضافة إعدادات المهام قريبًا')
+                  handleUnavailable('سيتم إضافة تصدير البيانات قريبًا')
                 }
               >
-                إعدادات
+                تصدير
               </Button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
-                    <Bell className="w-4 h-4 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-blue-900">
-                    مراجعة الرسائل
-                  </h3>
-                </div>
-                <p className="text-sm text-blue-700 mb-3">
-                  لديك 3 رسائل جديدة تحتاج إلى مراجعة
+            <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+              <div className="text-center">
+                <BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">
+                  سيتم إضافة الرسوم البيانية التفاعلية قريبًا
                 </p>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-blue-600 border-blue-300 hover:bg-blue-50"
-                  as="a"
-                  href="/dashboard/contact-forms"
-                >
-                  عرض الرسائل
-                </Button>
-              </div>
-
-              <div className="p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
-                    <Calendar className="w-4 h-4 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-green-900">
-                    فعاليات قادمة
-                  </h3>
-                </div>
-                <p className="text-sm text-green-700 mb-3">
-                  لديك 2 فعالية قادمة الأسبوع القادم
-                </p>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-green-600 border-green-300 hover:bg-green-50"
-                >
-                  عرض الفعاليات
-                </Button>
-              </div>
-
-              <div className="p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg border border-yellow-200">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center">
-                    <DollarSign className="w-4 h-4 text-white" />
-                  </div>
-                  <h3 className="font-semibold text-yellow-900">التبرعات</h3>
-                </div>
-                <p className="text-sm text-yellow-700 mb-3">
-                  إجمالي التبرعات هذا الشهر: $2,500
-                </p>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="text-yellow-600 border-yellow-300 hover:bg-yellow-50"
-                >
-                  عرض التبرعات
-                </Button>
               </div>
             </div>
           </Card>
-        </AccessibleSection>
+
+          {/* Recent Activities */}
+          <Card className="mb-8 shadow-md rounded-2xl p-6 bg-white border-0">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg md:text-xl font-bold text-gray-800">
+                الأنشطة الحديثة
+              </h2>
+              <Link
+                to="/dashboard/activities"
+                className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+              >
+                عرض الكل
+              </Link>
+            </div>
+            <div className="space-y-4">
+              {recentActivities?.slice(0, 5).map((activity: any) => {
+                const StatusIcon = getStatusIcon(activity.status);
+                return (
+                  <div
+                    key={activity.id}
+                    className={`p-4 rounded-lg border-l-4 ${getPriorityColor(
+                      activity.priority
+                    )} bg-gray-50 hover:bg-gray-100 transition-colors`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3 flex-1">
+                        <div className="flex-shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center">
+                            {getActivityIcon(activity.type)}
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 mb-1">
+                            {activity.message}
+                          </p>
+                          <div className="flex items-center gap-4 text-xs text-gray-500">
+                            <span>{activity.date}</span>
+                            {activity.user && (
+                              <span className="font-medium">
+                                {activity.user}
+                              </span>
+                            )}
+                            {activity.details && (
+                              <span className="text-gray-400">
+                                {activity.details}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                            activity.status
+                          )}`}
+                        >
+                          <StatusIcon className="w-3 h-3" />
+                          {activity.status === 'completed'
+                            ? 'مكتمل'
+                            : activity.status === 'pending'
+                            ? 'قيد الانتظار'
+                            : 'تحذير'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        </div>
+
+        {/* Quick Tasks */}
+        <Card className="mb-8 shadow-md rounded-2xl p-6 bg-white border-0">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg md:text-xl font-bold text-gray-800">
+              المهام السريعة
+            </h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              icon={Settings}
+              onClick={() =>
+                handleUnavailable('سيتم إضافة إعدادات المهام قريبًا')
+              }
+            >
+              إعدادات
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                  <Bell className="w-4 h-4 text-white" />
+                </div>
+                <h3 className="font-semibold text-blue-900">مراجعة الرسائل</h3>
+              </div>
+              <p className="text-sm text-blue-700 mb-3">
+                لديك 3 رسائل جديدة تحتاج إلى مراجعة
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-blue-600 border-blue-300 hover:bg-blue-50"
+                as="a"
+                href="/dashboard/contact-forms"
+              >
+                عرض الرسائل
+              </Button>
+            </div>
+
+            <div className="p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                  <Calendar className="w-4 h-4 text-white" />
+                </div>
+                <h3 className="font-semibold text-green-900">فعاليات قادمة</h3>
+              </div>
+              <p className="text-sm text-green-700 mb-3">
+                لديك 2 فعالية قادمة الأسبوع القادم
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-green-600 border-green-300 hover:bg-green-50"
+              >
+                عرض الفعاليات
+              </Button>
+            </div>
+
+            <div className="p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg border border-yellow-200">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center">
+                  <DollarSign className="w-4 h-4 text-white" />
+                </div>
+                <h3 className="font-semibold text-yellow-900">التبرعات</h3>
+              </div>
+              <p className="text-sm text-yellow-700 mb-3">
+                إجمالي التبرعات هذا الشهر: $2,500
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-yellow-600 border-yellow-300 hover:bg-yellow-50"
+              >
+                عرض التبرعات
+              </Button>
+            </div>
+          </div>
+        </Card>
 
         {/* Modal */}
         <Modal

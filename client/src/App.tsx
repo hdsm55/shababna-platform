@@ -5,9 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useLanguageStore } from './store/languageStore';
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
-import ErrorBoundary from './components/common/ErrorBoundary';
-import ScrollToTop from './components/common/ScrollToTop';
-import { ToastProvider } from './components/common/Toast';
+// تم حذف ErrorBoundary وScrollToTop وToastProvider
 
 // Pages
 import Home from './pages/Home';
@@ -27,6 +25,7 @@ import NewProgram from './pages/dashboard/programs/NewProgram';
 import NewUser from './pages/dashboard/users/NewUser';
 import ContactForms from './pages/dashboard/ContactForms';
 import RegistrantsDashboard from './pages/dashboard/Registrants';
+import Blog from './pages/Blog';
 
 function App() {
   const { i18n } = useTranslation();
@@ -40,60 +39,56 @@ function App() {
 
   return (
     <HelmetProvider>
-      <ErrorBoundary>
-        <ToastProvider>
-          <Router>
-            <ScrollToTop />
-            <Routes>
-              {/* Auth Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+      <Router>
+        <Routes>
+          {/* Auth Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/blog" element={<Blog />} />
 
-              {/* Dashboard Routes */}
-              <Route
-                path="/dashboard/*"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <Routes>
-                      <Route path="" element={<DashboardOverview />} />
-                      <Route path="programs" element={<ProgramsDashboard />} />
-                      <Route path="events" element={<EventsDashboard />} />
-                      <Route path="contact-forms" element={<ContactForms />} />
-                      <Route
-                        path="registrants"
-                        element={<RegistrantsDashboard />}
-                      />
-                      {/* صفحات الإجراءات السريعة */}
-                      <Route path="events/new" element={<NewEvent />} />
-                      <Route path="programs/new" element={<NewProgram />} />
-                      <Route path="users/new" element={<NewUser />} />
-                      {/* يمكن إضافة فروع أخرى هنا لاحقًا */}
-                    </Routes>
-                  </ProtectedRoute>
-                }
-              />
+          {/* Dashboard Routes */}
+          <Route
+            path="/dashboard/*"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <Routes>
+                  <Route path="" element={<DashboardOverview />} />
+                  <Route path="programs" element={<ProgramsDashboard />} />
+                  <Route path="events" element={<EventsDashboard />} />
+                  <Route path="contact-forms" element={<ContactForms />} />
+                  <Route
+                    path="registrants"
+                    element={<RegistrantsDashboard />}
+                  />
+                  {/* صفحات الإجراءات السريعة */}
+                  <Route path="events/new" element={<NewEvent />} />
+                  <Route path="programs/new" element={<NewProgram />} />
+                  <Route path="users/new" element={<NewUser />} />
+                  {/* يمكن إضافة فروع أخرى هنا لاحقًا */}
+                </Routes>
+              </ProtectedRoute>
+            }
+          />
 
-              {/* Public Routes */}
-              <Route
-                path="/*"
-                element={
-                  <Layout>
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/events" element={<Events />} />
-                      <Route path="/events/:id" element={<EventDetail />} />
-                      <Route path="/programs" element={<Programs />} />
-                      <Route path="/programs/:id" element={<ProgramDetail />} />
-                      <Route path="/join-us" element={<JoinUs />} />
-                      <Route path="/contact" element={<Contact />} />
-                    </Routes>
-                  </Layout>
-                }
-              />
-            </Routes>
-          </Router>
-        </ToastProvider>
-      </ErrorBoundary>
+          {/* Public Routes */}
+          <Route
+            path="/*"
+            element={
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/events" element={<Events />} />
+                  <Route path="/events/:id" element={<EventDetail />} />
+                  <Route path="/programs" element={<Programs />} />
+                  <Route path="/programs/:id" element={<ProgramDetail />} />
+                  <Route path="/join-us" element={<JoinUs />} />
+                  <Route path="/contact" element={<Contact />} />
+                </Routes>
+              </Layout>
+            }
+          />
+        </Routes>
+      </Router>
     </HelmetProvider>
   );
 }

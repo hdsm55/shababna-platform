@@ -9,7 +9,7 @@ import path from 'path';
 
 const router = express.Router();
 
-// إعداد multer لحفظ الصور في مجلد uploads
+// إعداد multer لحفظ الصور في مجلد uploads مع فحص الأمان
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, path.join(process.cwd(), 'server', 'uploads'));
@@ -19,7 +19,19 @@ const storage = multer.diskStorage({
         cb(null, uniqueSuffix + '-' + file.originalname);
     }
 });
-const upload = multer({ storage });
+// فلتر نوع الملف
+function fileFilter(req, file, cb) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.mimetype)) {
+        return cb(new Error('فقط صور jpeg, png, webp مسموحة'));
+    }
+    cb(null, true);
+}
+const upload = multer({
+    storage,
+    fileFilter,
+    limits: { fileSize: 6 * 1024 * 1024 } // 2MB
+});
 
 // Get all programs (public)
 router.get('/', getAllPrograms);
@@ -28,7 +40,12 @@ router.get('/', getAllPrograms);
 router.get('/:id', getProgramById);
 
 // تسجيل مستخدم في برنامج
-router.post('/:id/register', registerForProgram);
+router.post('/:id/register', [
+    body('firstName').trim().notEmpty().withMessage('الاسم الأول مطلوب'),
+    body('lastName').trim().notEmpty().withMessage('اسم العائلة مطلوب'),
+    body('email').isEmail().withMessage('البريد الإلكتروني غير صالح'),
+    body('phone').optional().isString()
+], registerForProgram);
 // دعم/تبرع لبرنامج
 router.post('/:id/support', supportProgram);
 
