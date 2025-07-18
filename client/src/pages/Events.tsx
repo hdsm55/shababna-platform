@@ -248,15 +248,13 @@ const Events: React.FC = () => {
             <div className="text-center py-12">
               <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
                 <p className="text-red-800 font-medium mb-2">
-                  {t('common.error.title')}
+                  حدث خطأ أثناء تحميل الفعاليات
                 </p>
                 <p className="text-red-600 text-sm mb-4">
-                  {error instanceof Error
-                    ? error.message
-                    : t('common.error.message')}
+                  يرجى المحاولة مرة أخرى أو التحقق من اتصالك بالإنترنت.
                 </p>
                 <Button onClick={() => refetch()} variant="outline" size="sm">
-                  {t('common.retry')}
+                  إعادة المحاولة
                 </Button>
               </div>
             </div>
@@ -281,10 +279,11 @@ const Events: React.FC = () => {
                       <div className="aspect-w-16 aspect-h-9">
                         <img
                           src={
-                            event.image ||
+                            event.image_url ||
                             'https://images.pexels.com/photos/1181622/pexels-photo-1181622.jpeg'
                           }
                           alt={event.title}
+                          loading="lazy"
                           className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
                         />
                       </div>
@@ -323,14 +322,24 @@ const Events: React.FC = () => {
                         </p>
                         <div className="space-y-2 mb-6">
                           <div className="flex items-center text-sm text-gray-500">
-                            <Calendar className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
-                            {event.start_date &&
-                            !isNaN(new Date(event.start_date).getTime())
-                              ? format(
-                                  new Date(event.start_date),
-                                  'MMM dd, yyyy'
-                                )
-                              : ''}
+                            <Clock className="w-4 h-4 text-primary-500" />
+                            <span>
+                              {event.start_date
+                                ? new Date(
+                                    event.start_date
+                                  ).toLocaleDateString()
+                                : ''}
+                            </span>
+                            {event.end_date && (
+                              <>
+                                <span className="mx-1">-</span>
+                                <span>
+                                  {new Date(
+                                    event.end_date
+                                  ).toLocaleDateString()}
+                                </span>
+                              </>
+                            )}
                           </div>
                           {(event.start_date || event.end_date) && (
                             <div className="flex items-center text-sm text-gray-500">
@@ -344,10 +353,12 @@ const Events: React.FC = () => {
                                 : ''}
                             </div>
                           )}
-                          <div className="flex items-center text-sm text-gray-500">
-                            <MapPin className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
-                            {event.location}
-                          </div>
+                          {event.location && (
+                            <div className="flex items-center gap-2 mb-2">
+                              <MapPin className="w-4 h-4 text-primary-500" />
+                              <span>{event.location}</span>
+                            </div>
+                          )}
                           {typeof event.max_attendees === 'number' && (
                             <div className="flex items-center text-sm text-gray-500">
                               <Users className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
@@ -413,11 +424,8 @@ const Events: React.FC = () => {
                   </svg>
                   <p className="text-gray-500 text-lg">
                     {searchTerm || selectedFilter !== 'all'
-                      ? t(
-                          'events.emptySearch',
-                          'لا توجد فعاليات مطابقة للبحث أو الفلتر.'
-                        )
-                      : t('events.empty', 'لا توجد فعاليات متاحة حالياً.')}
+                      ? 'لا توجد فعاليات مطابقة للبحث أو الفلتر.'
+                      : 'لا توجد فعاليات متاحة حالياً.'}
                   </p>
                 </div>
               )}

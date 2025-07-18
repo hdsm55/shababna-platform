@@ -9,7 +9,6 @@ import {
   fetchUsers,
   fetchEventRegistrations,
   fetchProgramRegistrations,
-  fetchDonations,
   fetchJoinRequests,
 } from '../../services/dashboardApi';
 import { User } from '../../types';
@@ -82,19 +81,6 @@ const RegistrantsDashboard: React.FC = () => {
             registeredAt: r.created_at || r.registered_at || '',
           })
         );
-        // جلب التبرعات
-        const donationsRes = await fetchDonations();
-        const donations: Registrant[] = (donationsRes?.data?.items || []).map(
-          (d: any) => ({
-            id: `donation-${d.id}`,
-            name: d.donorName || '-',
-            email: d.donorEmail || '-',
-            phone: d.donorPhone || '-',
-            source: 'تبرع',
-            sourceDetails: `${d.amount} ${d.currency || ''}`,
-            registeredAt: d.date || d.created_at || '',
-          })
-        );
         // جلب طلبات الانضمام
         const joinRes = await fetchJoinRequests();
         const joins: Registrant[] = (joinRes?.data?.items || []).map(
@@ -109,13 +95,7 @@ const RegistrantsDashboard: React.FC = () => {
           })
         );
         // دمج كل المسجلين
-        setRegistrants([
-          ...users,
-          ...events,
-          ...programs,
-          ...donations,
-          ...joins,
-        ]);
+        setRegistrants([...users, ...events, ...programs, ...joins]);
       } catch (err: any) {
         setError('حدث خطأ أثناء جلب بيانات المسجلين');
       } finally {

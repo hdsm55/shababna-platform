@@ -15,7 +15,6 @@ import Events from './pages/Events';
 import EventDetail from './pages/EventDetail';
 import Programs from './pages/Programs';
 import ProgramDetail from './pages/ProgramDetail';
-import Donations from './pages/Donations';
 import JoinUs from './pages/JoinUs';
 import Contact from './pages/Contact';
 import Login from './pages/auth/Login';
@@ -25,9 +24,7 @@ import ProgramsDashboard from './pages/dashboard/Programs';
 import EventsDashboard from './pages/dashboard/Events';
 import NewEvent from './pages/dashboard/events/NewEvent';
 import NewProgram from './pages/dashboard/programs/NewProgram';
-import NewDonation from './pages/dashboard/donations/NewDonation';
 import NewUser from './pages/dashboard/users/NewUser';
-import DonationsDashboard from './pages/dashboard/Donations';
 import ContactForms from './pages/dashboard/ContactForms';
 import RegistrantsDashboard from './pages/dashboard/Registrants';
 
@@ -61,10 +58,6 @@ function App() {
                       <Route path="" element={<DashboardOverview />} />
                       <Route path="programs" element={<ProgramsDashboard />} />
                       <Route path="events" element={<EventsDashboard />} />
-                      <Route
-                        path="donations"
-                        element={<DonationsDashboard />}
-                      />
                       <Route path="contact-forms" element={<ContactForms />} />
                       <Route
                         path="registrants"
@@ -73,7 +66,6 @@ function App() {
                       {/* صفحات الإجراءات السريعة */}
                       <Route path="events/new" element={<NewEvent />} />
                       <Route path="programs/new" element={<NewProgram />} />
-                      <Route path="donations/new" element={<NewDonation />} />
                       <Route path="users/new" element={<NewUser />} />
                       {/* يمكن إضافة فروع أخرى هنا لاحقًا */}
                     </Routes>
@@ -92,7 +84,6 @@ function App() {
                       <Route path="/events/:id" element={<EventDetail />} />
                       <Route path="/programs" element={<Programs />} />
                       <Route path="/programs/:id" element={<ProgramDetail />} />
-                      <Route path="/donations" element={<Donations />} />
                       <Route path="/join-us" element={<JoinUs />} />
                       <Route path="/contact" element={<Contact />} />
                     </Routes>

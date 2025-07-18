@@ -1,6 +1,6 @@
 import express from 'express';
 import { query } from '../config/database.js';
-import { getDashboardStats, getDashboardActivities, deleteDashboardEvent, deleteDashboardProgram, deleteDashboardUser, deleteDashboardDonation } from '../controllers/dashboardController.js';
+import { getDashboardStats, getDashboardActivities, deleteDashboardEvent, deleteDashboardProgram, deleteDashboardUser } from '../controllers/dashboardController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import { adminMiddleware } from '../middleware/adminMiddleware.js';
 
@@ -20,8 +20,5 @@ router.delete('/programs/:id', authMiddleware, adminMiddleware, deleteDashboardP
 
 // Delete user (admin only)
 router.delete('/users/:id', authMiddleware, adminMiddleware, deleteDashboardUser);
-
-// Delete donation (admin only)
-router.delete('/donations/:id', authMiddleware, adminMiddleware, deleteDashboardDonation);
 
 export default router;

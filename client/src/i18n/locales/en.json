@@ -108,35 +108,9 @@
       "volunteering": "Volunteering"
     },
     "support": "Support This Program",
-    "donate": "Donate",
     "sponsor": "Become a Sponsor",
+    "volunteer": "Volunteer",
     "notFound": "Sorry, this program could not be found."
-  },
-  "donations": {
-    "title": "Make a Donation",
-    "subtitle": "Your generous contribution helps us create lasting positive change",
-    "form": {
-      "firstName": "First Name",
-      "lastName": "Last Name",
-      "email": "Email Address",
-      "phone": "Phone Number",
-      "amount": "Donation Amount",
-      "program": "Program (Optional)",
-      "message": "Message (Optional)",
-      "anonymous": "Make this donation anonymous",
-      "submit": "Donate Now"
-    },
-    "options": {
-      "title": "Choose Your Impact",
-      "subtitle": "Select a donation amount that matches your desired impact level"
-    },
-    "impact": {
-      "title": "How Your Donation Helps",
-      "education": "Education",
-      "community": "Community Development",
-      "emergency": "Emergency Relief",
-      "admin": "Administrative"
-    }
   },
   "joinUs": {
     "title": "Join Our Community",
@@ -198,8 +172,7 @@
     "stats": {
       "events": "Total Events",
       "programs": "Active Programs",
-      "members": "Community Members",
-      "donations": "Total Donations"
+      "members": "Community Members"
     },
     "menu": {
       "overview": "Overview",

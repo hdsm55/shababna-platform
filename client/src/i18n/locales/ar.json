@@ -99,18 +99,20 @@
   },
   "programs": {
     "title": "برامجنا",
-    "subtitle": "برامج شاملة مصممة لتطوير الجيل القادم من القادة",
+    "subtitle": "برامج شاملة لتطوير الجيل القادم من القادة",
     "filter": {
-      "all": "جميع البرامج",
-      "education": "التعليم",
-      "technology": "التكنولوجيا",
-      "entrepreneurship": "ريادة الأعمال",
-      "volunteering": "التطوع"
+      "all": "كل البرامج",
+      "education": "تعليم",
+      "technology": "تقنية",
+      "entrepreneurship": "ريادة أعمال",
+      "volunteering": "تطوع"
     },
     "support": "ادعم هذا البرنامج",
-    "donate": "تبرع",
-    "sponsor": "كن راعياً",
-    "notFound": "عذراً، لم يتم العثور على هذا البرنامج."
+    "sponsor": "شراكة",
+    "volunteer": "تطوع",
+    "notFound": "عذراً، لم يتم العثور على هذا البرنامج.",
+    "donationSuccess": "تم الدعم بنجاح!",
+    "donationError": "حدث خطأ أثناء الدعم. حاول مرة أخرى."
   },
   "joinUs": {
     "title": "انضم لمجتمعنا",

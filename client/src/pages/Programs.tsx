@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SEO from '../components/common/SEO';
 import {
@@ -31,6 +31,7 @@ const Programs: React.FC = () => {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate();
 
   const filters = [
     { key: 'all', label: t('programs.filter.all') },
@@ -323,16 +324,18 @@ const Programs: React.FC = () => {
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-3">
-                          <Link to={`/programs/${program.id}`}>
-                            <Button
-                              size="sm"
-                              icon={ArrowRight}
-                              iconPosition="right"
-                              className="flex-1 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-                            >
-                              {t('programs.support')}
-                            </Button>
-                          </Link>
+                          <Button
+                            size="sm"
+                            icon={ArrowRight}
+                            iconPosition="right"
+                            className="flex-1 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                            onClick={() => {
+                              // فتح مودال دعم البرنامج أو الانتقال لصفحة التفاصيل
+                              navigate(`/programs/${program.id}`);
+                            }}
+                          >
+                            {t('programs.support')}
+                          </Button>
                           <Button
                             variant="outline"
                             size="sm"

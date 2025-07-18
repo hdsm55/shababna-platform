@@ -51,7 +51,6 @@ interface AnalyticsData {
     totalUsers: number;
     totalEvents: number;
     totalPrograms: number;
-    totalDonations: number;
     growthRate: number;
     activeUsers: number;
     newUsers: number;
@@ -101,7 +100,6 @@ const AnalyticsDashboard: React.FC = () => {
       totalUsers: 1250,
       totalEvents: 45,
       totalPrograms: 12,
-      totalDonations: 75000,
       growthRate: 15.5,
       activeUsers: 890,
       newUsers: 125,

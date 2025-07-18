@@ -19,7 +19,8 @@ import authRoutes from './routes/auth.js';
 import eventsRoutes from './routes/events.js';
 import programsRoutes from './routes/programs.js';
 import usersRoutes from './routes/users.js';
-import donationsRoutes from './routes/donations.js';
+// إزالة أو تعطيل استيراد donations.js
+// import donationsRoutes from './routes/donations.js';
 import formsRoutes from './routes/forms.js';
 import dashboardRoutes from './routes/dashboard.js';
 import errorHandler from './middleware/errorHandler.js';
@@ -57,7 +58,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/programs', programsRoutes);
 app.use('/api/users', usersRoutes);
-app.use('/api/donations', donationsRoutes);
+// إزالة أو تعطيل استيراد donations.js
+// app.use('/api/donations', donationsRoutes);
 app.use('/api/forms', formsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 

@@ -24,17 +24,17 @@ export const fetchProgramById = async (id: number | string): Promise<Program> =>
   return response.data.data;
 };
 
-// Make a donation to a program
-export const donateToProgram = async (programId: number, amount: number): Promise<{ success: boolean; message: string }> => {
-  const response = await http.post(`/programs/${programId}/donate`, { amount });
+// دعم برنامج (مالي أو تطوعي أو شراكة)
+export const supportProgram = async (programId: number, data: any): Promise<{ success: boolean; message: string }> => {
+  const response = await http.post(`/programs/${programId}/support`, data);
   return response.data;
 };
 
-// Get user's donations
-export const fetchUserDonations = async (): Promise<any[]> => {
-  const response = await http.get('/donations/my-donations');
-  return response.data.data;
-};
+// حذف دالة جلب تبرعات المستخدم العامة
+// export const fetchUserDonations = async (): Promise<any[]> => {
+//   const response = await http.get('/donations/my-donations');
+//   return response.data.data;
+// };
 
 // Create a new program (admin only) - supports FormData for image upload
 export const createProgram = async (programData: Partial<Program> | FormData): Promise<Program> => {

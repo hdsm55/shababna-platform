@@ -19,10 +19,10 @@ export const fetchUsers = async () => {
 };
 
 // جلب قائمة التبرعات
-export const fetchDonations = async () => {
-  const { data } = await api.get('/donations');
-  return data;
-};
+// export const fetchDonations = async () => {
+//   const { data } = await api.get('/donations');
+//   return data;
+// };
 
 // جلب بيانات التحليلات
 export const fetchAnalytics = async () => {
@@ -57,18 +57,6 @@ export const deleteProgram = async (id: string) => {
 // حذف مستخدم
 export const deleteUser = async (id: string) => {
   const { data } = await api.delete(`/dashboard/users/${id}`);
-  return data;
-};
-
-// حذف تبرع
-export const deleteDonation = async (id: string) => {
-  const { data } = await api.delete(`/dashboard/donations/${id}`);
-  return data;
-};
-
-// إضافة تبرع جديد
-export const createDonation = async (donationData: any) => {
-  const { data } = await api.post('/dashboard/donations', donationData);
   return data;
 };
 

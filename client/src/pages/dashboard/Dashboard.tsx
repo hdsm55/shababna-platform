@@ -116,18 +116,6 @@ const DashboardOverview: React.FC = () => {
           total: 156,
         },
       },
-      {
-        title: 'إجمالي التبرعات',
-        value: '$12,450',
-        change: '+15%',
-        changeType: 'increase',
-        icon: DollarSign,
-        color: 'warning',
-        details: {
-          monthly: 2500,
-          total: 12450,
-        },
-      },
     ],
     engagement: [
       {

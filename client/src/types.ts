@@ -6,8 +6,8 @@ export interface Event {
   start_date: string;
   end_date: string;
   location: string;
-  category: 'conference' | 'workshop' | 'networking';
-  image?: string;
+  category: string; // دعم جميع الفئات
+  image_url?: string; // تحديث الحقل ليكون مطابقاً لقاعدة البيانات
   max_attendees?: number;
   attendees: number;
   status: 'upcoming' | 'active' | 'completed' | 'cancelled';

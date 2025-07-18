@@ -28,7 +28,7 @@ import Card from '../components/common/Card';
 import Input from '../components/common/Input';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import { fetchProgramById, registerForProgram } from '../services/programsApi';
+import { fetchProgramById, supportProgram } from '../services/programsApi';
 import { Program } from '../types';
 import {
   AccessibleSection,
@@ -40,16 +40,19 @@ import {
 const ProgramDetail: React.FC = () => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
-  const [donationForm, setDonationForm] = useState({
+  // إزالة أي متغيرات أو دوال تخص التبرع العام
+  // توحيد النموذج ليشمل دعم مالي أو تطوعي أو شراكة
+  const [supportForm, setSupportForm] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
     amount: '',
     message: '',
+    supportType: 'donation', // 'donation' | 'volunteer' | 'partnership'
   });
-  const [isDonating, setIsDonating] = useState(false);
-  const [donationStatus, setDonationStatus] = useState<
+  const [isSupporting, setIsSupporting] = useState(false);
+  const [supportStatus, setSupportStatus] = useState<
     'idle' | 'success' | 'error'
   >('idle');
 
@@ -72,31 +75,34 @@ const ProgramDetail: React.FC = () => {
     console.log('isLoading:', isLoading, 'isError:', isError, 'error:', error);
   }, [program, isLoading, isError, error]);
 
-  const handleRegistration = async (e: React.FormEvent) => {
+  // إزالة أي متغيرات أو دوال تخص التبرع العام
+  // توحيد النموذج ليشمل دعم مالي أو تطوعي أو شراكة
+  const handleSupport = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsDonating(true);
-    setDonationStatus('idle');
-
+    setIsSupporting(true);
+    setSupportStatus('idle');
     try {
       if (!id) throw new Error('No program ID');
-      const res = await registerForProgram(id, donationForm);
+      // استدعاء API لدعم البرنامج حسب النوع
+      const res = await supportProgram(Number(id), supportForm);
       if (res.success) {
-        setDonationStatus('success');
-        setDonationForm({
+        setSupportStatus('success');
+        setSupportForm({
           firstName: '',
           lastName: '',
           email: '',
           phone: '',
           amount: '',
           message: '',
+          supportType: 'donation',
         });
       } else {
-        setDonationStatus('error');
+        setSupportStatus('error');
       }
     } catch (err) {
-      setDonationStatus('error');
+      setSupportStatus('error');
     } finally {
-      setIsDonating(false);
+      setIsSupporting(false);
     }
   };
 
@@ -494,10 +500,10 @@ const ProgramDetail: React.FC = () => {
                     </div>
                   </div>
 
-                  {donationStatus === 'success' && (
+                  {supportStatus === 'success' && (
                     <Alert
                       type="success"
-                      title="Donation successful!"
+                      title="Support successful!"
                       className="mb-6"
                     >
                       Thank you for your generous support! We'll send you a
@@ -505,24 +511,21 @@ const ProgramDetail: React.FC = () => {
                     </Alert>
                   )}
 
-                  {donationStatus === 'error' && (
-                    <Alert
-                      type="error"
-                      title="Donation failed"
-                      className="mb-6"
-                    >
-                      There was an error processing your donation. Please try
+                  {supportStatus === 'error' && (
+                    <Alert type="error" title="Support failed" className="mb-6">
+                      There was an error processing your support. Please try
                       again.
                     </Alert>
                   )}
 
-                  <form onSubmit={handleRegistration} className="space-y-4">
+                  <form onSubmit={handleSupport} className="space-y-4">
+                    {/* حقول الاسم والبريد والهاتف */}
                     <Input
                       label="First Name"
-                      value={donationForm.firstName}
+                      value={supportForm.firstName}
                       onChange={(e) =>
-                        setDonationForm({
-                          ...donationForm,
+                        setSupportForm({
+                          ...supportForm,
                           firstName: e.target.value,
                         })
                       }
@@ -531,10 +534,10 @@ const ProgramDetail: React.FC = () => {
                     />
                     <Input
                       label="Last Name"
-                      value={donationForm.lastName}
+                      value={supportForm.lastName}
                       onChange={(e) =>
-                        setDonationForm({
-                          ...donationForm,
+                        setSupportForm({
+                          ...supportForm,
                           lastName: e.target.value,
                         })
                       }
@@ -544,10 +547,10 @@ const ProgramDetail: React.FC = () => {
                     <Input
                       label="Email"
                       type="email"
-                      value={donationForm.email}
+                      value={supportForm.email}
                       onChange={(e) =>
-                        setDonationForm({
-                          ...donationForm,
+                        setSupportForm({
+                          ...supportForm,
                           email: e.target.value,
                         })
                       }
@@ -557,50 +560,66 @@ const ProgramDetail: React.FC = () => {
                     <Input
                       label="Phone"
                       type="tel"
-                      value={donationForm.phone}
+                      value={supportForm.phone}
                       onChange={(e) =>
-                        setDonationForm({
-                          ...donationForm,
+                        setSupportForm({
+                          ...supportForm,
                           phone: e.target.value,
                         })
                       }
                       icon={Phone}
                     />
+                    {/* إذا كان دعم مالي أظهر حقل المبلغ */}
+                    {supportForm.supportType === 'donation' && (
+                      <Input
+                        label="المبلغ (ريال)"
+                        type="number"
+                        value={supportForm.amount}
+                        onChange={(e) =>
+                          setSupportForm({
+                            ...supportForm,
+                            amount: e.target.value,
+                          })
+                        }
+                        required
+                        min="1"
+                        step="1"
+                      />
+                    )}
+                    {/* رسالة اختيارية */}
                     <Input
-                      label="Donation Amount ($)"
-                      type="number"
-                      value={donationForm.amount}
+                      label="رسالة (اختياري)"
+                      value={supportForm.message}
                       onChange={(e) =>
-                        setDonationForm({
-                          ...donationForm,
-                          amount: e.target.value,
-                        })
-                      }
-                      required
-                      icon={DollarSign}
-                      min="1"
-                      step="1"
-                    />
-                    <Input
-                      label="Message (Optional)"
-                      value={donationForm.message}
-                      onChange={(e) =>
-                        setDonationForm({
-                          ...donationForm,
+                        setSupportForm({
+                          ...supportForm,
                           message: e.target.value,
                         })
                       }
                       icon={Heart}
                     />
-
+                    <select
+                      value={supportForm.supportType}
+                      onChange={(e) =>
+                        setSupportForm({
+                          ...supportForm,
+                          supportType: e.target.value,
+                        })
+                      }
+                      required
+                    >
+                      <option value="donation">دعم مالي</option>
+                      <option value="volunteer">تطوع</option>
+                      <option value="partnership">شراكة</option>
+                    </select>
                     <Button
                       type="submit"
                       variant="primary"
                       size="lg"
-                      loading={isDonating}
+                      loading={isSupporting}
                       fullWidth
                     >
-                      {isDonating ? 'Processing...' : 'Donate Now'}
+                      {isSupporting ? 'جاري المعالجة...' : 'ادعم البرنامج'}
                     </Button>
                   </form>
                 </Card>
@@ -681,12 +700,12 @@ const ProgramDetail: React.FC = () => {
       </AccessibleSection>
 
       {/* Toast for donation status */}
-      {donationStatus === 'success' && (
+      {supportStatus === 'success' && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg z-50 animate-fade-in">
           {t('programs.donationSuccess', 'تم التبرع بنجاح!')}
         </div>
       )}
-      {donationStatus === 'error' && (
+      {supportStatus === 'error' && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg z-50 animate-fade-in">
           {t('programs.donationError', 'حدث خطأ أثناء التبرع. حاول مرة أخرى.')}
         </div>

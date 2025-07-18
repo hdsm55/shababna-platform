@@ -29,12 +29,14 @@ export const getDashboardStats = async (req, res) => {
         const newUsersResult = await query('SELECT COUNT(*) as count FROM users WHERE created_at >= NOW() - INTERVAL \'30 days\'');
         const newUsers = parseInt(newUsersResult.rows[0].count) || 0;
 
-        // إحصائيات التبرعات
-        const donationsResult = await query('SELECT COALESCE(SUM(amount), 0) as total FROM donations');
-        const totalDonations = parseInt(donationsResult.rows[0].total || 0);
-
-        const monthlyDonationsResult = await query("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE donated_at >= NOW() - INTERVAL '30 days'");
-        const monthlyDonations = parseInt(monthlyDonationsResult.rows[0].total || 0);
+        // إزالة إحصائيات التبرعات
+        // const donationsResult = await query('SELECT COALESCE(SUM(amount), 0) as total FROM donations');
+        // const totalDonations = parseInt(donationsResult.rows[0].total || 0);
+        // const monthlyDonationsResult = await query("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE donated_at >= NOW() - INTERVAL '30 days'");
+        // const monthlyDonations = parseInt(monthlyDonationsResult.rows[0].total || 0);
+        // const previousMonthDonationsResult = await query("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE donated_at >= NOW() - INTERVAL '60 days' AND donated_at < NOW() - INTERVAL '30 days'");
+        // const previousMonthDonations = parseInt(previousMonthDonationsResult.rows[0].total || 0);
+        // const donationGrowth = previousMonthDonations > 0 ? ((monthlyDonations - previousMonthDonations) / previousMonthDonations * 100).toFixed(1) : monthlyDonations > 0 ? '100' : '0';
 
         // إحصائيات التسجيل في البرامج
         const programRegistrationsResult = await query('SELECT COUNT(*) as count FROM program_registrations');
@@ -60,11 +62,6 @@ export const getDashboardStats = async (req, res) => {
         const previousMonthUsers = parseInt(previousMonthUsersResult.rows[0].count) || 0;
 
         const userGrowth = previousMonthUsers > 0 ? ((newUsers - previousMonthUsers) / previousMonthUsers * 100).toFixed(1) : newUsers > 0 ? '100' : '0';
-
-        const previousMonthDonationsResult = await query("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE donated_at >= NOW() - INTERVAL '60 days' AND donated_at < NOW() - INTERVAL '30 days'");
-        const previousMonthDonations = parseInt(previousMonthDonationsResult.rows[0].total || 0);
-
-        const donationGrowth = previousMonthDonations > 0 ? ((monthlyDonations - previousMonthDonations) / previousMonthDonations * 100).toFixed(1) : monthlyDonations > 0 ? '100' : '0';
 
         return successResponse(res, {
             overview: [
@@ -100,18 +97,6 @@ export const getDashboardStats = async (req, res) => {
                     details: {
                         new: newUsers,
                         total: totalUsers
-                    }
-                },
-                {
-                    title: 'إجمالي التبرعات',
-                    value: `$${totalDonations.toLocaleString()}`,
-                    change: `+${donationGrowth}%`,
-                    changeType: donationGrowth >= 0 ? 'increase' : 'decrease',
-                    icon: 'DollarSign',
-                    color: 'warning',
-                    details: {
-                        monthly: monthlyDonations,
-                        total: totalDonations
                     }
                 }
             ],
@@ -160,7 +145,7 @@ export const getDashboardActivities = async (req, res) => {
             FROM events
             ORDER BY created_at DESC
             LIMIT 5
-        `);
+                    `);
 
         recentEvents.rows.forEach((event, index) => {
             activities.push({
@@ -182,7 +167,7 @@ export const getDashboardActivities = async (req, res) => {
             FROM programs
             ORDER BY created_at DESC
             LIMIT 5
-        `);
+                    `);
 
         recentPrograms.rows.forEach((program, index) => {
             activities.push({
@@ -198,28 +183,28 @@ export const getDashboardActivities = async (req, res) => {
             });
         });
 
-        // جلب آخر التبرعات
-        const recentDonations = await query(`
-            SELECT d.id, d.amount, CONCAT(u.first_name, ' ', u.last_name) as donor_name, d.donated_at
-            FROM donations d
-            JOIN users u ON d.user_id = u.id
-            ORDER BY d.donated_at DESC
-            LIMIT 5
-        `);
+        // إزالة جلب آخر التبرعات من الأنشطة
+        // const recentDonations = await query(`
+        //     SELECT d.id, d.amount, u.first_name || ' ' || u.last_name as donor_name, d.donated_at
+        //     FROM donations d
+        //     LEFT JOIN users u ON d.user_id = u.id
+        //     ORDER BY d.donated_at DESC
+        //     LIMIT 5
+        // `);
 
-        recentDonations.rows.forEach((donation, index) => {
-            activities.push({
-                id: `donation_${donation.id}`,
-                type: 'donation',
-                message: `تم استلام تبرع جديد بقيمة $${donation.amount} من ${donation.donor_name || 'مجهول'}`,
-                date: getTimeAgo(donation.donated_at),
-                status: 'completed',
-                icon: 'DollarSign',
-                priority: 'high',
-                user: donation.donor_name || 'مجهول',
-                details: `تبرع نقدي - ${donation.amount} ريال`
-            });
-        });
+        // recentDonations.rows.forEach((donation, index) => {
+        //     activities.push({
+        //         id: `donation_${donation.id}`,
+        //         type: 'donation',
+        //         message: `تم استلام تبرع جديد بقيمة $${donation.amount} من ${donation.donor_name || 'مجهول'}`,
+        //         date: getTimeAgo(donation.donated_at),
+        //         status: 'completed',
+        //         icon: 'DollarSign',
+        //         priority: 'high',
+        //         user: donation.donor_name || 'مجهول',
+        //         details: `تبرع نقدي - ${donation.amount} ريال`
+        //     });
+        // });
 
         // جلب آخر المستخدمين المسجلين
         const recentUsers = await query(`
@@ -392,20 +377,5 @@ export const deleteDashboardUser = async (req, res) => {
     } catch (error) {
         console.error('Delete user error:', error);
         return errorResponse(res, 'خطأ في حذف المستخدم', 500, error);
-    }
-};
-
-// Delete donation (admin only)
-export const deleteDashboardDonation = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const result = await query('DELETE FROM donations WHERE id = $1 RETURNING *', [id]);
-        if (result.rows.length === 0) {
-            return errorResponse(res, 'التبرع غير موجود', 404);
-        }
-        return successResponse(res, result.rows[0], 'تم حذف التبرع بنجاح');
-    } catch (error) {
-        console.error('Delete donation error:', error);
-        return errorResponse(res, 'خطأ في حذف التبرع', 500, error);
     }
 };
