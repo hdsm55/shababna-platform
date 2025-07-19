@@ -25,7 +25,7 @@ export const fetchProgramById = async (id: number | string): Promise<Program> =>
 };
 
 // دعم برنامج (مالي أو تطوعي أو شراكة)
-export const supportProgram = async (programId: number, data: any): Promise<{ success: boolean; message: string }> => {
+export const supportProgram = async (programId: number | string, data: any) => {
   const response = await http.post(`/programs/${programId}/support`, data);
   return response.data;
 };

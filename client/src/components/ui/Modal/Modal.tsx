@@ -1,6 +1,6 @@
-import React from 'react';
-import { theme } from '@/theme';
-import { AnimatePresence, motion } from 'framer-motion';
+import React, { useEffect, useRef } from 'react';
+import { getCardClasses } from '../../common/DesignSystem';
+import { DESIGN_SYSTEM } from '../../common/DesignSystem';
 import { Button } from '../Button/Button';
 
 interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -8,6 +8,7 @@ interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
   onClose: () => void;
   title?: string;
   description?: string;
+  actions?: React.ReactNode;
   dir?: 'rtl' | 'ltr';
 }
 
@@ -16,99 +17,102 @@ export const Modal: React.FC<ModalProps> = ({
   onClose,
   title,
   description,
+  actions,
   dir,
   className = '',
   children,
   ...props
 }) => {
   const direction =
-    dir || (document?.documentElement?.dir as 'rtl' | 'ltr') || 'rtl';
-  const isRtl = direction === 'rtl';
+    dir ||
+    (typeof document !== 'undefined'
+      ? (document.documentElement.dir as 'rtl' | 'ltr')
+      : 'rtl');
+  const modalRef = useRef<HTMLDivElement>(null);
 
-  // Close on escape key
-  React.useEffect(() => {
+  // إغلاق عند الضغط على Escape
+  useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
+      if (e.key === 'Escape') onClose();
     };
-
-    if (open) {
-      document.addEventListener('keydown', handleEscape);
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
+    if (open) document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
   }, [open, onClose]);
 
+  // منع التمرير عند فتح المودال
+  useEffect(() => {
+    if (open) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [open]);
+
+  if (!open) return null;
+
   return (
-    <AnimatePresence>
-      {open && (
-        <div className="fixed inset-0 z-50" dir={direction}>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={onClose}
-          />
-
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ type: 'spring', duration: 0.3 }}
-            className="fixed inset-0 overflow-y-auto"
-          >
-            <div className="flex min-h-full items-center justify-center p-4">
-              <div
-                className={`
-                  relative w-full max-w-lg rounded-xl bg-white shadow-xl
-                  ${className}
-                `}
-                {...props}
-              >
-                {/* Header */}
-                {title && (
-                  <div className="flex items-center justify-between border-b border-neutral-200 px-6 py-4">
-                    <div>
-                      <h3
-                        className={`text-lg font-medium ${theme.fontFamily.arabic}`}
-                      >
-                        {title}
-                      </h3>
-                      {description && (
-                        <p
-                          className={`mt-1 text-sm text-neutral-500 ${theme.fontFamily.arabic}`}
-                        >
-                          {description}
-                        </p>
-                      )}
-                    </div>
-
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={onClose}
-                      className="text-neutral-400 hover:text-neutral-500"
-                      aria-label="Close"
-                    >
-                      ✕
-                    </Button>
-                  </div>
-                )}
-
-                {/* Content */}
-                <div className="px-6 py-4">{children}</div>
-              </div>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      dir={direction}
+    >
+      {/* الخلفية */}
+      <div
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+        aria-label="إغلاق المودال"
+      />
+      {/* المودال */}
+      <div
+        ref={modalRef}
+        className={[
+          'relative w-full max-w-lg',
+          getCardClasses('elevated'),
+          'rounded-xl shadow-xl bg-white',
+          `focus:outline-none focus:ring-2 focus:ring-[${DESIGN_SYSTEM.colors.primary}] focus:ring-offset-2`,
+          className,
+        ].join(' ')}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title ? 'modal-title' : undefined}
+        aria-describedby={description ? 'modal-desc' : undefined}
+        tabIndex={-1}
+        {...props}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* رأس المودال */}
+        {(title || description) && (
+          <div className="flex items-start justify-between border-b border-neutral-200 px-6 py-4">
+            <div>
+              {title && (
+                <h3 id="modal-title" className="text-lg font-medium">
+                  {title}
+                </h3>
+              )}
+              {description && (
+                <p id="modal-desc" className="mt-1 text-sm text-neutral-500">
+                  {description}
+                </p>
+              )}
             </div>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              className="text-neutral-400 hover:text-neutral-500"
+              aria-label="إغلاق"
+            >
+              ×
+            </Button>
+          </div>
+        )}
+        {/* محتوى المودال */}
+        <div className="px-6 py-4">{children}</div>
+        {/* أزرار الإجراءات */}
+        {actions && (
+          <div className="flex justify-end gap-2 px-6 pb-4">{actions}</div>
+        )}
+      </div>
+    </div>
   );
 };
 

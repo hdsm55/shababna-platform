@@ -98,7 +98,9 @@ const Footer: React.FC = () => {
 
           {/* Quick Links */}
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-white">Quick Links</h3>
+            <h3 className="text-lg font-semibold text-white">
+              {t('footer.quickLinks')}
+            </h3>
             <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.key}>
@@ -115,14 +117,16 @@ const Footer: React.FC = () => {
 
           {/* Contact Info */}
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-white">Contact Info</h3>
+            <h3 className="text-lg font-semibold text-white">
+              {t('footer.contactInfo')}
+            </h3>
             <div className="space-y-4">
               <div className="flex items-center space-x-3 rtl:space-x-reverse group">
                 <div className="w-8 h-8 bg-primary-600/20 rounded-lg flex items-center justify-center group-hover:bg-primary-600 transition-all duration-300">
                   <MapPin className="w-4 h-4 text-primary-400 group-hover:text-white transition-colors duration-300" />
                 </div>
                 <span className="text-neutral-300 text-sm">
-                  {t('contact.info.address')}
+                  {t('footer.address')}
                 </span>
               </div>
               <div className="flex items-center space-x-3 rtl:space-x-reverse group">
@@ -130,7 +134,7 @@ const Footer: React.FC = () => {
                   <Phone className="w-4 h-4 text-primary-400 group-hover:text-white transition-colors duration-300" />
                 </div>
                 <span className="text-neutral-300 text-sm">
-                  {t('contact.info.phone')}
+                  {t('footer.phone')}
                 </span>
               </div>
               <div className="flex items-center space-x-3 rtl:space-x-reverse group">
@@ -138,7 +142,7 @@ const Footer: React.FC = () => {
                   <Mail className="w-4 h-4 text-primary-400 group-hover:text-white transition-colors duration-300" />
                 </div>
                 <span className="text-neutral-300 text-sm">
-                  {t('contact.info.email')}
+                  {t('footer.email')}
                 </span>
               </div>
             </div>
@@ -146,19 +150,20 @@ const Footer: React.FC = () => {
 
           {/* Newsletter */}
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-white">Stay Updated</h3>
+            <h3 className="text-lg font-semibold text-white">
+              {t('footer.stayUpdated')}
+            </h3>
             <p className="text-neutral-300 text-sm">
-              Subscribe to our newsletter for the latest updates on events and
-              programs.
+              {t('home.newsletter.subtitle')}
             </p>
             <div className="space-y-3">
               <input
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t('home.newsletter.placeholder')}
                 className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-white placeholder-neutral-400 transition-all duration-300 hover:border-neutral-600"
               />
               <button className="w-full bg-primary-600 text-white px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary-700 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5">
-                Subscribe
+                {t('buttons.subscribe')}
               </button>
             </div>
           </div>
@@ -167,20 +172,20 @@ const Footer: React.FC = () => {
         <div className="border-t border-neutral-800 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-neutral-400 text-sm">
-              © 2024 Shababna Global. All rights reserved.
+              {t('footer.copyright', { year: new Date().getFullYear() })}
             </p>
             <div className="flex space-x-6 rtl:space-x-reverse mt-4 md:mt-0">
               <Link
                 to="/privacy"
                 className="text-neutral-400 hover:text-primary-400 text-sm transition-colors duration-300"
               >
-                Privacy Policy
+                {t('footer.privacyPolicy')}
               </Link>
               <Link
                 to="/terms"
                 className="text-neutral-400 hover:text-primary-400 text-sm transition-colors duration-300"
               >
-                Terms of Service
+                {t('footer.terms')}
               </Link>
             </div>
           </div>

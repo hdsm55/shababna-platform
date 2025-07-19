@@ -29,16 +29,17 @@ import ContactForms from './pages/dashboard/ContactForms';
 import RegistrantsDashboard from './pages/dashboard/Registrants';
 import EditEvent from './pages/dashboard/events/EditEvent';
 import DashboardEventDetail from './pages/dashboard/events/EventDetail';
+import NotFound from './pages/NotFound';
 
 function App() {
   const { i18n } = useTranslation();
   const { language, isRTL } = useLanguageStore();
 
+  // ضبط اتجاه الصفحة ولغة html بشكل مركزي واحترافي
   useEffect(() => {
-    i18n.changeLanguage(language);
     document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
     document.documentElement.lang = language;
-  }, [language, isRTL, i18n]);
+  }, [language, isRTL]);
 
   return (
     <HelmetProvider>
@@ -93,6 +94,7 @@ function App() {
                       <Route path="/programs/:id" element={<ProgramDetail />} />
                       <Route path="/join-us" element={<JoinUs />} />
                       <Route path="/contact" element={<Contact />} />
+                      <Route path="*" element={<NotFound />} />
                     </Routes>
                   </Layout>
                 }

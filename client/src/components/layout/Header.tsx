@@ -52,17 +52,12 @@ const Header: React.FC = () => {
             to="/"
             className="flex items-center space-x-3 rtl:space-x-reverse group"
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
-              <span className="text-white font-bold text-lg">SG</span>
-            </div>
-            <div>
-              <span className="text-xl font-bold text-neutral-900 group-hover:text-primary-600 transition-colors duration-300">
-                Shababna Global
-              </span>
-              <div className="text-xs text-neutral-500 font-medium">
-                Empowering Youth
-              </div>
-            </div>
+            <img
+              src="/images/logo.png"
+              alt="شبابنا - الشعار"
+              className="h-10 w-auto object-contain drop-shadow"
+              style={{ maxHeight: 40 }}
+            />
           </Link>
 
           {/* Desktop Navigation */}

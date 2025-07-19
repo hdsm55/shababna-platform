@@ -117,3 +117,22 @@ export const deleteProgram = async (req, res) => {
         return errorResponse(res, 'خطأ في حذف البرنامج', 500, error);
     }
 };
+
+export const supportProgram = async (req, res) => {
+    try {
+        const { id } = req.params; // program_id
+        const { supporter_name, supporter_email, phone, amount, note } = req.body;
+        if (!supporter_name || !supporter_email || !amount) {
+            return res.status(400).json({ success: false, message: 'الاسم والبريد والمبلغ مطلوبة' });
+        }
+        const result = await query(
+            `INSERT INTO program_supporters (program_id, supporter_name, supporter_email, phone, amount, note, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *`,
+            [id, supporter_name, supporter_email, phone || null, amount, note || null]
+        );
+        return res.json({ success: true, data: result.rows[0], message: 'تم تسجيل الدعم بنجاح' });
+    } catch (error) {
+        console.error('Support program error:', error);
+        return res.status(500).json({ success: false, message: 'حدث خطأ أثناء تسجيل الدعم' });
+    }
+};

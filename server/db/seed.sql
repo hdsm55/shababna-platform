@@ -49,3 +49,8 @@ INSERT INTO programs (title, description, start_date, end_date) VALUES
 
 -- Note: Users will be created through registration, not seed data
 -- The first user to register will automatically become admin
+-- إضافة بيانات تجريبية لتسجيل فعالية (بحساب وبدون حساب)
+INSERT INTO event_registrations (event_id, user_id, first_name, last_name, email, phone, created_at)
+VALUES
+  (1, 1, NULL, NULL, NULL, NULL, NOW()), -- تسجيل مستخدم مسجل
+  (2, NULL, 'أحمد', 'العلي', 'ahmad@example.com', '0500000000', NOW()); -- تسجيل بدون حساب

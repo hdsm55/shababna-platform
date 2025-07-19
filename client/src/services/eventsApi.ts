@@ -84,23 +84,9 @@ export const deleteEvent = async (id: number): Promise<ApiResponse<void>> => {
 // Register for an event
 export const registerForEvent = async (
   eventId: number | string,
-  registrationData: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone?: string;
-    organization?: string;
-  }
+  registrationData: any
 ): Promise<ApiResponse<any>> => {
-  // تحويل الحقول إلى snake_case
-  const payload = {
-    first_name: registrationData.firstName,
-    last_name: registrationData.lastName,
-    email: registrationData.email,
-    phone: registrationData.phone,
-    organization: registrationData.organization,
-  };
-  const response = await http.post(`/events/${eventId}/register`, payload);
+  const response = await http.post(`/events/${eventId}/register`, registrationData);
   return response.data;
 };
 

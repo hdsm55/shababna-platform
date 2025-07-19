@@ -6,6 +6,8 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import Alert from '../components/common/Alert';
 import Button from '../components/common/Button';
 import { ArrowLeft } from 'lucide-react';
+import LazyImage from '../components/common/LazyImage';
+import DOMPurify from 'dompurify';
 
 const BlogDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -38,11 +40,10 @@ const BlogDetail: React.FC = () => {
     <section className="py-12 min-h-screen bg-white" dir="rtl">
       <div className="max-w-3xl mx-auto px-4">
         {blog.image_url && (
-          <img
+          <LazyImage
             src={blog.image_url}
             alt={blog.title}
             className="w-full h-64 object-cover rounded-lg mb-8"
-            loading="lazy"
           />
         )}
         <h1 className="text-3xl font-bold text-primary-700 mb-4 line-clamp-2">
@@ -55,7 +56,11 @@ const BlogDetail: React.FC = () => {
             : ''}
         </div>
         <div className="prose prose-lg max-w-none text-gray-800" dir="auto">
-          {blog.content}
+          <div
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(blog.content),
+            }}
+          />
         </div>
         <div className="mt-8">
           <Link to="/blogs">

@@ -54,13 +54,13 @@ const QuickActions: React.FC<QuickActionsProps> = ({
             >
               <div className="flex items-center gap-2 mb-2">
                 <Icon className="w-7 h-7" />
-                <span className="text-lg font-semibold">{action.label}</span>
+                <span className="text-lg font-semibold">{t(action.label)}</span>
               </div>
               <span className="text-sm text-gray-400 font-light">
                 {action.description}
                 {action.soon && (
                   <span className="ml-1 text-xs text-gray-400">
-                    {t('قريبًا')}
+                    {t('common.soon', 'قريبًا')}
                   </span>
                 )}
               </span>

@@ -3,6 +3,7 @@
     "home": "Ana Sayfa",
     "events": "Etkinlikler",
     "programs": "Programlar",
+    "donations": "Bağışlar",
     "joinUs": "Bize Katıl",
     "contact": "İletişim",
     "login": "Giriş Yap",
@@ -21,7 +22,11 @@
       "members": "Aktif Üyeler",
       "events": "Düzenlenen Etkinlikler",
       "countries": "Ulaşılan Ülkeler",
-      "programs": "Aktif Programlar"
+      "programs": "Aktif Programlar",
+      "membersNumber": "1240",
+      "eventsNumber": "87",
+      "countriesNumber": "18",
+      "programsNumber": "12"
     },
     "features": {
       "title": "Ne Yapıyoruz",
@@ -47,7 +52,8 @@
       "noEvents": "Şu anda yaklaşan etkinlik bulunmuyor.",
       "noPrograms": "Şu anda aktif program bulunmuyor.",
       "viewAll": "Tümünü Görüntüle",
-      "explore": "Programları Keşfet"
+      "explore": "Programları Keşfet",
+      "latestPrograms": "En Son Programlar"
     },
     "newsletter": {
       "title": "Bağlantıda Kalın",
@@ -73,14 +79,25 @@
     "learnMore": "Daha Fazla Öğren",
     "date": "Tarih",
     "location": "Konum",
-    "category": "Kategori"
+    "category": "Kategori",
+    "viewDetails": "Detayları Görüntüle"
   },
   "programs": {
     "title": "Programlarımız",
     "subtitle": "Gelecek nesil liderleri geliştirmek için tasarlanmış kapsamlı programlar",
+    "filter": {
+      "all": "Tüm Programlar",
+      "education": "Eğitim",
+      "technology": "Teknoloji",
+      "entrepreneurship": "Girişimcilik",
+      "volunteering": "Gönüllülük"
+    },
     "support": "Bu Programı Destekle",
-    "donate": "Bağış Yap",
-    "sponsor": "Sponsor Ol"
+    "sponsor": "Sponsor Ol",
+    "volunteer": "Gönüllü Ol",
+    "notFound": "Üzgünüz, bu program bulunamadı.",
+    "donationSuccess": "Bağış başarıyla tamamlandı!",
+    "donationError": "Bağış sırasında bir hata oluştu. Lütfen tekrar deneyin."
   },
   "joinUs": {
     "title": "Topluluğumuza Katıl",
@@ -151,7 +168,10 @@
       "programs": "Program Yönetimi",
       "users": "Kullanıcılar",
       "donations": "Bağışlar",
-      "settings": "Ayarlar"
+      "settings": "Ayarlar",
+      "main": "Ana Sayfa",
+      "management": "İçerik Yönetimi",
+      "settingsSection": "Ayarlar"
     }
   },
   "common": {
@@ -160,7 +180,7 @@
     "close": "Kapat",
     "error": {
       "title": "Hata",
-      "message": "Bir şeyler yanlış gitti. Lütfen tekrar deneyin."
+      "message": "Beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin."
     },
     "retry": "Tekrar Dene",
     "cancel": "İptal",
@@ -174,6 +194,8 @@
     "search": "Ara",
     "filter": "Filtrele",
     "clear": "Temizle",
-    "apply": "Uygula"
+    "apply": "Uygula",
+    "backToPrograms": "Programlara Geri Dön",
+    "backToEvents": "Etkinliklere Geri Dön"
   }
 }

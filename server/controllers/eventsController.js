@@ -148,14 +148,19 @@ export const deleteEvent = async (req, res) => {
 // تسجيل مستخدم في فعالية
 export const registerForEvent = async (req, res) => {
     try {
+        // Log payload for debugging
+        console.log('registerForEvent payload:', req.body, 'event_id:', req.params.id);
         const { id } = req.params; // event_id
-        const { first_name, last_name, email, phone } = req.body;
-        if (!first_name || !last_name || !email) {
-            return res.status(400).json({ success: false, message: 'الاسم والبريد الإلكتروني مطلوبان' });
+        const { user_id, first_name, last_name, email, phone } = req.body;
+        // يجب أن يكون إما user_id أو (first_name و last_name و email)
+        if (!user_id && (!first_name || !last_name || !email)) {
+            return res.status(400).json({ success: false, message: 'يجب إدخال بيانات العضو أو بيانات شخصية (الاسم والبريد الإلكتروني)' });
         }
         const result = await query(
-            `INSERT INTO event_registrations (event_id, first_name, last_name, email, phone, created_at) VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING id, event_id, first_name, last_name, email, phone, created_at`,
-            [id, first_name, last_name, email, phone || null]
+            `INSERT INTO event_registrations (event_id, user_id, first_name, last_name, email, phone, created_at)
+             VALUES ($1, $2, $3, $4, $5, $6, NOW())
+             RETURNING id, event_id, user_id, first_name, last_name, email, phone, created_at`,
+            [id, user_id || null, first_name || null, last_name || null, email || null, phone || null]
         );
         return res.json({ success: true, data: result.rows[0], message: 'تم التسجيل في الفعالية بنجاح' });
     } catch (error) {

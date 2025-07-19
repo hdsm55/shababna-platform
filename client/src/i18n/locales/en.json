@@ -22,7 +22,11 @@
       "members": "Active Members",
       "events": "Events Hosted",
       "countries": "Countries Reached",
-      "programs": "Active Programs"
+      "programs": "Active Programs",
+      "membersNumber": "1240",
+      "eventsNumber": "87",
+      "countriesNumber": "18",
+      "programsNumber": "12"
     },
     "features": {
       "title": "What We Do",
@@ -95,7 +99,8 @@
     "date": "Date",
     "location": "Location",
     "category": "Category",
-    "notFound": "Sorry, this event could not be found."
+    "notFound": "Sorry, this event could not be found.",
+    "viewDetails": "View Details"
   },
   "programs": {
     "title": "Our Programs",
@@ -124,7 +129,8 @@
       "age": "Age",
       "interests": "Areas of Interest",
       "motivation": "Why do you want to join us?",
-      "submit": "Submit Application"
+      "submit": "Submit Application",
+      "send": "Send Application"
     }
   },
   "contact": {

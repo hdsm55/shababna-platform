@@ -36,25 +36,62 @@ import {
   AccessibleButton,
   SkipToContent,
 } from '../components/common/AccessibleComponents';
+import DOMPurify from 'dompurify';
+import { Modal } from '../components/ui/Modal/Modal';
 
 const ProgramDetail: React.FC = () => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   // إزالة أي متغيرات أو دوال تخص التبرع العام
   // توحيد النموذج ليشمل دعم مالي أو تطوعي أو شراكة
+  const [showSupportModal, setShowSupportModal] = useState(false);
   const [supportForm, setSupportForm] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     phone: '',
     amount: '',
-    message: '',
-    supportType: 'donation', // 'donation' | 'volunteer' | 'partnership'
+    note: '',
   });
-  const [isSupporting, setIsSupporting] = useState(false);
   const [supportStatus, setSupportStatus] = useState<
     'idle' | 'success' | 'error'
   >('idle');
+  const handleSupport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSupportStatus('idle');
+    try {
+      if (!id) throw new Error('No program ID');
+      const payload = {
+        supporter_name: supportForm.name.trim(),
+        supporter_email: supportForm.email.trim(),
+        phone: supportForm.phone.trim(),
+        amount: supportForm.amount.trim(),
+        note: supportForm.note.trim(),
+      };
+      if (
+        !payload.supporter_name ||
+        !payload.supporter_email ||
+        !payload.amount
+      ) {
+        setSupportStatus('error');
+        return;
+      }
+      const res = await supportProgram(id, payload);
+      if (res.success) {
+        setSupportStatus('success');
+        setSupportForm({
+          name: '',
+          email: '',
+          phone: '',
+          amount: '',
+          note: '',
+        });
+      } else {
+        setSupportStatus('error');
+      }
+    } catch {
+      setSupportStatus('error');
+    }
+  };
 
   console.log('Program id from URL:', id);
   // Fetch program details
@@ -77,44 +114,6 @@ const ProgramDetail: React.FC = () => {
 
   // إزالة أي متغيرات أو دوال تخص التبرع العام
   // توحيد النموذج ليشمل دعم مالي أو تطوعي أو شراكة
-  const handleSupport = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSupporting(true);
-    setSupportStatus('idle');
-    try {
-      if (!id) throw new Error('No program ID');
-      // أرسل الحقول بـ snake_case فقط
-      const payload: any = {
-        supporter_name: supportForm.firstName + ' ' + supportForm.lastName,
-        supporter_email: supportForm.email,
-        phone: supportForm.phone,
-      };
-      if (supportForm.supportType === 'donation' && supportForm.amount) {
-        payload.amount = supportForm.amount;
-      }
-      // أرسل program_id من useParams إذا احتاجه الباكند
-      const res = await supportProgram(Number(id), payload);
-      if (res.success) {
-        setSupportStatus('success');
-        setSupportForm({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          amount: '',
-          message: '',
-          supportType: 'donation',
-        });
-      } else {
-        setSupportStatus('error');
-      }
-    } catch (err) {
-      setSupportStatus('error');
-    } finally {
-      setIsSupporting(false);
-    }
-  };
-
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'education':
@@ -196,7 +195,7 @@ const ProgramDetail: React.FC = () => {
         {/* Program Banner Image */}
         {program.image && (
           <img
-            src={program.image}
+            src={program.image || '/images/islamic-youth.jpg'}
             alt={program.title}
             className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none select-none"
             style={{ zIndex: 0 }}
@@ -297,10 +296,7 @@ const ProgramDetail: React.FC = () => {
               >
                 <Card className="overflow-hidden">
                   <img
-                    src={
-                      program.image ||
-                      'https://images.pexels.com/photos/3183153/pexels-photo-3183153.jpeg'
-                    }
+                    src={program.image || '/images/islamic-youth.jpg'}
                     alt={program.title}
                     className="w-full h-64 lg:h-80 object-cover"
                   />
@@ -318,9 +314,11 @@ const ProgramDetail: React.FC = () => {
                     About This Program
                   </h2>
                   <div className="prose prose-neutral max-w-none">
-                    <p className="text-neutral-600 leading-relaxed mb-6">
-                      {program.description}
-                    </p>
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(program.description),
+                      }}
+                    />
                   </div>
                 </Card>
               </motion.div>
@@ -525,110 +523,106 @@ const ProgramDetail: React.FC = () => {
                     </Alert>
                   )}
 
-                  <form onSubmit={handleSupport} className="space-y-4">
-                    {/* حقول الاسم والبريد والهاتف */}
-                    <Input
-                      label="First Name"
-                      value={supportForm.firstName}
-                      onChange={(e) =>
-                        setSupportForm({
-                          ...supportForm,
-                          firstName: e.target.value,
-                        })
-                      }
-                      required
-                      icon={User}
-                    />
-                    <Input
-                      label="Last Name"
-                      value={supportForm.lastName}
-                      onChange={(e) =>
-                        setSupportForm({
-                          ...supportForm,
-                          lastName: e.target.value,
-                        })
-                      }
-                      required
-                      icon={User}
-                    />
-                    <Input
-                      label="Email"
-                      type="email"
-                      value={supportForm.email}
-                      onChange={(e) =>
-                        setSupportForm({
-                          ...supportForm,
-                          email: e.target.value,
-                        })
-                      }
-                      required
-                      icon={Mail}
-                    />
-                    <Input
-                      label="Phone"
-                      type="tel"
-                      value={supportForm.phone}
-                      onChange={(e) =>
-                        setSupportForm({
-                          ...supportForm,
-                          phone: e.target.value,
-                        })
-                      }
-                      icon={Phone}
-                    />
-                    {/* إذا كان دعم مالي أظهر حقل المبلغ */}
-                    {supportForm.supportType === 'donation' && (
+                  {/* زر ادعم البرنامج */}
+                  <div className="flex gap-4 mt-8 justify-center">
+                    <Button
+                      size="lg"
+                      variant="primary"
+                      onClick={() => setShowSupportModal(true)}
+                    >
+                      ادعم البرنامج
+                    </Button>
+                  </div>
+                  <Modal
+                    open={showSupportModal}
+                    onClose={() => setShowSupportModal(false)}
+                    title="دعم البرنامج"
+                  >
+                    <form onSubmit={handleSupport} className="space-y-4 p-2">
                       <Input
-                        label="المبلغ (ريال)"
+                        label="الاسم الكامل"
+                        value={supportForm.name}
+                        onChange={(e) =>
+                          setSupportForm((f) => ({
+                            ...f,
+                            name: e.target.value,
+                          }))
+                        }
+                        required
+                        fullWidth
+                      />
+                      <Input
+                        label="البريد الإلكتروني"
+                        type="email"
+                        value={supportForm.email}
+                        onChange={(e) =>
+                          setSupportForm((f) => ({
+                            ...f,
+                            email: e.target.value,
+                          }))
+                        }
+                        required
+                        fullWidth
+                      />
+                      <Input
+                        label="رقم الجوال (اختياري)"
+                        value={supportForm.phone}
+                        onChange={(e) =>
+                          setSupportForm((f) => ({
+                            ...f,
+                            phone: e.target.value,
+                          }))
+                        }
+                        fullWidth
+                      />
+                      <Input
+                        label="المبلغ (USD)"
                         type="number"
                         value={supportForm.amount}
                         onChange={(e) =>
-                          setSupportForm({
-                            ...supportForm,
+                          setSupportForm((f) => ({
+                            ...f,
                             amount: e.target.value,
-                          })
+                          }))
                         }
                         required
-                        min="1"
-                        step="1"
+                        fullWidth
                       />
-                    )}
-                    {/* رسالة اختيارية */}
-                    <Input
-                      label="رسالة (اختياري)"
-                      value={supportForm.message}
-                      onChange={(e) =>
-                        setSupportForm({
-                          ...supportForm,
-                          message: e.target.value,
-                        })
-                      }
-                      icon={Heart}
-                    />
-                    <select
-                      value={supportForm.supportType}
-                      onChange={(e) =>
-                        setSupportForm({
-                          ...supportForm,
-                          supportType: e.target.value,
-                        })
-                      }
-                      required
-                    >
-                      <option value="donation">دعم مالي</option>
-                      <option value="volunteer">تطوع</option>
-                      <option value="partnership">شراكة</option>
-                    </select>
-                    <Button
-                      type="submit"
-                      variant="primary"
-                      size="lg"
-                      loading={isSupporting}
-                      fullWidth
-                    >
-                      {isSupporting ? 'جاري المعالجة...' : 'ادعم البرنامج'}
-                    </Button>
-                  </form>
+                      <Input
+                        label="ملاحظة (اختياري)"
+                        value={supportForm.note}
+                        onChange={(e) =>
+                          setSupportForm((f) => ({
+                            ...f,
+                            note: e.target.value,
+                          }))
+                        }
+                        fullWidth
+                      />
+                      {supportStatus === 'success' && (
+                        <Alert type="success">
+                          تم تسجيل دعمك بنجاح! سنقوم بالتواصل معك قريباً.
+                        </Alert>
+                      )}
+                      {supportStatus === 'error' && (
+                        <Alert type="error">
+                          يرجى تعبئة جميع الحقول المطلوبة.
+                        </Alert>
+                      )}
+                      <div className="flex gap-2 justify-end mt-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setShowSupportModal(false)}
+                        >
+                          إلغاء
+                        </Button>
+                        <Button type="submit" variant="primary">
+                          تأكيد الدعم
+                        </Button>
+                      </div>
+                    </form>
+                  </Modal>
                 </Card>
               </motion.div>
 

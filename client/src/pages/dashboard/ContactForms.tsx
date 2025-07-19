@@ -125,13 +125,18 @@ const ContactForms: React.FC = () => {
         <AccessibleSection>
           <Card className="mb-8 shadow-lg rounded-2xl p-6 bg-white border-0">
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold">رسائل التواصل</h1>
+              <h1 className="text-2xl font-bold">
+                {t('dashboard.contactForms.title', 'رسائل التواصل')}
+              </h1>
               <Link to="/contact">
                 <Button
                   variant="outline"
                   className="font-bold text-primary-600 border-primary-300"
                 >
-                  اذهب إلى صفحة تواصل معنا
+                  {t(
+                    'dashboard.contactForms.goToContact',
+                    'اذهب إلى صفحة تواصل معنا'
+                  )}
                 </Button>
               </Link>
             </div>
@@ -143,7 +148,10 @@ const ContactForms: React.FC = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <input
                     type="text"
-                    placeholder="البحث في الرسائل..."
+                    placeholder={t(
+                      'dashboard.contactForms.searchPlaceholder',
+                      'البحث في الرسائل...'
+                    )}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -158,9 +166,15 @@ const ContactForms: React.FC = () => {
                   }
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
-                  <option value="">جميع الحالات</option>
-                  <option value="unread">غير مقروءة</option>
-                  <option value="read">مقروءة</option>
+                  <option value="">
+                    {t('dashboard.contactForms.allStatuses', 'جميع الحالات')}
+                  </option>
+                  <option value="unread">
+                    {t('dashboard.contactForms.unread', 'غير مقروءة')}
+                  </option>
+                  <option value="read">
+                    {t('dashboard.contactForms.read', 'مقروءة')}
+                  </option>
                 </select>
                 <Button
                   variant="outline"
@@ -170,7 +184,7 @@ const ContactForms: React.FC = () => {
                     // TODO: Implement export functionality
                   }}
                 >
-                  تصدير
+                  {t('dashboard.contactForms.export', 'تصدير')}
                 </Button>
               </div>
             </div>
@@ -184,10 +198,13 @@ const ContactForms: React.FC = () => {
               <div className="text-center py-12">
                 <MessageCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  لا توجد رسائل
+                  {t('dashboard.contactForms.noMessages', 'لا توجد رسائل')}
                 </h3>
                 <p className="text-gray-500">
-                  لم يتم العثور على رسائل تواصل تطابق معايير البحث
+                  {t(
+                    'dashboard.contactForms.noResults',
+                    'لم يتم العثور على رسائل تواصل تطابق معايير البحث'
+                  )}
                 </p>
               </div>
             ) : (
@@ -220,7 +237,11 @@ const ContactForms: React.FC = () => {
                               </span>
                             </div>
                             <p className="text-sm text-gray-700 mb-2">
-                              <strong>الموضوع:</strong> {form.subject}
+                              <strong>
+                                {t('dashboard.contactForms.subject', 'الموضوع')}
+                                :
+                              </strong>{' '}
+                              {form.subject}
                             </p>
                             <p className="text-xs text-gray-500">
                               {new Date(form.created_at).toLocaleDateString(
@@ -240,14 +261,19 @@ const ContactForms: React.FC = () => {
                             )}`}
                           >
                             <StatusIcon className="w-3 h-3" />
-                            {form.is_read ? 'مقروءة' : 'غير مقروءة'}
+                            {form.is_read
+                              ? t('dashboard.contactForms.read', 'مقروءة')
+                              : t(
+                                  'dashboard.contactForms.unread',
+                                  'غير مقروءة'
+                                )}
                           </span>
                           <Button
                             size="sm"
                             variant="ghost"
                             onClick={() => handleViewForm(form)}
                           >
-                            عرض
+                            {t('dashboard.contactForms.view', 'عرض')}
                           </Button>
                           <Button
                             size="sm"

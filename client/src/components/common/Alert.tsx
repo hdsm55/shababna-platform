@@ -1,11 +1,8 @@
 import React from 'react';
-import clsx from 'clsx';
 import { Info, CheckCircle, AlertTriangle, AlertCircle, X } from 'lucide-react';
+import { DESIGN_SYSTEM } from './DesignSystem';
+import { motion, AnimatePresence } from 'framer-motion';
 
-/**
- * Modern Alert component inspired by Stripe/Linear design
- * Features smooth animations, consistent spacing, and modern styling
- */
 export type AlertType = 'info' | 'success' | 'warning' | 'error';
 
 interface AlertProps {
@@ -14,13 +11,14 @@ interface AlertProps {
   children?: React.ReactNode;
   onClose?: () => void;
   className?: string;
+  dir?: 'rtl' | 'ltr';
 }
 
 const typeStyles: Record<AlertType, string> = {
-  info: 'bg-info/10 text-info border-info',
-  success: 'bg-success/10 text-success border-success',
-  warning: 'bg-warning/10 text-warning border-warning',
-  error: 'bg-error/10 text-error border-error',
+  info: 'bg-blue-50 border-blue-200 text-blue-800',
+  success: 'bg-green-50 border-green-200 text-green-800',
+  warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+  error: 'bg-red-50 border-red-200 text-red-800',
 };
 
 const typeIcons: Record<AlertType, React.ElementType> = {
@@ -36,36 +34,51 @@ const Alert: React.FC<AlertProps> = ({
   children,
   onClose,
   className,
+  dir,
 }) => {
   const Icon = typeIcons[type];
+  const direction =
+    dir ||
+    (typeof document !== 'undefined'
+      ? (document.documentElement.dir as 'rtl' | 'ltr')
+      : 'rtl');
   return (
-    <div
-      className={clsx(
-        'rounded-md border-l-4 p-4 flex items-start gap-3',
-        typeStyles[type],
-        className
-      )}
-      role="alert"
-    >
-      <div className="pt-1">
-        <Icon className="w-5 h-5" />
-      </div>
-      <div className="flex-1 min-w-0">
-        {title && (
-          <div className="font-semibold mb-1 rtl:text-right">{title}</div>
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 20 }}
+        transition={{ duration: 0.35, type: 'spring' }}
+        className={[
+          'rounded-md border-l-4 p-4 flex items-start gap-3',
+          typeStyles[type],
+          className,
+        ].join(' ')}
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+        dir={direction}
+      >
+        <div className="pt-1">
+          <Icon className="w-5 h-5" />
+        </div>
+        <div className="flex-1 min-w-0">
+          {title && (
+            <div className="font-semibold mb-1 rtl:text-right">{title}</div>
+          )}
+          {children && <div className="text-sm rtl:text-right">{children}</div>}
+        </div>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="text-neutral-400 hover:text-neutral-600 ml-2 rtl:mr-2 rtl:ml-0"
+            aria-label="إغلاق"
+          >
+            <X className="w-4 h-4" />
+          </button>
         )}
-        {children && <div className="text-sm rtl:text-right">{children}</div>}
-      </div>
-      {onClose && (
-        <button
-          onClick={onClose}
-          className="text-secondary hover:text-primary ml-2 rtl:mr-2 rtl:ml-0"
-          aria-label="Close"
-        >
-          <X className="w-4 h-4" />
-        </button>
-      )}
-    </div>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

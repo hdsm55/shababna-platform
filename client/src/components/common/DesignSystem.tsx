@@ -1,80 +1,20 @@
 import React from 'react';
 
-// Design System Constants
+// نظام تصميم مركزي موحد لجميع المكونات
 export const DESIGN_SYSTEM = {
   colors: {
-    primary: {
-      50: '#eff6ff',
-      100: '#dbeafe',
-      200: '#bfdbfe',
-      300: '#93c5fd',
-      400: '#60a5fa',
-      500: '#3b82f6',
-      600: '#2563eb',
-      700: '#1d4ed8',
-      800: '#1e40af',
-      900: '#1e3a8a',
-    },
-    secondary: {
-      50: '#f8fafc',
-      100: '#f1f5f9',
-      200: '#e2e8f0',
-      300: '#cbd5e1',
-      400: '#94a3b8',
-      500: '#64748b',
-      600: '#475569',
-      700: '#334155',
-      800: '#1e293b',
-      900: '#0f172a',
-    },
-    accent: {
-      50: '#fef2f2',
-      100: '#fee2e2',
-      200: '#fecaca',
-      300: '#fca5a5',
-      400: '#f87171',
-      500: '#ef4444',
-      600: '#dc2626',
-      700: '#b91c1c',
-      800: '#991b1b',
-      900: '#7f1d1d',
-    },
-    success: {
-      50: '#f0fdf4',
-      100: '#dcfce7',
-      200: '#bbf7d0',
-      300: '#86efac',
-      400: '#4ade80',
-      500: '#22c55e',
-      600: '#16a34a',
-      700: '#15803d',
-      800: '#166534',
-      900: '#14532d',
-    },
-    warning: {
-      50: '#fffbeb',
-      100: '#fef3c7',
-      200: '#fde68a',
-      300: '#fcd34d',
-      400: '#fbbf24',
-      500: '#f59e0b',
-      600: '#d97706',
-      700: '#b45309',
-      800: '#92400e',
-      900: '#78350f',
-    },
-    neutral: {
-      50: '#fafafa',
-      100: '#f5f5f5',
-      200: '#e5e5e5',
-      300: '#d4d4d4',
-      400: '#a3a3a3',
-      500: '#737373',
-      600: '#525252',
-      700: '#404040',
-      800: '#262626',
-      900: '#171717',
-    },
+    primary: '#27548A',
+    accent: '#DDA853',
+    secondary: '#183B4E',
+    neutral: '#F7F7F7',
+    error: '#EF4444',
+    success: '#22C55E',
+    warning: '#F59E42',
+    info: '#3B82F6',
+  },
+  fontFamily: {
+    arabic: "'Tajawal', 'Almarai', system-ui, -apple-system, sans-serif",
+    base: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   },
   spacing: {
     xs: '0.25rem',
@@ -82,46 +22,20 @@ export const DESIGN_SYSTEM = {
     md: '1rem',
     lg: '1.5rem',
     xl: '2rem',
-    '2xl': '3rem',
-    '3xl': '4rem',
+    '2xl': '2.5rem',
+    '3xl': '3rem',
+    '4xl': '4rem',
   },
-  borderRadius: {
+  radii: {
+    none: '0',
     sm: '0.25rem',
-    md: '0.5rem',
-    lg: '1rem',
-    xl: '1.5rem',
+    md: '0.375rem',
+    lg: '0.5rem',
+    xl: '0.75rem',
+    '2xl': '1rem',
     full: '9999px',
   },
-  shadows: {
-    sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-    md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-    lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-    xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-  },
-  typography: {
-    fontFamily: {
-      sans: ['Inter', 'system-ui', 'sans-serif'],
-      arabic: ['Tajawal', 'Noto Sans Arabic', 'system-ui', 'sans-serif'],
-    },
-    fontSize: {
-      xs: '0.75rem',
-      sm: '0.875rem',
-      base: '1rem',
-      lg: '1.125rem',
-      xl: '1.25rem',
-      '2xl': '1.5rem',
-      '3xl': '1.875rem',
-      '4xl': '2.25rem',
-    },
-    fontWeight: {
-      light: 300,
-      normal: 400,
-      medium: 500,
-      semibold: 600,
-      bold: 700,
-    },
-  },
-} as const;
+};
 
 // Section Background Variants
 export const SECTION_VARIANTS = {
@@ -173,6 +87,354 @@ export const getButtonClasses = (
   variant: keyof typeof BUTTON_VARIANTS = 'primary'
 ) => {
   return BUTTON_VARIANTS[variant];
+};
+
+// مثال توثيقي لمكون الزر الموحد
+export const ButtonShowcase = () => (
+  <div className="space-y-6">
+    <div className="flex flex-wrap gap-4 items-center">
+      <button className={getButtonClasses('primary') + ' px-4 py-2'}>
+        Primary
+      </button>
+      <button className={getButtonClasses('secondary') + ' px-4 py-2'}>
+        Secondary
+      </button>
+      <button className={getButtonClasses('outline') + ' px-4 py-2'}>
+        Outline
+      </button>
+      <button className={getButtonClasses('ghost') + ' px-4 py-2'}>
+        Ghost
+      </button>
+      <button className={getButtonClasses('primary') + ' px-4 py-2'} disabled>
+        Disabled
+      </button>
+      <button className={getButtonClasses('primary') + ' px-4 py-2 w-full'}>
+        Full Width
+      </button>
+    </div>
+    <div className="flex flex-wrap gap-4 items-center" dir="rtl">
+      <button className={getButtonClasses('primary') + ' px-4 py-2'}>
+        زر أساسي
+      </button>
+      <button className={getButtonClasses('secondary') + ' px-4 py-2'}>
+        زر ثانوي
+      </button>
+      <button className={getButtonClasses('outline') + ' px-4 py-2'}>
+        زر حدود
+      </button>
+      <button className={getButtonClasses('ghost') + ' px-4 py-2'}>
+        زر شفاف
+      </button>
+      <button className={getButtonClasses('primary') + ' px-4 py-2'} disabled>
+        معطل
+      </button>
+      <button className={getButtonClasses('primary') + ' px-4 py-2 w-full'}>
+        زر بعرض كامل
+      </button>
+    </div>
+    <div className="flex flex-wrap gap-4 items-center">
+      <button
+        className={getButtonClasses('primary') + ' px-4 py-2 flex items-center'}
+      >
+        <span className="mr-2">🔔</span> With Icon
+      </button>
+      <button
+        className={getButtonClasses('primary') + ' px-4 py-2 flex items-center'}
+        disabled
+      >
+        <svg className="w-4 h-4 animate-spin mr-2" viewBox="0 0 24 24">
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          />
+        </svg>
+        Loading
+      </button>
+    </div>
+  </div>
+);
+
+// مثال توثيقي لمكون البطاقة الموحد
+export const CardShowcase = () => (
+  <div className="space-y-6">
+    <div className="flex flex-wrap gap-4 items-start">
+      <div className={getCardClasses('default') + ' p-6 w-64'}>
+        Default Card
+      </div>
+      <div className={getCardClasses('accent') + ' p-6 w-64'}>Accent Card</div>
+      <div className={getCardClasses('elevated') + ' p-6 w-64'}>
+        Elevated Card
+      </div>
+      <div className={getCardClasses('primary') + ' p-6 w-64'}>
+        Primary Card
+      </div>
+      <div
+        className={
+          getCardClasses('default') +
+          ' p-6 w-64 transition-all duration-200 hover:shadow-lg hover:-translate-y-1'
+        }
+      >
+        Hoverable Card
+      </div>
+    </div>
+    <div className="flex flex-wrap gap-4 items-start" dir="rtl">
+      <div className={getCardClasses('default') + ' p-6 w-64'}>
+        بطاقة افتراضية
+      </div>
+      <div className={getCardClasses('accent') + ' p-6 w-64'}>بطاقة مميزة</div>
+      <div className={getCardClasses('elevated') + ' p-6 w-64'}>
+        بطاقة مرتفعة
+      </div>
+      <div className={getCardClasses('primary') + ' p-6 w-64'}>
+        بطاقة رئيسية
+      </div>
+      <div
+        className={
+          getCardClasses('default') +
+          ' p-6 w-64 transition-all duration-200 hover:shadow-lg hover:-translate-y-1'
+        }
+      >
+        بطاقة تفاعلية
+      </div>
+    </div>
+    <div className="flex flex-wrap gap-4 items-start">
+      <div className={getCardClasses('default') + ' p-4 w-48'}>Padding sm</div>
+      <div className={getCardClasses('default') + ' p-6 w-48'}>Padding md</div>
+      <div className={getCardClasses('default') + ' p-8 w-48'}>Padding lg</div>
+    </div>
+  </div>
+);
+
+// مثال توثيقي لمكون الإدخال الموحد
+import { Input as UnifiedInput } from '../ui/Input/Input';
+
+export const InputShowcase = () => (
+  <div className="space-y-8">
+    <div className="flex flex-col gap-4 max-w-md">
+      <UnifiedInput label="Input" placeholder="Type here..." />
+      <UnifiedInput
+        label="Input with Icon"
+        icon={<span>🔍</span>}
+        placeholder="بحث..."
+      />
+      <UnifiedInput
+        label="Input Error"
+        error="خطأ في الإدخال"
+        placeholder="خطأ..."
+      />
+      <UnifiedInput
+        label="Helper Text"
+        helperText="معلومة مساعدة"
+        placeholder="مساعدة..."
+      />
+      <UnifiedInput label="Full Width" fullWidth placeholder="عرض كامل..." />
+    </div>
+    <div className="flex flex-col gap-4 max-w-md">
+      <UnifiedInput
+        as="select"
+        label="Select"
+        options={[
+          { value: '', label: 'اختر' },
+          { value: '1', label: 'خيار 1' },
+          { value: '2', label: 'خيار 2' },
+        ]}
+      />
+      <UnifiedInput as="checkbox" label="موافق على الشروط" />
+    </div>
+    <div className="flex flex-col gap-4 max-w-md" dir="rtl">
+      <UnifiedInput label="إدخال عربي" placeholder="اكتب هنا..." />
+      <UnifiedInput
+        label="إدخال مع أيقونة"
+        icon={<span>🔒</span>}
+        placeholder="كلمة المرور..."
+      />
+      <UnifiedInput label="خطأ" error="هذا الحقل مطلوب" placeholder="خطأ..." />
+      <UnifiedInput
+        label="مساعدة"
+        helperText="يرجى إدخال اسمك الكامل"
+        placeholder="اسمك..."
+      />
+      <UnifiedInput
+        as="select"
+        label="قائمة منسدلة"
+        options={[
+          { value: '', label: 'اختر' },
+          { value: 'a', label: 'خيار أ' },
+          { value: 'b', label: 'خيار ب' },
+        ]}
+      />
+      <UnifiedInput as="checkbox" label="أوافق على الشروط" />
+    </div>
+  </div>
+);
+
+import { Modal as UnifiedModal } from '../ui/Modal/Modal';
+import { useState } from 'react';
+
+export const ModalShowcase = () => {
+  const [open, setOpen] = useState(false);
+  const [openRtl, setOpenRtl] = useState(false);
+  return (
+    <div className="space-y-6">
+      <button
+        className="bg-primary-600 text-white px-4 py-2 rounded"
+        onClick={() => setOpen(true)}
+      >
+        Open Modal
+      </button>
+      <UnifiedModal
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Modal Title"
+        description="This is a description for the modal."
+        actions={
+          <>
+            <button
+              className="bg-neutral-200 px-3 py-1 rounded"
+              onClick={() => setOpen(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className="bg-primary-600 text-white px-3 py-1 rounded"
+              onClick={() => setOpen(false)}
+            >
+              Confirm
+            </button>
+          </>
+        }
+      >
+        <div>Modal content goes here. You can put any React node here.</div>
+      </UnifiedModal>
+      <button
+        className="bg-primary-600 text-white px-4 py-2 rounded"
+        dir="rtl"
+        onClick={() => setOpenRtl(true)}
+      >
+        فتح نافذة منبثقة
+      </button>
+      <UnifiedModal
+        open={openRtl}
+        onClose={() => setOpenRtl(false)}
+        title="عنوان النافذة"
+        description="وصف مختصر للنافذة المنبثقة."
+        dir="rtl"
+        actions={
+          <>
+            <button
+              className="bg-neutral-200 px-3 py-1 rounded"
+              onClick={() => setOpenRtl(false)}
+            >
+              إلغاء
+            </button>
+            <button
+              className="bg-primary-600 text-white px-3 py-1 rounded"
+              onClick={() => setOpenRtl(false)}
+            >
+              تأكيد
+            </button>
+          </>
+        }
+      >
+        <div>محتوى النافذة المنبثقة هنا. يمكنك وضع أي عنصر React.</div>
+      </UnifiedModal>
+    </div>
+  );
+};
+
+import Alert from './Alert';
+import { useToast, ToastProvider } from './Toast';
+
+export const AlertShowcase = () => (
+  <div className="space-y-4 max-w-lg">
+    <Alert type="info" title="Info Alert">
+      This is an info alert.
+    </Alert>
+    <Alert type="success" title="Success Alert">
+      This is a success alert.
+    </Alert>
+    <Alert type="warning" title="Warning Alert">
+      This is a warning alert.
+    </Alert>
+    <Alert type="error" title="Error Alert">
+      This is an error alert.
+    </Alert>
+    <Alert type="info" title="تنبيه معلوماتي" dir="rtl">
+      هذا تنبيه معلوماتي باللغة العربية.
+    </Alert>
+    <Alert type="success" title="نجاح" dir="rtl">
+      تمت العملية بنجاح.
+    </Alert>
+  </div>
+);
+
+export const ToastShowcase = () => {
+  const { addToast } = useToast();
+  return (
+    <div className="space-x-2">
+      <button
+        className="bg-green-600 text-white px-3 py-1 rounded"
+        onClick={() =>
+          addToast({
+            type: 'success',
+            title: 'نجاح',
+            message: 'تمت العملية بنجاح',
+            dir: 'rtl',
+          })
+        }
+      >
+        نجاح
+      </button>
+      <button
+        className="bg-red-600 text-white px-3 py-1 rounded"
+        onClick={() =>
+          addToast({
+            type: 'error',
+            title: 'خطأ',
+            message: 'حدث خطأ ما',
+            dir: 'rtl',
+          })
+        }
+      >
+        خطأ
+      </button>
+      <button
+        className="bg-yellow-500 text-white px-3 py-1 rounded"
+        onClick={() =>
+          addToast({
+            type: 'warning',
+            title: 'تحذير',
+            message: 'يرجى الانتباه',
+            dir: 'rtl',
+          })
+        }
+      >
+        تحذير
+      </button>
+      <button
+        className="bg-blue-600 text-white px-3 py-1 rounded"
+        onClick={() =>
+          addToast({
+            type: 'info',
+            title: 'معلومة',
+            message: 'هذه رسالة معلوماتية',
+            dir: 'rtl',
+          })
+        }
+      >
+        معلومة
+      </button>
+    </div>
+  );
 };
 
 export default DESIGN_SYSTEM;

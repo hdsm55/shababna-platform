@@ -6,8 +6,8 @@ export interface Event {
   start_date: string;
   end_date: string;
   location: string;
-  category: string; // دعم جميع الفئات
-  image_url?: string; // تحديث الحقل ليكون مطابقاً لقاعدة البيانات
+  category: string;
+  image_url?: string;
   max_attendees?: number;
   attendees: number;
   status: 'upcoming' | 'active' | 'completed' | 'cancelled';
@@ -22,6 +22,8 @@ export interface Program {
   description: string;
   category: string;
   image_url?: string;
+  goal_amount?: number;
+  current_amount?: number;
   start_date: string;
   end_date: string;
   created_at: string;

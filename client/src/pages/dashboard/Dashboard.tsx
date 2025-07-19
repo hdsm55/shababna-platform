@@ -80,9 +80,9 @@ const DashboardOverview: React.FC = () => {
   const mockStats = {
     overview: [
       {
-        title: 'إجمالي الفعاليات',
+        title: t('dashboard.stats.events', 'إجمالي الفعاليات'),
         value: 24,
-        change: '+12 نشط',
+        change: '+12 ' + t('dashboard.stats.active', 'نشط'),
         changeType: 'increase',
         icon: Calendar,
         color: 'primary',
@@ -93,9 +93,9 @@ const DashboardOverview: React.FC = () => {
         },
       },
       {
-        title: 'البرامج النشطة',
+        title: t('dashboard.stats.programs', 'البرامج النشطة'),
         value: 8,
-        change: '+3 نشط',
+        change: '+3 ' + t('dashboard.stats.active', 'نشط'),
         changeType: 'increase',
         icon: TrendingUp,
         color: 'success',
@@ -105,7 +105,7 @@ const DashboardOverview: React.FC = () => {
         },
       },
       {
-        title: 'إجمالي الأعضاء',
+        title: t('dashboard.stats.members', 'إجمالي الأعضاء'),
         value: 156,
         change: '+8%',
         changeType: 'increase',
@@ -119,29 +119,29 @@ const DashboardOverview: React.FC = () => {
     ],
     engagement: [
       {
-        title: 'تسجيل البرامج',
+        title: t('dashboard.stats.programRegistrations', 'تسجيل البرامج'),
         value: 45,
         icon: Users,
         color: 'primary',
       },
       {
-        title: 'دعم البرامج',
+        title: t('dashboard.stats.programSupport', 'دعم البرامج'),
         value: 23,
         icon: Heart,
         color: 'success',
       },
       {
-        title: 'تسجيل الفعاليات',
+        title: t('dashboard.stats.eventRegistrations', 'تسجيل الفعاليات'),
         value: 67,
         icon: Calendar,
         color: 'info',
       },
       {
-        title: 'رسائل التواصل',
+        title: t('dashboard.stats.contactMessages', 'رسائل التواصل'),
         value: 12,
         icon: MessageCircle,
         color: 'warning',
-        alert: '3 غير مقروءة',
+        alert: '3 ' + t('dashboard.stats.unread', 'غير مقروءة'),
       },
     ],
   };
@@ -219,31 +219,31 @@ const DashboardOverview: React.FC = () => {
   const quickActions = [
     {
       to: '/dashboard/events/new',
-      label: 'إضافة فعالية',
+      label: t('dashboard.actions.addEvent', 'إضافة فعالية'),
       icon: Plus,
       color: 'primary' as const,
-      description: 'إنشاء فعالية جديدة',
+      description: t('dashboard.actions.addEventDesc', 'إنشاء فعالية جديدة'),
     },
     {
       to: '/dashboard/programs/new',
-      label: 'إضافة برنامج',
+      label: t('dashboard.actions.addProgram', 'إضافة برنامج'),
       icon: TrendingUp,
       color: 'success' as const,
-      description: 'إنشاء برنامج جديد',
+      description: t('dashboard.actions.addProgramDesc', 'إنشاء برنامج جديد'),
     },
     {
       to: '/dashboard/donations/new',
-      label: 'تسجيل تبرع',
+      label: t('dashboard.actions.addDonation', 'تسجيل تبرع'),
       icon: DollarSign,
       color: 'warning' as const,
-      description: 'تسجيل تبرع جديد',
+      description: t('dashboard.actions.addDonationDesc', 'تسجيل تبرع جديد'),
     },
     {
       to: '/dashboard/users/new',
-      label: 'إضافة عضو',
+      label: t('dashboard.actions.addUser', 'إضافة عضو'),
       icon: Users,
       color: 'info' as const,
-      description: 'إضافة عضو جديد',
+      description: t('dashboard.actions.addUserDesc', 'إضافة عضو جديد'),
     },
   ];
 
@@ -319,7 +319,9 @@ const DashboardOverview: React.FC = () => {
   };
 
   // دالة التعامل مع الأزرار غير الفعالة
-  const handleUnavailable = (msg = 'هذه الخاصية قيد التطوير، قريبًا!') => {
+  const handleUnavailable = (
+    msg = t('dashboard.unavailable', 'هذه الخاصية قيد التطوير، قريبًا!')
+  ) => {
     setModalMsg(msg);
     setModalOpen(true);
   };

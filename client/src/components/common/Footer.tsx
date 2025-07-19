@@ -1,6 +1,8 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Footer: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <footer
       className="w-full bg-gray-50 border-t border-gray-100 py-6 mt-12"
@@ -8,23 +10,23 @@ const Footer: React.FC = () => {
     >
       <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="text-sm text-gray-500">
-          © {new Date().getFullYear()} شبابنا. جميع الحقوق محفوظة.
+          {t('footer.copyright', { year: new Date().getFullYear() })}
         </div>
         <nav className="flex gap-4 text-sm text-gray-600">
           <a href="/" className="hover:text-primary-600 transition">
-            الرئيسية
+            {t('nav.home')}
           </a>
           <a href="/events" className="hover:text-primary-600 transition">
-            الفعاليات
+            {t('nav.events')}
           </a>
           <a href="/programs" className="hover:text-primary-600 transition">
-            البرامج
+            {t('nav.programs')}
           </a>
           <a href="/contact" className="hover:text-primary-600 transition">
-            تواصل معنا
+            {t('nav.contact')}
           </a>
           <a href="/blogs" className="hover:text-primary-600 transition">
-            المدونة
+            {t('nav.blogs', 'المدونة')}
           </a>
         </nav>
       </div>

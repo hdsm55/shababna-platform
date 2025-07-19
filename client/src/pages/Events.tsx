@@ -1,28 +1,27 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import SEO from '../components/common/SEO';
-import { Calendar, MapPin, Users, Filter, Search, Clock } from 'lucide-react';
-import { format } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
-import Button from '../components/common/Button';
-import Card from '../components/common/Card';
+import { Button } from '../components/ui/Button/Button';
+import { Card } from '../components/ui/Card/Card';
+import { Input } from '../components/ui/Input/Input';
+import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import LazyImage from '../components/common/LazyImage';
+import Skeleton from '../components/common/Skeleton';
 import { fetchEvents } from '../services/eventsApi';
 import { Event } from '../types';
-import {
-  AccessibleSection,
-  AccessibleCard,
-  AccessibleButton,
-  SkipToContent,
-} from '../components/common/AccessibleComponents';
+import { useRef } from 'react';
+import { useDebounce } from '../hooks/useDebounce';
 
 const Events: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearch = useDebounce(searchTerm, 400);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const isRTL = i18n.dir() === 'rtl';
 
   const filters = [
     { key: 'all', label: t('events.filter.all') },
@@ -34,10 +33,10 @@ const Events: React.FC = () => {
   // Prepare query parameters
   const queryParams = {
     category: selectedFilter === 'all' ? undefined : selectedFilter,
-    search: searchTerm || undefined,
+    search: debouncedSearch || undefined,
     page: currentPage,
     limit: 10,
-    status: 'upcoming', // Only show upcoming events by default
+    status: 'upcoming',
   };
 
   // Fetch events using React Query
@@ -46,16 +45,12 @@ const Events: React.FC = () => {
     isLoading,
     isError,
     error,
-    refetch,
   } = useQuery({
     queryKey: ['events', queryParams],
     queryFn: () => fetchEvents(queryParams),
     retry: 1,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
-
-  // طباعة البيانات في الكونسول للتشخيص
-  console.log('public-events data:', eventsData);
 
   const events = eventsData?.data?.items || [];
   const pagination = eventsData?.data?.pagination;
@@ -63,13 +58,13 @@ const Events: React.FC = () => {
   // Handle filter changes
   const handleFilterChange = (filterKey: string) => {
     setSelectedFilter(filterKey);
-    setCurrentPage(1); // Reset to first page when filter changes
+    setCurrentPage(1);
   };
 
   // Handle search changes
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
-    setCurrentPage(1); // Reset to first page when search changes
+    setCurrentPage(1);
   };
 
   // Handle pagination
@@ -77,426 +72,131 @@ const Events: React.FC = () => {
     setCurrentPage(page);
   };
 
-  // Get status badge color
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'upcoming':
-        return 'bg-blue-100 text-blue-800';
-      case 'active':
-        return 'bg-green-100 text-green-800';
-      case 'completed':
-        return 'bg-gray-100 text-gray-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  // Get category badge color
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'workshop':
-        return 'bg-primary-100 text-primary-800';
-      case 'conference':
-        return 'bg-secondary-100 text-secondary-800';
-      case 'networking':
-        return 'bg-secondary-100 text-secondary-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   return (
-    <div className="min-h-screen">
-      <SkipToContent />
+    <div className="min-h-screen bg-neutral-50" dir={isRTL ? 'rtl' : 'ltr'}>
       <SEO
-        title="Events"
-        description="Discover upcoming events, workshops, and conferences organized by Shababna Global. Join our community events and connect with youth leaders worldwide."
+        title={t('events.title')}
+        description={t('events.subtitle')}
         type="website"
       />
 
       {/* Header Section */}
-      <AccessibleSection variant="hero" ariaLabel="قسم رأس صفحة الفعاليات">
-        <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/1181622/pexels-photo-1181622.jpeg')] bg-cover bg-center opacity-5"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
-                {t('events.title')}
-              </h1>
-              <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-                {t('events.subtitle')}
-              </p>
-            </motion.div>
-          </div>
-
-          {/* Search and Filter */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex flex-col lg:flex-row gap-4 mb-8"
-          >
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 transform -translate-y-1/2 text-white/70 w-5 h-5" />
-              <input
-                type="text"
-                placeholder={t('common.search')}
-                value={searchTerm}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className="w-full pl-10 rtl:pr-10 rtl:pl-4 pr-4 py-3 border border-white/20 rounded-lg focus:ring-2 focus:ring-white focus:border-transparent shadow-sm bg-white/10 backdrop-blur-sm text-white placeholder-white/70"
-              />
-            </div>
-            <div className="flex gap-2 overflow-x-auto">
-              {filters.map((filter) => (
-                <button
-                  key={filter.key}
-                  onClick={() => handleFilterChange(filter.key)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
-                    selectedFilter === filter.key
-                      ? 'bg-white text-primary-600 shadow-lg'
-                      : 'bg-white/10 text-white border border-white/20 hover:bg-white/20 backdrop-blur-sm'
-                  }`}
-                >
-                  {filter.label}
-                </button>
-              ))}
-            </div>
-          </motion.div>
+      <section className="py-16 bg-gradient-to-br from-primary-50 via-white to-accent-50 text-center mb-8">
+        <div className="container mx-auto px-4">
+          <h1 className="text-3xl md:text-5xl font-bold mb-4 text-primary-700">
+            {t('events.title')}
+          </h1>
+          <p className="text-lg md:text-2xl text-neutral-700 mb-8">
+            {t('events.subtitle')}
+          </p>
         </div>
-      </AccessibleSection>
+      </section>
 
-      {/* Stats Section */}
-      <AccessibleSection variant="content" ariaLabel="قسم الإحصائيات">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                number: events.length.toString(),
-                label: 'Total Events',
-                icon: Calendar,
-              },
-              {
-                number: events
-                  .filter((e) => e.status === 'upcoming')
-                  .length.toString(),
-                label: 'Upcoming',
-                icon: Clock,
-              },
-              {
-                number: events
-                  .filter((e) => e.status === 'active')
-                  .length.toString(),
-                label: 'Active',
-                icon: Users,
-              },
-              {
-                number: events
-                  .filter((e) => e.status === 'completed')
-                  .length.toString(),
-                label: 'Completed',
-                icon: Calendar,
-              },
-            ].map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="text-center group cursor-pointer"
+      {/* Search and Filter */}
+      <section className="container mx-auto px-4 mb-8">
+        <div className="flex flex-col md:flex-row gap-4 items-center">
+          <div className="relative w-full max-w-md">
+            <Input
+              ref={inputRef}
+              type="text"
+              placeholder={t('common.search')}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pr-10"
+              fullWidth
+            />
+            {isLoading && (
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 rtl:left-3 rtl:right-auto">
+                <LoadingSpinner size="sm" />
+              </span>
+            )}
+          </div>
+          <div className="flex gap-2 overflow-x-auto">
+            {filters.map((filter) => (
+              <Button
+                key={filter.key}
+                variant={selectedFilter === filter.key ? 'primary' : 'outline'}
+                size="md"
+                onClick={() => handleFilterChange(filter.key)}
+                className={
+                  selectedFilter === filter.key ? 'ring-2 ring-primary-400' : ''
+                }
               >
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-100 rounded-xl mb-4 group-hover:bg-primary-200 transition-colors">
-                  <stat.icon className="w-6 h-6 text-primary-600" />
-                </div>
-                <div className="text-3xl font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
-                  {stat.number}
-                </div>
-                <div className="text-sm text-gray-600 group-hover:text-gray-800 transition-colors">
-                  {stat.label}
-                </div>
-              </motion.div>
+                {filter.label}
+              </Button>
             ))}
           </div>
         </div>
-      </AccessibleSection>
+      </section>
 
       {/* Events Grid */}
-      <AccessibleSection variant="neutral" ariaLabel="قسم شبكة الفعاليات">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {isLoading && (
-            <div className="text-center py-8 text-lg text-gray-500">
-              جاري تحميل الفعاليات...
-            </div>
-          )}
-          {isError && (
-            <div className="text-center py-8 text-lg text-red-600">
-              حدث خطأ أثناء جلب الفعاليات
-            </div>
-          )}
-          {!isLoading && !isError && events.length === 0 && (
-            <div className="text-center py-8 text-lg text-gray-500">
-              لا توجد فعاليات متاحة
-            </div>
-          )}
-          {/* Loading State */}
-          {isLoading && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[...Array(6)].map((_, idx) => (
-                <div key={idx} className="animate-pulse">
-                  <div className="bg-gray-200 rounded-xl h-48 w-full mb-4" />
-                  <div className="h-6 bg-gray-200 rounded w-2/3 mb-2" />
-                  <div className="h-4 bg-gray-100 rounded w-1/2 mb-2" />
-                  <div className="h-4 bg-gray-100 rounded w-1/3 mb-4" />
-                  <div className="flex gap-2">
-                    <div className="h-10 bg-gray-200 rounded w-1/2" />
-                    <div className="h-10 bg-gray-100 rounded w-1/2" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Error State */}
-          {isError && (
-            <div className="text-center py-12">
-              <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
-                <p className="text-red-800 font-medium mb-2">
-                  حدث خطأ أثناء تحميل الفعاليات
-                </p>
-                <p className="text-red-600 text-sm mb-4">
-                  يرجى المحاولة مرة أخرى أو التحقق من اتصالك بالإنترنت.
-                </p>
-                <Button onClick={() => refetch()} variant="outline" size="sm">
-                  إعادة المحاولة
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Events Grid */}
-          {!isLoading && !isError && (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {events.map((event: Event, index: number) => (
-                  <motion.div
-                    key={event.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                  >
-                    <Card
-                      hover
-                      variant="elevated"
-                      className="overflow-hidden group focus-within:ring-2 focus-within:ring-primary-400 focus-within:ring-offset-2 transition-shadow duration-300 shadow-md hover:shadow-2xl border border-transparent hover:border-primary-200"
-                    >
-                      <div className="aspect-w-16 aspect-h-9">
-                        <img
-                          src={
-                            event.image_url ||
-                            'https://images.pexels.com/photos/1181622/pexels-photo-1181622.jpeg'
-                          }
-                          alt={event.title}
-                          loading="lazy"
-                          className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                        />
-                      </div>
-                      <div className="p-6">
-                        <div className="flex items-center gap-2 mb-3">
-                          {event.category && (
-                            <span
-                              className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(
-                                event.category
-                              )}`}
-                            >
-                              {event.category}
-                            </span>
-                          )}
-                          {event.status && (
-                            <span
-                              className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
-                                event.status
-                              )}`}
-                            >
-                              {event.status}
-                            </span>
-                          )}
-                        </div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                          {event.title}
-                        </h3>
-                        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                          {event.description}
-                        </p>
-                        <div className="space-y-2 mb-6">
-                          <div className="flex items-center text-sm text-gray-500">
-                            <Clock className="w-4 h-4 text-primary-500" />
-                            <span>
-                              {event.start_date
-                                ? new Date(
-                                    event.start_date
-                                  ).toLocaleDateString()
-                                : ''}
-                            </span>
-                            {event.end_date && (
-                              <>
-                                <span className="mx-1">-</span>
-                                <span>
-                                  {new Date(
-                                    event.end_date
-                                  ).toLocaleDateString()}
-                                </span>
-                              </>
-                            )}
-                          </div>
-                          {event.location && (
-                            <div className="flex items-center gap-2 mb-2">
-                              <MapPin className="w-4 h-4 text-primary-500" />
-                              <span>{event.location}</span>
-                            </div>
-                          )}
-                          {typeof event.max_attendees === 'number' && (
-                            <div className="flex items-center text-sm text-gray-500">
-                              <Users className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
-                              {typeof event.attendees === 'number'
-                                ? event.attendees
-                                : 0}
-                              /{event.max_attendees} مشارك
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex gap-3">
-                          <Button
-                            size="sm"
-                            className="flex-1 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-                            disabled={
-                              event.status === 'cancelled' ||
-                              event.status === 'completed'
-                            }
-                            onClick={() => {
-                              // TODO: Implement event registration
-                              console.log('Register for event:', event.id);
-                            }}
-                          >
-                            {event.status === 'cancelled'
-                              ? 'ملغاة'
-                              : event.status === 'completed'
-                              ? 'مكتملة'
-                              : t('events.register')}
-                          </Button>
-                          <Link to={`/events/${event.id}`}>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-                            >
-                              {t('events.learnMore')}
-                            </Button>
-                          </Link>
-                        </div>
-                      </div>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Empty State */}
-              {events.length === 0 && !isLoading && (
-                <div className="text-center py-12 flex flex-col items-center justify-center">
-                  <svg
-                    width="64"
-                    height="64"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    className="mb-4 text-gray-300"
-                  >
-                    <path
-                      d="M8 7V3m8 4V3m-9 8h10m-13 8V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <p className="text-gray-500 text-lg">
-                    {searchTerm || selectedFilter !== 'all'
-                      ? 'لا توجد فعاليات مطابقة للبحث أو الفلتر.'
-                      : 'لا توجد فعاليات متاحة حالياً.'}
-                  </p>
-                </div>
-              )}
-
-              {/* Pagination */}
-              {pagination && pagination.totalPages > 1 && (
-                <div className="flex justify-center items-center gap-2 mt-8">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </Button>
-
-                  <span className="text-sm text-gray-600">
-                    Page {currentPage} of {pagination.totalPages}
-                  </span>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === pagination.totalPages}
-                  >
-                    Next
-                  </Button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      </AccessibleSection>
-
-      {/* CTA Section */}
-      <AccessibleSection variant="primary" ariaLabel="قسم دعوة للعمل">
-        <div className="absolute inset-0 bg-[url('https://images.pexels.com/photos/1181622/pexels-photo-1181622.jpeg')] bg-cover bg-center opacity-10"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
-              Ready to Join Our Events?
-            </h2>
-            <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
-              Don't miss out on amazing opportunities to learn, grow, and
-              connect with like-minded youth.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                variant="secondary"
-                size="lg"
-                icon={Calendar}
-                className="shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+      <section className="container mx-auto px-4 mb-16">
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {Array.from({ length: 6 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="bg-white rounded-xl shadow p-6 flex flex-col gap-4"
               >
-                View All Events
-              </Button>
+                <Skeleton height={180} className="w-full mb-4" />
+                <Skeleton height={24} width="60%" />
+                <Skeleton height={16} width="40%" />
+                <Skeleton height={16} width="80%" />
+                <div className="flex gap-2 mt-2">
+                  <Skeleton height={32} width={80} />
+                  <Skeleton height={32} width={80} />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : isError ? (
+          <Alert type="error">{t('events.error')}</Alert>
+        ) : events.length === 0 ? (
+          <Alert type="info">{t('events.noEvents')}</Alert>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {events.map((event: Event) => (
+              <Card key={event.id} variant="default" padding="md">
+                {event.image_url && (
+                  <LazyImage
+                    src={event.image_url || '/images/istanbul-mosque.jpg'}
+                    alt={event.title}
+                    className="w-full h-40 object-cover rounded-t-md mb-3"
+                  />
+                )}
+                <div className="font-bold text-lg mb-2">{event.title}</div>
+                <div className="text-sm text-neutral-600 mb-2">
+                  {event.location} | {event.start_date}
+                </div>
+                <div className="text-sm text-neutral-500 mb-4 line-clamp-3">
+                  {event.description}
+                </div>
+                <a href={`/events/${event.id}`}>
+                  <Button size="sm">{t('events.viewDetails')}</Button>
+                </a>
+              </Card>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Pagination */}
+      {pagination && pagination.totalPages > 1 && (
+        <section className="container mx-auto px-4 my-8 flex justify-center">
+          <div className="flex gap-2">
+            {Array.from({ length: pagination.totalPages }, (_, idx) => (
               <Button
-                variant="outline"
-                size="lg"
-                className="border-white text-white hover:bg-white hover:text-primary-600 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                key={idx + 1}
+                variant={pagination.page === idx + 1 ? 'primary' : 'outline'}
+                size="sm"
+                onClick={() => handlePageChange(idx + 1)}
               >
-                Get Notifications
+                {idx + 1}
               </Button>
-            </div>
-          </motion.div>
-        </div>
-      </AccessibleSection>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
 import { query } from '../config/database.js';
-import { getAllPrograms, getProgramById, registerForProgram, createProgram, updateProgram, deleteProgram } from '../controllers/programsController.js';
+import { getAllPrograms, getProgramById, registerForProgram, createProgram, updateProgram, deleteProgram, supportProgram } from '../controllers/programsController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import { adminMiddleware } from '../middleware/adminMiddleware.js';
 import multer from 'multer';
@@ -38,5 +38,8 @@ router.put('/:id', authMiddleware, adminMiddleware, updateProgram);
 
 // Delete a program (admin only)
 router.delete('/:id', authMiddleware, adminMiddleware, deleteProgram);
+
+// Add support for a program (public)
+router.post('/:id/support', supportProgram);
 
 export default router;

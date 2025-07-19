@@ -1,5 +1,5 @@
-import React, { forwardRef } from 'react';
-import { theme } from '../../../theme';
+import React from 'react';
+import { DESIGN_SYSTEM } from '../../common/DesignSystem';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -8,6 +8,8 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   icon?: React.ReactNode;
   dir?: 'rtl' | 'ltr';
   fullWidth?: boolean;
+  as?: 'input' | 'select' | 'checkbox';
+  options?: { value: string; label: string }[]; // for select
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -20,7 +22,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       dir,
       fullWidth = true,
       className = '',
-      children,
+      as = 'input',
+      options = [],
       type = 'text',
       ...props
     },
@@ -29,65 +32,30 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const direction =
       dir ||
       (typeof document !== 'undefined'
-        ? (document?.documentElement?.dir as 'rtl' | 'ltr')
-        : 'rtl') ||
-      'rtl';
+        ? (document.documentElement.dir as 'rtl' | 'ltr')
+        : 'rtl');
     const isRtl = direction === 'rtl';
-
-    const baseStyles = `
-      block
-      bg-white
-      border rounded-lg
-      px-4 py-2
-      transition-all duration-200
-      placeholder:text-neutral-400
-      ${theme.fontFamily.arabic}
-    `;
-
-    const states = error
-      ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-      : 'border-neutral-300 focus:border-primary-500 focus:ring-primary-500';
-
-    const iconPadding = icon ? (isRtl ? 'pr-10' : 'pl-10') : '';
     const widthClass = fullWidth ? 'w-full' : '';
+    const baseInput = [
+      'block',
+      `rounded-md`,
+      `border`,
+      `bg-white`,
+      `text-neutral-900`,
+      `placeholder:text-neutral-400`,
+      `focus:ring-2 focus:ring-[${DESIGN_SYSTEM.colors.primary}] focus:border-[${DESIGN_SYSTEM.colors.primary}]`,
+      'transition-all duration-150',
+      'py-2 px-3',
+      error
+        ? `border-[${DESIGN_SYSTEM.colors.error}] focus:ring-[${DESIGN_SYSTEM.colors.error}] focus:border-[${DESIGN_SYSTEM.colors.error}]`
+        : `border-neutral-300`,
+      icon ? (isRtl ? 'pr-10' : 'pl-10') : '',
+      widthClass,
+      className,
+    ].join(' ');
 
-    // دعم تلقائي للـselect
-    if (children && type === 'text') {
-      return (
-        <div className={`relative ${widthClass}`} dir={direction}>
-          {label && (
-            <label className="block mb-1 text-sm font-medium text-neutral-900">
-              {label}
-            </label>
-          )}
-          <select
-            // @ts-ignore
-            ref={ref as React.Ref<HTMLSelectElement>}
-            className={`
-              ${baseStyles}
-              ${states}
-              ${className}
-              appearance-none
-            `}
-            {...(props as React.SelectHTMLAttributes<HTMLSelectElement>)}
-          >
-            {children}
-          </select>
-          {(error || helperText) && (
-            <p
-              className={`mt-1 text-sm ${
-                error ? 'text-red-500' : 'text-neutral-500'
-              }`}
-            >
-              {error || helperText}
-            </p>
-          )}
-        </div>
-      );
-    }
-
-    // دعم input type=checkbox بشكل جمالي
-    if (type === 'checkbox') {
+    // Checkbox
+    if (as === 'checkbox' || type === 'checkbox') {
       return (
         <div
           className={`flex items-center gap-2 ${widthClass}`}
@@ -96,10 +64,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             type="checkbox"
-            className={`
-              form-checkbox h-5 w-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500 transition
-              ${className}
-            `}
+            className={[
+              'form-checkbox h-5 w-5 text-primary-600 border-neutral-300 rounded focus:ring-primary-500 transition',
+              className,
+            ].join(' ')}
             {...props}
           />
           {label && (
@@ -110,7 +78,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {(error || helperText) && (
             <p
               className={`mt-1 text-sm ${
-                error ? 'text-red-500' : 'text-neutral-500'
+                error ? 'text-error' : 'text-neutral-500'
               }`}
             >
               {error || helperText}
@@ -120,47 +88,82 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       );
     }
 
-    // input عادي
+    // Select
+    if (as === 'select' && options.length > 0) {
+      return (
+        <div className={`relative ${widthClass}`} dir={direction}>
+          {label && (
+            <label
+              htmlFor={props.id}
+              className="block mb-1 font-medium rtl:text-right"
+              aria-label={label}
+            >
+              {label}
+            </label>
+          )}
+          <select
+            ref={ref as any}
+            className={baseInput + ' appearance-none'}
+            aria-invalid={!!error}
+            aria-describedby={error ? `${props.id}-error` : undefined}
+            dir={direction}
+            {...(props as React.SelectHTMLAttributes<HTMLSelectElement>)}
+          >
+            {options.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          {helperText && !error && (
+            <div className="text-xs text-neutral-500 mt-1 rtl:text-right">
+              {helperText}
+            </div>
+          )}
+          {error && (
+            <div
+              id={`${props.id}-error`}
+              className="text-xs text-error mt-1 rtl:text-right"
+            >
+              {error}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Input عادي
     return (
-      <div className={`relative ${widthClass}`} dir={direction}>
+      <div className={widthClass} dir={direction}>
         {label && (
-          <label className="block mb-1 text-sm font-medium text-neutral-900">
+          <label
+            htmlFor={props.id}
+            className="block mb-1 font-medium rtl:text-right"
+            aria-label={label}
+          >
             {label}
           </label>
         )}
-
-        <div className="relative">
-          {icon && (
-            <div
-              className={`absolute inset-y-0 ${
-                isRtl ? 'right-3' : 'left-3'
-              } flex items-center pointer-events-none text-neutral-400`}
-            >
-              {icon}
-            </div>
-          )}
-
-          <input
-            ref={ref}
-            type={type}
-            className={`
-              ${baseStyles}
-              ${states}
-              ${iconPadding}
-              ${className}
-            `}
-            {...props}
-          />
-        </div>
-
-        {(error || helperText) && (
-          <p
-            className={`mt-1 text-sm ${
-              error ? 'text-red-500' : 'text-neutral-500'
-            }`}
+        <input
+          ref={ref}
+          className={baseInput}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${props.id}-error` : undefined}
+          dir={direction}
+          {...props}
+        />
+        {helperText && !error && (
+          <div className="text-xs text-neutral-500 mt-1 rtl:text-right">
+            {helperText}
+          </div>
+        )}
+        {error && (
+          <div
+            id={`${props.id}-error`}
+            className="text-xs text-error mt-1 rtl:text-right"
           >
-            {error || helperText}
-          </p>
+            {error}
+          </div>
         )}
       </div>
     );

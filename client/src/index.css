@@ -219,6 +219,15 @@
     @apply animate-pulse bg-neutral-200 rounded;
   }
 
+  /* حركة shimmer لمكون Skeleton */
+  .animate-shimmer {
+    animation: shimmer 1.2s infinite linear;
+  }
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
   /* Modern focus styles */
   .focus-ring {
     @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;

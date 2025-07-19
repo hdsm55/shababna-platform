@@ -74,10 +74,15 @@ CREATE TABLE IF NOT EXISTS program_supporters (
 );
 
 -- === 7. جدول تسجيلات الفعاليات ===
+-- يسمح بتسجيل أي شخص (بحساب أو بدون حساب)
 CREATE TABLE IF NOT EXISTS event_registrations (
     id SERIAL PRIMARY KEY,
     event_id INTEGER REFERENCES events(id) ON DELETE CASCADE,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    email VARCHAR(255),
+    phone VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
