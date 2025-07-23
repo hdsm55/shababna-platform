@@ -38,7 +38,7 @@ import {
   X,
 } from 'lucide-react';
 import QuickActions from '../../components/common/QuickActions';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface Event {
   id: number;
@@ -364,6 +364,7 @@ const EventsDashboard: React.FC = () => {
 
   // دالة التعامل مع الأزرار غير الفعالة
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const handleDelete = async (id: string) => {
     if (window.confirm('هل أنت متأكد من حذف هذه الفعالية؟')) {
@@ -372,7 +373,7 @@ const EventsDashboard: React.FC = () => {
         setModalMsg('تم حذف الفعالية بنجاح!');
         setModalOpen(true);
         // إعادة تحميل البيانات
-        queryClient.invalidateQueries({ queryKey: ['events'] });
+        queryClient.invalidateQueries({ queryKey: ['dashboard-events'] });
       } catch (error) {
         console.error('خطأ في حذف الفعالية:', error);
         setFormError('حدث خطأ أثناء حذف الفعالية');
@@ -439,533 +440,251 @@ const EventsDashboard: React.FC = () => {
 
   return (
     <DashboardLayout>
-      {isLoading && (
-        <div className="text-center py-8 text-lg text-gray-500">
-          جاري تحميل الفعاليات...
+      <section className="py-8 px-4" dir="rtl">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-primary-700">
+            إدارة الفعاليات
+          </h1>
+          <Button onClick={() => handleOpenModal('add')}>
+            إضافة فعالية جديدة
+          </Button>
         </div>
-      )}
-      {error && (
-        <div className="text-center py-8 text-lg text-red-600">
-          حدث خطأ أثناء جلب الفعاليات
-        </div>
-      )}
-      {!isLoading && !error && filteredEvents.length === 0 && (
-        <div className="text-center py-8 text-lg text-gray-500">
-          لا توجد فعاليات متاحة
-        </div>
-      )}
-      <div className="container mx-auto px-2 md:px-6 py-8">
-        {/* Quick Actions */}
-        <Card className="mb-10 shadow-lg rounded-2xl p-6 bg-gradient-to-tr from-blue-50 to-white border-0">
-          <h2 className="text-xl md:text-2xl font-extrabold text-gray-900 mb-6 tracking-tight text-center md:text-right">
-            إجراءات سريعة
-          </h2>
-          <QuickActions actions={quickActions} className="mb-0" />
-        </Card>
-
-        {/* قائمة الفعاليات */}
-        <Card className="shadow-md rounded-2xl p-6 bg-white border-0 mb-8">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">
-              قائمة الفعاليات
-            </h1>
-            <Link to="/events">
-              <Button
-                variant="outline"
-                className="font-bold text-primary-600 border-primary-300"
-              >
-                عرض جميع الفعاليات
-              </Button>
-            </Link>
+        {isLoading ? (
+          <div className="flex justify-center py-12">
+            <LoadingSpinner size="lg" />
           </div>
-          {/* جدول الفعاليات */}
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 bg-white rounded-xl shadow-sm">
-              <thead className="bg-blue-50">
-                <tr>
-                  <th className="px-4 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    اسم الفعالية
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    الوصف
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    التاريخ
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    الحالة
-                  </th>
-                  <th className="px-4 py-3 text-right text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    إجراءات
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-100">
-                {events.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={5}
-                      className="text-center text-gray-400 py-8 text-lg font-semibold"
-                    >
-                      لا توجد فعاليات حالياً
-                    </td>
-                  </tr>
-                ) : (
-                  events.map((event: any) => (
-                    <tr
-                      key={event.id}
-                      className="hover:bg-blue-50 transition-colors"
-                    >
-                      <td className="px-4 py-3 text-sm text-gray-900 font-medium">
-                        {event.title}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-700">
-                        {event.description}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-700">
-                        {event.start_date}
-                      </td>
-                      <td className="px-4 py-3 text-sm">
-                        <span
-                          className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
-                            event.status === 'active'
-                              ? 'bg-green-100 text-green-700'
-                              : event.status === 'upcoming'
-                              ? 'bg-yellow-100 text-yellow-700'
-                              : event.status === 'completed'
-                              ? 'bg-blue-100 text-blue-700'
-                              : 'bg-gray-100 text-gray-700'
-                          }`}
-                        >
-                          {event.status === 'active'
-                            ? 'نشطة'
-                            : event.status === 'upcoming'
-                            ? 'قادمة'
-                            : event.status === 'completed'
-                            ? 'منتهية'
-                            : 'غير معروف'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          as={Link}
-                          to={`/dashboard/events/${event.id}`}
-                          className="rounded-md"
-                        >
-                          عرض
-                        </Button>
-                        <Link to={`/dashboard/events/${event.id}/edit`}>
-                          <Button variant="outline" size="sm" icon={Edit}>
-                            تعديل
-                          </Button>
-                        </Link>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      </div>
-
-      {/* Modal */}
-      <Modal
-        open={modalOpen}
-        onClose={handleCloseModal}
-        title={
-          modalType === 'add'
-            ? 'إضافة فعالية جديدة'
-            : modalType === 'edit'
-            ? 'تعديل الفعالية'
-            : 'تفاصيل الفعالية'
-        }
-      >
-        {modalType === 'view' && selectedEvent ? (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                اسم الفعالية
-              </label>
-              <p className="text-gray-900">{selectedEvent.title}</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                الوصف
-              </label>
-              <p className="text-gray-900">{selectedEvent.description}</p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  الفئة
-                </label>
-                <p className="text-gray-900">{selectedEvent.category}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  الحالة
-                </label>
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                    selectedEvent.status
-                  )}`}
-                >
-                  {getStatusText(selectedEvent.status)}
-                </span>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  الموقع
-                </label>
-                <p className="text-gray-900">{selectedEvent.location}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  السعة
-                </label>
-                <p className="text-gray-900">
-                  {selectedEvent.max_attendees} شخص
-                </p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  تاريخ البداية
-                </label>
-                <p className="text-gray-900">
-                  {formatDate(selectedEvent.start_date)}
-                </p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  تاريخ الانتهاء
-                </label>
-                <p className="text-gray-900">
-                  {formatDate(selectedEvent.end_date)}
-                </p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  المتأهلين
-                </label>
-                <p className="text-gray-900">{selectedEvent.attendees} شخص</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  الصورة
-                </label>
-                <div className="relative">
-                  {selectedEvent.image_url ? (
-                    <img
-                      src={selectedEvent.image_url}
-                      alt="صورة الفعالية"
-                      className="w-32 h-32 object-cover rounded-lg border"
-                    />
-                  ) : (
-                    <div className="w-32 h-32 bg-gray-200 flex items-center justify-center rounded-lg border text-gray-500 text-sm">
-                      لا يوجد صورة
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-2 pt-4">
-              <Button
-                onClick={() => handleOpenModal('edit', selectedEvent)}
-                className="flex-1"
-              >
-                تعديل الفعالية
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={handleCloseModal}
-                className="flex-1"
-              >
-                إغلاق
-              </Button>
-            </div>
-          </div>
+        ) : error ? (
+          <Alert type="error">
+            حدث خطأ أثناء جلب الفعاليات. يرجى المحاولة لاحقًا.
+          </Alert>
+        ) : filteredEvents.length === 0 ? (
+          <Alert type="info">لا توجد فعاليات متاحة حالياً.</Alert>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {formError && (
-              <Alert type="error" className="mb-4">
-                {formError}
-              </Alert>
-            )}
-
-            <div>
-              <label
-                htmlFor="title"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                اسم الفعالية
-              </label>
-              <Input
-                id="title"
-                name="title"
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {filteredEvents.map((event) => (
+              <Card key={event.id} className="flex flex-col gap-2">
+                {event.image_url && (
+                  <img
+                    src={event.image_url}
+                    alt={event.title}
+                    className="w-full h-40 object-cover rounded-t-lg mb-2"
+                    loading="lazy"
+                  />
+                )}
+                <div className="flex flex-col gap-1 p-2">
+                  <h2 className="text-lg font-bold text-primary-700 mb-1 line-clamp-2">
+                    {event.title}
+                  </h2>
+                  <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+                    <span>{event.category}</span>
+                    <span>•</span>
+                    <span>{event.location}</span>
+                    <span>•</span>
+                    <span>
+                      {event.start_date} - {event.end_date}
+                    </span>
+                    <span>•</span>
+                    <span>
+                      {event.status === 'active'
+                        ? 'نشطة'
+                        : event.status === 'completed'
+                        ? 'مكتملة'
+                        : event.status === 'pending'
+                        ? 'قيد الانتظار'
+                        : 'قادمة'}
+                    </span>
+                  </div>
+                  <p className="text-gray-700 mb-2 line-clamp-3">
+                    {event.description?.slice(0, 100) || ''}
+                    {event.description?.length > 100 ? '...' : ''}
+                  </p>
+                  <div className="flex gap-2 mt-auto">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleOpenModal('view', event)}
+                    >
+                      عرض
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        navigate(`/dashboard/events/${event.id}/edit`)
+                      }
+                    >
+                      تعديل
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      color="red"
+                      onClick={() => handleDelete(event.id)}
+                    >
+                      حذف
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+        <Modal
+          isOpen={modalOpen}
+          onClose={handleCloseModal}
+          title={
+            modalType === 'add'
+              ? 'إضافة فعالية'
+              : modalType === 'edit'
+              ? 'تعديل فعالية'
+              : 'تفاصيل الفعالية'
+          }
+        >
+          {modalType === 'view' && selectedEvent ? (
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-primary-700">
+                {selectedEvent.title}
+              </h2>
+              <div className="text-gray-600">{selectedEvent.description}</div>
+              <div className="flex flex-col gap-2 text-sm">
+                <div>الفئة: {selectedEvent.category}</div>
+                <div>الموقع: {selectedEvent.location}</div>
+                <div>
+                  التاريخ: {selectedEvent.start_date} - {selectedEvent.end_date}
+                </div>
+                <div>الحالة: {getStatusText(selectedEvent.status)}</div>
+                <div>الحد الأقصى للحضور: {selectedEvent.max_attendees}</div>
+                <div>الحضور الحالي: {selectedEvent.attendees}</div>
+              </div>
+              {selectedEvent.image_url && (
+                <img
+                  src={selectedEvent.image_url}
+                  alt="صورة الفعالية"
+                  className="w-full h-40 object-cover rounded"
+                />
+              )}
+              <div className="flex gap-2 pt-4">
+                <Button
+                  onClick={() => handleOpenModal('edit', selectedEvent)}
+                  className="flex-1"
+                >
+                  تعديل
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={handleCloseModal}
+                  className="flex-1"
+                >
+                  إغلاق
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <input
                 type="text"
+                name="title"
+                placeholder="اسم الفعالية"
+                className="w-full border rounded p-2"
                 value={form.title}
                 onChange={handleChange}
                 required
-                placeholder="أدخل اسم الفعالية"
               />
-            </div>
-
-            <div>
-              <label
-                htmlFor="description"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                الوصف
-              </label>
+              <input
+                type="text"
+                name="category"
+                placeholder="الفئة"
+                className="w-full border rounded p-2"
+                value={form.category}
+                onChange={handleChange}
+                required
+              />
+              <input
+                type="text"
+                name="location"
+                placeholder="الموقع"
+                className="w-full border rounded p-2"
+                value={form.location}
+                onChange={handleChange}
+                required
+              />
+              <input
+                type="date"
+                name="start_date"
+                placeholder="تاريخ البداية"
+                className="w-full border rounded p-2"
+                value={form.start_date}
+                onChange={handleChange}
+                required
+              />
+              <input
+                type="date"
+                name="end_date"
+                placeholder="تاريخ النهاية"
+                className="w-full border rounded p-2"
+                value={form.end_date}
+                onChange={handleChange}
+                required
+              />
+              <input
+                type="number"
+                name="max_attendees"
+                placeholder="الحد الأقصى للحضور"
+                className="w-full border rounded p-2"
+                value={form.max_attendees}
+                onChange={handleChange}
+              />
               <textarea
-                id="description"
                 name="description"
+                placeholder="وصف الفعالية"
+                className="w-full border rounded p-2 min-h-[100px]"
                 value={form.description}
                 onChange={handleChange}
                 required
-                rows={3}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                placeholder="أدخل وصف الفعالية"
               />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label
-                  htmlFor="category"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  الفئة
-                </label>
-                <select
-                  id="category"
-                  name="category"
-                  value={form.category}
-                  onChange={handleChange}
-                  required
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="">اختر الفئة</option>
-                  <option value="conference">مؤتمر</option>
-                  <option value="workshop">ورشة عمل</option>
-                  <option value="networking">شبكة</option>
-                </select>
-              </div>
-              <div>
-                <label
-                  htmlFor="location"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  الموقع
-                </label>
-                <Input
-                  id="location"
-                  name="location"
-                  type="text"
-                  value={form.location}
-                  onChange={handleChange}
-                  required
-                  placeholder="أدخل الموقع"
+                <label className="block mb-1">صورة الفعالية (اختياري)</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
                 />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="start_date"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  تاريخ البداية
-                </label>
-                <Input
-                  id="start_date"
-                  name="start_date"
-                  type="date"
-                  value={form.start_date}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="end_date"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  تاريخ الانتهاء
-                </label>
-                <Input
-                  id="end_date"
-                  name="end_date"
-                  type="date"
-                  value={form.end_date}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label
-                  htmlFor="max_attendees"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  السعة
-                </label>
-                <Input
-                  id="max_attendees"
-                  name="max_attendees"
-                  type="number"
-                  value={form.max_attendees}
-                  onChange={handleChange}
-                  required
-                  placeholder="0"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="attendees"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  المتأهلين
-                </label>
-                <Input
-                  id="attendees"
-                  name="attendees"
-                  type="number"
-                  value={form.attendees}
-                  onChange={handleChange}
-                  required
-                  placeholder="0"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="image_url"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  الصورة
-                </label>
-                <Input
-                  id="image_url"
-                  name="image_url"
-                  type="text"
-                  value={form.image_url}
-                  onChange={handleChange}
-                  placeholder="رابط صورة الفعالية"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="status"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  الحالة
-                </label>
-                <select
-                  id="status"
-                  name="status"
-                  value={form.status}
-                  onChange={handleChange}
-                  required
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="upcoming">قادم</option>
-                  <option value="active">نشط</option>
-                  <option value="completed">مكتمل</option>
-                  <option value="cancelled">ملغي</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Image Upload */}
-            <div>
-              <label
-                htmlFor="image"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                صورة الفعالية
-              </label>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <input
-                    id="image"
-                    name="image"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
-                  <label
-                    htmlFor="image"
-                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-                  >
-                    <Upload className="w-4 h-4" />
-                    <span>اختر صورة</span>
-                  </label>
-                  {imagePreview && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={removeImage}
-                      icon={X}
-                    >
-                      إزالة
-                    </Button>
-                  )}
-                </div>
                 {imagePreview && (
-                  <div className="relative">
+                  <div className="relative mt-2 w-32 h-20">
                     <img
                       src={imagePreview}
-                      alt="معاينة الصورة"
-                      className="w-32 h-32 object-cover rounded-lg border"
+                      alt="معاينة"
+                      className="w-full h-full object-cover rounded"
                     />
+                    <button
+                      type="button"
+                      className="absolute top-0 right-0 bg-white rounded-full p-1 shadow"
+                      onClick={removeImage}
+                    >
+                      <X className="w-4 h-4 text-red-500" />
+                    </button>
                   </div>
                 )}
-                <p className="text-xs text-gray-500">
-                  المقاس المفضل: 400×400 بكسل (مربع). الحد الأقصى: 2MB
-                </p>
               </div>
-            </div>
-
-            <div className="flex gap-2 pt-4">
-              <Button type="submit" className="flex-1">
-                {modalType === 'add' ? 'إضافة الفعالية' : 'حفظ التغييرات'}
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleCloseModal}
-                className="flex-1"
-              >
-                إلغاء
-              </Button>
-            </div>
-          </form>
-        )}
-      </Modal>
-
-      {/* Modal التنبيه */}
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="تنبيه">
-        <div className="text-center py-4">
-          <p className="text-gray-700 text-lg font-medium">{modalMsg}</p>
-        </div>
-      </Modal>
+              {formError && (
+                <div className="text-red-600 text-sm">{formError}</div>
+              )}
+              <div className="flex gap-2 justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCloseModal}
+                >
+                  إلغاء
+                </Button>
+                <Button type="submit">
+                  {modalType === 'add' ? 'إضافة' : 'حفظ التعديلات'}
+                </Button>
+              </div>
+            </form>
+          )}
+        </Modal>
+      </section>
     </DashboardLayout>
   );
 };

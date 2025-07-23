@@ -46,10 +46,10 @@ const sidebarSections = [
         label: 'الفعاليات',
       },
       {
-        key: 'donations',
-        path: '/dashboard/donations',
-        icon: DollarSign,
-        label: 'التبرعات',
+        key: 'blogs',
+        path: '/dashboard/blogs',
+        icon: MessageCircle,
+        label: 'المدونة',
       },
       {
         key: 'registrants',

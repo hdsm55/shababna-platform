@@ -32,7 +32,7 @@ const Header: React.FC = () => {
     { key: 'home', path: '/' },
     { key: 'events', path: '/events' },
     { key: 'programs', path: '/programs' },
-    { key: 'donations', path: '/donations' },
+    { key: 'blogs', path: '/blogs' },
     { key: 'joinUs', path: '/join-us' },
     { key: 'contact', path: '/contact' },
   ];

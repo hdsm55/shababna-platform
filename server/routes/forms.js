@@ -18,6 +18,15 @@ router.post('/contact', async (req, res) => {
             });
         }
 
+        // التحقق من صحة البريد الإلكتروني
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({
+                success: false,
+                message: 'البريد الإلكتروني غير صالح'
+            });
+        }
+
         // حفظ النموذج في قاعدة البيانات
         const formData = {
             form_type: 'contact',
@@ -29,13 +38,27 @@ router.post('/contact', async (req, res) => {
             message
         };
 
-        const savedForm = await emailService.saveFormSubmission(formData);
+        let savedForm;
+        try {
+            savedForm = await emailService.saveFormSubmission(formData);
+        } catch (dbError) {
+            console.error('Database error:', dbError);
+            return res.status(500).json({
+                success: false,
+                message: 'حدث خطأ أثناء حفظ الرسالة. يرجى المحاولة مرة أخرى.'
+            });
+        }
 
-        // إرسال إيميل تأكيد للمستخدم
-        await emailService.sendContactConfirmation(formData);
-
-        // إرسال إشعار للمدير
-        await emailService.sendAdminNotification(formData);
+        // محاولة إرسال الإيميلات
+        try {
+            // إرسال إيميل تأكيد للمستخدم
+            await emailService.sendContactConfirmation(formData);
+            // إرسال إشعار للمدير
+            await emailService.sendAdminNotification(formData);
+        } catch (emailError) {
+            // تسجيل الخطأ ولكن لا نعيد خطأ للمستخدم لأن الرسالة تم حفظها بنجاح
+            console.error('Email sending error:', emailError);
+        }
 
         res.json({
             success: true,
@@ -125,6 +148,47 @@ router.post('/join-us', async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.'
+        });
+    }
+});
+
+// استقبال طلبات الانضمام من الواجهة الأمامية بدون توكن
+router.post('/join-requests', async (req, res) => {
+    try {
+        const {
+            first_name,
+            last_name,
+            email,
+            phone,
+            country,
+            age,
+            motivation
+        } = req.body;
+
+        if (!first_name || !last_name || !email || !country || !age || !motivation) {
+            return res.status(400).json({
+                success: false,
+                message: 'جميع الحقول مطلوبة'
+            });
+        }
+
+        const result = await query(
+            `INSERT INTO join_requests (first_name, last_name, email, phone, country, age, motivation, created_at, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), 'pending')
+       RETURNING *`,
+            [first_name, last_name, email, phone, country, age, motivation]
+        );
+
+        res.json({
+            success: true,
+            message: 'تم إرسال طلب الانضمام بنجاح!',
+            data: result.rows[0]
+        });
+    } catch (error) {
+        console.error('Join request error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'حدث خطأ أثناء إرسال الطلب'
         });
     }
 });

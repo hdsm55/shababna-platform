@@ -12,7 +12,11 @@ export interface Registrant {
 }
 
 export function useRegistrants() {
-  const [registrants, setRegistrants] = useState<Registrant[]>([]);
+  const [users, setUsers] = useState<Registrant[]>([]);
+  const [events, setEvents] = useState<Registrant[]>([]);
+  const [programs, setPrograms] = useState<Registrant[]>([]);
+  const [joins, setJoins] = useState<Registrant[]>([]);
+  // const [newsletter, setNewsletter] = useState<Registrant[]>([]); // مؤجل
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,9 +24,10 @@ export function useRegistrants() {
     setLoading(true);
     setError(null);
     try {
-      // جلب بيانات العضوية
+      // عضوية
       const usersRes = await fetchUsers();
-      const users: Registrant[] = (usersRes?.data?.items || []).map((u: any) => ({
+      console.log('users:', JSON.stringify(usersRes, null, 2));
+      setUsers((usersRes?.data?.items || []).map((u: any) => ({
         id: `user-${u.id}`,
         name: `${u.first_name || u.firstName || ''} ${u.last_name || u.lastName || ''}`.trim(),
         email: u.email,
@@ -30,32 +35,35 @@ export function useRegistrants() {
         source: 'عضوية',
         sourceDetails: '-',
         registeredAt: u.created_at || u.joinDate || '',
-      }));
-      // جلب تسجيلات الفعاليات
+      })));
+      // فعاليات
       const eventsRes = await fetchEventRegistrations();
-      const events: Registrant[] = (eventsRes?.data?.items || []).map((r: any) => ({
+      console.log('event registrations:', JSON.stringify(eventsRes, null, 2));
+      setEvents((eventsRes?.data?.registrations || []).map((r: any) => ({
         id: `event-${r.id}`,
-        name: `${r.first_name || ''} ${r.last_name || ''}`.trim(),
-        email: r.email,
+        name: r.user_name || `${r.first_name || ''} ${r.last_name || ''}`.trim(),
+        email: r.user_email || r.email,
         phone: r.phone,
         source: 'فعالية',
         sourceDetails: r.event_title || r.event?.title || '-',
         registeredAt: r.created_at || r.registered_at || '',
-      }));
-      // جلب تسجيلات البرامج
+      })));
+      // برامج
       const programsRes = await fetchProgramRegistrations();
-      const programs: Registrant[] = (programsRes?.data?.items || []).map((r: any) => ({
+      console.log('program registrations:', JSON.stringify(programsRes, null, 2));
+      setPrograms((programsRes?.data?.registrations || []).map((r: any) => ({
         id: `program-${r.id}`,
-        name: `${r.first_name || ''} ${r.last_name || ''}`.trim(),
-        email: r.email,
+        name: r.user_name || `${r.first_name || ''} ${r.last_name || ''}`.trim(),
+        email: r.user_email || r.email,
         phone: r.phone,
         source: 'برنامج',
         sourceDetails: r.program_title || r.program?.title || '-',
         registeredAt: r.created_at || r.registered_at || '',
-      }));
-      // جلب طلبات الانضمام
+      })));
+      // انضمام
       const joinRes = await fetchJoinRequests();
-      const joins: Registrant[] = (joinRes?.data?.items || []).map((j: any) => ({
+      console.log('join requests:', JSON.stringify(joinRes, null, 2));
+      setJoins((joinRes?.data?.requests || []).map((j: any) => ({
         id: `join-${j.id}`,
         name: `${j.first_name || ''} ${j.last_name || ''}`.trim(),
         email: j.email,
@@ -63,8 +71,20 @@ export function useRegistrants() {
         source: 'انضمام',
         sourceDetails: j.country || '-',
         registeredAt: j.created_at || '',
-      }));
-      setRegistrants([...users, ...events, ...programs, ...joins]);
+      })));
+      // نشرة بريدية (مؤجل)
+      // if (fetchNewsletterSubscribers) {
+      //   const newsletterRes = await fetchNewsletterSubscribers();
+      //   setNewsletter((newsletterRes?.data?.items || []).map((n: any) => ({
+      //     id: `newsletter-${n.id}`,
+      //     name: n.first_name ? `${n.first_name} ${n.last_name || ''}`.trim() : n.email,
+      //     email: n.email,
+      //     phone: n.phone,
+      //     source: 'نشرة بريدية',
+      //     sourceDetails: '-',
+      //     registeredAt: n.created_at || '',
+      //   })));
+      // }
     } catch (err) {
       setError('حدث خطأ أثناء جلب بيانات المسجلين');
     } finally {
@@ -72,10 +92,9 @@ export function useRegistrants() {
     }
   }, []);
 
-  // جلب البيانات عند أول تحميل
   useState(() => {
     fetchAll();
   });
 
-  return { registrants, loading, error, refetch: fetchAll };
+  return { users, events, programs, joins, loading, error, refetch: fetchAll };
 }

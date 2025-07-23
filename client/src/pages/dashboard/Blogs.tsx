@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import { useQuery } from '@tanstack/react-query';
-import { fetchBlogs } from '../../services/blogsApi';
+import {
+  fetchBlogs,
+  createBlog,
+  updateBlog,
+  deleteBlog,
+} from '../../services/blogsApi';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import Card from '../../components/common/Card';
@@ -15,12 +20,72 @@ const BlogsDashboard: React.FC = () => {
     ['dashboard-blogs'],
     fetchBlogs
   );
+  console.log('blogs data:', data);
+  console.log('blogs error:', error);
   const blogs: Blog[] = data || [];
 
   // حالة النافذة المنبثقة (للتطوير لاحقًا)
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
   const [modalType, setModalType] = useState<'add' | 'edit' | 'view'>('add');
+
+  // حالة النموذج
+  const [form, setForm] = useState({
+    title: '',
+    content: '',
+    author: '',
+    image_url: '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  // تعبئة النموذج عند التعديل
+  useEffect(() => {
+    if (modalType === 'edit' && selectedBlog) {
+      setForm({
+        title: selectedBlog.title || '',
+        content: selectedBlog.content || '',
+        author: selectedBlog.author || '',
+        image_url: selectedBlog.image_url || '',
+      });
+    } else if (modalType === 'add') {
+      setForm({ title: '', content: '', author: '', image_url: '' });
+    }
+  }, [modalType, selectedBlog]);
+
+  // إضافة أو تعديل مقالة
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMsg('');
+    try {
+      if (modalType === 'add') {
+        await createBlog(form);
+      } else if (modalType === 'edit' && selectedBlog) {
+        await updateBlog(selectedBlog.id, form);
+      }
+      setModalOpen(false);
+      refetch();
+    } catch (err) {
+      setErrorMsg('حدث خطأ أثناء الحفظ');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // حذف مقالة
+  const handleDelete = async (id) => {
+    if (!window.confirm('هل أنت متأكد من حذف هذه المقالة؟')) return;
+    setLoading(true);
+    try {
+      await deleteBlog(id);
+      refetch();
+    } catch (err) {
+      alert('حدث خطأ أثناء الحذف');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -101,9 +166,7 @@ const BlogsDashboard: React.FC = () => {
                       size="sm"
                       variant="outline"
                       color="red"
-                      onClick={() => {
-                        /* حذف لاحقًا */
-                      }}
+                      onClick={() => handleDelete(blog.id)}
                     >
                       حذف
                     </Button>
@@ -125,9 +188,50 @@ const BlogsDashboard: React.FC = () => {
               : 'تفاصيل المقالة'
           }
         >
-          <div className="text-center text-gray-500 py-8">
-            نموذج إضافة/تعديل المقالة قيد التطوير...
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="text"
+              placeholder="العنوان"
+              className="w-full border rounded p-2"
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              required
+            />
+            <input
+              type="text"
+              placeholder="اسم الكاتب"
+              className="w-full border rounded p-2"
+              value={form.author}
+              onChange={(e) => setForm({ ...form, author: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="رابط الصورة (اختياري)"
+              className="w-full border rounded p-2"
+              value={form.image_url}
+              onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+            />
+            <textarea
+              placeholder="المحتوى"
+              className="w-full border rounded p-2 min-h-[120px]"
+              value={form.content}
+              onChange={(e) => setForm({ ...form, content: e.target.value })}
+              required
+            />
+            {errorMsg && <div className="text-red-600 text-sm">{errorMsg}</div>}
+            <div className="flex gap-2 justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setModalOpen(false)}
+              >
+                إلغاء
+              </Button>
+              <Button type="submit" loading={loading}>
+                {modalType === 'add' ? 'إضافة' : 'حفظ التعديلات'}
+              </Button>
+            </div>
+          </form>
         </Modal>
       </section>
     </DashboardLayout>

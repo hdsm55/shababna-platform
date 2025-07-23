@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { countries } from '../../../utils/countries';
 
 const NewUser: React.FC = () => {
   const [firstName, setFirstName] = useState('');
@@ -10,6 +11,7 @@ const NewUser: React.FC = () => {
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [bio, setBio] = useState('');
+  const [country, setCountry] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -103,6 +105,22 @@ const NewUser: React.FC = () => {
               rows={3}
               required
             />
+          </div>
+          <div>
+            <label className="block mb-1 font-medium">الدولة</label>
+            <select
+              className="w-full border rounded px-3 py-2 focus:outline-none focus:ring"
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              required
+            >
+              <option value="">اختر الدولة</option>
+              {countries.map((c) => (
+                <option key={c.code} value={c.ar}>
+                  {c.ar}
+                </option>
+              ))}
+            </select>
           </div>
           <button
             type="submit"

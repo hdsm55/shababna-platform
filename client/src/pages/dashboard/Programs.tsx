@@ -375,269 +375,82 @@ const ProgramsDashboard: React.FC = () => {
       <SkipToContent />
 
       <AccessibleSection>
-        <div className="max-w-7xl mx-auto py-6 px-2 sm:px-4 lg:px-8">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">إدارة البرامج</h1>
-            <Link to="/programs">
-              <Button
-                variant="outline"
-                className="font-bold text-primary-600 border-primary-300"
-              >
-                عرض جميع البرامج
-              </Button>
-            </Link>
+        <section className="py-8 px-4" dir="rtl">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-2xl font-bold text-primary-700">
+              إدارة البرامج
+            </h1>
+            <Button onClick={() => handleOpenModal('add')}>
+              إضافة برنامج جديد
+            </Button>
           </div>
-
-          {/* Search and Filters */}
-          <Card className="mb-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <Input
-                    type="text"
-                    placeholder="البحث في البرامج..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 rtl:pr-10 rtl:pl-4"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setShowFilters(!showFilters)}
-                  icon={Filter}
-                >
-                  الفلاتر
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => {
-                    setSearchTerm('');
-                    setStatusFilter('all');
-                    setCategoryFilter('all');
-                  }}
-                >
-                  إعادة تعيين
-                </Button>
-              </div>
-            </div>
-
-            {/* Advanced Filters */}
-            {showFilters && (
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      الحالة
-                    </label>
-                    <select
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    >
-                      <option value="all">جميع الحالات</option>
-                      <option value="active">نشط</option>
-                      <option value="completed">مكتمل</option>
-                      <option value="pending">قيد الانتظار</option>
-                      <option value="cancelled">ملغي</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      الفئة
-                    </label>
-                    <select
-                      value={categoryFilter}
-                      onChange={(e) => setCategoryFilter(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    >
-                      <option value="all">جميع الفئات</option>
-                      <option value="صحية">صحية</option>
-                      <option value="تعليمية">تعليمية</option>
-                      <option value="قيادية">قيادية</option>
-                      <option value="اجتماعية">اجتماعية</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      الترتيب
-                    </label>
-                    <select className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500">
-                      <option value="newest">الأحدث</option>
-                      <option value="oldest">الأقدم</option>
-                      <option value="name">الاسم</option>
-                      <option value="progress">التقدم</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            )}
-          </Card>
-
-          {/* Programs Grid */}
           {isLoading ? (
-            <div className="flex justify-center py-8">
+            <div className="flex justify-center py-12">
               <LoadingSpinner size="lg" />
             </div>
+          ) : error ? (
+            <Alert type="error">
+              حدث خطأ أثناء جلب البرامج. يرجى المحاولة لاحقًا.
+            </Alert>
+          ) : filteredPrograms.length === 0 ? (
+            <Alert type="info">لا توجد برامج متاحة حالياً.</Alert>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredPrograms.map((program: any) => (
-                <Card
-                  key={program.id}
-                  className="hover:shadow-lg transition-shadow"
-                >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {filteredPrograms.map((program) => (
+                <Card key={program.id} className="flex flex-col gap-2">
                   {program.image_url && (
                     <img
                       src={program.image_url}
                       alt={program.title}
-                      className="w-full h-40 object-cover rounded-t-lg mb-4"
-                      onError={(e) => {
-                        e.currentTarget.src = '/default-program.png';
-                      }} // صورة افتراضية إذا لم تظهر الصورة
+                      className="w-full h-40 object-cover rounded-t-lg mb-2"
+                      loading="lazy"
                     />
                   )}
-                  <div className="p-6">
-                    {/* Header */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                          {program.title}
-                        </h3>
-                        <p className="text-sm text-gray-600 line-clamp-2">
-                          {program.description}
-                        </p>
-                      </div>
-                      <div className="relative">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          aria-label={`خيارات برنامج ${program.title}`}
-                        >
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Status Badge */}
-                    <div className="flex items-center justify-between mb-4">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                          program.status
-                        )}`}
-                      >
-                        {getStatusText(program.status)}
+                  <div className="flex flex-col gap-1 p-2">
+                    <h2 className="text-lg font-bold text-primary-700 mb-1 line-clamp-2">
+                      {program.title}
+                    </h2>
+                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+                      <span>{program.category}</span>
+                      <span>•</span>
+                      <span>
+                        {program.start_date} - {program.end_date}
                       </span>
-                      <span className="text-xs text-gray-500">
-                        {program.category}
+                      <span>•</span>
+                      <span>
+                        {program.status === 'active'
+                          ? 'نشط'
+                          : program.status === 'completed'
+                          ? 'مكتمل'
+                          : program.status === 'pending'
+                          ? 'قيد الانتظار'
+                          : 'ملغي'}
                       </span>
                     </div>
-
-                    {/* Progress Bar */}
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between text-sm mb-1">
-                        <span className="text-gray-600">التقدم</span>
-                        <span className="font-medium">
-                          $
-                          {typeof program.current_amount === 'number'
-                            ? program.current_amount.toLocaleString()
-                            : '0'}{' '}
-                          / $
-                          {typeof program.goal_amount === 'number'
-                            ? program.goal_amount.toLocaleString()
-                            : '0'}
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-primary-600 h-2 rounded-full transition-all duration-300"
-                          style={{
-                            width: `${getProgressPercentage(
-                              program.current_amount,
-                              program.goal_amount
-                            )}%`,
-                          }}
-                        />
-                      </div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {getProgressPercentage(
-                          program.current_amount,
-                          program.goal_amount
-                        ).toFixed(1)}
-                        % مكتمل
-                      </div>
-                    </div>
-
-                    {/* Stats */}
-                    <div className="grid grid-cols-3 gap-4 mb-4 text-center">
-                      <div>
-                        <div className="flex items-center justify-center text-primary-600 mb-1">
-                          <Users className="w-4 h-4" />
-                        </div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {program.participants_count}
-                        </div>
-                        <div className="text-xs text-gray-500">مشارك</div>
-                      </div>
-                      <div>
-                        <div className="flex items-center justify-center text-green-600 mb-1">
-                          <Calendar className="w-4 h-4" />
-                        </div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {new Date(program.start_date).toLocaleDateString(
-                            'ar-SA'
-                          )}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          تاريخ البداية
-                        </div>
-                      </div>
-                      <div>
-                        <div className="flex items-center justify-center text-blue-600 mb-1">
-                          <DollarSign className="w-4 h-4" />
-                        </div>
-                        <div className="text-sm font-medium text-gray-900">
-                          $
-                          {typeof program.current_amount === 'number'
-                            ? program.current_amount.toLocaleString()
-                            : '0'}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          المبلغ الحالي
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex gap-2">
+                    <p className="text-gray-700 mb-2 line-clamp-3">
+                      {program.description?.slice(0, 100) || ''}
+                      {program.description?.length > 100 ? '...' : ''}
+                    </p>
+                    <div className="flex gap-2 mt-auto">
                       <Button
                         size="sm"
-                        variant="secondary"
+                        variant="outline"
                         onClick={() => handleOpenModal('view', program)}
-                        icon={Eye}
-                        className="flex-1"
                       >
                         عرض
                       </Button>
                       <Button
                         size="sm"
-                        variant="secondary"
+                        variant="outline"
                         onClick={() => handleOpenModal('edit', program)}
-                        icon={Edit}
-                        className="flex-1"
                       >
                         تعديل
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
+                        color="red"
                         onClick={() => handleDelete(program.id)}
-                        icon={Trash2}
-                        className="text-red-600 hover:text-red-700"
                       >
                         حذف
                       </Button>
@@ -647,125 +460,49 @@ const ProgramsDashboard: React.FC = () => {
               ))}
             </div>
           )}
-
-          {/* Empty State */}
-          {filteredPrograms.length === 0 && !isLoading && (
-            <Card className="text-center py-12">
-              <TrendingUp className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                لا توجد برامج
-              </h3>
-              <p className="text-gray-500 mb-4">
-                {searchTerm ||
-                statusFilter !== 'all' ||
-                categoryFilter !== 'all'
-                  ? 'لا توجد برامج تطابق معايير البحث المحددة'
-                  : 'ابدأ بإضافة برنامج جديد'}
-              </p>
-              <Link to="/dashboard/programs/new">
-                <Button icon={Plus}>إضافة برنامج</Button>
-              </Link>
-            </Card>
-          )}
-
-          {/* Modal */}
           <Modal
-            open={modalOpen}
+            isOpen={modalOpen}
             onClose={handleCloseModal}
             title={
               modalType === 'add'
-                ? 'إضافة برنامج جديد'
+                ? 'إضافة برنامج'
                 : modalType === 'edit'
-                ? 'تعديل البرنامج'
+                ? 'تعديل برنامج'
                 : 'تفاصيل البرنامج'
             }
           >
             {modalType === 'view' && selectedProgram ? (
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    اسم البرنامج
-                  </label>
-                  <p className="text-gray-900">{selectedProgram.title}</p>
+                <h2 className="text-xl font-bold text-primary-700">
+                  {selectedProgram.title}
+                </h2>
+                <div className="text-gray-600">
+                  {selectedProgram.description}
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    الوصف
-                  </label>
-                  <p className="text-gray-900">{selectedProgram.description}</p>
+                <div className="flex flex-col gap-2 text-sm">
+                  <div>الفئة: {selectedProgram.category}</div>
+                  <div>
+                    التاريخ: {selectedProgram.start_date} -{' '}
+                    {selectedProgram.end_date}
+                  </div>
+                  <div>الحالة: {getStatusText(selectedProgram.status)}</div>
+                  <div>الهدف المالي: {selectedProgram.goal_amount}</div>
+                  <div>المبلغ الحالي: {selectedProgram.current_amount}</div>
+                  <div>عدد المشاركين: {selectedProgram.participants_count}</div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      الفئة
-                    </label>
-                    <p className="text-gray-900">{selectedProgram.category}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      الحالة
-                    </label>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                        selectedProgram.status
-                      )}`}
-                    >
-                      {getStatusText(selectedProgram.status)}
-                    </span>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      الهدف المالي
-                    </label>
-                    <p className="text-gray-900">
-                      $
-                      {typeof selectedProgram.goal_amount === 'number'
-                        ? selectedProgram.goal_amount.toLocaleString()
-                        : '0'}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      المبلغ الحالي
-                    </label>
-                    <p className="text-gray-900">
-                      $
-                      {typeof selectedProgram.current_amount === 'number'
-                        ? selectedProgram.current_amount.toLocaleString()
-                        : '0'}
-                    </p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      تاريخ البداية
-                    </label>
-                    <p className="text-gray-900">
-                      {new Date(selectedProgram.start_date).toLocaleDateString(
-                        'ar-SA'
-                      )}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      تاريخ الانتهاء
-                    </label>
-                    <p className="text-gray-900">
-                      {new Date(selectedProgram.end_date).toLocaleDateString(
-                        'ar-SA'
-                      )}
-                    </p>
-                  </div>
-                </div>
+                {selectedProgram.image_url && (
+                  <img
+                    src={selectedProgram.image_url}
+                    alt="صورة البرنامج"
+                    className="w-full h-40 object-cover rounded"
+                  />
+                )}
                 <div className="flex gap-2 pt-4">
                   <Button
                     onClick={() => handleOpenModal('edit', selectedProgram)}
                     className="flex-1"
                   >
-                    تعديل البرنامج
+                    تعديل
                   </Button>
                   <Button
                     variant="secondary"
@@ -778,206 +515,102 @@ const ProgramsDashboard: React.FC = () => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
-                {formError && (
-                  <Alert type="error" className="mb-4">
-                    {formError}
-                  </Alert>
-                )}
-
+                <input
+                  type="text"
+                  name="title"
+                  placeholder="اسم البرنامج"
+                  className="w-full border rounded p-2"
+                  value={form.title}
+                  onChange={handleChange}
+                  required
+                />
+                <input
+                  type="text"
+                  name="category"
+                  placeholder="الفئة"
+                  className="w-full border rounded p-2"
+                  value={form.category}
+                  onChange={handleChange}
+                  required
+                />
+                <input
+                  type="number"
+                  name="goal_amount"
+                  placeholder="الهدف المالي (بالريال)"
+                  className="w-full border rounded p-2"
+                  value={form.goal_amount}
+                  onChange={handleChange}
+                  required
+                />
+                <input
+                  type="date"
+                  name="start_date"
+                  placeholder="تاريخ البداية"
+                  className="w-full border rounded p-2"
+                  value={form.start_date}
+                  onChange={handleChange}
+                  required
+                />
+                <input
+                  type="date"
+                  name="end_date"
+                  placeholder="تاريخ النهاية"
+                  className="w-full border rounded p-2"
+                  value={form.end_date}
+                  onChange={handleChange}
+                  required
+                />
+                <textarea
+                  name="description"
+                  placeholder="وصف البرنامج"
+                  className="w-full border rounded p-2 min-h-[100px]"
+                  value={form.description}
+                  onChange={handleChange}
+                  required
+                />
                 <div>
-                  <label
-                    htmlFor="title"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    اسم البرنامج
-                  </label>
-                  <Input
-                    id="title"
-                    name="title"
-                    type="text"
-                    value={form.title}
-                    onChange={handleChange}
-                    required
-                    placeholder="أدخل اسم البرنامج"
+                  <label className="block mb-1">صورة البرنامج (اختياري)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
                   />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="description"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    الوصف
-                  </label>
-                  <textarea
-                    id="description"
-                    name="description"
-                    value={form.description}
-                    onChange={handleChange}
-                    required
-                    rows={3}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="أدخل وصف البرنامج"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="category"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      الفئة
-                    </label>
-                    <select
-                      id="category"
-                      name="category"
-                      value={form.category}
-                      onChange={handleChange}
-                      required
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    >
-                      <option value="">اختر الفئة</option>
-                      <option value="صحية">صحية</option>
-                      <option value="تعليمية">تعليمية</option>
-                      <option value="قيادية">قيادية</option>
-                      <option value="اجتماعية">اجتماعية</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="goal_amount"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      الهدف المالي
-                    </label>
-                    <Input
-                      id="goal_amount"
-                      name="goal_amount"
-                      type="number"
-                      value={form.goal_amount}
-                      onChange={handleChange}
-                      required
-                      placeholder="0"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="start_date"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      تاريخ البداية
-                    </label>
-                    <Input
-                      id="start_date"
-                      name="start_date"
-                      type="date"
-                      value={form.start_date}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="end_date"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      تاريخ الانتهاء
-                    </label>
-                    <Input
-                      id="end_date"
-                      name="end_date"
-                      type="date"
-                      value={form.end_date}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Image Upload */}
-                <div>
-                  <label
-                    htmlFor="image"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    صورة البرنامج
-                  </label>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <input
-                        id="image"
-                        name="image"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="hidden"
+                  {imagePreview && (
+                    <div className="relative mt-2 w-32 h-20">
+                      <img
+                        src={imagePreview}
+                        alt="معاينة"
+                        className="w-full h-full object-cover rounded"
                       />
-                      <label
-                        htmlFor="image"
-                        className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                      <button
+                        type="button"
+                        className="absolute top-0 right-0 bg-white rounded-full p-1 shadow"
+                        onClick={removeImage}
                       >
-                        <Upload className="w-4 h-4" />
-                        <span>اختر صورة</span>
-                      </label>
-                      {imagePreview && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={removeImage}
-                          icon={X}
-                        >
-                          إزالة
-                        </Button>
-                      )}
+                        <X className="w-4 h-4 text-red-500" />
+                      </button>
                     </div>
-                    {imagePreview && (
-                      <div className="relative">
-                        <img
-                          src={imagePreview}
-                          alt="معاينة الصورة"
-                          className="w-32 h-32 object-cover rounded-lg border"
-                        />
-                      </div>
-                    )}
-                    <p className="text-xs text-gray-500">
-                      المقاس المفضل: 400×400 بكسل (مربع). الحد الأقصى: 2MB
-                    </p>
-                  </div>
+                  )}
                 </div>
-
-                <div className="flex gap-2 pt-4">
-                  <Button type="submit" className="flex-1">
-                    {modalType === 'add' ? 'إضافة البرنامج' : 'حفظ التغييرات'}
-                  </Button>
+                {formError && (
+                  <div className="text-red-600 text-sm">{formError}</div>
+                )}
+                <div className="flex gap-2 justify-end">
                   <Button
                     type="button"
-                    variant="secondary"
+                    variant="outline"
                     onClick={handleCloseModal}
-                    className="flex-1"
                   >
                     إلغاء
+                  </Button>
+                  <Button type="submit">
+                    {modalType === 'add' ? 'إضافة' : 'حفظ التعديلات'}
                   </Button>
                 </div>
               </form>
             )}
           </Modal>
-
-          {/* Modal التنبيه */}
-          <Modal
-            open={modalOpen}
-            onClose={() => setModalOpen(false)}
-            title="تنبيه"
-          >
-            <div className="text-center py-4">
-              <p className="text-gray-700 text-lg font-medium">{modalMsg}</p>
-            </div>
-          </Modal>
-        </div>
+        </section>
       </AccessibleSection>
     </DashboardLayout>
   );

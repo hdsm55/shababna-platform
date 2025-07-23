@@ -22,11 +22,11 @@ const Footer: React.FC = () => {
           <a href="/programs" className="hover:text-primary-600 transition">
             {t('nav.programs')}
           </a>
-          <a href="/contact" className="hover:text-primary-600 transition">
-            {t('nav.contact')}
-          </a>
           <a href="/blogs" className="hover:text-primary-600 transition">
             {t('nav.blogs', 'المدونة')}
+          </a>
+          <a href="/contact" className="hover:text-primary-600 transition">
+            {t('nav.contact')}
           </a>
         </nav>
       </div>

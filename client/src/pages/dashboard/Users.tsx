@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchUsers, deleteUser } from '../../services/dashboardApi';
+import {
+  fetchUsers,
+  deleteUser,
+  createUser,
+  updateUser,
+} from '../../services/dashboardApi';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import {
@@ -192,15 +197,20 @@ const UsersDashboard: React.FC = () => {
     },
   ];
 
-  const users = data?.data?.items || mockUsers;
+  // استخدام البيانات الحقيقية فقط
+  const users = data?.data?.items || [];
 
   // فلترة المستخدمين
   const filteredUsers = users.filter((user: any) => {
     const matchesSearch =
-      user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.location.toLowerCase().includes(searchTerm.toLowerCase());
+      (user.firstName &&
+        user.firstName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (user.lastName &&
+        user.lastName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (user.email &&
+        user.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (user.location &&
+        user.location.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesStatus =
       statusFilter === 'all' || user.status === statusFilter;
     const matchesRole = roleFilter === 'all' || user.role === roleFilter;
@@ -259,7 +269,7 @@ const UsersDashboard: React.FC = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.firstName || !form.lastName || !form.email) {
       setFormError('الحقول الأساسية مطلوبة');
@@ -272,21 +282,22 @@ const UsersDashboard: React.FC = () => {
       setFormError('كلمة المرور غير متطابقة');
       return;
     }
-
-    // محاكاة عملية الإضافة/التعديل
-    if (modalType === 'add') {
-      console.log('إضافة مستخدم جديد:', form);
-      // هنا سيتم إرسال البيانات إلى API
-      setModalMsg('تم إضافة المستخدم بنجاح!');
-    } else if (modalType === 'edit' && selectedUser) {
-      console.log('تعديل المستخدم:', { id: selectedUser.id, ...form });
-      // هنا سيتم إرسال البيانات إلى API
-      setModalMsg('تم تحديث المستخدم بنجاح!');
+    setFormError('');
+    try {
+      if (modalType === 'add') {
+        await createUser(form);
+        setModalMsg('تم إضافة المستخدم بنجاح!');
+      } else if (modalType === 'edit' && selectedUser) {
+        await updateUser(selectedUser.id, form);
+        setModalMsg('تم تحديث المستخدم بنجاح!');
+      }
+      setTimeout(() => {
+        setModalOpen(false);
+        queryClient.invalidateQueries({ queryKey: ['dashboard-users'] });
+      }, 1200);
+    } catch (error) {
+      setFormError('حدث خطأ أثناء حفظ المستخدم');
     }
-
-    setModalOpen(false);
-    // إعادة تحميل البيانات
-    // queryClient.invalidateQueries(['dashboard-users']);
   };
 
   const getRoleColor = (role: string) => {
@@ -438,263 +449,156 @@ const UsersDashboard: React.FC = () => {
       <SkipToContent />
 
       <AccessibleSection>
-        <div className="max-w-7xl mx-auto py-6 px-2 sm:px-4 lg:px-8">
-          {/* Header */}
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">
+        <section className="py-8 px-4" dir="rtl">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-2xl font-bold text-primary-700">
               إدارة المستخدمين
             </h1>
-            <Link to="/join-us">
-              <Button
-                variant="outline"
-                className="font-bold text-primary-600 border-primary-300"
-              >
-                انضم إلينا
-              </Button>
-            </Link>
+            <Button onClick={() => handleOpenModal('add')}>
+              إضافة مستخدم جديد
+            </Button>
           </div>
-
-          {/* Search and Filters */}
-          <Card className="mb-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <Input
-                    type="text"
-                    placeholder="البحث في المستخدمين..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 rtl:pr-10 rtl:pl-4"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setShowFilters(!showFilters)}
-                  icon={Filter}
-                >
-                  الفلاتر
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => {
-                    setSearchTerm('');
-                    setStatusFilter('all');
-                    setRoleFilter('all');
-                  }}
-                >
-                  إعادة تعيين
-                </Button>
-              </div>
-            </div>
-
-            {/* Advanced Filters */}
-            {showFilters && (
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      الحالة
-                    </label>
-                    <select
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    >
-                      <option value="all">جميع الحالات</option>
-                      <option value="active">نشط</option>
-                      <option value="inactive">غير نشط</option>
-                      <option value="pending">قيد الانتظار</option>
-                      <option value="suspended">معلق</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      الدور
-                    </label>
-                    <select
-                      value={roleFilter}
-                      onChange={(e) => setRoleFilter(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    >
-                      <option value="all">جميع الأدوار</option>
-                      <option value="admin">مدير</option>
-                      <option value="moderator">مشرف</option>
-                      <option value="member">عضو</option>
-                      <option value="guest">زائر</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      الترتيب
-                    </label>
-                    <select className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500">
-                      <option value="newest">الأحدث</option>
-                      <option value="oldest">الأقدم</option>
-                      <option value="name">الاسم</option>
-                      <option value="activity">النشاط</option>
-                      <option value="role">الدور</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            )}
-          </Card>
-
-          {/* Users Grid */}
           {isLoading ? (
-            <div className="flex justify-center py-8">
+            <div className="flex justify-center py-12">
               <LoadingSpinner size="lg" />
             </div>
+          ) : error ? (
+            <Alert type="error">
+              حدث خطأ أثناء جلب المستخدمين. يرجى المحاولة لاحقًا.
+            </Alert>
+          ) : users.length === 0 ? (
+            <Alert type="info">لا يوجد مستخدمون متاحون حالياً.</Alert>
           ) : (
-            <UsersTable users={users} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {filteredUsers.map((user) => (
+                <Card key={user.id} className="flex flex-col gap-2">
+                  <div className="flex items-center gap-3 p-2">
+                    <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center text-xl font-bold text-primary-700">
+                      {user.avatar ||
+                        (user.firstName ? user.firstName[0] : '') +
+                          (user.lastName ? user.lastName[0] : '') ||
+                        '?'}
+                    </div>
+                    <div className="flex-1">
+                      <h2 className="text-lg font-bold text-primary-800 mb-1 line-clamp-1">
+                        {user.firstName || ''} {user.lastName || ''}
+                      </h2>
+                      <div className="text-xs text-gray-500 mb-1">
+                        {user.email || ''}
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <span>
+                          {user.role === 'admin'
+                            ? 'مدير'
+                            : user.role === 'moderator'
+                            ? 'مشرف'
+                            : user.role === 'member'
+                            ? 'عضو'
+                            : 'زائر'}
+                        </span>
+                        <span>•</span>
+                        <span>
+                          {user.status === 'active'
+                            ? 'نشط'
+                            : user.status === 'inactive'
+                            ? 'غير نشط'
+                            : user.status === 'pending'
+                            ? 'قيد الانتظار'
+                            : 'موقوف'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1 p-2">
+                    <div className="text-xs text-gray-500 mb-1">
+                      {user.location}
+                    </div>
+                    <p className="text-gray-700 mb-2 line-clamp-2">
+                      {user.bio?.slice(0, 60) || ''}
+                      {user.bio?.length > 60 ? '...' : ''}
+                    </p>
+                    <div className="flex gap-2 mt-auto">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleOpenModal('view', user)}
+                      >
+                        عرض
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleOpenModal('edit', user)}
+                      >
+                        تعديل
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        color="red"
+                        onClick={() => handleDelete(user.id)}
+                      >
+                        حذف
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
           )}
-
-          {/* Empty State */}
-          {filteredUsers.length === 0 && !isLoading && (
-            <Card className="text-center py-12">
-              <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                لا توجد مستخدمين
-              </h3>
-              <p className="text-gray-500 mb-4">
-                {searchTerm || statusFilter !== 'all' || roleFilter !== 'all'
-                  ? 'لا توجد مستخدمين تطابق معايير البحث المحددة'
-                  : 'ابدأ بإضافة مستخدم جديد'}
-              </p>
-              <Link to="/dashboard/users/new">
-                <Button icon={UserPlus}>إضافة عضو</Button>
-              </Link>
-            </Card>
-          )}
-
-          {/* Modal */}
           <Modal
-            open={modalOpen}
+            isOpen={modalOpen}
             onClose={handleCloseModal}
             title={
               modalType === 'add'
-                ? 'إضافة مستخدم جديد'
+                ? 'إضافة مستخدم'
                 : modalType === 'edit'
-                ? 'تعديل المستخدم'
+                ? 'تعديل مستخدم'
                 : 'تفاصيل المستخدم'
             }
           >
             {modalType === 'view' && selectedUser ? (
               <div className="space-y-4">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-bold text-xl">
-                    {selectedUser.avatar}
+                <h2 className="text-xl font-bold text-primary-700">
+                  {selectedUser.firstName} {selectedUser.lastName}
+                </h2>
+                <div className="text-gray-600">{selectedUser.email}</div>
+                <div className="flex flex-col gap-2 text-sm">
+                  <div>
+                    الدور:{' '}
+                    {selectedUser.role === 'admin'
+                      ? 'مدير'
+                      : selectedUser.role === 'moderator'
+                      ? 'مشرف'
+                      : selectedUser.role === 'member'
+                      ? 'عضو'
+                      : 'زائر'}
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {selectedUser.firstName} {selectedUser.lastName}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {selectedUser.email}
-                    </p>
+                    الحالة:{' '}
+                    {selectedUser.status === 'active'
+                      ? 'نشط'
+                      : selectedUser.status === 'inactive'
+                      ? 'غير نشط'
+                      : selectedUser.status === 'pending'
+                      ? 'قيد الانتظار'
+                      : 'موقوف'}
                   </div>
+                  <div>رقم الجوال: {selectedUser.phone}</div>
+                  <div>الموقع: {selectedUser.location}</div>
+                  <div>نبذة: {selectedUser.bio}</div>
+                  <div>تاريخ الانضمام: {selectedUser.joinDate}</div>
+                  <div>آخر دخول: {selectedUser.lastLogin}</div>
+                  <div>عدد الفعاليات: {selectedUser.eventsAttended}</div>
+                  <div>عدد البرامج: {selectedUser.programsParticipated}</div>
+                  <div>إجمالي التبرعات: {selectedUser.totalDonations}</div>
                 </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      الدور
-                    </label>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(
-                        selectedUser.role
-                      )}`}
-                    >
-                      {getRoleText(selectedUser.role)}
-                    </span>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      الحالة
-                    </label>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                        selectedUser.status
-                      )}`}
-                    >
-                      {getStatusText(selectedUser.status)}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      رقم الهاتف
-                    </label>
-                    <p className="text-gray-900">{selectedUser.phone}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      الموقع
-                    </label>
-                    <p className="text-gray-900">{selectedUser.location}</p>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    السيرة الذاتية
-                  </label>
-                  <p className="text-gray-900">{selectedUser.bio}</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      تاريخ الانضمام
-                    </label>
-                    <p className="text-gray-900">
-                      {formatDate(selectedUser.joinDate)}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      آخر تسجيل دخول
-                    </label>
-                    <p className="text-gray-900">
-                      {formatLastLogin(selectedUser.lastLogin)}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center p-3 bg-blue-50 rounded-lg">
-                    <div className="text-lg font-bold text-blue-600">
-                      {selectedUser.eventsAttended}
-                    </div>
-                    <div className="text-xs text-gray-600">فعالية</div>
-                  </div>
-                  <div className="text-center p-3 bg-green-50 rounded-lg">
-                    <div className="text-lg font-bold text-green-600">
-                      {selectedUser.programsParticipated}
-                    </div>
-                    <div className="text-xs text-gray-600">برنامج</div>
-                  </div>
-                  <div className="text-center p-3 bg-yellow-50 rounded-lg">
-                    <div className="text-lg font-bold text-yellow-600">
-                      ${selectedUser.totalDonations}
-                    </div>
-                    <div className="text-xs text-gray-600">تبرع</div>
-                  </div>
-                </div>
-
                 <div className="flex gap-2 pt-4">
                   <Button
                     onClick={() => handleOpenModal('edit', selectedUser)}
                     className="flex-1"
                   >
-                    تعديل المستخدم
+                    تعديل
                   </Button>
                   <Button
                     variant="secondary"
@@ -707,224 +611,119 @@ const UsersDashboard: React.FC = () => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
+                <input
+                  type="text"
+                  name="firstName"
+                  placeholder="الاسم الأول"
+                  className="w-full border rounded p-2"
+                  value={form.firstName}
+                  onChange={handleChange}
+                  required
+                />
+                <input
+                  type="text"
+                  name="lastName"
+                  placeholder="اسم العائلة"
+                  className="w-full border rounded p-2"
+                  value={form.lastName}
+                  onChange={handleChange}
+                  required
+                />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="البريد الإلكتروني"
+                  className="w-full border rounded p-2"
+                  value={form.email}
+                  onChange={handleChange}
+                  required
+                />
+                <input
+                  type="text"
+                  name="phone"
+                  placeholder="رقم الجوال"
+                  className="w-full border rounded p-2"
+                  value={form.phone}
+                  onChange={handleChange}
+                />
+                <input
+                  type="text"
+                  name="location"
+                  placeholder="المدينة/الدولة"
+                  className="w-full border rounded p-2"
+                  value={form.location}
+                  onChange={handleChange}
+                />
+                <textarea
+                  name="bio"
+                  placeholder="نبذة عن المستخدم"
+                  className="w-full border rounded p-2 min-h-[60px]"
+                  value={form.bio}
+                  onChange={handleChange}
+                />
+                <select
+                  name="role"
+                  className="w-full border rounded p-2"
+                  value={form.role}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">اختر الدور</option>
+                  <option value="admin">مدير</option>
+                  <option value="moderator">مشرف</option>
+                  <option value="member">عضو</option>
+                  <option value="guest">زائر</option>
+                </select>
+                <select
+                  name="status"
+                  className="w-full border rounded p-2"
+                  value={form.status}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">اختر الحالة</option>
+                  <option value="active">نشط</option>
+                  <option value="inactive">غير نشط</option>
+                  <option value="pending">قيد الانتظار</option>
+                  <option value="suspended">موقوف</option>
+                </select>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="كلمة المرور (للمستخدم الجديد أو التغيير)"
+                  className="w-full border rounded p-2"
+                  value={form.password}
+                  onChange={handleChange}
+                  autoComplete="new-password"
+                />
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  placeholder="تأكيد كلمة المرور"
+                  className="w-full border rounded p-2"
+                  value={form.confirmPassword}
+                  onChange={handleChange}
+                  autoComplete="new-password"
+                />
                 {formError && (
-                  <Alert type="error" className="mb-4">
-                    {formError}
-                  </Alert>
+                  <div className="text-red-600 text-sm">{formError}</div>
                 )}
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="firstName"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      الاسم الأول
-                    </label>
-                    <Input
-                      id="firstName"
-                      name="firstName"
-                      type="text"
-                      value={form.firstName}
-                      onChange={handleChange}
-                      required
-                      placeholder="الاسم الأول"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="lastName"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      الاسم الأخير
-                    </label>
-                    <Input
-                      id="lastName"
-                      name="lastName"
-                      type="text"
-                      value={form.lastName}
-                      onChange={handleChange}
-                      required
-                      placeholder="الاسم الأخير"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      البريد الإلكتروني
-                    </label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      required
-                      placeholder="example@email.com"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="phone"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      رقم الهاتف
-                    </label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      value={form.phone}
-                      onChange={handleChange}
-                      required
-                      placeholder="+966501234567"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="role"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      الدور
-                    </label>
-                    <select
-                      id="role"
-                      name="role"
-                      value={form.role}
-                      onChange={handleChange}
-                      required
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    >
-                      <option value="">اختر الدور</option>
-                      <option value="admin">مدير</option>
-                      <option value="moderator">مشرف</option>
-                      <option value="member">عضو</option>
-                      <option value="guest">زائر</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="status"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      الحالة
-                    </label>
-                    <select
-                      id="status"
-                      name="status"
-                      value={form.status}
-                      onChange={handleChange}
-                      required
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    >
-                      <option value="">اختر الحالة</option>
-                      <option value="active">نشط</option>
-                      <option value="inactive">غير نشط</option>
-                      <option value="pending">قيد الانتظار</option>
-                      <option value="suspended">معلق</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="location"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    الموقع
-                  </label>
-                  <Input
-                    id="location"
-                    name="location"
-                    type="text"
-                    value={form.location}
-                    onChange={handleChange}
-                    placeholder="المدينة، البلد"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="bio"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    السيرة الذاتية
-                  </label>
-                  <textarea
-                    id="bio"
-                    name="bio"
-                    value={form.bio}
-                    onChange={handleChange}
-                    rows={3}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="نبذة مختصرة عن المستخدم"
-                  />
-                </div>
-
-                {modalType === 'add' && (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label
-                        htmlFor="password"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
-                        كلمة المرور
-                      </label>
-                      <Input
-                        id="password"
-                        name="password"
-                        type="password"
-                        value={form.password}
-                        onChange={handleChange}
-                        required
-                        placeholder="كلمة المرور"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="confirmPassword"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
-                        تأكيد كلمة المرور
-                      </label>
-                      <Input
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        type="password"
-                        value={form.confirmPassword}
-                        onChange={handleChange}
-                        required
-                        placeholder="تأكيد كلمة المرور"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex gap-2 pt-4">
-                  <Button type="submit" className="flex-1">
-                    {modalType === 'add' ? 'إضافة المستخدم' : 'حفظ التغييرات'}
-                  </Button>
+                <div className="flex gap-2 justify-end">
                   <Button
                     type="button"
-                    variant="secondary"
+                    variant="outline"
                     onClick={handleCloseModal}
-                    className="flex-1"
                   >
                     إلغاء
+                  </Button>
+                  <Button type="submit">
+                    {modalType === 'add' ? 'إضافة' : 'حفظ التعديلات'}
                   </Button>
                 </div>
               </form>
             )}
           </Modal>
-        </div>
+        </section>
       </AccessibleSection>
     </DashboardLayout>
   );

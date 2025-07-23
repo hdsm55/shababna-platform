@@ -30,6 +30,10 @@ import RegistrantsDashboard from './pages/dashboard/Registrants';
 import EditEvent from './pages/dashboard/events/EditEvent';
 import DashboardEventDetail from './pages/dashboard/events/EventDetail';
 import NotFound from './pages/NotFound';
+import Blogs from './pages/Blogs';
+import BlogDetail from './pages/BlogDetail';
+import BlogsDashboard from './pages/dashboard/Blogs';
+import UsersDashboard from './pages/dashboard/Users';
 
 function App() {
   const { i18n } = useTranslation();
@@ -66,6 +70,8 @@ function App() {
                         path="registrants"
                         element={<RegistrantsDashboard />}
                       />
+                      <Route path="blogs" element={<BlogsDashboard />} />
+                      <Route path="users" element={<UsersDashboard />} />
                       {/* صفحات الإجراءات السريعة */}
                       <Route path="events/new" element={<NewEvent />} />
                       <Route path="programs/new" element={<NewProgram />} />
@@ -94,6 +100,8 @@ function App() {
                       <Route path="/programs/:id" element={<ProgramDetail />} />
                       <Route path="/join-us" element={<JoinUs />} />
                       <Route path="/contact" element={<Contact />} />
+                      <Route path="/blogs" element={<Blogs />} />
+                      <Route path="/blogs/:id" element={<BlogDetail />} />
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </Layout>

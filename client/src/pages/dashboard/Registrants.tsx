@@ -26,53 +26,86 @@ interface Registrant {
 }
 
 const RegistrantsDashboard: React.FC = () => {
-  const { registrants, loading, error, refetch } = useRegistrants();
-  const [search, setSearch] = useState('');
-  const [sourceFilter, setSourceFilter] = useState<
-    'all' | Registrant['source']
-  >('all');
-  const [selectedRegistrant, setSelectedRegistrant] =
-    useState<Registrant | null>(null);
+  const {
+    users,
+    events,
+    programs,
+    joins,
+    newsletter,
+    loading,
+    error,
+    refetch,
+  } = useRegistrants();
+  const [selectedRegistrant, setSelectedRegistrant] = useState<any | null>(
+    null
+  );
 
-  // فلترة وبحث
-  const filtered = useMemo(() => {
-    return registrants.filter((r) => {
-      const matchesSearch =
-        r.name.toLowerCase().includes(search.toLowerCase()) ||
-        r.email.toLowerCase().includes(search.toLowerCase()) ||
-        (r.phone || '').toLowerCase().includes(search.toLowerCase());
-      const matchesSource = sourceFilter === 'all' || r.source === sourceFilter;
-      return matchesSearch && matchesSource;
-    });
-  }, [registrants, search, sourceFilter]);
+  const renderTable = (title: string, data: any[], type?: string) => (
+    <Card className="mb-8">
+      <h2 className="text-xl font-bold mb-4">{title}</h2>
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-right rtl:text-right">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="py-2 px-3">الاسم</th>
+              <th className="py-2 px-3">البريد الإلكتروني</th>
+              <th className="py-2 px-3">الهاتف</th>
+              {type === 'join' && <th className="py-2 px-3">الدولة</th>}
+              {type === 'join' && <th className="py-2 px-3">العمر</th>}
+              {type === 'join' && <th className="py-2 px-3">التحفيز</th>}
+              <th className="py-2 px-3">تفاصيل</th>
+              <th className="py-2 px-3">تاريخ التسجيل</th>
+              <th className="py-2 px-3">عرض</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((r) => (
+              <tr key={r.id} className="border-b hover:bg-gray-50">
+                <td className="py-2 px-3 font-medium">{r.name}</td>
+                <td className="py-2 px-3">{r.email}</td>
+                <td className="py-2 px-3">{r.phone || '-'}</td>
+                {type === 'join' && (
+                  <td className="py-2 px-3">{r.country || '-'}</td>
+                )}
+                {type === 'join' && (
+                  <td className="py-2 px-3">{r.age || '-'}</td>
+                )}
+                {type === 'join' && (
+                  <td className="py-2 px-3">{r.motivation || '-'}</td>
+                )}
+                <td className="py-2 px-3">{r.sourceDetails}</td>
+                <td className="py-2 px-3">
+                  {r.registeredAt?.slice(0, 10) || '-'}
+                </td>
+                <td className="py-2 px-3">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    icon={Eye}
+                    onClick={() => setSelectedRegistrant(r)}
+                  >
+                    عرض
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {data.length === 0 && (
+          <div className="text-center py-8 text-gray-500">
+            لا يوجد بيانات في هذا القسم.
+          </div>
+        )}
+      </div>
+    </Card>
+  );
 
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto py-6 px-2 sm:px-4 lg:px-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">جميع المسجلين</h1>
-        <Card className="mb-6">
-          <div className="flex flex-col md:flex-row gap-4 items-center">
-            <input
-              type="text"
-              placeholder="بحث بالاسم أو البريد أو الهاتف..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
-            <select
-              value={sourceFilter}
-              onChange={(e) => setSourceFilter(e.target.value as any)}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-            >
-              <option value="all">جميع المصادر</option>
-              <option value="عضوية">عضوية</option>
-              <option value="فعالية">فعالية</option>
-              <option value="برنامج">برنامج</option>
-              <option value="تبرع">تبرع</option>
-              <option value="انضمام">انضمام</option>
-            </select>
-          </div>
-        </Card>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">
+          إدارة جميع المسجلين
+        </h1>
         {loading ? (
           <div className="flex justify-center py-8">
             <LoadingSpinner size="lg" />
@@ -82,52 +115,13 @@ const RegistrantsDashboard: React.FC = () => {
             {error}
           </Alert>
         ) : (
-          <Card>
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-right rtl:text-right">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="py-2 px-3">الاسم</th>
-                    <th className="py-2 px-3">البريد الإلكتروني</th>
-                    <th className="py-2 px-3">الهاتف</th>
-                    <th className="py-2 px-3">مصدر التسجيل</th>
-                    <th className="py-2 px-3">تفاصيل المصدر</th>
-                    <th className="py-2 px-3">تاريخ التسجيل</th>
-                    <th className="py-2 px-3">تفاصيل</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((r) => (
-                    <tr key={r.id} className="border-b hover:bg-gray-50">
-                      <td className="py-2 px-3 font-medium">{r.name}</td>
-                      <td className="py-2 px-3">{r.email}</td>
-                      <td className="py-2 px-3">{r.phone || '-'}</td>
-                      <td className="py-2 px-3">{r.source}</td>
-                      <td className="py-2 px-3">{r.sourceDetails}</td>
-                      <td className="py-2 px-3">
-                        {r.registeredAt?.slice(0, 10) || '-'}
-                      </td>
-                      <td className="py-2 px-3">
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          icon={Eye}
-                          onClick={() => setSelectedRegistrant(r)}
-                        >
-                          عرض
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {filtered.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
-                  لا يوجد مسجلين مطابقين للبحث أو الفلتر.
-                </div>
-              )}
-            </div>
-          </Card>
+          <>
+            {renderTable('الأعضاء (عضوية)', users)}
+            {/* {renderTable('المسجلون في النشرة البريدية', newsletter)} */}
+            {renderTable('المسجلون في الفعاليات', events)}
+            {renderTable('المسجلون في البرامج', programs)}
+            {renderTable('طلبات الانضمام', joins, 'join')}
+          </>
         )}
         {/* نافذة التفاصيل */}
         {selectedRegistrant && (
@@ -149,19 +143,42 @@ const RegistrantsDashboard: React.FC = () => {
                   <strong>البريد الإلكتروني:</strong> {selectedRegistrant.email}
                 </div>
                 <div>
-                  <strong>الهاتف:</strong> {selectedRegistrant.phone || '-'}
+                  <strong>رقم الهاتف:</strong> {selectedRegistrant.phone || '-'}
                 </div>
                 <div>
-                  <strong>مصدر التسجيل:</strong> {selectedRegistrant.source}
+                  <strong>الدولة:</strong> {selectedRegistrant.country || '-'}
                 </div>
                 <div>
-                  <strong>تفاصيل المصدر:</strong>{' '}
-                  {selectedRegistrant.sourceDetails}
+                  <strong>العمر:</strong> {selectedRegistrant.age || '-'}
+                </div>
+                <div>
+                  <strong>الدافع:</strong>{' '}
+                  {selectedRegistrant.motivation || '-'}
+                </div>
+                <div>
+                  <strong>تفاصيل:</strong> {selectedRegistrant.sourceDetails}
                 </div>
                 <div>
                   <strong>تاريخ التسجيل:</strong>{' '}
                   {selectedRegistrant.registeredAt?.slice(0, 10) || '-'}
                 </div>
+                {/* الحقول الإدارية */}
+                {selectedRegistrant.id && (
+                  <div>
+                    <strong>رقم الطلب (ID):</strong> {selectedRegistrant.id}
+                  </div>
+                )}
+                {selectedRegistrant.status && (
+                  <div>
+                    <strong>الحالة:</strong> {selectedRegistrant.status}
+                  </div>
+                )}
+                {selectedRegistrant.created_at && (
+                  <div>
+                    <strong>تاريخ الإنشاء:</strong>{' '}
+                    {selectedRegistrant.created_at?.slice(0, 10)}
+                  </div>
+                )}
               </div>
             </div>
           </div>

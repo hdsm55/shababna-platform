@@ -54,3 +54,9 @@ INSERT INTO event_registrations (event_id, user_id, first_name, last_name, email
 VALUES
   (1, 1, NULL, NULL, NULL, NULL, NOW()), -- تسجيل مستخدم مسجل
   (2, NULL, 'أحمد', 'العلي', 'ahmad@example.com', '0500000000', NOW()); -- تسجيل بدون حساب
+
+-- بيانات تجريبية للمقالات (المدونة)
+INSERT INTO blogs (title, content, author, image_url, created_at)
+VALUES
+('أهمية العمل التطوعي للشباب', 'مقال عن أثر العمل التطوعي في بناء شخصية الشباب المسلم وتنمية المجتمع.', 'فريق شبابنا', NULL, NOW()),
+('كيف تبدأ مشروعك الريادي؟', 'دليل عملي مختصر لبدء مشروع ريادي ناجح للشباب.', 'فريق شبابنا', NULL, NOW());

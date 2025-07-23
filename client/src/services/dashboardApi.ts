@@ -136,3 +136,13 @@ export const exportData = async (type: string, format: 'csv' | 'excel' = 'csv') 
   });
   return data;
 };
+
+export const createUser = async (data: any) => {
+  const { data: res } = await api.post('/users', data);
+  return res;
+};
+
+export const updateUser = async (id: string, data: any) => {
+  const { data: res } = await api.put(`/users/${id}`, data);
+  return res;
+};

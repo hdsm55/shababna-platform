@@ -6,15 +6,16 @@ import { Card } from '../components/ui/Card/Card';
 import { Input } from '../components/ui/Input/Input';
 import Alert from '../components/common/Alert';
 import SEO from '../components/common/SEO';
+import { countries } from '../utils/countries';
 
 interface JoinUsFormData {
   firstName: string;
   lastName: string;
   email: string;
-  phone: string;
+  phone: string; // مطلوب
   country: string;
-  age: number;
-  motivation: string;
+  age: number; // مطلوب
+  motivation: string; // مطلوب
 }
 
 const JoinUs: React.FC = () => {
@@ -37,8 +38,21 @@ const JoinUs: React.FC = () => {
     setFormMsg('');
     setShowAlert(false);
     try {
-      // هنا يجب ربط الـ API الفعلي
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // إرسال البيانات فعليًا إلى API
+      const res = await fetch('/api/forms/join-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          first_name: data.firstName,
+          last_name: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          country: data.country,
+          age: data.age,
+          motivation: data.motivation,
+        }),
+      });
+      if (!res.ok) throw new Error('فشل في إرسال الطلب');
       setFormStatus('success');
       setFormMsg(
         t(
@@ -135,7 +149,7 @@ const JoinUs: React.FC = () => {
                 label={t('joinUs.form.phone')}
                 type="tel"
                 {...register('phone', {
-                  required: t('joinUs.form.phoneRequired', 'رقم الجوال مطلوب'),
+                  required: t('joinUs.form.phoneRequired', 'رقم الهاتف مطلوب'),
                 })}
                 error={errors.phone?.message}
                 fullWidth
@@ -155,22 +169,11 @@ const JoinUs: React.FC = () => {
                   <option value="">
                     {t('joinUs.form.selectCountry', 'اختر الدولة')}
                   </option>
-                  <option value="saudi-arabia">
-                    {t('joinUs.form.saudiArabia', 'السعودية')}
-                  </option>
-                  <option value="turkey">
-                    {t('joinUs.form.turkey', 'تركيا')}
-                  </option>
-                  <option value="uae">
-                    {t('joinUs.form.uae', 'الإمارات')}
-                  </option>
-                  <option value="egypt">{t('joinUs.form.egypt', 'مصر')}</option>
-                  <option value="jordan">
-                    {t('joinUs.form.jordan', 'الأردن')}
-                  </option>
-                  <option value="other">
-                    {t('joinUs.form.other', 'دولة أخرى')}
-                  </option>
+                  {countries.map((country) => (
+                    <option key={country.code} value={country.ar}>
+                      {country.ar}
+                    </option>
+                  ))}
                 </select>
                 {errors.country && (
                   <p className="text-red-600 text-sm mt-1">
@@ -183,6 +186,7 @@ const JoinUs: React.FC = () => {
                 type="number"
                 {...register('age', {
                   required: t('joinUs.form.ageRequired', 'العمر مطلوب'),
+                  min: { value: 1, message: 'العمر يجب أن يكون أكبر من 0' },
                 })}
                 error={errors.age?.message}
                 fullWidth

@@ -17,8 +17,8 @@ const MainNav: React.FC = () => {
     { to: '/', label: t('nav.home') },
     { to: '/events', label: t('nav.events') },
     { to: '/programs', label: t('nav.programs') },
-    { to: '/contact', label: t('nav.contact') },
     { to: '/blogs', label: t('nav.blogs', 'المدونة') },
+    { to: '/contact', label: t('nav.contact') },
     { to: '/join-us', label: t('nav.joinUs') },
   ];
   const languages = [

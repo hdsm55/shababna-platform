@@ -95,3 +95,15 @@ export interface ProgramsQueryParams {
   page?: number;
   limit?: number;
 }
+
+// Blog types
+export interface Blog {
+  id: number;
+  title: string;
+  content: string;
+  image_url?: string;
+  author?: string;
+  author_id?: number;
+  created_at: string;
+  updated_at?: string;
+}

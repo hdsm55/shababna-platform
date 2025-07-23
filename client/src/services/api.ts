@@ -7,19 +7,15 @@ export const http = axios.create({
   timeout: 10000, // 10 seconds timeout
 });
 
-// Request interceptor to add auth token
-http.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+// إضافة Interceptor لإرسال التوكن تلقائياً
+http.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers['Authorization'] = `Bearer ${token}`;
   }
-);
+  return config;
+});
 
 // Response interceptor to handle common errors
 http.interceptors.response.use(

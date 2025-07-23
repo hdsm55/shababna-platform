@@ -4,20 +4,26 @@ import { emailConfig, emailSettings, validateEmailConfig } from '../config/email
 
 class EmailService {
     constructor() {
-        // التحقق من إعدادات البريد الإلكتروني
-        this.isEmailEnabled = validateEmailConfig();
+        this.isEmailEnabled = process.env.EMAIL_ENABLED === 'true';
+        this.fromEmail = process.env.EMAIL_FROM || 'no-reply@shababna.org';
+        this.fromName = process.env.EMAIL_FROM_NAME || 'شبابنا العالمية';
 
         if (this.isEmailEnabled) {
-            // إعداد مزود البريد الإلكتروني
-            const config = emailConfig[emailConfig.default];
-            this.transporter = nodemailer.createTransporter(config);
-
-            this.fromEmail = emailSettings.fromEmail;
-            this.fromName = emailSettings.fromName;
-            this.adminEmails = emailSettings.adminEmails;
-        } else {
-            console.warn('📧 Email service is disabled due to missing configuration');
-            this.transporter = null;
+            try {
+                const nodemailer = require('nodemailer');
+                this.transporter = nodemailer.createTransport({
+                    host: process.env.EMAIL_HOST,
+                    port: process.env.EMAIL_PORT,
+                    secure: process.env.EMAIL_SECURE === 'true',
+                    auth: {
+                        user: process.env.EMAIL_USER,
+                        pass: process.env.EMAIL_PASS
+                    }
+                });
+            } catch (error) {
+                console.error('Failed to initialize email service:', error);
+                this.isEmailEnabled = false;
+            }
         }
     }
 
@@ -50,18 +56,18 @@ class EmailService {
     async sendContactConfirmation(formData) {
         const subject = 'تم استلام رسالتك - شبابنا العالمية';
         const content = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #14b8a6;">شكراً لك ${formData.first_name}!</h2>
-        <p>لقد تم استلام رسالتك بنجاح وسنقوم بالرد عليك في أقرب وقت ممكن.</p>
-        <div style="background-color: #f0fdfa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <h3>تفاصيل رسالتك:</h3>
-          <p><strong>الموضوع:</strong> ${formData.subject}</p>
-          <p><strong>الرسالة:</strong> ${formData.message}</p>
-        </div>
-        <p>سنقوم بالرد عليك خلال 24-48 ساعة.</p>
-        <p>مع تحيات،<br>فريق شبابنا العالمية</p>
-      </div>
-    `;
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; direction: rtl;">
+                <h2 style="color: #14b8a6;">شكراً لك ${formData.first_name}!</h2>
+                <p>لقد تم استلام رسالتك بنجاح وسنقوم بالرد عليك في أقرب وقت ممكن.</p>
+                <div style="background-color: #f0fdfa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h3>تفاصيل رسالتك:</h3>
+                    <p><strong>الموضوع:</strong> ${formData.subject}</p>
+                    <p><strong>الرسالة:</strong> ${formData.message}</p>
+                </div>
+                <p>سنقوم بالرد عليك خلال 24-48 ساعة.</p>
+                <p>مع تحيات،<br>فريق شبابنا العالمية</p>
+            </div>
+        `;
 
         return this.sendEmail(formData.email, formData.first_name, subject, content, 'contact_confirmation');
     }
@@ -129,16 +135,10 @@ class EmailService {
     // إرسال إيميل عام
     async sendEmail(to, recipientName, subject, content, emailType = 'general') {
         try {
-            // التحقق من تفعيل خدمة البريد الإلكتروني
             if (!this.isEmailEnabled || !this.transporter) {
-                console.warn('📧 Email service is disabled. Email would have been sent to:', to);
+                console.warn('📧 Email service is disabled or not configured. Email would have been sent to:', to);
                 console.warn('📧 Subject:', subject);
-                console.warn('📧 Content preview:', content.substring(0, 100) + '...');
-
-                // تسجيل الإيميل في قاعدة البيانات كـ "simulated"
-                await this.logEmail(to, recipientName, subject, content, emailType, 'simulated');
-
-                return { success: true, messageId: 'simulated', simulated: true };
+                return { success: true, simulated: true };
             }
 
             const mailOptions = {
@@ -149,18 +149,10 @@ class EmailService {
             };
 
             const result = await this.transporter.sendMail(mailOptions);
-
-            // تسجيل الإيميل في قاعدة البيانات
-            await this.logEmail(to, recipientName, subject, content, emailType, 'sent');
-
             return { success: true, messageId: result.messageId };
 
         } catch (error) {
             console.error('Email sending failed:', error);
-
-            // تسجيل الخطأ في قاعدة البيانات
-            await this.logEmail(to, recipientName, subject, content, emailType, 'failed', error.message);
-
             throw error;
         }
     }
@@ -249,44 +241,24 @@ class EmailService {
     async saveFormSubmission(formData) {
         try {
             if (formData.form_type === 'contact') {
-                // نموذج التواصل
                 const sqlQuery = `
-        INSERT INTO contact_forms (
-          name, email, phone, subject, message
-        )
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING *
-      `;
+                    INSERT INTO contact_forms (
+                        name, email, phone, subject, message, status
+                    )
+                    VALUES ($1, $2, $3, $4, $5, $6)
+                    RETURNING *
+                `;
                 const result = await query(sqlQuery, [
                     formData.first_name + (formData.last_name ? ' ' + formData.last_name : ''),
                     formData.email,
-                    formData.phone,
+                    formData.phone || null,
                     formData.subject,
-                    formData.message
+                    formData.message,
+                    'pending'
                 ]);
                 return result.rows[0];
-            } else if (formData.form_type === 'join_us') {
-                // نموذج الانضمام
-                const sqlQuery = `
-        INSERT INTO join_requests (
-          first_name, last_name, email, phone, country, age, motivation
-        )
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
-        RETURNING *
-      `;
-                const result = await query(sqlQuery, [
-                    formData.first_name,
-                    formData.last_name,
-                    formData.email,
-                    formData.phone,
-                    formData.country,
-                    formData.age,
-                    formData.motivation
-                ]);
-                return result.rows[0];
-            } else {
-                throw new Error('نوع النموذج غير مدعوم');
             }
+            throw new Error('نوع النموذج غير مدعوم');
         } catch (error) {
             console.error('Failed to save form submission:', error);
             throw error;

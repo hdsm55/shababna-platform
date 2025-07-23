@@ -3,13 +3,12 @@
     "home": "الرئيسية",
     "events": "الفعاليات",
     "programs": "البرامج",
-    "donations": "تبرعات",
+    "blogs": "المدونة",
     "joinUs": "انضم إلينا",
     "contact": "تواصل معنا",
     "login": "دخول",
     "dashboard": "لوحة التحكم",
-    "logout": "خروج",
-    "blogs": "المدونة"
+    "logout": "خروج"
   },
   "home": {
     "hero": {
