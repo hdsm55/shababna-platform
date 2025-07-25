@@ -8,6 +8,7 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   className?: string;
   hover?: boolean;
+  padding?: 'none' | 'sm' | 'md' | 'lg';
 }
 
 const variantStyles: Record<CardVariant, string> = {
@@ -16,18 +17,27 @@ const variantStyles: Record<CardVariant, string> = {
   elevated: 'bg-surface text-textPrimary shadow-lg',
 };
 
+const paddingStyles: Record<CardProps['padding'], string> = {
+  none: 'p-0',
+  sm: 'p-2',
+  md: 'p-4',
+  lg: 'p-6',
+};
+
 const Card: React.FC<CardProps> = ({
   variant = 'base',
   children,
   className,
   hover = false,
+  padding = 'none',
   ...props
 }) => {
   return (
     <div
       className={clsx(
-        'rounded-lg p-lg transition-shadow duration-200',
+        'rounded-lg transition-shadow duration-200',
         variantStyles[variant],
+        paddingStyles[padding],
         hover && 'hover:shadow-lg',
         className
       )}

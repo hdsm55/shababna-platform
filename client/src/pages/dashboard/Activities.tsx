@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import DashboardLayout from '../../components/dashboard/DashboardLayout';
+import DashboardLayout from '../../layouts/DashboardLayout';
 import { useQuery } from '@tanstack/react-query';
 import { getRecentActivities } from '../../services/dashboardApi';
 import Button from '../../components/common/Button';

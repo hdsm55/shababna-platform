@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { fetchUsers, fetchEventRegistrations, fetchProgramRegistrations, fetchJoinRequests } from '../services/dashboardApi';
 
 export interface Registrant {
@@ -92,9 +92,9 @@ export function useRegistrants() {
     }
   }, []);
 
-  useState(() => {
+  useEffect(() => {
     fetchAll();
-  });
+  }, [fetchAll]);
 
   return { users, events, programs, joins, loading, error, refetch: fetchAll };
 }

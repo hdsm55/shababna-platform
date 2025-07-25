@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createEvent } from '../../../services/eventsApi';
-import DashboardLayout from '../../../components/dashboard/DashboardLayout';
+import DashboardLayout from '../../../layouts/DashboardLayout';
 import Button from '../../../components/common/Button';
 import Input from '../../../components/common/Input';
 import Alert from '../../../components/common/Alert';

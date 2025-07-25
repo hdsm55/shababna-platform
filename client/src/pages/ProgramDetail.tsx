@@ -1,737 +1,494 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
-import {
-  Target,
-  Heart,
-  Users,
-  Calendar,
-  MapPin,
-  ArrowLeft,
-  Share2,
-  DollarSign,
-  TrendingUp,
-  CheckCircle,
-  AlertCircle,
-  User,
-  Mail,
-  Phone,
-  Globe,
-  Star,
-  Award,
-} from 'lucide-react';
-import { format } from 'date-fns';
+import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import Button from '../components/common/Button';
-import Card from '../components/common/Card';
-import Input from '../components/common/Input';
+import SEO from '../components/common/SEO';
+import { Button } from '../components/ui/Button/Button';
+import { Card } from '../components/ui/Card/Card';
+import { Input } from '../components/ui/Input/Input';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import { fetchProgramById, supportProgram } from '../services/programsApi';
-import { Program } from '../types';
+import { fetchProgramById } from '../services/programsApi';
+import { motion } from 'framer-motion';
 import {
-  AccessibleSection,
-  AccessibleCard,
-  AccessibleButton,
-  SkipToContent,
-} from '../components/common/AccessibleComponents';
-import DOMPurify from 'dompurify';
-import { Modal } from '../components/ui/Modal/Modal';
+  Calendar,
+  MapPin,
+  Users,
+  Clock,
+  ArrowLeft,
+  Share2,
+  Bookmark,
+  Phone,
+  Mail,
+  Globe,
+  User,
+  CheckCircle,
+  TrendingUp,
+  Target,
+  Award,
+} from 'lucide-react';
+
+interface DonationForm {
+  amount: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  message?: string;
+}
 
 const ProgramDetail: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
-  // إزالة أي متغيرات أو دوال تخص التبرع العام
-  // توحيد النموذج ليشمل دعم مالي أو تطوعي أو شراكة
-  const [showSupportModal, setShowSupportModal] = useState(false);
-  const [supportForm, setSupportForm] = useState({
-    name: '',
+  const isRTL = i18n.dir() === 'rtl';
+
+  const [showDonation, setShowDonation] = useState(false);
+  const [donationForm, setDonationForm] = useState<DonationForm>({
+    amount: 100,
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
-    amount: '',
-    note: '',
+    message: '',
   });
-  const [supportStatus, setSupportStatus] = useState<
-    'idle' | 'success' | 'error'
+  const [donationStatus, setDonationStatus] = useState<
+    'idle' | 'loading' | 'success' | 'error'
   >('idle');
-  const handleSupport = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSupportStatus('idle');
-    try {
-      if (!id) throw new Error('No program ID');
-      const payload = {
-        supporter_name: supportForm.name.trim(),
-        supporter_email: supportForm.email.trim(),
-        phone: supportForm.phone.trim(),
-        amount: supportForm.amount.trim(),
-        note: supportForm.note.trim(),
-      };
-      if (
-        !payload.supporter_name ||
-        !payload.supporter_email ||
-        !payload.amount
-      ) {
-        setSupportStatus('error');
-        return;
-      }
-      const res = await supportProgram(id, payload);
-      if (res.success) {
-        setSupportStatus('success');
-        setSupportForm({
-          name: '',
-          email: '',
-          phone: '',
-          amount: '',
-          note: '',
-        });
-      } else {
-        setSupportStatus('error');
-      }
-    } catch {
-      setSupportStatus('error');
-    }
-  };
+  const [donationMessage, setDonationMessage] = useState('');
 
-  console.log('Program id from URL:', id);
   // Fetch program details
   const {
-    data: program,
+    data: programData,
     isLoading,
-    isError,
     error,
   } = useQuery({
     queryKey: ['program', id],
     queryFn: () => fetchProgramById(id!),
     enabled: !!id,
-    staleTime: 5 * 60 * 1000,
   });
 
-  useEffect(() => {
-    console.log('Fetched program data:', program);
-    console.log('isLoading:', isLoading, 'isError:', isError, 'error:', error);
-  }, [program, isLoading, isError, error]);
+  const program = programData?.data || programData;
 
-  // إزالة أي متغيرات أو دوال تخص التبرع العام
-  // توحيد النموذج ليشمل دعم مالي أو تطوعي أو شراكة
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'education':
-        return 'bg-primary-100 text-primary-800';
-      case 'technology':
-        return 'bg-accent-100 text-accent-800';
-      case 'entrepreneurship':
-        return 'bg-secondary-100 text-secondary-800';
-      case 'volunteering':
-        return 'bg-success-100 text-success-800';
-      default:
-        return 'bg-neutral-100 text-neutral-800';
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('ar-SA', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
+  const getProgressPercentage = (current: number, goal: number) => {
+    return Math.min((current / goal) * 100, 100);
+  };
+
+  const handleDonation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setDonationStatus('loading');
+
+    try {
+      // إرسال البيانات الفعلية للـ API
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+        }/programs/${id}/register`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            firstName: donationForm.firstName,
+            lastName: donationForm.lastName,
+            email: donationForm.email,
+            phone: donationForm.phone,
+            message: donationForm.message,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('فشل في التسجيل');
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        setDonationStatus('success');
+        setDonationMessage('تم التسجيل في البرنامج بنجاح! شكراً لك.');
+        setShowDonation(false);
+        // إعادة تعيين النموذج
+        setDonationForm({
+          amount: 100,
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          message: '',
+        });
+      } else {
+        throw new Error(result.message || 'حدث خطأ أثناء التسجيل');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      setDonationStatus('error');
+      setDonationMessage('حدث خطأ أثناء التسجيل. يرجى المحاولة مرة أخرى.');
     }
   };
 
-  const getProgressColor = (percentage: number) => {
-    if (percentage >= 80) return 'bg-success-500';
-    if (percentage >= 50) return 'bg-warning-500';
-    return 'bg-accent-500';
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setDonationForm({
+      ...donationForm,
+      [e.target.name]: e.target.value,
+    });
   };
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-full max-w-4xl mx-auto animate-pulse">
-          <div className="h-56 bg-gray-200 rounded-2xl mb-8" />
-          <div className="h-10 bg-gray-200 rounded w-2/3 mb-4" />
-          <div className="h-6 bg-gray-100 rounded w-1/2 mb-6" />
-          <div className="h-4 bg-gray-100 rounded w-3/4 mb-2" />
-          <div className="h-4 bg-gray-100 rounded w-1/2 mb-2" />
-          <div className="h-4 bg-gray-100 rounded w-1/3 mb-8" />
-          <div className="h-12 bg-gray-200 rounded mb-4 w-full" />
-        </div>
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
 
-  if (isError || !program) {
-    let errorMsg = t('common.error.message');
-    if (error && error instanceof Error && error.message.includes('404')) {
-      errorMsg = t(
-        'programs.notFound',
-        'عذراً، لم يتم العثور على هذا البرنامج.'
-      );
-    }
+  if (error || !program) {
     return (
-      <div className="min-h-screen">
-        <SkipToContent />
-        <div className="container py-16">
-          <Alert
-            type="error"
-            title={t('common.error.title', 'حدث خطأ')}
-            className="max-w-2xl mx-auto"
-          >
-            {errorMsg}
-          </Alert>
-          <div className="text-center mt-8">
-            <Link to="/programs">
-              <Button variant="primary" icon={ArrowLeft} iconPosition="left">
-                {t('common.backToPrograms', 'العودة للبرامج')}
-              </Button>
-            </Link>
-          </div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <Alert type="error">
+          {t('programDetail.error', 'حدث خطأ أثناء جلب تفاصيل البرنامج.')}
+        </Alert>
       </div>
     );
   }
-
-  const progressPercentage = program.goal_amount
-    ? Math.round((program.current_amount / program.goal_amount) * 100)
-    : 0;
 
   return (
-    <div className="min-h-screen">
-      <SkipToContent />
-      {/* Hero Section */}
-      <AccessibleSection variant="hero" ariaLabel="قسم رأس تفاصيل البرنامج">
-        <div className="absolute inset-0 bg-black/20"></div>
-        {/* Program Banner Image */}
-        {program.image && (
-          <img
-            src={program.image || '/images/islamic-youth.jpg'}
-            alt={program.title}
-            className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none select-none"
-            style={{ zIndex: 0 }}
-          />
-        )}
-        <div className="relative container">
-          <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-neutral-50" dir={isRTL ? 'rtl' : 'ltr'}>
+      <SEO
+        title={`${program.title} - منصة شبابنا العالمية`}
+        description={program.description}
+        type="program"
+      />
+
+      {/* Back Button */}
+      <section className="container mx-auto px-4 py-6">
+        <Link to="/programs">
+          <Button variant="outline" className="flex items-center gap-2">
+            <ArrowLeft className="w-4 h-4" />
+            {t('programDetail.backToPrograms', 'العودة إلى البرامج')}
+          </Button>
+        </Link>
+      </section>
+
+      {/* Program Header */}
+      <section className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Program Image */}
+          <div className="lg:col-span-2">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              {/* Breadcrumb */}
-              <div className="mb-8">
-                <Link
-                  to="/programs"
-                  className="inline-flex items-center text-white/80 hover:text-white transition-colors duration-300"
-                >
-                  <ArrowLeft className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
-                  {t('common.backToPrograms')}
-                </Link>
-              </div>
+              <img
+                src={program.image_url || '/images/program-placeholder.jpg'}
+                alt={program.title}
+                className="w-full h-96 object-cover rounded-2xl shadow-lg"
+                loading="lazy"
+                onError={(e) => (e.currentTarget.src = '/images/fallback.jpg')}
+              />
+            </motion.div>
+          </div>
 
-              {/* Program Header */}
-              <div className="mb-6">
-                <span
-                  className={`px-3 py-1 text-sm font-medium rounded-full ${getCategoryColor(
-                    program.category
-                  )}`}
-                >
-                  {typeof program.category === 'string'
-                    ? program.category.charAt(0).toUpperCase() +
-                      program.category.slice(1)
-                    : ''}
-                </span>
-              </div>
+          {/* Program Info */}
+          <div className="lg:col-span-1">
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <Card className="p-6 sticky top-6">
+                {/* Category Badge */}
+                <div className="flex items-center justify-between mb-4">
+                  <span className="px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800">
+                    {program.category}
+                  </span>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm">
+                      <Share2 className="w-4 h-4" />
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      <Bookmark className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
 
-              <h1 className="text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
-                {program.title}
-              </h1>
+                {/* Program Title */}
+                <h1 className="text-2xl font-bold text-primary-900 mb-4">
+                  {program.title}
+                </h1>
 
-              <p className="text-xl text-white/90 mb-8 leading-relaxed">
-                {program.description}
-              </p>
-
-              {/* Program Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="flex items-center text-white/90">
-                  <DollarSign className="w-5 h-5 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
-                  <div>
-                    <div className="font-medium">
-                      $
-                      {typeof program.current_amount === 'number'
-                        ? program.current_amount.toLocaleString()
-                        : '0'}
+                {/* Program Details */}
+                <div className="space-y-4 mb-6">
+                  <div className="flex items-center text-gray-600">
+                    <Calendar className="w-5 h-5 mr-3" />
+                    <div>
+                      <div className="font-medium">
+                        {formatDate(program.start_date)}
+                        {program.end_date !== program.start_date &&
+                          ` - ${formatDate(program.end_date)}`}
+                      </div>
                     </div>
-                    <div className="text-sm opacity-80">Raised</div>
                   </div>
-                </div>
 
-                <div className="flex items-center text-white/90">
-                  <Target className="w-5 h-5 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
-                  <div>
-                    <div className="font-medium">
-                      $
-                      {typeof program.goal_amount === 'number'
-                        ? program.goal_amount.toLocaleString()
-                        : '∞'}
+                  <div className="flex items-center text-gray-600">
+                    <TrendingUp className="w-5 h-5 mr-3" />
+                    <span>{program.category}</span>
+                  </div>
+
+                  {program.goal_amount && program.current_amount && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">التقدم</span>
+                        <span className="font-medium">
+                          {getProgressPercentage(
+                            program.current_amount,
+                            program.goal_amount
+                          ).toFixed(1)}
+                          %
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-gradient-to-r from-primary-500 to-accent-500 h-2 rounded-full transition-all duration-300"
+                          style={{
+                            width: `${getProgressPercentage(
+                              program.current_amount,
+                              program.goal_amount
+                            )}%`,
+                          }}
+                        ></div>
+                      </div>
+                      <div className="flex justify-between text-sm text-gray-500">
+                        <span>
+                          تم جمع: ${program.current_amount.toLocaleString()}
+                        </span>
+                        <span>
+                          الهدف: ${program.goal_amount.toLocaleString()}
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-sm opacity-80">Goal</div>
-                  </div>
+                  )}
                 </div>
 
-                <div className="flex items-center text-white/90">
-                  <Users className="w-5 h-5 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
-                  <div>
-                    <div className="font-medium">{'—'}</div>
-                    <div className="text-sm opacity-80">Beneficiaries</div>
+                {/* Donation Button */}
+                <Button
+                  className="w-full mb-4"
+                  onClick={() => setShowDonation(true)}
+                >
+                  {t('programDetail.donate', 'تبرع الآن')}
+                </Button>
+
+                {/* Contact Info */}
+                <div className="border-t pt-4">
+                  <h3 className="font-semibold mb-2">
+                    {t('programDetail.contactInfo', 'معلومات التواصل')}
+                  </h3>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div className="flex items-center">
+                      <Phone className="w-4 h-4 mr-2" />
+                      <span>+966 50 123 4567</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Mail className="w-4 h-4 mr-2" />
+                      <span>programs@shababna.com</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Globe className="w-4 h-4 mr-2" />
+                      <span>www.shababna.com</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Card>
             </motion.div>
           </div>
         </div>
-      </AccessibleSection>
+      </section>
 
-      {/* Content Section */}
-      <AccessibleSection variant="neutral" ariaLabel="قسم محتوى البرنامج">
-        <div className="container">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* Program Image */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-              >
-                <Card className="overflow-hidden">
-                  <img
-                    src={program.image || '/images/islamic-youth.jpg'}
-                    alt={program.title}
-                    className="w-full h-64 lg:h-80 object-cover"
-                  />
-                </Card>
-              </motion.div>
+      {/* Program Description */}
+      <section className="container mx-auto px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <Card className="p-8">
+            <h2 className="text-2xl font-bold text-primary-900 mb-6">
+              {t('programDetail.about', 'عن البرنامج')}
+            </h2>
+            <div className="prose prose-lg max-w-none">
+              <p className="text-gray-700 leading-relaxed">
+                {program.description}
+              </p>
 
-              {/* Program Details */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-              >
-                <Card>
-                  <h2 className="text-2xl font-bold text-neutral-900 mb-6">
-                    About This Program
-                  </h2>
-                  <div className="prose prose-neutral max-w-none">
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(program.description),
-                      }}
-                    />
-                  </div>
-                </Card>
-              </motion.div>
+              {/* Additional Details */}
+              <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h3 className="text-lg font-semibold mb-3 flex items-center">
+                    <Target className="w-5 h-5 mr-2 text-primary-500" />
+                    {t('programDetail.objectives', 'أهداف البرنامج')}
+                  </h3>
+                  <ul className="space-y-2 text-gray-700">
+                    <li className="flex items-center">
+                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                      تطوير المهارات الشخصية والمهنية
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                      بناء مجتمع شبابي قوي ومتضامن
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                      تعزيز القيم الإسلامية والأخلاقية
+                    </li>
+                  </ul>
+                </div>
 
-              {/* Program Impact */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-              >
-                <Card>
-                  <h2 className="text-2xl font-bold text-neutral-900 mb-6">
-                    Program Impact
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="flex items-start space-x-4 rtl:space-x-reverse">
-                      <div className="flex-shrink-0 w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center">
-                        <Users className="w-6 h-6 text-primary-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-neutral-900">
-                          Community Impact
-                        </h3>
-                        <p className="text-sm text-neutral-600">
-                          Directly benefiting{' '}
-                          {program.beneficiaries || 'hundreds'} of people in the
-                          community
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-4 rtl:space-x-reverse">
-                      <div className="flex-shrink-0 w-12 h-12 bg-success-100 rounded-xl flex items-center justify-center">
-                        <TrendingUp className="w-6 h-6 text-success-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-neutral-900">
-                          Long-term Benefits
-                        </h3>
-                        <p className="text-sm text-neutral-600">
-                          Creating sustainable change and lasting positive
-                          impact
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-4 rtl:space-x-reverse">
-                      <div className="flex-shrink-0 w-12 h-12 bg-accent-100 rounded-xl flex items-center justify-center">
-                        <Award className="w-6 h-6 text-accent-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-neutral-900">
-                          Quality Standards
-                        </h3>
-                        <p className="text-sm text-neutral-600">
-                          Following best practices and international standards
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-4 rtl:space-x-reverse">
-                      <div className="flex-shrink-0 w-12 h-12 bg-secondary-100 rounded-xl flex items-center justify-center">
-                        <Star className="w-6 h-6 text-secondary-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-neutral-900">
-                          Excellence
-                        </h3>
-                        <p className="text-sm text-neutral-600">
-                          Committed to delivering the highest quality outcomes
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
-
-              {/* Program Timeline */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-              >
-                <Card>
-                  <h2 className="text-2xl font-bold text-neutral-900 mb-6">
-                    Program Timeline
-                  </h2>
-                  <div className="space-y-6">
-                    <div className="flex items-start space-x-4 rtl:space-x-reverse">
-                      <div className="flex-shrink-0 w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-                        <CheckCircle className="w-6 h-6 text-primary-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-neutral-900">
-                          Program Launch
-                        </h3>
-                        <p className="text-sm text-neutral-600 mb-2">
-                          Initial planning and community engagement phase
-                        </p>
-                        <div className="text-xs text-primary-600 font-medium">
-                          Phase 1 - Completed
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-4 rtl:space-x-reverse">
-                      <div className="flex-shrink-0 w-12 h-12 bg-accent-100 rounded-full flex items-center justify-center">
-                        <Target className="w-6 h-6 text-accent-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-neutral-900">
-                          Active Implementation
-                        </h3>
-                        <p className="text-sm text-neutral-600 mb-2">
-                          Core program activities and direct service delivery
-                        </p>
-                        <div className="text-xs text-accent-600 font-medium">
-                          Phase 2 - In Progress
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-4 rtl:space-x-reverse">
-                      <div className="flex-shrink-0 w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center">
-                        <TrendingUp className="w-6 h-6 text-neutral-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-neutral-900">
-                          Expansion & Growth
-                        </h3>
-                        <p className="text-sm text-neutral-600 mb-2">
-                          Scaling successful initiatives and reaching more
-                          communities
-                        </p>
-                        <div className="text-xs text-neutral-600 font-medium">
-                          Phase 3 - Planned
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-3 flex items-center">
+                    <Award className="w-5 h-5 mr-2 text-accent-500" />
+                    {t('programDetail.benefits', 'الفوائد المتوقعة')}
+                  </h3>
+                  <ul className="space-y-2 text-gray-700">
+                    <li className="flex items-center">
+                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                      شهادات معتمدة للمشاركين
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                      فرص عمل وترقيات مهنية
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                      شبكة علاقات مهنية قوية
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
+          </Card>
+        </motion.div>
+      </section>
 
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Donation Card */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.5 }}
-              >
-                <Card variant="accent">
-                  <h3 className="text-xl font-bold text-neutral-900 mb-6">
-                    Support This Program
-                  </h3>
+      {/* Donation Modal */}
+      {showDonation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="bg-white rounded-2xl p-6 w-full max-w-md"
+          >
+            <h3 className="text-xl font-bold mb-4">
+              {t('programDetail.donate', 'تبرع للبرنامج')}
+            </h3>
 
-                  {/* Progress Bar */}
-                  <div className="mb-6">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-neutral-700">
-                        Progress
-                      </span>
-                      <span className="text-sm font-medium text-neutral-700">
-                        {progressPercentage}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-neutral-200 rounded-full h-3">
-                      <div
-                        className={`h-3 rounded-full transition-all duration-500 ${getProgressColor(
-                          progressPercentage
-                        )}`}
-                        style={{ width: `${progressPercentage}%` }}
-                      ></div>
-                    </div>
-                    <div className="flex justify-between text-sm text-neutral-600 mt-2">
-                      <span>
-                        $
-                        {typeof program.current_amount === 'number'
-                          ? program.current_amount.toLocaleString()
-                          : '0'}{' '}
-                        raised
-                      </span>
-                      <span>
-                        $
-                        {typeof program.goal_amount === 'number'
-                          ? program.goal_amount.toLocaleString()
-                          : '∞'}{' '}
-                        goal
-                      </span>
-                    </div>
-                  </div>
+            <form onSubmit={handleDonation} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('programDetail.amount', 'مبلغ التبرع')}
+                </label>
+                <Input
+                  name="amount"
+                  type="number"
+                  placeholder="100"
+                  value={donationForm.amount}
+                  onChange={handleInputChange}
+                  required
+                  min="1"
+                />
+              </div>
 
-                  {supportStatus === 'success' && (
-                    <Alert
-                      type="success"
-                      title="تم الدعم بنجاح!"
-                      className="mb-6"
-                    >
-                      تم دعم البرنامج بنجاح. شكرًا لمساهمتك!
-                    </Alert>
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  name="firstName"
+                  placeholder={t('programDetail.firstName', 'الاسم الأول')}
+                  value={donationForm.firstName}
+                  onChange={handleInputChange}
+                  required
+                />
+                <Input
+                  name="lastName"
+                  placeholder={t('programDetail.lastName', 'اسم العائلة')}
+                  value={donationForm.lastName}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <Input
+                name="email"
+                type="email"
+                placeholder={t('programDetail.email', 'البريد الإلكتروني')}
+                value={donationForm.email}
+                onChange={handleInputChange}
+                required
+              />
+
+              <Input
+                name="phone"
+                placeholder={t('programDetail.phone', 'رقم الجوال')}
+                value={donationForm.phone}
+                onChange={handleInputChange}
+                required
+              />
+
+              <textarea
+                name="message"
+                placeholder={t('programDetail.message', 'رسالة (اختياري)')}
+                value={donationForm.message}
+                onChange={handleInputChange}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                rows={3}
+              />
+
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowDonation(false)}
+                  className="flex-1"
+                >
+                  {t('programDetail.cancel', 'إلغاء')}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={donationStatus === 'loading'}
+                  className="flex-1"
+                >
+                  {donationStatus === 'loading' ? (
+                    <LoadingSpinner size="sm" />
+                  ) : (
+                    t('programDetail.submit', 'تأكيد التبرع')
                   )}
-
-                  {supportStatus === 'error' && (
-                    <Alert type="error" title="خطأ في الدعم" className="mb-6">
-                      حدث خطأ أثناء معالجة الدعم. يرجى المحاولة مرة أخرى.
-                    </Alert>
-                  )}
-
-                  {/* زر ادعم البرنامج */}
-                  <div className="flex gap-4 mt-8 justify-center">
-                    <Button
-                      size="lg"
-                      variant="primary"
-                      onClick={() => setShowSupportModal(true)}
-                    >
-                      ادعم البرنامج
-                    </Button>
-                  </div>
-                  <Modal
-                    open={showSupportModal}
-                    onClose={() => setShowSupportModal(false)}
-                    title="دعم البرنامج"
-                  >
-                    <form onSubmit={handleSupport} className="space-y-4 p-2">
-                      <Input
-                        label="الاسم الكامل"
-                        value={supportForm.name}
-                        onChange={(e) =>
-                          setSupportForm((f) => ({
-                            ...f,
-                            name: e.target.value,
-                          }))
-                        }
-                        required
-                        fullWidth
-                      />
-                      <Input
-                        label="البريد الإلكتروني"
-                        type="email"
-                        value={supportForm.email}
-                        onChange={(e) =>
-                          setSupportForm((f) => ({
-                            ...f,
-                            email: e.target.value,
-                          }))
-                        }
-                        required
-                        fullWidth
-                      />
-                      <Input
-                        label="رقم الجوال (اختياري)"
-                        value={supportForm.phone}
-                        onChange={(e) =>
-                          setSupportForm((f) => ({
-                            ...f,
-                            phone: e.target.value,
-                          }))
-                        }
-                        fullWidth
-                      />
-                      <Input
-                        label="المبلغ (USD)"
-                        type="number"
-                        value={supportForm.amount}
-                        onChange={(e) =>
-                          setSupportForm((f) => ({
-                            ...f,
-                            amount: e.target.value,
-                          }))
-                        }
-                        required
-                        fullWidth
-                      />
-                      <Input
-                        label="ملاحظة (اختياري)"
-                        value={supportForm.note}
-                        onChange={(e) =>
-                          setSupportForm((f) => ({
-                            ...f,
-                            note: e.target.value,
-                          }))
-                        }
-                        fullWidth
-                      />
-                      {supportStatus === 'success' && (
-                        <Alert type="success">
-                          تم تسجيل دعمك بنجاح! سنقوم بالتواصل معك قريباً.
-                        </Alert>
-                      )}
-                      {supportStatus === 'error' && (
-                        <Alert type="error">
-                          يرجى تعبئة جميع الحقول المطلوبة.
-                        </Alert>
-                      )}
-                      <div className="flex gap-2 justify-end mt-4">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => setShowSupportModal(false)}
-                        >
-                          إلغاء
-                        </Button>
-                        <Button type="submit" variant="primary">
-                          تأكيد الدعم
-                        </Button>
-                      </div>
-                    </form>
-                  </Modal>
-                </Card>
-              </motion.div>
-
-              {/* Program Info Card */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
-              >
-                <Card>
-                  <h3 className="text-xl font-bold text-neutral-900 mb-6">
-                    Program Information
-                  </h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center text-neutral-600">
-                      <Target className="w-4 h-4 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
-                      <span className="text-sm">{program.category}</span>
-                    </div>
-                    <div className="flex items-center text-neutral-600">
-                      <DollarSign className="w-4 h-4 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
-                      <span className="text-sm">
-                        $
-                        {typeof program.current_amount === 'number'
-                          ? program.current_amount.toLocaleString()
-                          : '0'}{' '}
-                        raised
-                      </span>
-                    </div>
-                    <div className="flex items-center text-neutral-600">
-                      <Users className="w-4 h-4 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
-                      <span className="text-sm">— beneficiaries</span>
-                    </div>
-                    <div className="flex items-center text-neutral-600">
-                      <Calendar className="w-4 h-4 mr-3 rtl:ml-3 rtl:mr-0 flex-shrink-0" />
-                      <span className="text-sm">Ongoing program</span>
-                    </div>
-                  </div>
-                </Card>
-              </motion.div>
-
-              {/* Share Card */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.7 }}
-              >
-                <Card>
-                  <h3 className="text-xl font-bold text-neutral-900 mb-6">
-                    Share Program
-                  </h3>
-                  <div className="space-y-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      icon={Share2}
-                      fullWidth
-                      onClick={() => {
-                        navigator.share?.({
-                          title: program.title,
-                          text: program.description,
-                          url: window.location.href,
-                        });
-                      }}
-                    >
-                      Share Program
-                    </Button>
-                    <Button variant="ghost" size="sm" icon={Heart} fullWidth>
-                      Add to Favorites
-                    </Button>
-                  </div>
-                </Card>
-              </motion.div>
-            </div>
-          </div>
-        </div>
-      </AccessibleSection>
-
-      {/* Toast for donation status */}
-      {supportStatus === 'success' && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg z-50 animate-fade-in">
-          {t('programs.donationSuccess', 'تم التبرع بنجاح!')}
-        </div>
-      )}
-      {supportStatus === 'error' && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg z-50 animate-fade-in">
-          {t('programs.donationError', 'حدث خطأ أثناء التبرع. حاول مرة أخرى.')}
+                </Button>
+              </div>
+            </form>
+          </motion.div>
         </div>
       )}
 
-      {/* Suggested Programs Section */}
-      <AccessibleSection variant="content" ariaLabel="قسم البرامج المقترحة">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold mb-8 text-primary-700 flex items-center gap-2">
-            <Target className="w-6 h-6" />
-            {t('programs.suggested', 'برامج مقترحة')}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* برامج ثابتة كمثال */}
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="p-6">
-                <div className="h-32 bg-gray-200 rounded-xl mb-4" />
-                <div className="h-6 bg-gray-100 rounded w-2/3 mb-2" />
-                <div className="h-4 bg-gray-100 rounded w-1/2 mb-2" />
-                <div className="h-4 bg-gray-100 rounded w-1/3" />
-              </Card>
-            ))}
-          </div>
+      {/* Donation Status Alert */}
+      {donationStatus !== 'idle' && (
+        <div className="fixed bottom-4 right-4 z-50">
+          <Alert
+            type={donationStatus === 'success' ? 'success' : 'error'}
+            onClose={() => setDonationStatus('idle')}
+          >
+            {donationMessage}
+          </Alert>
         </div>
-      </AccessibleSection>
+      )}
     </div>
   );
 };

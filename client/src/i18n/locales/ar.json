@@ -10,6 +10,39 @@
     "dashboard": "لوحة التحكم",
     "logout": "خروج"
   },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "breadcrumb": "لوحة التحكم",
+    "sidebar": {
+      "main": "الرئيسية",
+      "overview": "نظرة عامة",
+      "overviewDesc": "نظرة شاملة على النظام",
+      "content": "إدارة المحتوى",
+      "programs": "البرامج",
+      "programsDesc": "إدارة البرامج والمشاريع",
+      "events": "الفعاليات",
+      "eventsDesc": "إدارة الفعاليات والورش",
+      "blogs": "المدونة",
+      "blogsDesc": "إدارة المقالات والمحتوى",
+      "users": "المستخدمون",
+      "usersDesc": "إدارة المستخدمين والصلاحيات",
+      "registrants": "المسجلون",
+      "registrantsDesc": "عرض المسجلين في البرامج والفعاليات",
+      "communication": "التواصل",
+      "contactForms": "رسائل التواصل",
+      "contactFormsDesc": "إدارة رسائل التواصل والاستفسارات",
+      "analytics": "التحليلات والتقارير",
+      "analyticsDesc": "تحليلات شاملة للنظام",
+      "reports": "التقارير",
+      "reportsDesc": "تقارير مفصلة وإحصائيات",
+      "activities": "النشاطات",
+      "activitiesDesc": "سجل النشاطات والأحداث",
+      "system": "النظام",
+      "settings": "الإعدادات",
+      "settingsDesc": "إعدادات النظام والحساب",
+      "logout": "تسجيل الخروج"
+    }
+  },
   "home": {
     "hero": {
       "badge": "شباب مسلم يصنع التغيير",

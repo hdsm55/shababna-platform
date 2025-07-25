@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import DashboardLayout from '../../components/dashboard/DashboardLayout';
+import DashboardLayout from '../../layouts/DashboardLayout';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import LoadingSpinner from '../../components/common/LoadingSpinner';

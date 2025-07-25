@@ -3,26 +3,33 @@ import { Program, PaginatedResponse, ProgramsQueryParams } from '../types';
 
 // Fetch programs with filters and pagination
 export const fetchPrograms = async (params: ProgramsQueryParams = {}): Promise<PaginatedResponse<Program>> => {
-  const { category, search, page = 1, limit = 10 } = params;
+  try {
+    const { category, search, page = 1, limit = 10 } = params;
 
-  const queryParams = new URLSearchParams();
-  if (category) queryParams.append('category', category);
-  if (search) queryParams.append('search', search);
-  queryParams.append('page', page.toString());
-  queryParams.append('limit', limit.toString());
+    const queryParams = new URLSearchParams();
+    if (category) queryParams.append('category', category);
+    if (search) queryParams.append('search', search);
+    queryParams.append('page', page.toString());
+    queryParams.append('limit', limit.toString());
 
-  const response = await http.get(`/programs?${queryParams.toString()}`);
-  return response.data;
-};
-
-// Fetch a single program by ID
-export const fetchProgramById = async (id: number | string): Promise<Program> => {
-  const response = await http.get(`/programs/${id}`);
-  if (!response.data || !response.data.data) {
-    throw new Error('404: Program not found');
+    const response = await http.get(`/programs?${queryParams.toString()}`);
+    return response.data;
+  } catch (error) {
+    console.error('Programs API failed:', error);
+    throw error; // إعادة رمي الخطأ بدلاً من إرجاع بيانات وهمية
   }
-  return response.data.data;
 };
+
+// Fetch single program by ID
+export const fetchProgramById = async (id: string): Promise<any> => {
+  try {
+    const response = await http.get(`/programs/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Program API failed:', error);
+    throw error; // إعادة رمي الخطأ بدلاً من إرجاع بيانات وهمية
+  }
+}
 
 // دعم برنامج (مالي أو تطوعي أو شراكة)
 export const supportProgram = async (programId: number | string, data: any) => {

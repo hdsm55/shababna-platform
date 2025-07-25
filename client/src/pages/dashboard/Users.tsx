@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import DashboardLayout from '../../components/dashboard/DashboardLayout';
+import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'framer-motion';
+import DashboardLayout from '../../layouts/DashboardLayout';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   fetchUsers,
@@ -7,16 +9,12 @@ import {
   createUser,
   updateUser,
 } from '../../services/dashboardApi';
-import Button from '../../components/common/Button';
+import { Button } from '../../components/ui/Button/Button';
 import Modal from '../../components/common/Modal';
-import {
-  AccessibleSection,
-  SkipToContent,
-} from '../../components/common/AccessibleComponents';
-import Card from '../../components/common/Card';
+import { Card } from '../../components/ui/Card/Card';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Alert from '../../components/common/Alert';
-import Input from '../../components/common/Input';
+import { Input } from '../../components/ui/Input/Input';
 import {
   Search,
   Filter,
@@ -39,10 +37,108 @@ import {
   Activity,
   TrendingUp,
   DollarSign,
+  ChevronDown,
+  ChevronUp,
+  Download,
+  Upload,
+  RefreshCw,
+  Settings,
+  UserCheck,
+  UserX,
+  Crown,
+  Award,
+  Target,
+  Heart,
+  MessageCircle,
+  Bell,
+  Lock,
+  Unlock,
+  Key,
+  EyeOff,
+  AlertTriangle,
+  Info,
+  HelpCircle,
+  ExternalLink,
+  Copy,
+  Share2,
+  Archive,
+  Send,
+  Mail as MailIcon,
+  Phone as PhoneIcon,
+  Smartphone,
+  Monitor,
+  Tablet,
+  Laptop,
+  Database,
+  Server,
+  Cloud,
+  Wifi,
+  Signal,
+  Battery,
+  Volume2,
+  VolumeX,
+  Mic,
+  MicOff,
+  Camera,
+  CameraOff,
+  Video,
+  VideoOff,
+  Headphones,
+  Speaker,
+  Radio,
+  Tv,
+  Smartphone as Mobile,
+  Watch,
+  Clock as TimeIcon,
+  Calendar as DateIcon,
+  Timer,
+  TimerOff,
+  Hourglass,
+  History,
+  Repeat,
+  RotateCcw,
+  RotateCw,
+  FastForward,
+  Rewind,
+  SkipBack,
+  SkipForward,
+  PlayCircle,
+  PauseCircle,
+  StopCircle as StopIcon,
+  Square as SquareIcon,
+  Circle,
+  Dot,
+  Minus as MinusIcon,
+  Plus as PlusIcon,
+  X,
+  Check,
+  AlertTriangle as AlertTriangleIcon,
+  Info as InfoIcon,
+  HelpCircle as HelpCircleIcon,
+  Lock as LockIcon,
+  Unlock as UnlockIcon,
+  Eye as EyeIcon,
+  EyeOff as EyeOffIcon,
+  Key as KeyIcon,
+  Fingerprint,
+  Shield as ShieldIcon,
+  ShieldCheck,
+  ShieldX,
+  ShieldAlert,
+  ShieldOff,
+  User,
+  UserCheck as UserCheckIcon,
+  UserX as UserXIcon,
+  UserPlus as UserAdd,
+  UserMinus,
+  Users as UsersIcon,
+  UserCog,
+  UserSearch,
+  UserCheck as UserVerified,
+  UserX as UserBlocked,
 } from 'lucide-react';
-import QuickActions from '../../components/common/QuickActions';
-import { Link } from 'react-router-dom';
-import UsersTable from './Users/UsersTable';
+
+import SEO from '../../components/common/SEO';
 
 interface User {
   id: string;
@@ -65,10 +161,15 @@ interface User {
 }
 
 const UsersDashboard: React.FC = () => {
+  const { t, i18n } = useTranslation();
+  const queryClient = useQueryClient();
+  const isRTL = i18n.dir() === 'rtl';
+
   // جلب قائمة المستخدمين
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['dashboard-users'],
     queryFn: () => fetchUsers(),
+    staleTime: 5 * 60 * 1000,
   });
 
   // حالة النافذة المنبثقة
@@ -81,6 +182,8 @@ const UsersDashboard: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [roleFilter, setRoleFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
+  const [sortBy, setSortBy] = useState('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   // نموذج البيانات
   const [form, setForm] = useState({
@@ -98,145 +201,12 @@ const UsersDashboard: React.FC = () => {
   const [formError, setFormError] = useState('');
   const [modalMsg, setModalMsg] = useState('');
 
-  // بيانات افتراضية للمستخدمين
-  const mockUsers: User[] = [
-    {
-      id: '1',
-      firstName: 'أحمد',
-      lastName: 'محمد',
-      email: 'ahmed@example.com',
-      phone: '+966501234567',
-      role: 'admin',
-      status: 'active',
-      avatar: 'AM',
-      joinDate: '2024-01-15',
-      lastLogin: '2024-06-01T10:30:00Z',
-      location: 'الرياض، السعودية',
-      bio: 'مدير المنظمة ومؤسسها',
-      eventsAttended: 25,
-      programsParticipated: 8,
-      totalDonations: 5000,
-      isVerified: true,
-      permissions: ['all'],
-    },
-    {
-      id: '2',
-      firstName: 'فاطمة',
-      lastName: 'علي',
-      email: 'fatima@example.com',
-      phone: '+966502345678',
-      role: 'moderator',
-      status: 'active',
-      avatar: 'فع',
-      joinDate: '2024-02-01',
-      lastLogin: '2024-06-01T09:15:00Z',
-      location: 'جدة، السعودية',
-      bio: 'منسقة الفعاليات والبرامج',
-      eventsAttended: 18,
-      programsParticipated: 6,
-      totalDonations: 2500,
-      isVerified: true,
-      permissions: ['events', 'programs', 'users'],
-    },
-    {
-      id: '3',
-      firstName: 'عمر',
-      lastName: 'خالد',
-      email: 'omar@example.com',
-      phone: '+966503456789',
-      role: 'member',
-      status: 'active',
-      avatar: 'عخ',
-      joinDate: '2024-03-10',
-      lastLogin: '2024-05-30T14:20:00Z',
-      location: 'الدمام، السعودية',
-      bio: 'عضو نشط في المنظمة',
-      eventsAttended: 12,
-      programsParticipated: 4,
-      totalDonations: 1200,
-      isVerified: true,
-      permissions: ['events', 'programs'],
-    },
-    {
-      id: '4',
-      firstName: 'سارة',
-      lastName: 'أحمد',
-      email: 'sara@example.com',
-      phone: '+966504567890',
-      role: 'member',
-      status: 'pending',
-      avatar: 'سأ',
-      joinDate: '2024-06-01',
-      lastLogin: '2024-06-01T08:45:00Z',
-      location: 'مكة، السعودية',
-      bio: 'عضو جديد في المنظمة',
-      eventsAttended: 0,
-      programsParticipated: 0,
-      totalDonations: 0,
-      isVerified: false,
-      permissions: ['events'],
-    },
-    {
-      id: '5',
-      firstName: 'يوسف',
-      lastName: 'عبدالله',
-      email: 'youssef@example.com',
-      phone: '+966505678901',
-      role: 'guest',
-      status: 'inactive',
-      avatar: 'يع',
-      joinDate: '2024-04-20',
-      lastLogin: '2024-05-15T16:30:00Z',
-      location: 'المدينة، السعودية',
-      bio: 'زائر في المنظمة',
-      eventsAttended: 3,
-      programsParticipated: 1,
-      totalDonations: 300,
-      isVerified: false,
-      permissions: ['events'],
-    },
-  ];
-
-  // استخدام البيانات الحقيقية فقط
+  // استخدام البيانات الحقيقية من API
   const users = data?.data?.items || [];
-
-  // فلترة المستخدمين
-  const filteredUsers = users.filter((user: any) => {
-    const matchesSearch =
-      (user.firstName &&
-        user.firstName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (user.lastName &&
-        user.lastName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (user.email &&
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (user.location &&
-        user.location.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesStatus =
-      statusFilter === 'all' || user.status === statusFilter;
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
-
-    return matchesSearch && matchesStatus && matchesRole;
-  });
 
   const handleOpenModal = (type: 'add' | 'edit' | 'view', user?: User) => {
     setModalType(type);
-    setFormError('');
-
-    if (type === 'add') {
-      setForm({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        role: '',
-        status: '',
-        location: '',
-        bio: '',
-        password: '',
-        confirmPassword: '',
-      });
-      setSelectedUser(null);
-    } else if (user) {
+    if (user) {
       setSelectedUser(user);
       setForm({
         firstName: user.firstName,
@@ -250,8 +220,22 @@ const UsersDashboard: React.FC = () => {
         password: '',
         confirmPassword: '',
       });
+    } else {
+      setSelectedUser(null);
+      setForm({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        role: '',
+        status: '',
+        location: '',
+        bio: '',
+        password: '',
+        confirmPassword: '',
+      });
     }
-
+    setFormError('');
     setModalOpen(true);
   };
 
@@ -267,105 +251,116 @@ const UsersDashboard: React.FC = () => {
     >
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setFormError('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError('');
+
+    // التحقق من صحة البيانات
     if (!form.firstName || !form.lastName || !form.email) {
-      setFormError('الحقول الأساسية مطلوبة');
+      setFormError(
+        t('users.form.requiredFields', 'جميع الحقول المطلوبة يجب ملؤها')
+      );
       return;
     }
+
     if (
       modalType === 'add' &&
       (!form.password || form.password !== form.confirmPassword)
     ) {
-      setFormError('كلمة المرور غير متطابقة');
+      setFormError(t('users.form.passwordMismatch', 'كلمة المرور غير متطابقة'));
       return;
     }
-    setFormError('');
+
     try {
       if (modalType === 'add') {
         await createUser(form);
-        setModalMsg('تم إضافة المستخدم بنجاح!');
+        setModalMsg(t('users.success.created', 'تم إنشاء المستخدم بنجاح'));
       } else if (modalType === 'edit' && selectedUser) {
         await updateUser(selectedUser.id, form);
-        setModalMsg('تم تحديث المستخدم بنجاح!');
+        setModalMsg(t('users.success.updated', 'تم تحديث المستخدم بنجاح'));
       }
-      setTimeout(() => {
-        setModalOpen(false);
-        queryClient.invalidateQueries({ queryKey: ['dashboard-users'] });
-      }, 1200);
+
+      queryClient.invalidateQueries(['dashboard-users']);
+      handleCloseModal();
     } catch (error) {
-      setFormError('حدث خطأ أثناء حفظ المستخدم');
+      setFormError(t('users.error.general', 'حدث خطأ أثناء حفظ البيانات'));
     }
   };
 
   const getRoleColor = (role: string) => {
     switch (role) {
       case 'admin':
-        return 'bg-red-100 text-red-800';
+        return 'text-red-600 bg-red-50 border-red-200';
       case 'moderator':
-        return 'bg-blue-100 text-blue-800';
+        return 'text-blue-600 bg-blue-50 border-blue-200';
       case 'member':
-        return 'bg-green-100 text-green-800';
+        return 'text-green-600 bg-green-50 border-green-200';
       case 'guest':
-        return 'bg-gray-100 text-gray-800';
+        return 'text-gray-600 bg-gray-50 border-gray-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'text-gray-600 bg-gray-50 border-gray-200';
     }
   };
 
   const getRoleText = (role: string) => {
     switch (role) {
       case 'admin':
-        return 'مدير';
+        return t('users.roles.admin', 'مدير');
       case 'moderator':
-        return 'مشرف';
+        return t('users.roles.moderator', 'مشرف');
       case 'member':
-        return 'عضو';
+        return t('users.roles.member', 'عضو');
       case 'guest':
-        return 'زائر';
+        return t('users.roles.guest', 'زائر');
       default:
-        return 'غير محدد';
+        return role;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'text-green-600 bg-green-50 border-green-200';
       case 'inactive':
-        return 'bg-gray-100 text-gray-800';
+        return 'text-gray-600 bg-gray-50 border-gray-200';
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
       case 'suspended':
-        return 'bg-red-100 text-red-800';
+        return 'text-red-600 bg-red-50 border-red-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'text-gray-600 bg-gray-50 border-gray-200';
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
       case 'active':
-        return 'نشط';
+        return t('users.status.active', 'نشط');
       case 'inactive':
-        return 'غير نشط';
+        return t('users.status.inactive', 'غير نشط');
       case 'pending':
-        return 'قيد الانتظار';
+        return t('users.status.pending', 'قيد الانتظار');
       case 'suspended':
-        return 'معلق';
+        return t('users.status.suspended', 'معلق');
       default:
-        return 'غير محدد';
+        return status;
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    if (!dateString) return 'غير محدد';
+    try {
+      return new Date(dateString).toLocaleDateString('ar-SA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    } catch (error) {
+      return 'غير محدد';
+    }
   };
 
   const formatLastLogin = (dateString: string) => {
@@ -375,356 +370,755 @@ const UsersDashboard: React.FC = () => {
       (now.getTime() - date.getTime()) / (1000 * 60 * 60)
     );
 
-    if (diffInHours < 1) return 'الآن';
-    if (diffInHours < 24) return `منذ ${diffInHours} ساعة`;
-    if (diffInHours < 48) return 'أمس';
-    return formatDate(dateString);
+    if (diffInHours < 1) {
+      return t('users.lastLogin.justNow', 'الآن');
+    } else if (diffInHours < 24) {
+      return t('users.lastLogin.hoursAgo', 'منذ {hours} ساعة', {
+        hours: diffInHours,
+      });
+    } else {
+      return formatDate(dateString);
+    }
   };
 
-  const queryClient = useQueryClient();
-
   const handleDelete = async (id: string) => {
-    if (window.confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
+    if (
+      window.confirm(
+        t('users.delete.confirm', 'هل أنت متأكد من حذف هذا المستخدم؟')
+      )
+    ) {
       try {
         await deleteUser(id);
-        setModalMsg('تم حذف المستخدم بنجاح!');
-        setModalOpen(true);
-        // إعادة تحميل البيانات
-        queryClient.invalidateQueries({ queryKey: ['dashboard-users'] });
+        queryClient.invalidateQueries(['dashboard-users']);
+        setModalMsg(t('users.success.deleted', 'تم حذف المستخدم بنجاح'));
       } catch (error) {
-        console.error('خطأ في حذف المستخدم:', error);
-        setFormError('حدث خطأ أثناء حذف المستخدم');
+        setFormError(t('users.error.delete', 'حدث خطأ أثناء حذف المستخدم'));
       }
     }
   };
 
-  const quickActions = [
-    {
-      to: '/dashboard/events/new',
-      label: 'إضافة فعالية',
-      icon: Plus,
-      color: 'primary' as const,
-      description: 'إنشاء فعالية جديدة',
-    },
-    {
-      to: '/dashboard/programs/new',
-      label: 'إضافة برنامج',
-      icon: TrendingUp,
-      color: 'success' as const,
-      description: 'إنشاء برنامج جديد',
-    },
-    {
-      to: '/dashboard/donations/new',
-      label: 'تسجيل تبرع',
-      icon: DollarSign,
-      color: 'warning' as const,
-      description: 'تسجيل تبرع جديد',
-    },
-    {
-      to: '/dashboard/users/new',
-      label: 'إضافة عضو',
-      icon: Users,
-      color: 'info' as const,
-      description: 'إضافة عضو جديد',
-    },
-  ];
+  const handleUnavailable = (
+    msg = t('users.unavailable', 'هذه الخاصية قيد التطوير، قريبًا!')
+  ) => {
+    alert(msg);
+  };
+
+  const filteredUsers = users.filter((user: User) => {
+    const matchesSearch =
+      (user.firstName?.toLowerCase() || '').includes(
+        searchTerm.toLowerCase()
+      ) ||
+      (user.lastName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (user.email?.toLowerCase() || '').includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      statusFilter === 'all' || user.status === statusFilter;
+    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+
+    return matchesSearch && matchesStatus && matchesRole;
+  });
+
+  const sortedUsers = [...filteredUsers].sort((a, b) => {
+    let aValue, bValue;
+
+    switch (sortBy) {
+      case 'name':
+        aValue = `${a.firstName} ${a.lastName}`;
+        bValue = `${b.firstName} ${b.lastName}`;
+        break;
+      case 'email':
+        aValue = a.email;
+        bValue = b.email;
+        break;
+      case 'role':
+        aValue = a.role;
+        bValue = b.role;
+        break;
+      case 'status':
+        aValue = a.status;
+        bValue = b.status;
+        break;
+      case 'joinDate':
+        aValue = new Date(a.joinDate).getTime();
+        bValue = new Date(b.joinDate).getTime();
+        break;
+      default:
+        aValue = a.firstName;
+        bValue = b.firstName;
+    }
+
+    if (sortOrder === 'asc') {
+      return aValue > bValue ? 1 : -1;
+    } else {
+      return aValue < bValue ? 1 : -1;
+    }
+  });
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <LoadingSpinner size="lg" />
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   if (error) {
     return (
       <DashboardLayout>
-        <QuickActions actions={quickActions} className="mb-8" />
-        <SkipToContent />
-        <AccessibleSection>
-          <Alert type="error" title="خطأ في تحميل البيانات">
-            حدث خطأ أثناء جلب قائمة المستخدمين. يرجى المحاولة مرة أخرى.
-          </Alert>
-        </AccessibleSection>
+        <Alert
+          type="error"
+          title={t('users.error.title', 'خطأ في تحميل البيانات')}
+          message={t(
+            'users.error.message',
+            'حدث خطأ أثناء تحميل بيانات المستخدمين'
+          )}
+        />
       </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout>
-      <QuickActions actions={quickActions} className="mb-8" />
-      <SkipToContent />
+      <SEO
+        title={t('users.seo.title', 'إدارة المستخدمين')}
+        description={t(
+          'users.seo.description',
+          'إدارة المستخدمين والأعضاء في المنصة'
+        )}
+      />
 
-      <AccessibleSection>
-        <section className="py-8 px-4" dir="rtl">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-primary-700">
-              إدارة المستخدمين
+      {/* Header Section */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              {t('users.title', 'إدارة المستخدمين')}
             </h1>
-            <Button onClick={() => handleOpenModal('add')}>
-              إضافة مستخدم جديد
+            <p className="text-gray-600">
+              {t('users.subtitle', 'إدارة المستخدمين والأعضاء في المنصة')}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className="w-4 h-4" />
+              {t('users.refresh', 'تحديث')}
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => handleOpenModal('add')}
+              className="flex items-center gap-2"
+            >
+              <UserPlus className="w-4 h-4" />
+              {t('users.addNew', 'إضافة مستخدم')}
             </Button>
           </div>
-          {isLoading ? (
-            <div className="flex justify-center py-12">
-              <LoadingSpinner size="lg" />
-            </div>
-          ) : error ? (
-            <Alert type="error">
-              حدث خطأ أثناء جلب المستخدمين. يرجى المحاولة لاحقًا.
-            </Alert>
-          ) : users.length === 0 ? (
-            <Alert type="info">لا يوجد مستخدمون متاحون حالياً.</Alert>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {filteredUsers.map((user) => (
-                <Card key={user.id} className="flex flex-col gap-2">
-                  <div className="flex items-center gap-3 p-2">
-                    <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center text-xl font-bold text-primary-700">
-                      {user.avatar ||
-                        (user.firstName ? user.firstName[0] : '') +
-                          (user.lastName ? user.lastName[0] : '') ||
-                        '?'}
-                    </div>
-                    <div className="flex-1">
-                      <h2 className="text-lg font-bold text-primary-800 mb-1 line-clamp-1">
-                        {user.firstName || ''} {user.lastName || ''}
-                      </h2>
-                      <div className="text-xs text-gray-500 mb-1">
-                        {user.email || ''}
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <span>
-                          {user.role === 'admin'
-                            ? 'مدير'
-                            : user.role === 'moderator'
-                            ? 'مشرف'
-                            : user.role === 'member'
-                            ? 'عضو'
-                            : 'زائر'}
-                        </span>
-                        <span>•</span>
-                        <span>
-                          {user.status === 'active'
-                            ? 'نشط'
-                            : user.status === 'inactive'
-                            ? 'غير نشط'
-                            : user.status === 'pending'
-                            ? 'قيد الانتظار'
-                            : 'موقوف'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-1 p-2">
-                    <div className="text-xs text-gray-500 mb-1">
-                      {user.location}
-                    </div>
-                    <p className="text-gray-700 mb-2 line-clamp-2">
-                      {user.bio?.slice(0, 60) || ''}
-                      {user.bio?.length > 60 ? '...' : ''}
-                    </p>
-                    <div className="flex gap-2 mt-auto">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleOpenModal('view', user)}
-                      >
-                        عرض
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleOpenModal('edit', user)}
-                      >
-                        تعديل
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        color="red"
-                        onClick={() => handleDelete(user.id)}
-                      >
-                        حذف
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          )}
-          <Modal
-            isOpen={modalOpen}
-            onClose={handleCloseModal}
-            title={
-              modalType === 'add'
-                ? 'إضافة مستخدم'
-                : modalType === 'edit'
-                ? 'تعديل مستخدم'
-                : 'تفاصيل المستخدم'
-            }
-          >
-            {modalType === 'view' && selectedUser ? (
-              <div className="space-y-4">
-                <h2 className="text-xl font-bold text-primary-700">
-                  {selectedUser.firstName} {selectedUser.lastName}
-                </h2>
-                <div className="text-gray-600">{selectedUser.email}</div>
-                <div className="flex flex-col gap-2 text-sm">
-                  <div>
-                    الدور:{' '}
-                    {selectedUser.role === 'admin'
-                      ? 'مدير'
-                      : selectedUser.role === 'moderator'
-                      ? 'مشرف'
-                      : selectedUser.role === 'member'
-                      ? 'عضو'
-                      : 'زائر'}
-                  </div>
-                  <div>
-                    الحالة:{' '}
-                    {selectedUser.status === 'active'
-                      ? 'نشط'
-                      : selectedUser.status === 'inactive'
-                      ? 'غير نشط'
-                      : selectedUser.status === 'pending'
-                      ? 'قيد الانتظار'
-                      : 'موقوف'}
-                  </div>
-                  <div>رقم الجوال: {selectedUser.phone}</div>
-                  <div>الموقع: {selectedUser.location}</div>
-                  <div>نبذة: {selectedUser.bio}</div>
-                  <div>تاريخ الانضمام: {selectedUser.joinDate}</div>
-                  <div>آخر دخول: {selectedUser.lastLogin}</div>
-                  <div>عدد الفعاليات: {selectedUser.eventsAttended}</div>
-                  <div>عدد البرامج: {selectedUser.programsParticipated}</div>
-                  <div>إجمالي التبرعات: {selectedUser.totalDonations}</div>
-                </div>
-                <div className="flex gap-2 pt-4">
-                  <Button
-                    onClick={() => handleOpenModal('edit', selectedUser)}
-                    className="flex-1"
-                  >
-                    تعديل
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={handleCloseModal}
-                    className="flex-1"
-                  >
-                    إغلاق
-                  </Button>
-                </div>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div>
+          <Card className="p-5 hover:shadow-sm transition-all duration-200 border border-gray-100 bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 rounded-lg bg-blue-50">
+                <Users className="w-5 h-5 text-blue-500" />
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <input
+              <div className="text-right">
+                <span className="text-xs text-blue-600">
+                  {t('users.stats.total', 'إجمالي')}
+                </span>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                {users.length}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {t('users.stats.totalUsers', 'إجمالي المستخدمين')}
+              </p>
+            </div>
+          </Card>
+        </div>
+
+        <div>
+          <Card className="p-5 hover:shadow-sm transition-all duration-200 border border-gray-100 bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 rounded-lg bg-green-50">
+                <UserCheck className="w-5 h-5 text-green-500" />
+              </div>
+              <div className="text-right">
+                <span className="text-xs text-green-600">
+                  {t('users.stats.active', 'نشط')}
+                </span>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                {users.filter((u: User) => u.status === 'active').length}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {t('users.stats.activeUsers', 'المستخدمين النشطين')}
+              </p>
+            </div>
+          </Card>
+        </div>
+
+        <div>
+          <Card className="p-5 hover:shadow-sm transition-all duration-200 border border-gray-100 bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 rounded-lg bg-yellow-50">
+                <Clock className="w-5 h-5 text-yellow-500" />
+              </div>
+              <div className="text-right">
+                <span className="text-xs text-yellow-600">
+                  {t('users.stats.pending', 'قيد الانتظار')}
+                </span>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                {users.filter((u: User) => u.status === 'pending').length}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {t('users.stats.pendingUsers', 'المستخدمين قيد الانتظار')}
+              </p>
+            </div>
+          </Card>
+        </div>
+
+        <div>
+          <Card className="p-5 hover:shadow-sm transition-all duration-200 border border-gray-100 bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 rounded-lg bg-red-50">
+                <UserX className="w-5 h-5 text-red-500" />
+              </div>
+              <div className="text-right">
+                <span className="text-xs text-red-600">
+                  {t('users.stats.inactive', 'غير نشط')}
+                </span>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                {users.filter((u: User) => u.status === 'inactive').length}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {t('users.stats.inactiveUsers', 'المستخدمين غير النشطين')}
+              </p>
+            </div>
+          </Card>
+        </div>
+      </div>
+
+      {/* Filters and Search */}
+      <div className="mb-6">
+        <Card className="p-6">
+          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+            <div className="flex-1 w-full lg:w-auto">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
                   type="text"
-                  name="firstName"
-                  placeholder="الاسم الأول"
-                  className="w-full border rounded p-2"
-                  value={form.firstName}
-                  onChange={handleChange}
-                  required
+                  placeholder={t(
+                    'users.search.placeholder',
+                    'البحث في المستخدمين...'
+                  )}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-full"
                 />
-                <input
-                  type="text"
-                  name="lastName"
-                  placeholder="اسم العائلة"
-                  className="w-full border rounded p-2"
-                  value={form.lastName}
-                  onChange={handleChange}
-                  required
-                />
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="البريد الإلكتروني"
-                  className="w-full border rounded p-2"
-                  value={form.email}
-                  onChange={handleChange}
-                  required
-                />
-                <input
-                  type="text"
-                  name="phone"
-                  placeholder="رقم الجوال"
-                  className="w-full border rounded p-2"
-                  value={form.phone}
-                  onChange={handleChange}
-                />
-                <input
-                  type="text"
-                  name="location"
-                  placeholder="المدينة/الدولة"
-                  className="w-full border rounded p-2"
-                  value={form.location}
-                  onChange={handleChange}
-                />
-                <textarea
-                  name="bio"
-                  placeholder="نبذة عن المستخدم"
-                  className="w-full border rounded p-2 min-h-[60px]"
-                  value={form.bio}
-                  onChange={handleChange}
-                />
-                <select
-                  name="role"
-                  className="w-full border rounded p-2"
-                  value={form.role}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">اختر الدور</option>
-                  <option value="admin">مدير</option>
-                  <option value="moderator">مشرف</option>
-                  <option value="member">عضو</option>
-                  <option value="guest">زائر</option>
-                </select>
-                <select
-                  name="status"
-                  className="w-full border rounded p-2"
-                  value={form.status}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">اختر الحالة</option>
-                  <option value="active">نشط</option>
-                  <option value="inactive">غير نشط</option>
-                  <option value="pending">قيد الانتظار</option>
-                  <option value="suspended">موقوف</option>
-                </select>
-                <input
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-2"
+              >
+                <Filter className="w-4 h-4" />
+                {t('users.filters', 'الفلترة')}
+                {showFilters ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleUnavailable()}
+                className="flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                {t('users.export', 'تصدير')}
+              </Button>
+            </div>
+          </div>
+
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-4 pt-4 border-t border-gray-200"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('users.filters.status', 'الحالة')}
+                    </label>
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    >
+                      <option value="all">
+                        {t('users.filters.allStatus', 'جميع الحالات')}
+                      </option>
+                      <option value="active">
+                        {t('users.status.active', 'نشط')}
+                      </option>
+                      <option value="inactive">
+                        {t('users.status.inactive', 'غير نشط')}
+                      </option>
+                      <option value="pending">
+                        {t('users.status.pending', 'قيد الانتظار')}
+                      </option>
+                      <option value="suspended">
+                        {t('users.status.suspended', 'معلق')}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('users.filters.role', 'الدور')}
+                    </label>
+                    <select
+                      value={roleFilter}
+                      onChange={(e) => setRoleFilter(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    >
+                      <option value="all">
+                        {t('users.filters.allRoles', 'جميع الأدوار')}
+                      </option>
+                      <option value="admin">
+                        {t('users.roles.admin', 'مدير')}
+                      </option>
+                      <option value="moderator">
+                        {t('users.roles.moderator', 'مشرف')}
+                      </option>
+                      <option value="member">
+                        {t('users.roles.member', 'عضو')}
+                      </option>
+                      <option value="guest">
+                        {t('users.roles.guest', 'زائر')}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('users.filters.sortBy', 'ترتيب حسب')}
+                    </label>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    >
+                      <option value="name">
+                        {t('users.sort.name', 'الاسم')}
+                      </option>
+                      <option value="email">
+                        {t('users.sort.email', 'البريد الإلكتروني')}
+                      </option>
+                      <option value="role">
+                        {t('users.sort.role', 'الدور')}
+                      </option>
+                      <option value="status">
+                        {t('users.sort.status', 'الحالة')}
+                      </option>
+                      <option value="joinDate">
+                        {t('users.sort.joinDate', 'تاريخ الانضمام')}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </Card>
+      </div>
+
+      {/* Users Table */}
+      <div>
+        <Card className="p-6">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-right py-3 px-4 font-semibold text-gray-900">
+                    {t('users.table.user', 'المستخدم')}
+                  </th>
+                  <th className="text-right py-3 px-4 font-semibold text-gray-900">
+                    {t('users.table.contact', 'معلومات التواصل')}
+                  </th>
+                  <th className="text-right py-3 px-4 font-semibold text-gray-900">
+                    {t('users.table.role', 'الدور')}
+                  </th>
+                  <th className="text-right py-3 px-4 font-semibold text-gray-900">
+                    {t('users.table.status', 'الحالة')}
+                  </th>
+                  <th className="text-right py-3 px-4 font-semibold text-gray-900">
+                    {t('users.table.activity', 'النشاط')}
+                  </th>
+                  <th className="text-right py-3 px-4 font-semibold text-gray-900">
+                    {t('users.table.actions', 'الإجراءات')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedUsers.map((user, index) => (
+                  <tr
+                    key={user.id}
+                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                  >
+                    <td className="py-4 px-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-100 to-accent-100 flex items-center justify-center">
+                          <span className="text-primary-600 font-semibold">
+                            {user.firstName?.charAt(0) || ''}
+                            {user.lastName?.charAt(0) || ''}
+                          </span>
+                        </div>
+                        <div>
+                          <div className="font-medium text-gray-900">
+                            {user.firstName || ''} {user.lastName || ''}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {formatDate(user.joinDate)}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="py-4 px-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Mail className="w-4 h-4 text-gray-400" />
+                          <span className="text-gray-900">
+                            {user.email || 'غير محدد'}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Phone className="w-4 h-4 text-gray-400" />
+                          <span className="text-gray-600">
+                            {user.phone || 'غير محدد'}
+                          </span>
+                        </div>
+                        {user.location && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <MapPin className="w-4 h-4 text-gray-400" />
+                            <span className="text-gray-600">
+                              {user.location}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+
+                    <td className="py-4 px-4">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getRoleColor(
+                          user.role
+                        )}`}
+                      >
+                        {getRoleText(user.role)}
+                      </span>
+                    </td>
+
+                    <td className="py-4 px-4">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                          user.status
+                        )}`}
+                      >
+                        {getStatusText(user.status)}
+                      </span>
+                    </td>
+
+                    <td className="py-4 px-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Calendar className="w-4 h-4 text-gray-400" />
+                          <span className="text-gray-600">
+                            {user.eventsAttended || 0}{' '}
+                            {t('users.activity.events', 'فعالية')}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Target className="w-4 h-4 text-gray-400" />
+                          <span className="text-gray-600">
+                            {user.programsParticipated || 0}{' '}
+                            {t('users.activity.programs', 'برنامج')}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <DollarSign className="w-4 h-4 text-gray-400" />
+                          <span className="text-gray-600">
+                            {user.totalDonations || 0}{' '}
+                            {t('users.activity.donations', 'تبرع')}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="py-4 px-4">
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleOpenModal('view', user)}
+                          className="p-1"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleOpenModal('edit', user)}
+                          className="p-1"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(user.id)}
+                          className="p-1 text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </div>
+
+      {/* Modal */}
+      <Modal
+        open={modalOpen}
+        onClose={handleCloseModal}
+        title={
+          modalType === 'add'
+            ? t('users.modal.addTitle', 'إضافة مستخدم جديد')
+            : modalType === 'edit'
+            ? t('users.modal.editTitle', 'تعديل المستخدم')
+            : t('users.modal.viewTitle', 'تفاصيل المستخدم')
+        }
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('users.form.firstName', 'الاسم الأول')} *
+              </label>
+              <Input
+                type="text"
+                name="firstName"
+                value={form.firstName}
+                onChange={handleChange}
+                required
+                disabled={modalType === 'view'}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('users.form.lastName', 'الاسم الأخير')} *
+              </label>
+              <Input
+                type="text"
+                name="lastName"
+                value={form.lastName}
+                onChange={handleChange}
+                required
+                disabled={modalType === 'view'}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('users.form.email', 'البريد الإلكتروني')} *
+              </label>
+              <Input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                required
+                disabled={modalType === 'view'}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('users.form.phone', 'رقم الهاتف')}
+              </label>
+              <Input
+                type="tel"
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
+                disabled={modalType === 'view'}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('users.form.role', 'الدور')}
+              </label>
+              <select
+                name="role"
+                value={form.role}
+                onChange={handleChange}
+                disabled={modalType === 'view'}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              >
+                <option value="">
+                  {t('users.form.selectRole', 'اختر الدور')}
+                </option>
+                <option value="admin">{t('users.roles.admin', 'مدير')}</option>
+                <option value="moderator">
+                  {t('users.roles.moderator', 'مشرف')}
+                </option>
+                <option value="member">{t('users.roles.member', 'عضو')}</option>
+                <option value="guest">{t('users.roles.guest', 'زائر')}</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('users.form.status', 'الحالة')}
+              </label>
+              <select
+                name="status"
+                value={form.status}
+                onChange={handleChange}
+                disabled={modalType === 'view'}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              >
+                <option value="">
+                  {t('users.form.selectStatus', 'اختر الحالة')}
+                </option>
+                <option value="active">
+                  {t('users.status.active', 'نشط')}
+                </option>
+                <option value="inactive">
+                  {t('users.status.inactive', 'غير نشط')}
+                </option>
+                <option value="pending">
+                  {t('users.status.pending', 'قيد الانتظار')}
+                </option>
+                <option value="suspended">
+                  {t('users.status.suspended', 'معلق')}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('users.form.location', 'الموقع')}
+            </label>
+            <Input
+              type="text"
+              name="location"
+              value={form.location}
+              onChange={handleChange}
+              disabled={modalType === 'view'}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('users.form.bio', 'نبذة شخصية')}
+            </label>
+            <textarea
+              name="bio"
+              value={form.bio}
+              onChange={handleChange}
+              disabled={modalType === 'view'}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            />
+          </div>
+
+          {modalType === 'add' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('users.form.password', 'كلمة المرور')} *
+                </label>
+                <Input
                   type="password"
                   name="password"
-                  placeholder="كلمة المرور (للمستخدم الجديد أو التغيير)"
-                  className="w-full border rounded p-2"
                   value={form.password}
                   onChange={handleChange}
-                  autoComplete="new-password"
+                  required
                 />
-                <input
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('users.form.confirmPassword', 'تأكيد كلمة المرور')} *
+                </label>
+                <Input
                   type="password"
                   name="confirmPassword"
-                  placeholder="تأكيد كلمة المرور"
-                  className="w-full border rounded p-2"
                   value={form.confirmPassword}
                   onChange={handleChange}
-                  autoComplete="new-password"
+                  required
                 />
-                {formError && (
-                  <div className="text-red-600 text-sm">{formError}</div>
-                )}
-                <div className="flex gap-2 justify-end">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleCloseModal}
-                  >
-                    إلغاء
-                  </Button>
-                  <Button type="submit">
-                    {modalType === 'add' ? 'إضافة' : 'حفظ التعديلات'}
-                  </Button>
-                </div>
-              </form>
+              </div>
+            </div>
+          )}
+
+          {formError && <Alert type="error" title={formError} />}
+
+          <div className="flex justify-end gap-3 pt-4">
+            <Button variant="outline" onClick={handleCloseModal}>
+              {t('common.cancel', 'إلغاء')}
+            </Button>
+            {modalType !== 'view' && (
+              <Button type="submit" variant="primary">
+                {modalType === 'add'
+                  ? t('users.form.add', 'إضافة')
+                  : t('users.form.update', 'تحديث')}
+              </Button>
             )}
-          </Modal>
-        </section>
-      </AccessibleSection>
+          </div>
+        </form>
+      </Modal>
     </DashboardLayout>
   );
 };

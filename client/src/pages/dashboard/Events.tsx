@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import DashboardLayout from '../../components/dashboard/DashboardLayout';
+import { useTranslation } from 'react-i18next';
+import DashboardLayout from '../../layouts/DashboardLayout';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   fetchEvents,
@@ -7,16 +8,12 @@ import {
   updateEvent,
 } from '../../services/eventsApi';
 import { deleteEvent } from '../../services/dashboardApi';
-import Button from '../../components/common/Button';
+import { Button } from '../../components/ui/Button/Button';
 import Modal from '../../components/common/Modal';
-import {
-  AccessibleSection,
-  SkipToContent,
-} from '../../components/common/AccessibleComponents';
-import Card from '../../components/common/Card';
+import { Card } from '../../components/ui/Card/Card';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Alert from '../../components/common/Alert';
-import Input from '../../components/common/Input';
+import { Input } from '../../components/ui/Input/Input';
 import {
   Search,
   Filter,
@@ -36,9 +33,105 @@ import {
   DollarSign,
   Upload,
   X,
+  ChevronDown,
+  ChevronUp,
+  Download,
+  RefreshCw,
+  Settings,
+  UserCheck,
+  UserX,
+  Award,
+  Target,
+  Heart,
+  MessageCircle,
+  Bell,
+  Lock,
+  Unlock,
+  Key,
+  EyeOff,
+  AlertTriangle,
+  Info,
+  HelpCircle,
+  ExternalLink,
+  Copy,
+  Share2,
+  Archive,
+  Send,
+  Mail as MailIcon,
+  Phone as PhoneIcon,
+  Smartphone,
+  Monitor,
+  Tablet,
+  Laptop,
+  Database,
+  Server,
+  Cloud,
+  Wifi,
+  Signal,
+  Battery,
+  Volume2,
+  VolumeX,
+  Mic,
+  MicOff,
+  Camera,
+  CameraOff,
+  Video,
+  VideoOff,
+  Headphones,
+  Speaker,
+  Radio,
+  Tv,
+  Smartphone as Mobile,
+  Watch,
+  Calendar as DateIcon,
+  Timer,
+  TimerOff,
+  Hourglass,
+  History,
+  Repeat,
+  RotateCcw,
+  RotateCw,
+  FastForward,
+  Rewind,
+  SkipBack,
+  SkipForward,
+  PlayCircle,
+  PauseCircle,
+  StopCircle as StopIcon,
+  Square as SquareIcon,
+  Circle,
+  Dot,
+  Minus as MinusIcon,
+  Plus as PlusIcon,
+  Check,
+  AlertTriangle as AlertTriangleIcon,
+  Info as InfoIcon,
+  HelpCircle as HelpCircleIcon,
+  Lock as LockIcon,
+  Unlock as UnlockIcon,
+  Eye as EyeIcon,
+  EyeOff as EyeOffIcon,
+  Key as KeyIcon,
+  Fingerprint,
+  Shield as ShieldIcon,
+  ShieldCheck,
+  ShieldX,
+  ShieldAlert,
+  ShieldOff,
+  User,
+  UserCheck as UserCheckIcon,
+  UserX as UserXIcon,
+  UserPlus as UserAdd,
+  UserMinus,
+  Users as UsersIcon,
+  UserCog,
+  UserSearch,
+  UserCheck as UserVerified,
+  UserX as UserBlocked,
 } from 'lucide-react';
-import QuickActions from '../../components/common/QuickActions';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
+import SEO from '../../components/common/SEO';
 
 interface Event {
   id: number;
@@ -57,14 +150,17 @@ interface Event {
 }
 
 const EventsDashboard: React.FC = () => {
-  // جلب قائمة الفعاليات
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['dashboard-events'],
-    queryFn: () => fetchEvents(),
-  });
+  const { t, i18n } = useTranslation();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const isRTL = i18n.dir() === 'rtl';
 
-  // طباعة البيانات في الكونسول للتشخيص
-  console.log('dashboard-events data:', data);
+  // جلب قائمة الفعاليات
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['dashboard-events'],
+    queryFn: () => fetchEvents({ page: 1, limit: 50 }),
+    staleTime: 5 * 60 * 1000,
+  });
 
   // حالة النافذة المنبثقة
   const [modalOpen, setModalOpen] = useState(false);
@@ -76,6 +172,8 @@ const EventsDashboard: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
+  const [sortBy, setSortBy] = useState('date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   // نموذج البيانات
   const [form, setForm] = useState({
@@ -97,94 +195,28 @@ const EventsDashboard: React.FC = () => {
   // حالة التنبيه
   const [modalMsg, setModalMsg] = useState('');
 
-  // بيانات افتراضية للفعاليات
-  const mockEvents: Event[] = [
-    {
-      id: 1,
-      title: 'ملتقى الشباب العربي',
-      description:
-        'ملتقى سنوي يجمع الشباب العربي لمناقشة قضاياهم وتطوير مهاراتهم',
-      category: 'اجتماعي',
-      location: 'القاهرة، مصر',
-      start_date: '2024-07-15',
-      end_date: '2024-07-17',
-      status: 'upcoming',
-      max_attendees: 200,
-      attendees: 150,
-      image_url: 'https://via.placeholder.com/150',
-      created_at: '2024-05-01',
-      updated_at: '2024-05-15',
-    },
-    {
-      id: 2,
-      title: 'ورشة عمل التكنولوجيا',
-      description: 'ورشة عمل مكثفة في مجال التكنولوجيا والبرمجة للشباب',
-      category: 'تعليمي',
-      location: 'الرياض، السعودية',
-      start_date: '2024-06-20',
-      end_date: '2024-06-22',
-      status: 'active',
-      max_attendees: 50,
-      attendees: 45,
-      image_url: 'https://via.placeholder.com/150',
-      created_at: '2024-04-15',
-      updated_at: '2024-06-01',
-    },
-    {
-      id: 3,
-      title: 'مؤتمر القيادة الشبابية',
-      description: 'مؤتمر سنوي لتطوير مهارات القيادة لدى الشباب',
-      category: 'قيادي',
-      location: 'دبي، الإمارات',
-      start_date: '2024-08-10',
-      end_date: '2024-08-12',
-      status: 'upcoming',
-      max_attendees: 300,
-      attendees: 120,
-      image_url: 'https://via.placeholder.com/150',
-      created_at: '2024-06-01',
-      updated_at: '2024-06-01',
-    },
-    {
-      id: 4,
-      title: 'معرض الفنون الشبابية',
-      description: 'معرض سنوي لعرض إبداعات الشباب في مجال الفنون',
-      category: 'ثقافي',
-      location: 'عمان، الأردن',
-      start_date: '2024-05-01',
-      end_date: '2024-05-03',
-      status: 'completed',
-      max_attendees: 100,
-      attendees: 95,
-      image_url: 'https://via.placeholder.com/150',
-      created_at: '2024-03-01',
-      updated_at: '2024-05-03',
-    },
-  ];
-
+  // استخدام البيانات الحقيقية من API
   const events = data?.data?.items || [];
-
-  // فلترة الفعاليات
-  const filteredEvents = events.filter((event: any) => {
-    const matchesSearch =
-      event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === 'all' || event.status === statusFilter;
-    const matchesCategory =
-      categoryFilter === 'all' || event.category === categoryFilter;
-
-    return matchesSearch && matchesStatus && matchesCategory;
-  });
 
   const handleOpenModal = (type: 'add' | 'edit' | 'view', event?: Event) => {
     setModalType(type);
-    setFormError('');
-    setImage(null);
-    setImagePreview(null);
-
-    if (type === 'add') {
+    if (event) {
+      setSelectedEvent(event);
+      setForm({
+        title: event.title,
+        description: event.description,
+        category: event.category,
+        location: event.location,
+        start_date: event.start_date.split('T')[0],
+        end_date: event.end_date.split('T')[0],
+        max_attendees: event.max_attendees?.toString() || '',
+        attendees: event.attendees?.toString() || '',
+        image_url: event.image_url || '',
+        status: event.status,
+      });
+      setImagePreview(event.image_url || null);
+    } else {
+      setSelectedEvent(null);
       setForm({
         title: '',
         description: '',
@@ -197,26 +229,9 @@ const EventsDashboard: React.FC = () => {
         image_url: '',
         status: 'upcoming',
       });
-      setSelectedEvent(null);
-    } else if (event) {
-      setSelectedEvent(event);
-      setForm({
-        title: event.title,
-        description: event.description,
-        category: event.category,
-        location: event.location,
-        start_date: event.start_date,
-        end_date: event.end_date,
-        max_attendees: event.max_attendees?.toString() || '',
-        attendees: event.attendees?.toString() || '',
-        image_url: event.image_url || '',
-        status: event.status,
-      });
-      if (event.image_url) {
-        setImagePreview(event.image_url);
-      }
+      setImagePreview(null);
     }
-
+    setFormError('');
     setModalOpen(true);
   };
 
@@ -234,6 +249,7 @@ const EventsDashboard: React.FC = () => {
     >
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setFormError('');
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -241,7 +257,9 @@ const EventsDashboard: React.FC = () => {
     if (file) {
       setImage(file);
       const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result as string);
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
       reader.readAsDataURL(file);
     }
   };
@@ -249,442 +267,891 @@ const EventsDashboard: React.FC = () => {
   const removeImage = () => {
     setImage(null);
     setImagePreview(null);
+    setForm({ ...form, image_url: '' });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
-    setModalMsg('');
 
-    // تحقق من الحقول المطلوبة
+    // التحقق من صحة البيانات
     if (
       !form.title ||
+      !form.description ||
+      !form.location ||
       !form.start_date ||
-      !form.end_date ||
-      !form.category ||
-      !form.status
+      !form.end_date
     ) {
       setFormError(
-        'جميع الحقول الأساسية مطلوبة. يرجى تعبئة جميع الحقول بشكل صحيح.'
+        t('events.form.requiredFields', 'جميع الحقول المطلوبة يجب ملؤها')
       );
       return;
     }
 
-    // تحقق من صحة التواريخ
-    if (new Date(form.end_date) < new Date(form.start_date)) {
-      setFormError('تاريخ النهاية يجب أن يكون بعد تاريخ البداية.');
+    if (new Date(form.start_date) >= new Date(form.end_date)) {
+      setFormError(
+        t(
+          'events.form.dateError',
+          'تاريخ البداية يجب أن يكون قبل تاريخ النهاية'
+        )
+      );
       return;
     }
 
-    // بناء الـ payload مع تحويل القيم الرقمية
-    const allowedStatuses = [
-      'upcoming',
-      'active',
-      'completed',
-      'cancelled',
-    ] as const;
-    const payload = {
-      ...form,
-      max_attendees:
-        form.max_attendees && !isNaN(Number(form.max_attendees))
-          ? Number(form.max_attendees)
-          : undefined,
-      attendees:
-        form.attendees && !isNaN(Number(form.attendees))
-          ? Number(form.attendees)
-          : 0,
-      status: allowedStatuses.includes(form.status as any)
-        ? (form.status as (typeof allowedStatuses)[number])
-        : 'upcoming',
-      image_url:
-        form.image_url && form.image_url.trim() !== ''
-          ? form.image_url
-          : undefined,
-    };
-
     try {
+      const eventData = {
+        ...form,
+        max_attendees: form.max_attendees
+          ? parseInt(form.max_attendees)
+          : undefined,
+        attendees: form.attendees ? parseInt(form.attendees) : 0,
+      };
+
       if (modalType === 'add') {
-        await createEvent(payload);
-        setModalMsg('تم إضافة الفعالية بنجاح!');
+        await createEvent(eventData);
+        setModalMsg(t('events.success.created', 'تم إنشاء الفعالية بنجاح'));
       } else if (modalType === 'edit' && selectedEvent) {
-        await updateEvent(Number(selectedEvent.id), payload);
-        setModalMsg('تم تحديث الفعالية بنجاح!');
+        await updateEvent(selectedEvent.id, eventData);
+        setModalMsg(t('events.success.updated', 'تم تحديث الفعالية بنجاح'));
       }
 
-      setTimeout(() => {
-        setModalOpen(false);
-        queryClient.invalidateQueries({ queryKey: ['dashboard-events'] });
-      }, 1500);
+      queryClient.invalidateQueries(['dashboard-events']);
+      handleCloseModal();
     } catch (error) {
-      setFormError('حدث خطأ أثناء حفظ الفعالية');
+      setFormError(t('events.error.general', 'حدث خطأ أثناء حفظ البيانات'));
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'upcoming':
-        return 'bg-blue-100 text-blue-800';
+        return 'text-blue-600 bg-blue-50 border-blue-200';
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'text-green-600 bg-green-50 border-green-200';
       case 'completed':
-        return 'bg-gray-100 text-gray-800';
+        return 'text-gray-600 bg-gray-50 border-gray-200';
       case 'cancelled':
-        return 'bg-red-100 text-red-800';
+        return 'text-red-600 bg-red-50 border-red-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'text-gray-600 bg-gray-50 border-gray-200';
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
       case 'upcoming':
-        return 'قادم';
+        return t('events.status.upcoming', 'قادمة');
       case 'active':
-        return 'نشط';
+        return t('events.status.active', 'نشطة');
       case 'completed':
-        return 'مكتمل';
+        return t('events.status.completed', 'مكتملة');
       case 'cancelled':
-        return 'ملغي';
+        return t('events.status.cancelled', 'ملغية');
       default:
-        return 'غير محدد';
+        return status;
     }
   };
 
   const getRegistrationPercentage = (registered: number, capacity: number) => {
-    return Math.min((registered / capacity) * 100, 100);
+    if (!capacity) return 0;
+    return Math.round((registered / capacity) * 100);
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    if (!dateString) return 'غير محدد';
+    try {
+      return new Date(dateString).toLocaleDateString('ar-SA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch (error) {
+      return 'غير محدد';
+    }
   };
 
-  // دالة التعامل مع الأزرار غير الفعالة
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-
-  const handleDelete = async (id: string) => {
-    if (window.confirm('هل أنت متأكد من حذف هذه الفعالية؟')) {
+  const handleDelete = async (id: number) => {
+    if (
+      window.confirm(
+        t('events.delete.confirm', 'هل أنت متأكد من حذف هذه الفعالية؟')
+      )
+    ) {
       try {
-        await deleteEvent(id);
-        setModalMsg('تم حذف الفعالية بنجاح!');
-        setModalOpen(true);
-        // إعادة تحميل البيانات
-        queryClient.invalidateQueries({ queryKey: ['dashboard-events'] });
+        await deleteEvent(id.toString());
+        queryClient.invalidateQueries(['dashboard-events']);
+        setModalMsg(t('events.success.deleted', 'تم حذف الفعالية بنجاح'));
       } catch (error) {
-        console.error('خطأ في حذف الفعالية:', error);
-        setFormError('حدث خطأ أثناء حذف الفعالية');
+        setFormError(t('events.error.delete', 'حدث خطأ أثناء حذف الفعالية'));
       }
     }
   };
 
-  const handleUnavailable = (msg = 'هذه الخاصية قيد التطوير، قريبًا!') => {
+  const handleUnavailable = (
+    msg = t('events.unavailable', 'هذه الخاصية قيد التطوير، قريبًا!')
+  ) => {
     setModalMsg(msg);
     setModalOpen(true);
   };
 
-  const quickActions = [
-    {
-      to: '/dashboard/events/new',
-      label: 'إضافة فعالية',
-      icon: Plus,
-      color: 'primary' as const,
-      description: 'إنشاء فعالية جديدة',
+  const filteredEvents = events.filter((event: Event) => {
+    const matchesSearch =
+      event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.location.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      statusFilter === 'all' || event.status === statusFilter;
+    const matchesCategory =
+      categoryFilter === 'all' || event.category === categoryFilter;
+
+    return matchesSearch && matchesStatus && matchesCategory;
+  });
+
+  const sortedEvents = [...filteredEvents].sort((a, b) => {
+    let aValue, bValue;
+
+    switch (sortBy) {
+      case 'date':
+        aValue = new Date(a.start_date).getTime();
+        bValue = new Date(b.start_date).getTime();
+        break;
+      case 'title':
+        aValue = a.title;
+        bValue = b.title;
+        break;
+      case 'category':
+        aValue = a.category;
+        bValue = b.category;
+        break;
+      case 'status':
+        aValue = a.status;
+        bValue = b.status;
+        break;
+      case 'attendees':
+        aValue = a.attendees || 0;
+        bValue = b.attendees || 0;
+        break;
+      default:
+        aValue = new Date(a.start_date).getTime();
+        bValue = new Date(b.start_date).getTime();
+    }
+
+    if (sortOrder === 'asc') {
+      return aValue > bValue ? 1 : -1;
+    } else {
+      return aValue < bValue ? 1 : -1;
+    }
+  });
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
     },
-    {
-      to: '/dashboard/programs/new',
-      label: 'إضافة برنامج',
-      icon: TrendingUp,
-      color: 'success' as const,
-      description: 'إنشاء برنامج جديد',
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+      },
     },
-    {
-      to: '/dashboard/donations/new',
-      label: 'تسجيل تبرع',
-      icon: DollarSign,
-      color: 'warning' as const,
-      description: 'تسجيل تبرع جديد',
-    },
-    {
-      to: '/dashboard/users/new',
-      label: 'إضافة عضو',
-      icon: Users,
-      color: 'info' as const,
-      description: 'إضافة عضو جديد',
-    },
-  ];
+  };
 
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="flex justify-center items-center h-96">
+        <div className="flex items-center justify-center min-h-[60vh]">
           <LoadingSpinner size="lg" />
         </div>
       </DashboardLayout>
     );
   }
+
   if (error) {
     return (
       <DashboardLayout>
-        <div className="flex justify-center items-center h-96">
-          <Alert type="error" title="خطأ في تحميل البيانات">
-            حدث خطأ أثناء جلب قائمة الفعاليات. يرجى المحاولة مرة أخرى.
-          </Alert>
-        </div>
+        <Alert
+          type="error"
+          title={t('events.error.title', 'خطأ في تحميل البيانات')}
+          message={t(
+            'events.error.message',
+            'حدث خطأ أثناء تحميل بيانات الفعاليات'
+          )}
+        />
       </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout>
-      <section className="py-8 px-4" dir="rtl">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-primary-700">
-            إدارة الفعاليات
-          </h1>
-          <Button onClick={() => handleOpenModal('add')}>
-            إضافة فعالية جديدة
-          </Button>
-        </div>
-        {isLoading ? (
-          <div className="flex justify-center py-12">
-            <LoadingSpinner size="lg" />
-          </div>
-        ) : error ? (
-          <Alert type="error">
-            حدث خطأ أثناء جلب الفعاليات. يرجى المحاولة لاحقًا.
-          </Alert>
-        ) : filteredEvents.length === 0 ? (
-          <Alert type="info">لا توجد فعاليات متاحة حالياً.</Alert>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {filteredEvents.map((event) => (
-              <Card key={event.id} className="flex flex-col gap-2">
-                {event.image_url && (
-                  <img
-                    src={event.image_url}
-                    alt={event.title}
-                    className="w-full h-40 object-cover rounded-t-lg mb-2"
-                    loading="lazy"
-                  />
-                )}
-                <div className="flex flex-col gap-1 p-2">
-                  <h2 className="text-lg font-bold text-primary-700 mb-1 line-clamp-2">
-                    {event.title}
-                  </h2>
-                  <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
-                    <span>{event.category}</span>
-                    <span>•</span>
-                    <span>{event.location}</span>
-                    <span>•</span>
-                    <span>
-                      {event.start_date} - {event.end_date}
-                    </span>
-                    <span>•</span>
-                    <span>
-                      {event.status === 'active'
-                        ? 'نشطة'
-                        : event.status === 'completed'
-                        ? 'مكتملة'
-                        : event.status === 'pending'
-                        ? 'قيد الانتظار'
-                        : 'قادمة'}
-                    </span>
-                  </div>
-                  <p className="text-gray-700 mb-2 line-clamp-3">
-                    {event.description?.slice(0, 100) || ''}
-                    {event.description?.length > 100 ? '...' : ''}
-                  </p>
-                  <div className="flex gap-2 mt-auto">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleOpenModal('view', event)}
-                    >
-                      عرض
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() =>
-                        navigate(`/dashboard/events/${event.id}/edit`)
-                      }
-                    >
-                      تعديل
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      color="red"
-                      onClick={() => handleDelete(event.id)}
-                    >
-                      حذف
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+      <SEO
+        title={t('events.seo.title', 'إدارة الفعاليات')}
+        description={t(
+          'events.seo.description',
+          'إدارة الفعاليات والأنشطة في المنصة'
         )}
-        <Modal
-          isOpen={modalOpen}
-          onClose={handleCloseModal}
-          title={
-            modalType === 'add'
-              ? 'إضافة فعالية'
-              : modalType === 'edit'
-              ? 'تعديل فعالية'
-              : 'تفاصيل الفعالية'
-          }
-        >
-          {modalType === 'view' && selectedEvent ? (
-            <div className="space-y-4">
-              <h2 className="text-xl font-bold text-primary-700">
-                {selectedEvent.title}
-              </h2>
-              <div className="text-gray-600">{selectedEvent.description}</div>
-              <div className="flex flex-col gap-2 text-sm">
-                <div>الفئة: {selectedEvent.category}</div>
-                <div>الموقع: {selectedEvent.location}</div>
-                <div>
-                  التاريخ: {selectedEvent.start_date} - {selectedEvent.end_date}
-                </div>
-                <div>الحالة: {getStatusText(selectedEvent.status)}</div>
-                <div>الحد الأقصى للحضور: {selectedEvent.max_attendees}</div>
-                <div>الحضور الحالي: {selectedEvent.attendees}</div>
+      />
+
+      {/* Header Section */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8"
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              {t('events.title', 'إدارة الفعاليات')}
+            </h1>
+            <p className="text-gray-600">
+              {t('events.subtitle', 'إدارة الفعاليات والأنشطة في المنصة')}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className="w-4 h-4" />
+              {t('events.refresh', 'تحديث')}
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => handleOpenModal('add')}
+              className="flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              {t('events.addNew', 'إضافة فعالية')}
+            </Button>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Stats Cards */}
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+      >
+        <motion.div variants={itemVariants}>
+          <Card className="p-5 hover:shadow-sm transition-all duration-200 border border-gray-100 bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 rounded-lg bg-blue-50">
+                <Calendar className="w-5 h-5 text-blue-500" />
               </div>
-              {selectedEvent.image_url && (
-                <img
-                  src={selectedEvent.image_url}
-                  alt="صورة الفعالية"
-                  className="w-full h-40 object-cover rounded"
-                />
-              )}
-              <div className="flex gap-2 pt-4">
-                <Button
-                  onClick={() => handleOpenModal('edit', selectedEvent)}
-                  className="flex-1"
-                >
-                  تعديل
-                </Button>
-                <Button
-                  variant="secondary"
-                  onClick={handleCloseModal}
-                  className="flex-1"
-                >
-                  إغلاق
-                </Button>
+              <div className="text-right">
+                <span className="text-xs text-blue-600">
+                  {t('events.stats.total', 'إجمالي')}
+                </span>
               </div>
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                {events.length}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {t('events.stats.totalEvents', 'إجمالي الفعاليات')}
+              </p>
+            </div>
+          </Card>
+        </motion.div>
+
+        <motion.div variants={itemVariants}>
+          <Card className="p-5 hover:shadow-sm transition-all duration-200 border border-gray-100 bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 rounded-lg bg-green-50">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+              </div>
+              <div className="text-right">
+                <span className="text-xs text-green-600">
+                  {t('events.stats.active', 'نشطة')}
+                </span>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                {events.filter((e: Event) => e.status === 'active').length}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {t('events.stats.activeEvents', 'الفعاليات النشطة')}
+              </p>
+            </div>
+          </Card>
+        </motion.div>
+
+        <motion.div variants={itemVariants}>
+          <Card className="p-5 hover:shadow-sm transition-all duration-200 border border-gray-100 bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 rounded-lg bg-yellow-50">
+                <Clock className="w-5 h-5 text-yellow-500" />
+              </div>
+              <div className="text-right">
+                <span className="text-xs text-yellow-600">
+                  {t('events.stats.upcoming', 'قادمة')}
+                </span>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                {events.filter((e: Event) => e.status === 'upcoming').length}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {t('events.stats.upcomingEvents', 'الفعاليات القادمة')}
+              </p>
+            </div>
+          </Card>
+        </motion.div>
+
+        <motion.div variants={itemVariants}>
+          <Card className="p-5 hover:shadow-sm transition-all duration-200 border border-gray-100 bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 rounded-lg bg-purple-50">
+                <Users className="w-5 h-5 text-purple-500" />
+              </div>
+              <div className="text-right">
+                <span className="text-xs text-purple-600">
+                  {t('events.stats.attendees', 'مشاركين')}
+                </span>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                {events.reduce((sum, e) => sum + (e.attendees || 0), 0)}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {t('events.stats.totalAttendees', 'إجمالي المشاركين')}
+              </p>
+            </div>
+          </Card>
+        </motion.div>
+      </motion.div>
+
+      {/* Filters and Search */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-6"
+      >
+        <Card className="p-6">
+          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+            <div className="flex-1 w-full lg:w-auto">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  type="text"
+                  placeholder={t(
+                    'events.search.placeholder',
+                    'البحث في الفعاليات...'
+                  )}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-full"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-2"
+              >
+                <Filter className="w-4 h-4" />
+                {t('events.filters', 'الفلترة')}
+                {showFilters ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleUnavailable()}
+                className="flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                {t('events.export', 'تصدير')}
+              </Button>
+            </div>
+          </div>
+
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-4 pt-4 border-t border-gray-200"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('events.filters.status', 'الحالة')}
+                    </label>
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    >
+                      <option value="all">
+                        {t('events.filters.allStatus', 'جميع الحالات')}
+                      </option>
+                      <option value="upcoming">
+                        {t('events.status.upcoming', 'قادمة')}
+                      </option>
+                      <option value="active">
+                        {t('events.status.active', 'نشطة')}
+                      </option>
+                      <option value="completed">
+                        {t('events.status.completed', 'مكتملة')}
+                      </option>
+                      <option value="cancelled">
+                        {t('events.status.cancelled', 'ملغية')}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('events.filters.category', 'الفئة')}
+                    </label>
+                    <select
+                      value={categoryFilter}
+                      onChange={(e) => setCategoryFilter(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    >
+                      <option value="all">
+                        {t('events.filters.allCategories', 'جميع الفئات')}
+                      </option>
+                      <option value="تدريب">
+                        {t('events.categories.training', 'تدريب')}
+                      </option>
+                      <option value="تطوع">
+                        {t('events.categories.volunteer', 'تطوع')}
+                      </option>
+                      <option value="تقنية">
+                        {t('events.categories.tech', 'تقنية')}
+                      </option>
+                      <option value="صحة">
+                        {t('events.categories.health', 'صحة')}
+                      </option>
+                      <option value="أعمال">
+                        {t('events.categories.business', 'أعمال')}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('events.filters.sortBy', 'ترتيب حسب')}
+                    </label>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    >
+                      <option value="date">
+                        {t('events.sort.date', 'التاريخ')}
+                      </option>
+                      <option value="title">
+                        {t('events.sort.title', 'العنوان')}
+                      </option>
+                      <option value="category">
+                        {t('events.sort.category', 'الفئة')}
+                      </option>
+                      <option value="status">
+                        {t('events.sort.status', 'الحالة')}
+                      </option>
+                      <option value="attendees">
+                        {t('events.sort.attendees', 'المشاركين')}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('events.filters.order', 'الترتيب')}
+                    </label>
+                    <select
+                      value={sortOrder}
+                      onChange={(e) =>
+                        setSortOrder(e.target.value as 'asc' | 'desc')
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    >
+                      <option value="desc">
+                        {t('events.sort.desc', 'تنازلي')}
+                      </option>
+                      <option value="asc">
+                        {t('events.sort.asc', 'تصاعدي')}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </Card>
+      </motion.div>
+
+      {/* Events Grid */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <AnimatePresence>
+            {sortedEvents.map((event, index) => (
+              <motion.div
+                key={event.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <Card className="p-6 hover:shadow-lg transition-all duration-300 h-full">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
+                        {event.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                        {event.description}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          navigate(`/dashboard/events/${event.id}`)
+                        }
+                        className="p-1"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleOpenModal('edit', event)}
+                        className="p-1"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(event.id)}
+                        className="p-1 text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Calendar className="w-4 h-4 text-gray-400" />
+                      <span className="text-gray-600">
+                        {formatDate(event.start_date)}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-sm">
+                      <MapPin className="w-4 h-4 text-gray-400" />
+                      <span className="text-gray-600">{event.location}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-sm">
+                      <Users className="w-4 h-4 text-gray-400" />
+                      <span className="text-gray-600">
+                        {event.attendees || 0} / {event.max_attendees || '∞'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                          event.status
+                        )}`}
+                      >
+                        {getStatusText(event.status)}
+                      </span>
+
+                      {event.max_attendees && (
+                        <div className="flex items-center gap-2">
+                          <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-primary-500 rounded-full transition-all duration-500"
+                              style={{
+                                width: `${getRegistrationPercentage(
+                                  event.attendees || 0,
+                                  event.max_attendees
+                                )}%`,
+                              }}
+                            />
+                          </div>
+                          <span className="text-xs text-gray-500">
+                            {getRegistrationPercentage(
+                              event.attendees || 0,
+                              event.max_attendees
+                            )}
+                            %
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      </motion.div>
+
+      {/* Modal */}
+      <Modal
+        open={modalOpen}
+        onClose={handleCloseModal}
+        title={
+          modalType === 'add'
+            ? t('events.modal.addTitle', 'إضافة فعالية جديدة')
+            : modalType === 'edit'
+            ? t('events.modal.editTitle', 'تعديل الفعالية')
+            : t('events.modal.viewTitle', 'تفاصيل الفعالية')
+        }
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('events.form.title', 'عنوان الفعالية')} *
+              </label>
+              <Input
                 type="text"
                 name="title"
-                placeholder="اسم الفعالية"
-                className="w-full border rounded p-2"
                 value={form.title}
                 onChange={handleChange}
                 required
+                disabled={modalType === 'view'}
               />
-              <input
-                type="text"
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('events.form.category', 'الفئة')} *
+              </label>
+              <select
                 name="category"
-                placeholder="الفئة"
-                className="w-full border rounded p-2"
                 value={form.category}
                 onChange={handleChange}
                 required
-              />
-              <input
+                disabled={modalType === 'view'}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              >
+                <option value="">
+                  {t('events.form.selectCategory', 'اختر الفئة')}
+                </option>
+                <option value="تدريب">
+                  {t('events.categories.training', 'تدريب')}
+                </option>
+                <option value="تطوع">
+                  {t('events.categories.volunteer', 'تطوع')}
+                </option>
+                <option value="تقنية">
+                  {t('events.categories.tech', 'تقنية')}
+                </option>
+                <option value="صحة">
+                  {t('events.categories.health', 'صحة')}
+                </option>
+                <option value="أعمال">
+                  {t('events.categories.business', 'أعمال')}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('events.form.description', 'وصف الفعالية')} *
+            </label>
+            <textarea
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              required
+              disabled={modalType === 'view'}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('events.form.location', 'الموقع')} *
+              </label>
+              <Input
                 type="text"
                 name="location"
-                placeholder="الموقع"
-                className="w-full border rounded p-2"
                 value={form.location}
                 onChange={handleChange}
                 required
+                disabled={modalType === 'view'}
               />
-              <input
-                type="date"
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('events.form.status', 'الحالة')}
+              </label>
+              <select
+                name="status"
+                value={form.status}
+                onChange={handleChange}
+                disabled={modalType === 'view'}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              >
+                <option value="upcoming">
+                  {t('events.status.upcoming', 'قادمة')}
+                </option>
+                <option value="active">
+                  {t('events.status.active', 'نشطة')}
+                </option>
+                <option value="completed">
+                  {t('events.status.completed', 'مكتملة')}
+                </option>
+                <option value="cancelled">
+                  {t('events.status.cancelled', 'ملغية')}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('events.form.startDate', 'تاريخ البداية')} *
+              </label>
+              <Input
+                type="datetime-local"
                 name="start_date"
-                placeholder="تاريخ البداية"
-                className="w-full border rounded p-2"
                 value={form.start_date}
                 onChange={handleChange}
                 required
+                disabled={modalType === 'view'}
               />
-              <input
-                type="date"
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('events.form.endDate', 'تاريخ النهاية')} *
+              </label>
+              <Input
+                type="datetime-local"
                 name="end_date"
-                placeholder="تاريخ النهاية"
-                className="w-full border rounded p-2"
                 value={form.end_date}
                 onChange={handleChange}
                 required
+                disabled={modalType === 'view'}
               />
-              <input
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('events.form.maxAttendees', 'الحد الأقصى للمشاركين')}
+              </label>
+              <Input
                 type="number"
                 name="max_attendees"
-                placeholder="الحد الأقصى للحضور"
-                className="w-full border rounded p-2"
                 value={form.max_attendees}
                 onChange={handleChange}
+                disabled={modalType === 'view'}
+                min="1"
               />
-              <textarea
-                name="description"
-                placeholder="وصف الفعالية"
-                className="w-full border rounded p-2 min-h-[100px]"
-                value={form.description}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('events.form.currentAttendees', 'المشاركين الحاليين')}
+              </label>
+              <Input
+                type="number"
+                name="attendees"
+                value={form.attendees}
                 onChange={handleChange}
-                required
+                disabled={modalType === 'view'}
+                min="0"
               />
-              <div>
-                <label className="block mb-1">صورة الفعالية (اختياري)</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                />
-                {imagePreview && (
-                  <div className="relative mt-2 w-32 h-20">
-                    <img
-                      src={imagePreview}
-                      alt="معاينة"
-                      className="w-full h-full object-cover rounded"
-                    />
-                    <button
-                      type="button"
-                      className="absolute top-0 right-0 bg-white rounded-full p-1 shadow"
-                      onClick={removeImage}
-                    >
-                      <X className="w-4 h-4 text-red-500" />
-                    </button>
-                  </div>
-                )}
-              </div>
-              {formError && (
-                <div className="text-red-600 text-sm">{formError}</div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('events.form.image', 'صورة الفعالية')}
+            </label>
+            <div className="space-y-2">
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                disabled={modalType === 'view'}
+              />
+              {imagePreview && (
+                <div className="relative inline-block">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-32 h-32 object-cover rounded-lg"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={removeImage}
+                    className="absolute top-0 right-0 p-1 bg-red-500 text-white rounded-full"
+                    disabled={modalType === 'view'}
+                  >
+                    <X className="w-3 h-3" />
+                  </Button>
+                </div>
               )}
-              <div className="flex gap-2 justify-end">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCloseModal}
-                >
-                  إلغاء
-                </Button>
-                <Button type="submit">
-                  {modalType === 'add' ? 'إضافة' : 'حفظ التعديلات'}
-                </Button>
-              </div>
-            </form>
-          )}
-        </Modal>
-      </section>
+            </div>
+          </div>
+
+          {formError && <Alert type="error" title={formError} />}
+
+          <div className="flex justify-end gap-3 pt-4">
+            <Button variant="outline" onClick={handleCloseModal}>
+              {t('common.cancel', 'إلغاء')}
+            </Button>
+            {modalType !== 'view' && (
+              <Button type="submit" variant="primary">
+                {modalType === 'add'
+                  ? t('events.form.add', 'إضافة')
+                  : t('events.form.update', 'تحديث')}
+              </Button>
+            )}
+          </div>
+        </form>
+      </Modal>
     </DashboardLayout>
   );
 };

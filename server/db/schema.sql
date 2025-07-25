@@ -124,6 +124,9 @@ CREATE INDEX idx_program_registrations_user_id ON program_registrations(user_id)
 CREATE INDEX idx_program_registrations_program_id ON program_registrations(program_id);
 CREATE INDEX idx_event_registrations_user_id ON event_registrations(user_id);
 CREATE INDEX idx_event_registrations_event_id ON event_registrations(event_id);
+CREATE INDEX idx_programs_title ON programs (title);
+CREATE INDEX idx_events_title ON events (title);
+CREATE INDEX idx_events_start_date ON events (start_date);
 
 -- === 11. جدول تسجيل رسائل البريد الإلكتروني ===
 CREATE TABLE IF NOT EXISTS email_logs (

@@ -9,7 +9,9 @@ export const http = axios.create({
 
 // إضافة Interceptor لإرسال التوكن تلقائياً
 http.interceptors.request.use((config) => {
+  // الحصول على التوكن من localStorage
   const token = localStorage.getItem('token');
+
   if (token) {
     config.headers = config.headers || {};
     config.headers['Authorization'] = `Bearer ${token}`;

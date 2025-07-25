@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import DashboardLayout from '../../components/dashboard/DashboardLayout';
+import DashboardLayout from '../../layouts/DashboardLayout';
 import {
   fetchContactForms,
   updateContactFormReadStatus,

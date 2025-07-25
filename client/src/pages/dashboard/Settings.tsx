@@ -1,778 +1,346 @@
 import React, { useState } from 'react';
-import DashboardLayout from '../../components/dashboard/DashboardLayout';
-import { useQuery } from '@tanstack/react-query';
-import Button from '../../components/common/Button';
-import Modal from '../../components/common/Modal';
-import {
-  AccessibleSection,
-  SkipToContent,
-} from '../../components/common/AccessibleComponents';
-import Card from '../../components/common/Card';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { useTranslation } from 'react-i18next';
+import DashboardLayout from '../../layouts/DashboardLayout';
+import { useAuthStore } from '../../store/authStore';
+import { Card } from '../../components/ui/Card/Card';
+import { Button } from '../../components/ui/Button/Button';
+import { Input } from '../../components/ui/Input/Input';
 import Alert from '../../components/common/Alert';
-import Input from '../../components/common/Input';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 import {
-  Settings as SettingsIcon,
   User,
-  Bell,
   Shield,
   Globe,
   Palette,
+  LogOut,
   Save,
-  Edit,
   Eye,
   EyeOff,
-  Lock,
-  Key,
-  Smartphone,
-  Mail,
-  Calendar,
-  MapPin,
-  Camera,
-  Trash2,
-  Download,
-  Upload,
-  Database,
-  Monitor,
-  Wifi,
-  Volume2,
-  VolumeX,
-  Sun,
-  Moon,
-  Languages,
-  Rss,
-  CheckCircle,
-  XCircle,
-  Info,
-  AlertTriangle,
 } from 'lucide-react';
-import ProfileSettingsSection from './Settings/ProfileSettingsSection';
-import SecuritySettingsSection from './Settings/SecuritySettingsSection';
-import NotificationsSettingsSection from './Settings/NotificationsSettingsSection';
-import PreferencesSettingsSection from './Settings/PreferencesSettingsSection';
-import DangerZoneSection from './Settings/DangerZoneSection';
-
-interface UserSettings {
-  profile: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    avatar: string;
-    bio: string;
-    location: string;
-    website: string;
-    dateOfBirth: string;
-  };
-  notifications: {
-    email: boolean;
-    sms: boolean;
-    push: boolean;
-    events: boolean;
-    programs: boolean;
-    donations: boolean;
-    updates: boolean;
-    marketing: boolean;
-  };
-  security: {
-    twoFactorEnabled: boolean;
-    loginNotifications: boolean;
-    sessionTimeout: number;
-    passwordLastChanged: string;
-    lastLogin: string;
-    activeSessions: number;
-  };
-  preferences: {
-    language: string;
-    theme: 'light' | 'dark' | 'auto';
-    timezone: string;
-    dateFormat: string;
-    currency: string;
-    rtl: boolean;
-  };
-  privacy: {
-    profileVisibility: 'public' | 'private' | 'friends';
-    showEmail: boolean;
-    showPhone: boolean;
-    showLocation: boolean;
-    allowMessages: boolean;
-    allowFriendRequests: boolean;
-  };
-}
+import { motion } from 'framer-motion';
 
 const SettingsDashboard: React.FC = () => {
-  // جلب إعدادات المستخدم
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['user-settings'],
-    queryFn: () => fetchUserSettings(),
+  const { t } = useTranslation();
+  const { user, logout } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error'>(
+    'success'
+  );
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Profile Form - معلومات بسيطة
+  const [profileForm, setProfileForm] = useState({
+    firstName: user?.first_name || '',
+    lastName: user?.last_name || '',
+    email: user?.email || '',
   });
 
-  // حالة النافذة المنبثقة
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<
-    'profile' | 'security' | 'export' | 'delete'
-  >('profile');
-  const [activeTab, setActiveTab] = useState('profile');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  // نموذج البيانات
-  const [form, setForm] = useState({
+  // Security Form - تغيير كلمة المرور
+  const [securityForm, setSecurityForm] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
-  const [formError, setFormError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
 
-  // بيانات افتراضية للإعدادات
-  const mockSettings: UserSettings = {
-    profile: {
-      firstName: 'أحمد',
-      lastName: 'محمد',
-      email: 'ahmed@example.com',
-      phone: '+966501234567',
-      avatar: 'AM',
-      bio: 'مدير المنظمة ومؤسسها، مهتم بتطوير الشباب والمجتمع',
-      location: 'الرياض، السعودية',
-      website: 'https://ahmed-mohammed.com',
-      dateOfBirth: '1990-05-15',
-    },
-    notifications: {
-      email: true,
-      sms: false,
-      push: true,
-      events: true,
-      programs: true,
-      donations: false,
-      updates: true,
-      marketing: false,
-    },
-    security: {
-      twoFactorEnabled: true,
-      loginNotifications: true,
-      sessionTimeout: 30,
-      passwordLastChanged: '2024-01-15',
-      lastLogin: '2024-06-01T10:30:00Z',
-      activeSessions: 2,
-    },
-    preferences: {
-      language: 'ar',
-      theme: 'auto',
-      timezone: 'Asia/Riyadh',
-      dateFormat: 'DD/MM/YYYY',
-      currency: 'SAR',
-      rtl: true,
-    },
-    privacy: {
-      profileVisibility: 'public',
-      showEmail: false,
-      showPhone: false,
-      showLocation: true,
-      allowMessages: true,
-      allowFriendRequests: true,
-    },
-  };
-
-  const settings = data || mockSettings;
-
-  // Mock API function
-  const fetchUserSettings = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return mockSettings;
-  };
-
-  const handleOpenModal = (
-    type: 'profile' | 'security' | 'export' | 'delete'
-  ) => {
-    setModalType(type);
-    setFormError('');
-    setSuccessMessage('');
-    setForm({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    });
-    setModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setModalOpen(false);
-    setFormError('');
-    setSuccessMessage('');
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (modalType === 'security') {
-      if (!form.currentPassword || !form.newPassword || !form.confirmPassword) {
-        setFormError('جميع الحقول مطلوبة');
-        return;
-      }
-      if (form.newPassword !== form.confirmPassword) {
-        setFormError('كلمة المرور الجديدة غير متطابقة');
-        return;
-      }
-      if (form.newPassword.length < 8) {
-        setFormError('كلمة المرور يجب أن تكون 8 أحرف على الأقل');
-        return;
-      }
-    }
-    // هنا سيتم الربط مع API لاحقًا
-    console.log('Form submitted:', form);
-    setSuccessMessage('تم حفظ الإعدادات بنجاح');
-    setTimeout(() => {
-      setModalOpen(false);
-      setSuccessMessage('');
-    }, 2000);
-  };
+    setIsLoading(true);
 
-  const handleNotificationChange = (key: string, value: boolean) => {
-    // هنا سيتم تحديث الإعدادات
-    console.log('Notification setting changed:', key, value);
-  };
-
-  const handlePrivacyChange = (key: string, value: any) => {
-    // هنا سيتم تحديث إعدادات الخصوصية
-    console.log('Privacy setting changed:', key, value);
-  };
-
-  const handlePreferenceChange = (key: string, value: any) => {
-    // هنا سيتم تحديث التفضيلات
-    console.log('Preference changed:', key, value);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
-  const getTabIcon = (tab: string) => {
-    switch (tab) {
-      case 'profile':
-        return User;
-      case 'notifications':
-        return Bell;
-      case 'security':
-        return Shield;
-      case 'preferences':
-        return SettingsIcon;
-      case 'privacy':
-        return Lock;
-      default:
-        return SettingsIcon;
+    try {
+      // محاكاة بسيطة
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setMessage('تم تحديث الملف الشخصي بنجاح');
+      setMessageType('success');
+    } catch (error) {
+      setMessage('حدث خطأ أثناء تحديث الملف الشخصي');
+      setMessageType('error');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const getTabTitle = (tab: string) => {
-    switch (tab) {
-      case 'profile':
-        return 'الملف الشخصي';
-      case 'notifications':
-        return 'الإشعارات';
-      case 'security':
-        return 'الأمان';
-      case 'preferences':
-        return 'التفضيلات';
-      case 'privacy':
-        return 'الخصوصية';
-      default:
-        return 'الإعدادات';
+  const handleSecuritySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      if (securityForm.newPassword !== securityForm.confirmPassword) {
+        setMessage('كلمة المرور الجديدة غير متطابقة');
+        setMessageType('error');
+        return;
+      }
+
+      if (securityForm.newPassword.length < 6) {
+        setMessage('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+        setMessageType('error');
+        return;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setMessage('تم تغيير كلمة المرور بنجاح');
+      setMessageType('success');
+
+      setSecurityForm({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+    } catch (error) {
+      setMessage('حدث خطأ أثناء تغيير كلمة المرور');
+      setMessageType('error');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  if (error) {
-    return (
-      <DashboardLayout>
-        <SkipToContent />
-        <AccessibleSection>
-          <Alert type="error" title="خطأ في تحميل الإعدادات">
-            حدث خطأ أثناء جلب إعدادات المستخدم. يرجى المحاولة مرة أخرى.
-          </Alert>
-        </AccessibleSection>
-      </DashboardLayout>
-    );
-  }
-
-  const tabs = [
-    { id: 'profile', label: 'الملف الشخصي', icon: User },
-    { id: 'notifications', label: 'الإشعارات', icon: Bell },
-    { id: 'security', label: 'الأمان', icon: Shield },
-    { id: 'preferences', label: 'التفضيلات', icon: SettingsIcon },
-    { id: 'privacy', label: 'الخصوصية', icon: Lock },
-    { id: 'danger', label: 'إدارة الحساب', icon: Trash2 },
-  ];
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <DashboardLayout>
-      <SkipToContent />
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8"
+      >
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          {t('settings.title', 'الإعدادات')}
+        </h1>
+        <p className="text-gray-600">
+          {t('settings.subtitle', 'إدارة إعدادات حسابك')}
+        </p>
+      </motion.div>
 
-      <AccessibleSection>
-        <div className="max-w-7xl mx-auto py-6 px-2 sm:px-4 lg:px-8">
-          {/* Header */}
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">الإعدادات</h1>
-            <p className="text-gray-600">إدارة إعدادات حسابك وتفضيلاتك</p>
-          </div>
+      {/* Message Alert */}
+      {message && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6"
+        >
+          <Alert
+            type={messageType}
+            title={messageType === 'success' ? 'نجح' : 'خطأ'}
+            message={message}
+            onClose={() => setMessage('')}
+          />
+        </motion.div>
+      )}
 
-          {isLoading ? (
-            <div className="flex justify-center py-8">
-              <LoadingSpinner size="lg" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Profile Section */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+        >
+          <Card className="p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <User className="w-6 h-6 text-blue-600" />
+              <h2 className="text-xl font-bold text-gray-900">
+                {t('settings.profile.title', 'الملف الشخصي')}
+              </h2>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {/* Sidebar Navigation */}
-              <div className="lg:col-span-1">
-                <Card>
-                  <nav className="space-y-1">
-                    {tabs.map((tab) => {
-                      const Icon = tab.icon;
-                      return (
-                        <button
-                          key={tab.id}
-                          onClick={() => setActiveTab(tab.id)}
-                          className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                            activeTab === tab.id
-                              ? 'bg-primary-100 text-primary-700 border-r-2 border-primary-500'
-                              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                          }`}
-                        >
-                          <Icon className="w-5 h-5 mr-3 rtl:ml-3 rtl:mr-0" />
-                          {tab.label}
-                        </button>
-                      );
-                    })}
-                  </nav>
-                </Card>
+
+            <form onSubmit={handleProfileSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('settings.profile.firstName', 'الاسم الأول')}
+                </label>
+                <Input
+                  type="text"
+                  value={profileForm.firstName}
+                  onChange={(e) =>
+                    setProfileForm((prev) => ({
+                      ...prev,
+                      firstName: e.target.value,
+                    }))
+                  }
+                  required
+                />
               </div>
 
-              {/* Main Content */}
-              <div className="lg:col-span-3">
-                <Card>
-                  <div className="p-6">
-                    {/* Profile Settings */}
-                    {activeTab === 'profile' && (
-                      <ProfileSettingsSection settings={settings} />
-                    )}
-
-                    {/* Notification Settings */}
-                    {activeTab === 'notifications' && (
-                      <NotificationsSettingsSection settings={settings} />
-                    )}
-
-                    {/* Security Settings */}
-                    {activeTab === 'security' && (
-                      <SecuritySettingsSection settings={settings} />
-                    )}
-
-                    {/* Preferences Settings */}
-                    {activeTab === 'preferences' && (
-                      <PreferencesSettingsSection settings={settings} />
-                    )}
-
-                    {/* Privacy Settings */}
-                    {activeTab === 'privacy' && (
-                      <div className="space-y-6">
-                        <h2 className="text-xl font-semibold text-gray-900">
-                          إعدادات الخصوصية
-                        </h2>
-
-                        <div className="space-y-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              رؤية الملف الشخصي
-                            </label>
-                            <select
-                              value={settings.privacy.profileVisibility}
-                              onChange={(e) =>
-                                handlePrivacyChange(
-                                  'profileVisibility',
-                                  e.target.value
-                                )
-                              }
-                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                            >
-                              <option value="public">عام</option>
-                              <option value="private">خاص</option>
-                              <option value="friends">الأصدقاء فقط</option>
-                            </select>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                              <div className="flex items-center">
-                                <Mail className="w-5 h-5 text-gray-600 mr-3 rtl:ml-3 rtl:mr-0" />
-                                <div>
-                                  <h3 className="font-medium text-gray-900">
-                                    إظهار البريد الإلكتروني
-                                  </h3>
-                                  <p className="text-sm text-gray-600">
-                                    السماح للآخرين برؤية بريدك الإلكتروني
-                                  </p>
-                                </div>
-                              </div>
-                              <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={settings.privacy.showEmail}
-                                  onChange={(e) =>
-                                    handlePrivacyChange(
-                                      'showEmail',
-                                      e.target.checked
-                                    )
-                                  }
-                                  className="sr-only peer"
-                                />
-                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                              </label>
-                            </div>
-
-                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                              <div className="flex items-center">
-                                <Phone className="w-5 h-5 text-gray-600 mr-3 rtl:ml-3 rtl:mr-0" />
-                                <div>
-                                  <h3 className="font-medium text-gray-900">
-                                    إظهار رقم الهاتف
-                                  </h3>
-                                  <p className="text-sm text-gray-600">
-                                    السماح للآخرين برؤية رقم هاتفك
-                                  </p>
-                                </div>
-                              </div>
-                              <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={settings.privacy.showPhone}
-                                  onChange={(e) =>
-                                    handlePrivacyChange(
-                                      'showPhone',
-                                      e.target.checked
-                                    )
-                                  }
-                                  className="sr-only peer"
-                                />
-                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                              </label>
-                            </div>
-
-                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                              <div className="flex items-center">
-                                <MapPin className="w-5 h-5 text-gray-600 mr-3 rtl:ml-3 rtl:mr-0" />
-                                <div>
-                                  <h3 className="font-medium text-gray-900">
-                                    إظهار الموقع
-                                  </h3>
-                                  <p className="text-sm text-gray-600">
-                                    السماح للآخرين برؤية موقعك
-                                  </p>
-                                </div>
-                              </div>
-                              <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={settings.privacy.showLocation}
-                                  onChange={(e) =>
-                                    handlePrivacyChange(
-                                      'showLocation',
-                                      e.target.checked
-                                    )
-                                  }
-                                  className="sr-only peer"
-                                />
-                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                              </label>
-                            </div>
-
-                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                              <div className="flex items-center">
-                                <Mail className="w-5 h-5 text-gray-600 mr-3 rtl:ml-3 rtl:mr-0" />
-                                <div>
-                                  <h3 className="font-medium text-gray-900">
-                                    السماح بالرسائل
-                                  </h3>
-                                  <p className="text-sm text-gray-600">
-                                    السماح للآخرين بإرسال رسائل لك
-                                  </p>
-                                </div>
-                              </div>
-                              <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={settings.privacy.allowMessages}
-                                  onChange={(e) =>
-                                    handlePrivacyChange(
-                                      'allowMessages',
-                                      e.target.checked
-                                    )
-                                  }
-                                  className="sr-only peer"
-                                />
-                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Danger Zone */}
-                    {activeTab === 'danger' && (
-                      <DangerZoneSection settings={settings} />
-                    )}
-                  </div>
-                </Card>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('settings.profile.lastName', 'الاسم الأخير')}
+                </label>
+                <Input
+                  type="text"
+                  value={profileForm.lastName}
+                  onChange={(e) =>
+                    setProfileForm((prev) => ({
+                      ...prev,
+                      lastName: e.target.value,
+                    }))
+                  }
+                  required
+                />
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('settings.profile.email', 'البريد الإلكتروني')}
+                </label>
+                <Input
+                  type="email"
+                  value={profileForm.email}
+                  onChange={(e) =>
+                    setProfileForm((prev) => ({
+                      ...prev,
+                      email: e.target.value,
+                    }))
+                  }
+                  required
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="flex items-center gap-2"
+                >
+                  {isLoading ? (
+                    <LoadingSpinner size="sm" />
+                  ) : (
+                    <Save className="w-4 h-4" />
+                  )}
+                  {t('settings.save', 'حفظ التغييرات')}
+                </Button>
+              </div>
+            </form>
+          </Card>
+        </motion.div>
+
+        {/* Security Section */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+        >
+          <Card className="p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <Shield className="w-6 h-6 text-red-600" />
+              <h2 className="text-xl font-bold text-gray-900">
+                {t('settings.security.title', 'الأمان')}
+              </h2>
             </div>
-          )}
 
-          {/* Modal */}
-          <Modal
-            open={modalOpen}
-            onClose={handleCloseModal}
-            title={
-              modalType === 'profile'
-                ? 'تعديل الملف الشخصي'
-                : modalType === 'security'
-                ? 'تغيير كلمة المرور'
-                : modalType === 'export'
-                ? 'تصدير البيانات'
-                : 'حذف الحساب'
-            }
-          >
-            {modalType === 'security' ? (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {formError && (
-                  <Alert type="error" className="mb-4">
-                    {formError}
-                  </Alert>
-                )}
-                {successMessage && (
-                  <Alert type="success" className="mb-4">
-                    {successMessage}
-                  </Alert>
-                )}
-
-                <div>
-                  <label
-                    htmlFor="currentPassword"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    كلمة المرور الحالية
-                  </label>
-                  <div className="relative">
-                    <Input
-                      id="currentPassword"
-                      name="currentPassword"
-                      type={showPassword ? 'text' : 'password'}
-                      value={form.currentPassword}
-                      onChange={handleChange}
-                      required
-                      placeholder="كلمة المرور الحالية"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="newPassword"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    كلمة المرور الجديدة
-                  </label>
-                  <div className="relative">
-                    <Input
-                      id="newPassword"
-                      name="newPassword"
-                      type={showPassword ? 'text' : 'password'}
-                      value={form.newPassword}
-                      onChange={handleChange}
-                      required
-                      placeholder="كلمة المرور الجديدة"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="confirmPassword"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    تأكيد كلمة المرور الجديدة
-                  </label>
-                  <div className="relative">
-                    <Input
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      value={form.confirmPassword}
-                      onChange={handleChange}
-                      required
-                      placeholder="تأكيد كلمة المرور الجديدة"
-                    />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
-                      className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex gap-2 pt-4">
-                  <Button type="submit" className="flex-1">
-                    تغيير كلمة المرور
-                  </Button>
-                  <Button
+            <form onSubmit={handleSecuritySubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t(
+                    'settings.security.currentPassword',
+                    'كلمة المرور الحالية'
+                  )}
+                </label>
+                <div className="relative">
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    value={securityForm.currentPassword}
+                    onChange={(e) =>
+                      setSecurityForm((prev) => ({
+                        ...prev,
+                        currentPassword: e.target.value,
+                      }))
+                    }
+                    required
+                  />
+                  <button
                     type="button"
-                    variant="secondary"
-                    onClick={handleCloseModal}
-                    className="flex-1"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2"
                   >
-                    إلغاء
-                  </Button>
-                </div>
-              </form>
-            ) : modalType === 'profile' ? (
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      الاسم الأول
-                    </label>
-                    <Input
-                      type="text"
-                      defaultValue={settings.profile.firstName}
-                      placeholder="الاسم الأول"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      الاسم الأخير
-                    </label>
-                    <Input
-                      type="text"
-                      defaultValue={settings.profile.lastName}
-                      placeholder="الاسم الأخير"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    البريد الإلكتروني
-                  </label>
-                  <Input
-                    type="email"
-                    defaultValue={settings.profile.email}
-                    placeholder="example@email.com"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    رقم الهاتف
-                  </label>
-                  <Input
-                    type="tel"
-                    defaultValue={settings.profile.phone}
-                    placeholder="+966501234567"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    الموقع
-                  </label>
-                  <Input
-                    type="text"
-                    defaultValue={settings.profile.location}
-                    placeholder="المدينة، البلد"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    السيرة الذاتية
-                  </label>
-                  <textarea
-                    defaultValue={settings.profile.bio}
-                    rows={3}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    placeholder="نبذة مختصرة عنك"
-                  />
-                </div>
-
-                <div className="flex gap-2 pt-4">
-                  <Button className="flex-1">حفظ التغييرات</Button>
-                  <Button
-                    variant="secondary"
-                    onClick={handleCloseModal}
-                    className="flex-1"
-                  >
-                    إلغاء
-                  </Button>
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4 text-gray-400" />
+                    ) : (
+                      <Eye className="w-4 h-4 text-gray-400" />
+                    )}
+                  </button>
                 </div>
               </div>
-            ) : (
-              <div className="text-center py-8">
-                <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  {modalType === 'export' ? 'تصدير البيانات' : 'حذف الحساب'}
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  {modalType === 'export'
-                    ? 'سيتم تصدير جميع بياناتك الشخصية'
-                    : 'هذا الإجراء لا يمكن التراجع عنه'}
-                </p>
-                <div className="flex gap-2">
-                  <Button
-                    variant={modalType === 'export' ? 'primary' : 'danger'}
-                    className="flex-1"
-                  >
-                    {modalType === 'export' ? 'تصدير' : 'حذف'}
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={handleCloseModal}
-                    className="flex-1"
-                  >
-                    إلغاء
-                  </Button>
-                </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('settings.security.newPassword', 'كلمة المرور الجديدة')}
+                </label>
+                <Input
+                  type="password"
+                  value={securityForm.newPassword}
+                  onChange={(e) =>
+                    setSecurityForm((prev) => ({
+                      ...prev,
+                      newPassword: e.target.value,
+                    }))
+                  }
+                  required
+                />
               </div>
-            )}
-          </Modal>
-        </div>
-      </AccessibleSection>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('settings.security.confirmPassword', 'تأكيد كلمة المرور')}
+                </label>
+                <Input
+                  type="password"
+                  value={securityForm.confirmPassword}
+                  onChange={(e) =>
+                    setSecurityForm((prev) => ({
+                      ...prev,
+                      confirmPassword: e.target.value,
+                    }))
+                  }
+                  required
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="flex items-center gap-2"
+                >
+                  {isLoading ? (
+                    <LoadingSpinner size="sm" />
+                  ) : (
+                    <Shield className="w-4 h-4" />
+                  )}
+                  {t('settings.security.changePassword', 'تغيير كلمة المرور')}
+                </Button>
+              </div>
+            </form>
+          </Card>
+        </motion.div>
+      </div>
+
+      {/* Logout Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-8"
+      >
+        <Card className="p-6 border-red-200 bg-red-50">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-red-900 mb-1">
+                {t('settings.logout.title', 'تسجيل الخروج')}
+              </h3>
+              <p className="text-sm text-red-700">
+                {t('settings.logout.description', 'تسجيل الخروج من الحساب')}
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={handleLogout}
+              className="border-red-300 text-red-700 hover:bg-red-100"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              {t('settings.logout.button', 'تسجيل الخروج')}
+            </Button>
+          </div>
+        </Card>
+      </motion.div>
     </DashboardLayout>
   );
 };

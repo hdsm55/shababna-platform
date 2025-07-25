@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import DashboardLayout from '../../components/dashboard/DashboardLayout';
+import { useTranslation } from 'react-i18next';
+import DashboardLayout from '../../layouts/DashboardLayout';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   fetchPrograms,
@@ -7,16 +8,12 @@ import {
   updateProgram,
 } from '../../services/programsApi';
 import { deleteProgram } from '../../services/dashboardApi';
-import Button from '../../components/common/Button';
+import { Button } from '../../components/ui/Button/Button';
 import Modal from '../../components/common/Modal';
-import {
-  AccessibleSection,
-  SkipToContent,
-} from '../../components/common/AccessibleComponents';
-import Card from '../../components/common/Card';
+import { Card } from '../../components/ui/Card/Card';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Alert from '../../components/common/Alert';
-import Input from '../../components/common/Input';
+import { Input } from '../../components/ui/Input/Input';
 import {
   Search,
   Filter,
@@ -34,9 +31,107 @@ import {
   AlertCircle,
   Upload,
   X,
+  ChevronDown,
+  ChevronUp,
+  Download,
+  RefreshCw,
+  Settings,
+  UserCheck,
+  UserX,
+  Star,
+  Crown,
+  Award,
+  Target,
+  Heart,
+  MessageCircle,
+  Bell,
+  Lock,
+  Unlock,
+  Key,
+  EyeOff,
+  AlertTriangle,
+  Info,
+  HelpCircle,
+  ExternalLink,
+  Copy,
+  Share2,
+  Archive,
+  Send,
+  Mail as MailIcon,
+  Phone as PhoneIcon,
+  Smartphone,
+  Monitor,
+  Tablet,
+  Laptop,
+  Database,
+  Server,
+  Cloud,
+  Wifi,
+  Signal,
+  Battery,
+  Volume2,
+  VolumeX,
+  Mic,
+  MicOff,
+  Camera,
+  CameraOff,
+  Video,
+  VideoOff,
+  Headphones,
+  Speaker,
+  Radio,
+  Tv,
+  Smartphone as Mobile,
+  Watch,
+  Calendar as DateIcon,
+  Timer,
+  TimerOff,
+  Hourglass,
+  History,
+  Repeat,
+  RotateCcw,
+  RotateCw,
+  FastForward,
+  Rewind,
+  SkipBack,
+  SkipForward,
+  PlayCircle,
+  PauseCircle,
+  StopCircle as StopIcon,
+  Square as SquareIcon,
+  Circle,
+  Dot,
+  Minus as MinusIcon,
+  Plus as PlusIcon,
+  Check,
+  AlertTriangle as AlertTriangleIcon,
+  Info as InfoIcon,
+  HelpCircle as HelpCircleIcon,
+  Lock as LockIcon,
+  Unlock as UnlockIcon,
+  Eye as EyeIcon,
+  EyeOff as EyeOffIcon,
+  Key as KeyIcon,
+  Fingerprint,
+  Shield as ShieldIcon,
+  ShieldCheck,
+  ShieldX,
+  ShieldAlert,
+  ShieldOff,
+  User,
+  UserCheck as UserCheckIcon,
+  UserX as UserXIcon,
+  UserPlus as UserAdd,
+  UserMinus,
+  Users as UsersIcon,
+  UserCog,
+  UserSearch,
+  UserCheck as UserVerified,
+  UserX as UserBlocked,
 } from 'lucide-react';
-import QuickActions from '../../components/common/QuickActions';
-import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useNavigate } from 'react-router-dom';
+import SEO from '../../components/common/SEO';
 
 interface Program {
   id: string;
@@ -55,10 +150,16 @@ interface Program {
 }
 
 const ProgramsDashboard: React.FC = () => {
+  const { t, i18n } = useTranslation();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const isRTL = i18n.dir() === 'rtl';
+
   // جلب قائمة البرامج
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['dashboard-programs'],
-    queryFn: () => fetchPrograms(),
+    queryFn: () => fetchPrograms({ page: 1, limit: 50 }),
+    staleTime: 5 * 60 * 1000,
   });
 
   // حالة النافذة المنبثقة
@@ -71,6 +172,8 @@ const ProgramsDashboard: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
+  const [sortBy, setSortBy] = useState('date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   // نموذج البيانات
   const [form, setForm] = useState({
@@ -88,80 +191,27 @@ const ProgramsDashboard: React.FC = () => {
   // حالة التنبيه
   const [modalMsg, setModalMsg] = useState('');
 
-  // بيانات افتراضية للبرامج
-  const mockPrograms: Program[] = [
-    {
-      id: '1',
-      title: 'برنامج التوعية الصحية',
-      description: 'برنامج شامل للتوعية الصحية للشباب',
-      category: 'صحية',
-      goal_amount: 5000,
-      current_amount: 3200,
-      status: 'active',
-      start_date: '2024-06-01',
-      end_date: '2024-08-01',
-      participants_count: 45,
-      created_at: '2024-05-15',
-      updated_at: '2024-05-20',
-      image_url: '/default-program.png',
-    },
-    {
-      id: '2',
-      title: 'مشروع التعليم الرقمي',
-      description: 'تطوير مهارات الشباب في التكنولوجيا',
-      category: 'تعليمية',
-      goal_amount: 8000,
-      current_amount: 8000,
-      status: 'completed',
-      start_date: '2024-03-01',
-      end_date: '2024-05-01',
-      participants_count: 32,
-      created_at: '2024-02-15',
-      updated_at: '2024-05-01',
-      image_url: '/default-program.png',
-    },
-    {
-      id: '3',
-      title: 'برنامج القيادة الشبابية',
-      description: 'تطوير مهارات القيادة للشباب',
-      category: 'قيادية',
-      goal_amount: 3000,
-      current_amount: 1500,
-      status: 'pending',
-      start_date: '2024-07-01',
-      end_date: '2024-09-01',
-      participants_count: 25,
-      created_at: '2024-06-01',
-      updated_at: '2024-06-01',
-      image_url: '/default-program.png',
-    },
-  ];
-
-  const programs = data?.data?.items || mockPrograms;
-
-  // فلترة البرامج
-  const filteredPrograms = programs.filter((program: any) => {
-    const matchesSearch =
-      program.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      program.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      statusFilter === 'all' || program.status === statusFilter;
-    const matchesCategory =
-      categoryFilter === 'all' || program.category === categoryFilter;
-
-    return matchesSearch && matchesStatus && matchesCategory;
-  });
+  // استخدام البيانات الحقيقية من API
+  const programs = data?.data?.items || [];
 
   const handleOpenModal = (
     type: 'add' | 'edit' | 'view',
     program?: Program
   ) => {
     setModalType(type);
-    setFormError('');
-    setImage(null);
-    setImagePreview(null);
-
-    if (type === 'add') {
+    if (program) {
+      setSelectedProgram(program);
+      setForm({
+        title: program.title,
+        description: program.description,
+        category: program.category,
+        goal_amount: program.goal_amount.toString(),
+        start_date: program.start_date.split('T')[0],
+        end_date: program.end_date.split('T')[0],
+      });
+      setImagePreview(program.image_url || null);
+    } else {
+      setSelectedProgram(null);
       setForm({
         title: '',
         description: '',
@@ -170,22 +220,9 @@ const ProgramsDashboard: React.FC = () => {
         start_date: '',
         end_date: '',
       });
-      setSelectedProgram(null);
-    } else if (program) {
-      setSelectedProgram(program);
-      setForm({
-        title: program.title,
-        description: program.description,
-        category: program.category,
-        goal_amount: program.goal_amount.toString(),
-        start_date: program.start_date,
-        end_date: program.end_date,
-      });
-      if (program.image_url) {
-        setImagePreview(program.image_url);
-      }
+      setImagePreview(null);
     }
-
+    setFormError('');
     setModalOpen(true);
   };
 
@@ -203,6 +240,7 @@ const ProgramsDashboard: React.FC = () => {
     >
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setFormError('');
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -210,7 +248,9 @@ const ProgramsDashboard: React.FC = () => {
     if (file) {
       setImage(file);
       const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result as string);
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
       reader.readAsDataURL(file);
     }
   };
@@ -218,10 +258,14 @@ const ProgramsDashboard: React.FC = () => {
   const removeImage = () => {
     setImage(null);
     setImagePreview(null);
+    setForm({ ...form, image_url: '' });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError('');
+
+    // التحقق من صحة البيانات
     if (
       !form.title ||
       !form.description ||
@@ -230,388 +274,832 @@ const ProgramsDashboard: React.FC = () => {
       !form.start_date ||
       !form.end_date
     ) {
-      setFormError('جميع الحقول المطلوبة يجب ملؤها');
+      setFormError(
+        t('programs.form.requiredFields', 'جميع الحقول المطلوبة يجب ملؤها')
+      );
       return;
     }
 
-    setFormError('');
-    setModalMsg('');
+    if (new Date(form.start_date) >= new Date(form.end_date)) {
+      setFormError(
+        t(
+          'programs.form.dateError',
+          'تاريخ البداية يجب أن يكون قبل تاريخ النهاية'
+        )
+      );
+      return;
+    }
+
+    if (parseFloat(form.goal_amount) <= 0) {
+      setFormError(
+        t('programs.form.amountError', 'المبلغ المطلوب يجب أن يكون أكبر من صفر')
+      );
+      return;
+    }
 
     try {
-      const formData = new FormData();
-      formData.append('title', form.title);
-      formData.append('description', form.description);
-      formData.append('category', form.category);
-      formData.append('goal_amount', form.goal_amount);
-      formData.append('start_date', form.start_date);
-      formData.append('end_date', form.end_date);
-
-      if (image) {
-        formData.append('image', image);
-      }
+      const programData = {
+        ...form,
+        goal_amount: parseFloat(form.goal_amount),
+        current_amount: selectedProgram?.current_amount || 0,
+        participants_count: selectedProgram?.participants_count || 0,
+      };
 
       if (modalType === 'add') {
-        await createProgram(formData);
-        setModalMsg('تم إضافة البرنامج بنجاح!');
+        await createProgram(programData);
+        setModalMsg(t('programs.success.created', 'تم إنشاء البرنامج بنجاح'));
       } else if (modalType === 'edit' && selectedProgram) {
-        await updateProgram(selectedProgram.id, formData);
-        setModalMsg('تم تحديث البرنامج بنجاح!');
+        await updateProgram(selectedProgram.id, programData);
+        setModalMsg(t('programs.success.updated', 'تم تحديث البرنامج بنجاح'));
       }
 
-      setTimeout(() => {
-        setModalOpen(false);
-        queryClient.invalidateQueries({ queryKey: ['dashboard-programs'] });
-      }, 1500);
+      queryClient.invalidateQueries(['dashboard-programs']);
+      handleCloseModal();
     } catch (error) {
-      setFormError('حدث خطأ أثناء حفظ البرنامج');
+      setFormError(t('programs.error.general', 'حدث خطأ أثناء حفظ البيانات'));
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'text-green-600 bg-green-50 border-green-200';
       case 'completed':
-        return 'bg-blue-100 text-blue-800';
+        return 'text-blue-600 bg-blue-50 border-blue-200';
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
       case 'cancelled':
-        return 'bg-red-100 text-red-800';
+        return 'text-red-600 bg-red-50 border-red-200';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'text-gray-600 bg-gray-50 border-gray-200';
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
       case 'active':
-        return 'نشط';
+        return t('programs.status.active', 'نشط');
       case 'completed':
-        return 'مكتمل';
+        return t('programs.status.completed', 'مكتمل');
       case 'pending':
-        return 'قيد الانتظار';
+        return t('programs.status.pending', 'قيد الانتظار');
       case 'cancelled':
-        return 'ملغي';
+        return t('programs.status.cancelled', 'ملغي');
       default:
-        return 'غير محدد';
+        return status;
     }
   };
 
   const getProgressPercentage = (current: number, goal: number) => {
+    if (!goal) return 0;
     return Math.min((current / goal) * 100, 100);
   };
 
-  const queryClient = useQueryClient();
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'غير محدد';
+    try {
+      return new Date(dateString).toLocaleDateString('ar-SA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    } catch (error) {
+      return 'غير محدد';
+    }
+  };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('هل أنت متأكد من حذف هذا البرنامج؟')) {
+    if (
+      window.confirm(
+        t('programs.delete.confirm', 'هل أنت متأكد من حذف هذا البرنامج؟')
+      )
+    ) {
       try {
         await deleteProgram(id);
-        setModalMsg('تم حذف البرنامج بنجاح!');
-        setModalOpen(true);
-        // إعادة تحميل البيانات
-        queryClient.invalidateQueries({ queryKey: ['dashboard-programs'] });
+        queryClient.invalidateQueries(['dashboard-programs']);
+        setModalMsg(t('programs.success.deleted', 'تم حذف البرنامج بنجاح'));
       } catch (error) {
-        console.error('خطأ في حذف البرنامج:', error);
-        setFormError('حدث خطأ أثناء حذف البرنامج');
+        setFormError(t('programs.error.delete', 'حدث خطأ أثناء حذف البرنامج'));
       }
     }
   };
 
-  // دالة التعامل مع الأزرار غير الفعالة
-  const handleUnavailable = (msg = 'هذه الخاصية قيد التطوير، قريبًا!') => {
+  const handleUnavailable = (
+    msg = t('programs.unavailable', 'هذه الخاصية قيد التطوير، قريبًا!')
+  ) => {
     setModalMsg(msg);
     setModalOpen(true);
   };
 
-  const quickActions = [
-    {
-      to: '/dashboard/events/new',
-      label: 'إضافة فعالية',
-      icon: Plus,
-      color: 'primary' as const,
-      description: 'إنشاء فعالية جديدة',
+  const filteredPrograms = programs.filter((program: Program) => {
+    const matchesSearch =
+      program.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      program.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      program.category.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      statusFilter === 'all' || program.status === statusFilter;
+    const matchesCategory =
+      categoryFilter === 'all' || program.category === categoryFilter;
+
+    return matchesSearch && matchesStatus && matchesCategory;
+  });
+
+  const sortedPrograms = [...filteredPrograms].sort((a, b) => {
+    let aValue, bValue;
+
+    switch (sortBy) {
+      case 'date':
+        aValue = new Date(a.start_date).getTime();
+        bValue = new Date(b.start_date).getTime();
+        break;
+      case 'title':
+        aValue = a.title;
+        bValue = b.title;
+        break;
+      case 'category':
+        aValue = a.category;
+        bValue = b.category;
+        break;
+      case 'status':
+        aValue = a.status;
+        bValue = b.status;
+        break;
+      case 'amount':
+        aValue = a.current_amount;
+        bValue = b.current_amount;
+        break;
+      default:
+        aValue = new Date(a.start_date).getTime();
+        bValue = new Date(b.start_date).getTime();
+    }
+
+    if (sortOrder === 'asc') {
+      return aValue > bValue ? 1 : -1;
+    } else {
+      return aValue < bValue ? 1 : -1;
+    }
+  });
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
     },
-    {
-      to: '/dashboard/programs/new',
-      label: 'إضافة برنامج',
-      icon: TrendingUp,
-      color: 'success' as const,
-      description: 'إنشاء برنامج جديد',
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+      },
     },
-    {
-      to: '/dashboard/donations/new',
-      label: 'تسجيل تبرع',
-      icon: DollarSign,
-      color: 'warning' as const,
-      description: 'تسجيل تبرع جديد',
-    },
-    {
-      to: '/dashboard/users/new',
-      label: 'إضافة عضو',
-      icon: Users,
-      color: 'info' as const,
-      description: 'إضافة عضو جديد',
-    },
-  ];
+  };
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <LoadingSpinner size="lg" />
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   if (error) {
     return (
       <DashboardLayout>
-        <QuickActions actions={quickActions} className="mb-8" />
-        <SkipToContent />
-        <AccessibleSection>
-          <Alert type="error" title="خطأ في تحميل البيانات">
-            حدث خطأ أثناء جلب قائمة البرامج. يرجى المحاولة مرة أخرى.
-          </Alert>
-        </AccessibleSection>
+        <Alert
+          type="error"
+          title={t('programs.error.title', 'خطأ في تحميل البيانات')}
+          message={t(
+            'programs.error.message',
+            'حدث خطأ أثناء تحميل بيانات البرامج'
+          )}
+        />
       </DashboardLayout>
     );
   }
 
   return (
     <DashboardLayout>
-      <QuickActions actions={quickActions} className="mb-8" />
-      <SkipToContent />
+      <SEO
+        title={t('programs.seo.title', 'إدارة البرامج')}
+        description={t(
+          'programs.seo.description',
+          'إدارة البرامج والمشاريع في المنصة'
+        )}
+      />
 
-      <AccessibleSection>
-        <section className="py-8 px-4" dir="rtl">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-primary-700">
-              إدارة البرامج
+      {/* Header Section */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8"
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              {t('programs.title', 'إدارة البرامج')}
             </h1>
-            <Button onClick={() => handleOpenModal('add')}>
-              إضافة برنامج جديد
+            <p className="text-gray-600">
+              {t('programs.subtitle', 'إدارة البرامج والمشاريع في المنصة')}
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className="w-4 h-4" />
+              {t('programs.refresh', 'تحديث')}
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => handleOpenModal('add')}
+              className="flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              {t('programs.addNew', 'إضافة برنامج')}
             </Button>
           </div>
-          {isLoading ? (
-            <div className="flex justify-center py-12">
-              <LoadingSpinner size="lg" />
+        </div>
+      </motion.div>
+
+      {/* Stats Cards */}
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+      >
+        <motion.div variants={itemVariants}>
+          <Card className="p-5 hover:shadow-sm transition-all duration-200 border border-gray-100 bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 rounded-lg bg-blue-50">
+                <TrendingUp className="w-5 h-5 text-blue-500" />
+              </div>
+              <div className="text-right">
+                <span className="text-xs text-blue-600">
+                  {t('programs.stats.total', 'إجمالي')}
+                </span>
+              </div>
             </div>
-          ) : error ? (
-            <Alert type="error">
-              حدث خطأ أثناء جلب البرامج. يرجى المحاولة لاحقًا.
-            </Alert>
-          ) : filteredPrograms.length === 0 ? (
-            <Alert type="info">لا توجد برامج متاحة حالياً.</Alert>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {filteredPrograms.map((program) => (
-                <Card key={program.id} className="flex flex-col gap-2">
-                  {program.image_url && (
-                    <img
-                      src={program.image_url}
-                      alt={program.title}
-                      className="w-full h-40 object-cover rounded-t-lg mb-2"
-                      loading="lazy"
-                    />
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                {programs.length}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {t('programs.stats.totalPrograms', 'إجمالي البرامج')}
+              </p>
+            </div>
+          </Card>
+        </motion.div>
+
+        <motion.div variants={itemVariants}>
+          <Card className="p-5 hover:shadow-sm transition-all duration-200 border border-gray-100 bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 rounded-lg bg-green-50">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+              </div>
+              <div className="text-right">
+                <span className="text-xs text-green-600">
+                  {t('programs.stats.active', 'نشط')}
+                </span>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                {programs.filter((p: Program) => p.status === 'active').length}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {t('programs.stats.activePrograms', 'البرامج النشطة')}
+              </p>
+            </div>
+          </Card>
+        </motion.div>
+
+        <motion.div variants={itemVariants}>
+          <Card className="p-5 hover:shadow-sm transition-all duration-200 border border-gray-100 bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 rounded-lg bg-yellow-50">
+                <Clock className="w-5 h-5 text-yellow-500" />
+              </div>
+              <div className="text-right">
+                <span className="text-xs text-yellow-600">
+                  {t('programs.stats.pending', 'قيد الانتظار')}
+                </span>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                {programs.filter((p: Program) => p.status === 'pending').length}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {t('programs.stats.pendingPrograms', 'البرامج قيد الانتظار')}
+              </p>
+            </div>
+          </Card>
+        </motion.div>
+
+        <motion.div variants={itemVariants}>
+          <Card className="p-5 hover:shadow-sm transition-all duration-200 border border-gray-100 bg-white">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-2 rounded-lg bg-purple-50">
+                <DollarSign className="w-5 h-5 text-purple-500" />
+              </div>
+              <div className="text-right">
+                <span className="text-xs text-purple-600">
+                  {t('programs.stats.funding', 'تمويل')}
+                </span>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-1">
+                ₺
+                {programs
+                  .reduce((sum, p) => sum + (p.current_amount || 0), 0)
+                  .toLocaleString()}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {t('programs.stats.totalFunding', 'إجمالي التمويل')}
+              </p>
+            </div>
+          </Card>
+        </motion.div>
+      </motion.div>
+
+      {/* Filters and Search */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-6"
+      >
+        <Card className="p-6">
+          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+            <div className="flex-1 w-full lg:w-auto">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  type="text"
+                  placeholder={t(
+                    'programs.search.placeholder',
+                    'البحث في البرامج...'
                   )}
-                  <div className="flex flex-col gap-1 p-2">
-                    <h2 className="text-lg font-bold text-primary-700 mb-1 line-clamp-2">
-                      {program.title}
-                    </h2>
-                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
-                      <span>{program.category}</span>
-                      <span>•</span>
-                      <span>
-                        {program.start_date} - {program.end_date}
-                      </span>
-                      <span>•</span>
-                      <span>
-                        {program.status === 'active'
-                          ? 'نشط'
-                          : program.status === 'completed'
-                          ? 'مكتمل'
-                          : program.status === 'pending'
-                          ? 'قيد الانتظار'
-                          : 'ملغي'}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-full"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-2"
+              >
+                <Filter className="w-4 h-4" />
+                {t('programs.filters', 'الفلترة')}
+                {showFilters ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleUnavailable()}
+                className="flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                {t('programs.export', 'تصدير')}
+              </Button>
+            </div>
+          </div>
+
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-4 pt-4 border-t border-gray-200"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('programs.filters.status', 'الحالة')}
+                    </label>
+                    <select
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    >
+                      <option value="all">
+                        {t('programs.filters.allStatus', 'جميع الحالات')}
+                      </option>
+                      <option value="active">
+                        {t('programs.status.active', 'نشط')}
+                      </option>
+                      <option value="completed">
+                        {t('programs.status.completed', 'مكتمل')}
+                      </option>
+                      <option value="pending">
+                        {t('programs.status.pending', 'قيد الانتظار')}
+                      </option>
+                      <option value="cancelled">
+                        {t('programs.status.cancelled', 'ملغي')}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('programs.filters.category', 'الفئة')}
+                    </label>
+                    <select
+                      value={categoryFilter}
+                      onChange={(e) => setCategoryFilter(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    >
+                      <option value="all">
+                        {t('programs.filters.allCategories', 'جميع الفئات')}
+                      </option>
+                      <option value="صحية">
+                        {t('programs.categories.health', 'صحية')}
+                      </option>
+                      <option value="تقنية">
+                        {t('programs.categories.tech', 'تقنية')}
+                      </option>
+                      <option value="قيادية">
+                        {t('programs.categories.leadership', 'قيادية')}
+                      </option>
+                      <option value="تطوعية">
+                        {t('programs.categories.volunteer', 'تطوعية')}
+                      </option>
+                      <option value="أعمال">
+                        {t('programs.categories.business', 'أعمال')}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('programs.filters.sortBy', 'ترتيب حسب')}
+                    </label>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    >
+                      <option value="date">
+                        {t('programs.sort.date', 'التاريخ')}
+                      </option>
+                      <option value="title">
+                        {t('programs.sort.title', 'العنوان')}
+                      </option>
+                      <option value="category">
+                        {t('programs.sort.category', 'الفئة')}
+                      </option>
+                      <option value="status">
+                        {t('programs.sort.status', 'الحالة')}
+                      </option>
+                      <option value="amount">
+                        {t('programs.sort.amount', 'المبلغ')}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('programs.filters.order', 'الترتيب')}
+                    </label>
+                    <select
+                      value={sortOrder}
+                      onChange={(e) =>
+                        setSortOrder(e.target.value as 'asc' | 'desc')
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    >
+                      <option value="desc">
+                        {t('programs.sort.desc', 'تنازلي')}
+                      </option>
+                      <option value="asc">
+                        {t('programs.sort.asc', 'تصاعدي')}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </Card>
+      </motion.div>
+
+      {/* Programs Grid */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <AnimatePresence>
+            {sortedPrograms.map((program, index) => (
+              <motion.div
+                key={program.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <Card className="p-6 hover:shadow-lg transition-all duration-300 h-full">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
+                        {program.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                        {program.description}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          navigate(`/dashboard/programs/${program.id}`)
+                        }
+                        className="p-1"
+                        title={t('programs.actions.view', 'عرض التفاصيل')}
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleOpenModal('edit', program)}
+                        className="p-1"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(program.id)}
+                        className="p-1 text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Calendar className="w-4 h-4 text-gray-400" />
+                      <span className="text-gray-600">
+                        {formatDate(program.start_date)} -{' '}
+                        {formatDate(program.end_date)}
                       </span>
                     </div>
-                    <p className="text-gray-700 mb-2 line-clamp-3">
-                      {program.description?.slice(0, 100) || ''}
-                      {program.description?.length > 100 ? '...' : ''}
-                    </p>
-                    <div className="flex gap-2 mt-auto">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleOpenModal('view', program)}
+
+                    <div className="flex items-center gap-2 text-sm">
+                      <Users className="w-4 h-4 text-gray-400" />
+                      <span className="text-gray-600">
+                        {program.participants_count}{' '}
+                        {t('programs.participants', 'مشارك')}
+                      </span>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">
+                          {t('programs.funding', 'التمويل')}
+                        </span>
+                        <span className="font-medium">
+                          ₺{(program.current_amount || 0).toLocaleString()} / ₺
+                          {(program.goal_amount || 0).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-primary-500 h-2 rounded-full transition-all duration-500"
+                          style={{
+                            width: `${getProgressPercentage(
+                              program.current_amount,
+                              program.goal_amount
+                            )}%`,
+                          }}
+                        />
+                      </div>
+                      <div className="text-xs text-gray-500 text-center">
+                        {getProgressPercentage(
+                          program.current_amount,
+                          program.goal_amount
+                        ).toFixed(1)}
+                        %
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                          program.status
+                        )}`}
                       >
-                        عرض
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleOpenModal('edit', program)}
-                      >
-                        تعديل
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        color="red"
-                        onClick={() => handleDelete(program.id)}
-                      >
-                        حذف
-                      </Button>
+                        {getStatusText(program.status)}
+                      </span>
                     </div>
                   </div>
                 </Card>
-              ))}
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      </motion.div>
+
+      {/* Modal */}
+      <Modal
+        open={modalOpen}
+        onClose={handleCloseModal}
+        title={
+          modalType === 'add'
+            ? t('programs.modal.addTitle', 'إضافة برنامج جديد')
+            : modalType === 'edit'
+            ? t('programs.modal.editTitle', 'تعديل البرنامج')
+            : t('programs.modal.viewTitle', 'تفاصيل البرنامج')
+        }
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('programs.form.title', 'عنوان البرنامج')} *
+              </label>
+              <Input
+                type="text"
+                name="title"
+                value={form.title}
+                onChange={handleChange}
+                required
+                disabled={modalType === 'view'}
+              />
             </div>
-          )}
-          <Modal
-            isOpen={modalOpen}
-            onClose={handleCloseModal}
-            title={
-              modalType === 'add'
-                ? 'إضافة برنامج'
-                : modalType === 'edit'
-                ? 'تعديل برنامج'
-                : 'تفاصيل البرنامج'
-            }
-          >
-            {modalType === 'view' && selectedProgram ? (
-              <div className="space-y-4">
-                <h2 className="text-xl font-bold text-primary-700">
-                  {selectedProgram.title}
-                </h2>
-                <div className="text-gray-600">
-                  {selectedProgram.description}
-                </div>
-                <div className="flex flex-col gap-2 text-sm">
-                  <div>الفئة: {selectedProgram.category}</div>
-                  <div>
-                    التاريخ: {selectedProgram.start_date} -{' '}
-                    {selectedProgram.end_date}
-                  </div>
-                  <div>الحالة: {getStatusText(selectedProgram.status)}</div>
-                  <div>الهدف المالي: {selectedProgram.goal_amount}</div>
-                  <div>المبلغ الحالي: {selectedProgram.current_amount}</div>
-                  <div>عدد المشاركين: {selectedProgram.participants_count}</div>
-                </div>
-                {selectedProgram.image_url && (
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('programs.form.category', 'الفئة')} *
+              </label>
+              <select
+                name="category"
+                value={form.category}
+                onChange={handleChange}
+                required
+                disabled={modalType === 'view'}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              >
+                <option value="">
+                  {t('programs.form.selectCategory', 'اختر الفئة')}
+                </option>
+                <option value="صحية">
+                  {t('programs.categories.health', 'صحية')}
+                </option>
+                <option value="تقنية">
+                  {t('programs.categories.tech', 'تقنية')}
+                </option>
+                <option value="قيادية">
+                  {t('programs.categories.leadership', 'قيادية')}
+                </option>
+                <option value="تطوعية">
+                  {t('programs.categories.volunteer', 'تطوعية')}
+                </option>
+                <option value="أعمال">
+                  {t('programs.categories.business', 'أعمال')}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('programs.form.description', 'وصف البرنامج')} *
+            </label>
+            <textarea
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              required
+              disabled={modalType === 'view'}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('programs.form.goalAmount', 'المبلغ المطلوب')} *
+              </label>
+              <Input
+                type="number"
+                name="goal_amount"
+                value={form.goal_amount}
+                onChange={handleChange}
+                required
+                disabled={modalType === 'view'}
+                min="1"
+                step="0.01"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('programs.form.startDate', 'تاريخ البداية')} *
+              </label>
+              <Input
+                type="date"
+                name="start_date"
+                value={form.start_date}
+                onChange={handleChange}
+                required
+                disabled={modalType === 'view'}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('programs.form.endDate', 'تاريخ النهاية')} *
+              </label>
+              <Input
+                type="date"
+                name="end_date"
+                value={form.end_date}
+                onChange={handleChange}
+                required
+                disabled={modalType === 'view'}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('programs.form.image', 'صورة البرنامج')}
+            </label>
+            <div className="space-y-2">
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                disabled={modalType === 'view'}
+              />
+              {imagePreview && (
+                <div className="relative inline-block">
                   <img
-                    src={selectedProgram.image_url}
-                    alt="صورة البرنامج"
-                    className="w-full h-40 object-cover rounded"
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-32 h-32 object-cover rounded-lg"
                   />
-                )}
-                <div className="flex gap-2 pt-4">
-                  <Button
-                    onClick={() => handleOpenModal('edit', selectedProgram)}
-                    className="flex-1"
-                  >
-                    تعديل
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={handleCloseModal}
-                    className="flex-1"
-                  >
-                    إغلاق
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <input
-                  type="text"
-                  name="title"
-                  placeholder="اسم البرنامج"
-                  className="w-full border rounded p-2"
-                  value={form.title}
-                  onChange={handleChange}
-                  required
-                />
-                <input
-                  type="text"
-                  name="category"
-                  placeholder="الفئة"
-                  className="w-full border rounded p-2"
-                  value={form.category}
-                  onChange={handleChange}
-                  required
-                />
-                <input
-                  type="number"
-                  name="goal_amount"
-                  placeholder="الهدف المالي (بالريال)"
-                  className="w-full border rounded p-2"
-                  value={form.goal_amount}
-                  onChange={handleChange}
-                  required
-                />
-                <input
-                  type="date"
-                  name="start_date"
-                  placeholder="تاريخ البداية"
-                  className="w-full border rounded p-2"
-                  value={form.start_date}
-                  onChange={handleChange}
-                  required
-                />
-                <input
-                  type="date"
-                  name="end_date"
-                  placeholder="تاريخ النهاية"
-                  className="w-full border rounded p-2"
-                  value={form.end_date}
-                  onChange={handleChange}
-                  required
-                />
-                <textarea
-                  name="description"
-                  placeholder="وصف البرنامج"
-                  className="w-full border rounded p-2 min-h-[100px]"
-                  value={form.description}
-                  onChange={handleChange}
-                  required
-                />
-                <div>
-                  <label className="block mb-1">صورة البرنامج (اختياري)</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                  />
-                  {imagePreview && (
-                    <div className="relative mt-2 w-32 h-20">
-                      <img
-                        src={imagePreview}
-                        alt="معاينة"
-                        className="w-full h-full object-cover rounded"
-                      />
-                      <button
-                        type="button"
-                        className="absolute top-0 right-0 bg-white rounded-full p-1 shadow"
-                        onClick={removeImage}
-                      >
-                        <X className="w-4 h-4 text-red-500" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-                {formError && (
-                  <div className="text-red-600 text-sm">{formError}</div>
-                )}
-                <div className="flex gap-2 justify-end">
                   <Button
                     type="button"
-                    variant="outline"
-                    onClick={handleCloseModal}
+                    variant="ghost"
+                    size="sm"
+                    onClick={removeImage}
+                    className="absolute top-0 right-0 p-1 bg-red-500 text-white rounded-full"
+                    disabled={modalType === 'view'}
                   >
-                    إلغاء
-                  </Button>
-                  <Button type="submit">
-                    {modalType === 'add' ? 'إضافة' : 'حفظ التعديلات'}
+                    <X className="w-3 h-3" />
                   </Button>
                 </div>
-              </form>
+              )}
+            </div>
+          </div>
+
+          {formError && <Alert type="error" title={formError} />}
+
+          <div className="flex justify-end gap-3 pt-4">
+            <Button variant="outline" onClick={handleCloseModal}>
+              {t('common.cancel', 'إلغاء')}
+            </Button>
+            {modalType !== 'view' && (
+              <Button type="submit" variant="primary">
+                {modalType === 'add'
+                  ? t('programs.form.add', 'إضافة')
+                  : t('programs.form.update', 'تحديث')}
+              </Button>
             )}
-          </Modal>
-        </section>
-      </AccessibleSection>
+          </div>
+        </form>
+      </Modal>
     </DashboardLayout>
   );
 };

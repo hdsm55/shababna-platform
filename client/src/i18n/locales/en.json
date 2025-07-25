@@ -10,6 +10,39 @@
     "dashboard": "Dashboard",
     "logout": "Logout"
   },
+  "dashboard": {
+    "title": "Dashboard",
+    "breadcrumb": "Dashboard",
+    "sidebar": {
+      "main": "Main",
+      "overview": "Overview",
+      "overviewDesc": "System overview and statistics",
+      "content": "Content Management",
+      "programs": "Programs",
+      "programsDesc": "Manage programs and projects",
+      "events": "Events",
+      "eventsDesc": "Manage events and workshops",
+      "blogs": "Blogs",
+      "blogsDesc": "Manage articles and content",
+      "users": "Users",
+      "usersDesc": "Manage users and permissions",
+      "registrants": "Registrants",
+      "registrantsDesc": "View program and event registrations",
+      "communication": "Communication",
+      "contactForms": "Contact Forms",
+      "contactFormsDesc": "Manage contact messages and inquiries",
+      "analytics": "Analytics & Reports",
+      "analyticsDesc": "Comprehensive system analytics",
+      "reports": "Reports",
+      "reportsDesc": "Detailed reports and statistics",
+      "activities": "Activities",
+      "activitiesDesc": "Activity log and events",
+      "system": "System",
+      "settings": "Settings",
+      "settingsDesc": "System and account settings",
+      "logout": "Logout"
+    }
+  },
   "home": {
     "hero": {
       "badge": "Empowering Youth Worldwide",

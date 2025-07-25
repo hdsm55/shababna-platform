@@ -29,11 +29,17 @@ import ContactForms from './pages/dashboard/ContactForms';
 import RegistrantsDashboard from './pages/dashboard/Registrants';
 import EditEvent from './pages/dashboard/events/EditEvent';
 import DashboardEventDetail from './pages/dashboard/events/EventDetail';
+import DashboardProgramDetail from './pages/dashboard/programs/ProgramDetail';
+import EditProgram from './pages/dashboard/programs/EditProgram';
 import NotFound from './pages/NotFound';
 import Blogs from './pages/Blogs';
 import BlogDetail from './pages/BlogDetail';
 import BlogsDashboard from './pages/dashboard/Blogs';
 import UsersDashboard from './pages/dashboard/Users';
+import SettingsDashboard from './pages/dashboard/Settings';
+import ReportsDashboard from './pages/dashboard/Reports';
+import AnalyticsDashboard from './pages/dashboard/Analytics';
+import ActivitiesDashboard from './pages/dashboard/Activities';
 
 function App() {
   const { i18n } = useTranslation();
@@ -66,12 +72,23 @@ function App() {
                       <Route path="programs" element={<ProgramsDashboard />} />
                       <Route path="events" element={<EventsDashboard />} />
                       <Route path="contact-forms" element={<ContactForms />} />
+                      <Route path="forms" element={<ContactForms />} />
                       <Route
                         path="registrants"
                         element={<RegistrantsDashboard />}
                       />
                       <Route path="blogs" element={<BlogsDashboard />} />
                       <Route path="users" element={<UsersDashboard />} />
+                      <Route path="settings" element={<SettingsDashboard />} />
+                      <Route path="reports" element={<ReportsDashboard />} />
+                      <Route
+                        path="analytics"
+                        element={<AnalyticsDashboard />}
+                      />
+                      <Route
+                        path="activities"
+                        element={<ActivitiesDashboard />}
+                      />
                       {/* صفحات الإجراءات السريعة */}
                       <Route path="events/new" element={<NewEvent />} />
                       <Route path="programs/new" element={<NewProgram />} />
@@ -80,6 +97,14 @@ function App() {
                       <Route
                         path="events/:id"
                         element={<DashboardEventDetail />}
+                      />
+                      <Route
+                        path="programs/:id"
+                        element={<DashboardProgramDetail />}
+                      />
+                      <Route
+                        path="programs/:id/edit"
+                        element={<EditProgram />}
                       />
                       {/* يمكن إضافة فروع أخرى هنا لاحقًا */}
                     </Routes>

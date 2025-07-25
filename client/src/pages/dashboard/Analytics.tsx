@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import DashboardLayout from '../../components/dashboard/DashboardLayout';
+import DashboardLayout from '../../layouts/DashboardLayout';
 import { useQuery } from '@tanstack/react-query';
-import { fetchAnalytics } from '../../services/dashboardApi';
+import { getDashboardStats } from '../../services/dashboardApi';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
 import {
@@ -85,7 +85,8 @@ const AnalyticsDashboard: React.FC = () => {
   // جلب بيانات التحليلات
   const { data, isLoading, error } = useQuery({
     queryKey: ['dashboard-analytics'],
-    queryFn: () => fetchAnalytics(),
+    queryFn: () => getDashboardStats(),
+    staleTime: 5 * 60 * 1000,
   });
 
   // حالة النافذة المنبثقة
@@ -94,147 +95,40 @@ const AnalyticsDashboard: React.FC = () => {
   const [dateRange, setDateRange] = useState('30');
   const [activeTab, setActiveTab] = useState('overview');
 
-  // بيانات افتراضية للتحليلات
-  const mockAnalytics: AnalyticsData = {
+  // استخدام البيانات الحقيقية من API
+  const analytics = data || {
     overview: {
-      totalUsers: 1250,
-      totalEvents: 45,
-      totalPrograms: 12,
-      growthRate: 15.5,
-      activeUsers: 890,
-      newUsers: 125,
-      conversionRate: 8.2,
+      totalUsers: 0,
+      totalEvents: 0,
+      totalPrograms: 0,
+      growthRate: 0,
+      activeUsers: 0,
+      newUsers: 0,
+      conversionRate: 0,
     },
     trends: {
-      users: [
-        { date: '2024-01', count: 850 },
-        { date: '2024-02', count: 920 },
-        { date: '2024-03', count: 980 },
-        { date: '2024-04', count: 1050 },
-        { date: '2024-05', count: 1150 },
-        { date: '2024-06', count: 1250 },
-      ],
-      events: [
-        { date: '2024-01', count: 8 },
-        { date: '2024-02', count: 12 },
-        { date: '2024-03', count: 15 },
-        { date: '2024-04', count: 18 },
-        { date: '2024-05', count: 22 },
-        { date: '2024-06', count: 45 },
-      ],
-      donations: [
-        { date: '2024-01', amount: 8500 },
-        { date: '2024-02', amount: 12000 },
-        { date: '2024-03', amount: 15000 },
-        { date: '2024-04', amount: 18000 },
-        { date: '2024-05', amount: 22000 },
-        { date: '2024-06', amount: 75000 },
-      ],
-      engagement: [
-        { date: '2024-01', rate: 65 },
-        { date: '2024-02', rate: 68 },
-        { date: '2024-03', rate: 72 },
-        { date: '2024-04', rate: 75 },
-        { date: '2024-05', rate: 78 },
-        { date: '2024-06', rate: 82 },
-      ],
+      users: [],
+      events: [],
+      donations: [],
+      engagement: [],
     },
     demographics: {
-      ageGroups: [
-        { group: '18-25', count: 450, percentage: 36 },
-        { group: '26-35', count: 380, percentage: 30.4 },
-        { group: '36-45', count: 250, percentage: 20 },
-        { group: '46-55', count: 120, percentage: 9.6 },
-        { group: '55+', count: 50, percentage: 4 },
-      ],
-      locations: [
-        { city: 'الرياض', count: 450, percentage: 36 },
-        { city: 'جدة', count: 320, percentage: 25.6 },
-        { city: 'الدمام', count: 200, percentage: 16 },
-        { city: 'مكة', count: 150, percentage: 12 },
-        { city: 'المدينة', count: 130, percentage: 10.4 },
-      ],
-      interests: [
-        { category: 'التعليم', count: 380, percentage: 30.4 },
-        { category: 'الفعاليات', count: 320, percentage: 25.6 },
-        { category: 'البرامج', count: 250, percentage: 20 },
-        { category: 'التطوع', count: 200, percentage: 16 },
-        { category: 'التبرعات', count: 100, percentage: 8 },
-      ],
+      ageGroups: [],
+      locations: [],
+      interests: [],
     },
     performance: {
-      topEvents: [
-        { name: 'ملتقى الشباب العربي', participants: 250, rating: 4.8 },
-        { name: 'ورشة التطوير المهني', participants: 180, rating: 4.6 },
-        { name: 'مؤتمر الابتكار الاجتماعي', participants: 150, rating: 4.7 },
-        { name: 'معرض المشاريع الشبابية', participants: 120, rating: 4.5 },
-        { name: 'ندوة التكنولوجيا الحديثة', participants: 100, rating: 4.4 },
-      ],
-      topPrograms: [
-        { name: 'برنامج القيادة الشبابية', participants: 80, completion: 95 },
-        { name: 'مبادرة التطوع المجتمعي', participants: 65, completion: 88 },
-        { name: 'دورة المهارات الرقمية', participants: 55, completion: 92 },
-        { name: 'برنامج ريادة الأعمال', participants: 45, completion: 85 },
-        { name: 'مشروع التوعية البيئية', participants: 40, completion: 90 },
-      ],
-      topDonors: [
-        { name: 'أحمد محمد', amount: 5000, count: 3 },
-        { name: 'فاطمة علي', amount: 3500, count: 2 },
-        { name: 'عمر خالد', amount: 2800, count: 4 },
-        { name: 'سارة أحمد', amount: 2200, count: 1 },
-        { name: 'يوسف عبدالله', amount: 1800, count: 2 },
-      ],
-      topLocations: [
-        { city: 'الرياض', events: 15, participants: 450 },
-        { city: 'جدة', events: 12, participants: 320 },
-        { city: 'الدمام', events: 8, participants: 200 },
-        { city: 'مكة', events: 6, participants: 150 },
-        { city: 'المدينة', events: 4, participants: 130 },
-      ],
+      topEvents: [],
+      topPrograms: [],
+      topDonors: [],
+      topLocations: [],
     },
     insights: {
-      peakHours: [
-        { hour: '09:00', activity: 85 },
-        { hour: '10:00', activity: 120 },
-        { hour: '11:00', activity: 95 },
-        { hour: '12:00', activity: 75 },
-        { hour: '13:00', activity: 60 },
-        { hour: '14:00', activity: 80 },
-        { hour: '15:00', activity: 100 },
-        { hour: '16:00', activity: 110 },
-        { hour: '17:00', activity: 90 },
-        { hour: '18:00', activity: 70 },
-      ],
-      popularCategories: [
-        { category: 'التعليم', count: 380 },
-        { category: 'الفعاليات', count: 320 },
-        { category: 'البرامج', count: 250 },
-        { category: 'التطوع', count: 200 },
-        { category: 'التبرعات', count: 100 },
-      ],
-      userRetention: [
-        { month: 'يناير', rate: 65 },
-        { month: 'فبراير', rate: 68 },
-        { month: 'مارس', rate: 72 },
-        { month: 'أبريل', rate: 75 },
-        { month: 'مايو', rate: 78 },
-        { month: 'يونيو', rate: 82 },
-      ],
-      donationPatterns: [
-        { method: 'بطاقة ائتمان', amount: 45000, count: 180 },
-        { method: 'تحويل بنكي', amount: 20000, count: 45 },
-        { method: 'محفظة إلكترونية', amount: 8000, count: 120 },
-        { method: 'نقدي', amount: 2000, count: 25 },
-      ],
+      peakHours: [],
+      popularCategories: [],
+      userRetention: [],
+      donationPatterns: [],
     },
-  };
-
-  const analytics = data || mockAnalytics;
-
-  // Mock API function
-  const fetchAnalytics = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return mockAnalytics;
   };
 
   const handleOpenModal = (chartType: string) => {

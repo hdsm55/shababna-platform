@@ -16,23 +16,23 @@ router.get('/:id', getEventById);
 // Create new event (admin only)
 router.post('/', authMiddleware, adminMiddleware, [
   body('title').trim().isLength({ min: 1 }).withMessage('Title is required'),
-  body('description').trim().isLength({ min: 10 }).withMessage('Description must be at least 10 characters'),
+  body('description').trim().isLength({ min: 1 }).withMessage('Description is required'),
   body('location').trim().isLength({ min: 1 }).withMessage('Location is required'),
   body('start_date').isISO8601().withMessage('Start date must be a valid date'),
   body('end_date').isISO8601().withMessage('End date must be a valid date'),
-  body('category').isIn(['workshop', 'conference', 'networking']).withMessage('Invalid category'),
-  body('max_attendees').optional().isInt({ min: 1 }).withMessage('Max attendees must be a positive number')
+  body('category').trim().isLength({ min: 1 }).withMessage('Category is required'),
+  body('max_attendees').optional().isInt({ min: 0 }).withMessage('Max attendees must be a non-negative number')
 ], createEvent);
 
 // Update event (admin only)
 router.put('/:id', authMiddleware, adminMiddleware, [
   body('title').optional().trim().isLength({ min: 1 }),
-  body('description').optional().trim().isLength({ min: 10 }),
+  body('description').optional().trim().isLength({ min: 1 }),
   body('location').optional().trim().isLength({ min: 1 }),
   body('start_date').optional().isISO8601(),
   body('end_date').optional().isISO8601(),
-  body('category').optional().isIn(['workshop', 'conference', 'networking']),
-  body('max_attendees').optional().isInt({ min: 1 }),
+  body('category').optional().trim().isLength({ min: 1 }),
+  body('max_attendees').optional().isInt({ min: 0 }),
   body('status').optional().isIn(['upcoming', 'active', 'completed', 'cancelled'])
 ], updateEvent);
 

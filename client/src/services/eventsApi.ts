@@ -3,28 +3,34 @@ import { Event, PaginatedResponse, EventsQueryParams, ApiResponse } from '../typ
 
 // Fetch events with filters and pagination
 export const fetchEvents = async (params: EventsQueryParams = {}): Promise<PaginatedResponse<Event>> => {
-  const { category, search, page = 1, limit = 10, status } = params;
+  try {
+    const { category, search, page = 1, limit = 10, status } = params;
 
-  const queryParams = new URLSearchParams();
-  if (category) queryParams.append('category', category);
-  if (search) queryParams.append('search', search);
-  if (status) queryParams.append('status', status);
-  queryParams.append('page', page.toString());
-  queryParams.append('limit', limit.toString());
+    const queryParams = new URLSearchParams();
+    if (category) queryParams.append('category', category);
+    if (search) queryParams.append('search', search);
+    if (status) queryParams.append('status', status);
+    queryParams.append('page', page.toString());
+    queryParams.append('limit', limit.toString());
 
-  const response = await http.get(`/events?${queryParams.toString()}`);
-  return response.data;
-};
-
-// Fetch a single event by ID
-export const fetchEventById = async (id: number | string): Promise<Event> => {
-  const response = await http.get(`/events/${id}`);
-  if (!response.data || !response.data.data) {
-    throw new Error('لم يتم العثور على الفعالية أو حدث خطأ في الاتصال');
+    const response = await http.get(`/events?${queryParams.toString()}`);
+    return response.data;
+  } catch (error) {
+    console.error('Events API failed:', error);
+    throw error; // إعادة رمي الخطأ بدلاً من إرجاع بيانات وهمية
   }
-  // تأكد من وجود image_url حتى لو كانت فارغة
-  return { ...response.data.data, image_url: response.data.data.image_url || '' };
-};
+}
+
+// Fetch single event by ID
+export const fetchEventById = async (id: string): Promise<any> => {
+  try {
+    const response = await http.get(`/events/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Event API failed:', error);
+    throw error; // إعادة رمي الخطأ بدلاً من إرجاع بيانات وهمية
+  }
+}
 
 // Create a new event (admin only) - supports FormData for image upload
 export const createEvent = async (eventData: Partial<Event> | FormData): Promise<ApiResponse<Event>> => {
