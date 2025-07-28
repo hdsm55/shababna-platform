@@ -65,7 +65,7 @@ export const Modal: React.FC<ModalProps> = ({
       <div
         ref={modalRef}
         className={[
-          'relative w-full max-w-lg',
+          'relative w-full max-w-lg max-h-[90vh] overflow-hidden',
           getCardClasses('elevated'),
           'rounded-xl shadow-xl bg-white',
           `focus:outline-none focus:ring-2 focus:ring-[${DESIGN_SYSTEM.colors.primary}] focus:ring-offset-2`,
@@ -81,7 +81,7 @@ export const Modal: React.FC<ModalProps> = ({
       >
         {/* رأس المودال */}
         {(title || description) && (
-          <div className="flex items-start justify-between border-b border-neutral-200 px-6 py-4">
+          <div className="flex items-start justify-between border-b border-neutral-200 px-6 py-4 flex-shrink-0">
             <div>
               {title && (
                 <h3 id="modal-title" className="text-lg font-medium">
@@ -106,10 +106,12 @@ export const Modal: React.FC<ModalProps> = ({
           </div>
         )}
         {/* محتوى المودال */}
-        <div className="px-6 py-4">{children}</div>
+        <div className="overflow-y-auto flex-1">{children}</div>
         {/* أزرار الإجراءات */}
         {actions && (
-          <div className="flex justify-end gap-2 px-6 pb-4">{actions}</div>
+          <div className="flex justify-end gap-2 px-6 pb-4 flex-shrink-0 border-t border-neutral-200">
+            {actions}
+          </div>
         )}
       </div>
     </div>

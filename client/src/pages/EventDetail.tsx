@@ -204,7 +204,6 @@ const EventDetail: React.FC = () => {
       <section className="container mx-auto px-4 py-6">
         <Link to="/events">
           <Button variant="outline" className="flex items-center gap-2">
-            <ArrowLeft className="w-4 h-4" />
             {t('eventDetail.backToEvents', 'العودة إلى الفعاليات')}
           </Button>
         </Link>
@@ -221,11 +220,14 @@ const EventDetail: React.FC = () => {
               transition={{ duration: 0.6 }}
             >
               <img
-                src={event.image_url || '/images/event-placeholder.jpg'}
+                src={event.image_url || '/images/event-placeholder.svg'}
                 alt={event.title}
                 className="w-full h-96 object-cover rounded-2xl shadow-lg"
                 loading="lazy"
-                onError={(e) => (e.currentTarget.src = '/images/fallback.jpg')}
+                onError={(e) => {
+                  console.log('Image failed to load:', event.image_url);
+                  e.currentTarget.src = '/images/event-placeholder.svg';
+                }}
               />
             </motion.div>
           </div>

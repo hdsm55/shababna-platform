@@ -16,8 +16,11 @@ import {
   Clock,
   Star,
   ArrowRight,
+  Search,
+  X,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Input } from '../components/ui/Input/Input';
 
 interface Program {
   id: number;
@@ -52,11 +55,21 @@ const Programs: React.FC = () => {
 
   // فلترة البرامج
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+  };
 
   const filteredPrograms = programs.filter((program: any) => {
     const matchesCategory =
       categoryFilter === 'all' || program.category === categoryFilter;
-    return matchesCategory;
+    const matchesSearchTerm =
+      searchTerm === '' ||
+      program.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      program.description.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearchTerm;
   });
 
   const getStatusColor = (status: string) => {
@@ -81,10 +94,11 @@ const Programs: React.FC = () => {
 
   const categories = [
     { value: 'all', label: 'جميع الفئات' },
-    { value: 'education', label: 'التعليم' },
-    { value: 'health', label: 'الصحة' },
-    { value: 'social', label: 'اجتماعي' },
-    { value: 'technology', label: 'التكنولوجيا' },
+    { value: 'صحية', label: 'صحية' },
+    { value: 'تعليمية', label: 'تعليمية' },
+    { value: 'اجتماعية', label: 'اجتماعية' },
+    { value: 'رياضية', label: 'رياضية' },
+    { value: 'ثقافية', label: 'ثقافية' },
   ];
 
   return (
@@ -123,29 +137,78 @@ const Programs: React.FC = () => {
         </div>
       </section>
 
-      {/* Filters Section */}
-      <section className="py-8 bg-white border-b">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="flex flex-col md:flex-row gap-4">
-              <select
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              >
-                {categories.map((category) => (
-                  <option key={category.value} value={category.value}>
-                    {category.label}
-                  </option>
-                ))}
-              </select>
+      {/* Search and Filters Section - Enhanced */}
+      <section className="container mx-auto px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="bg-gradient-to-r from-white to-accent-50 p-6 rounded-2xl shadow-lg border border-accent-100"
+        >
+          <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
+            {/* Search Bar - Enhanced */}
+            <div className="relative w-full lg:w-96">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-accent-400" />
+              </div>
+              <Input
+                ref={inputRef}
+                type="text"
+                placeholder={t(
+                  'programs.search.placeholder',
+                  'ابحث في البرامج...'
+                )}
+                value={searchTerm}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="pl-12 pr-4 py-3 bg-white border-accent-200 focus:border-accent-500 focus:ring-accent-500 shadow-sm"
+                fullWidth
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => handleSearchChange('')}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
-            <div className="text-sm text-gray-600">
-              {t('programs.results', 'نتائج البحث:')} {filteredPrograms.length}{' '}
-              {t('programs.program', 'برنامج')}
+
+            {/* Filters - Enhanced */}
+            <div className="flex flex-wrap gap-3">
+              {categories.map((category) => (
+                <motion.div
+                  key={category.value}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button
+                    variant={
+                      categoryFilter === category.value ? 'accent' : 'outline'
+                    }
+                    size="md"
+                    onClick={() => setCategoryFilter(category.value)}
+                    className={`transition-all duration-200 ${
+                      categoryFilter === category.value
+                        ? 'shadow-lg shadow-accent-200 ring-2 ring-accent-300'
+                        : 'hover:shadow-md hover:shadow-accent-100'
+                    }`}
+                  >
+                    {category.label}
+                  </Button>
+                </motion.div>
+              ))}
             </div>
           </div>
-        </div>
+
+          {/* Results Counter */}
+          <div className="mt-4 pt-4 border-t border-accent-100">
+            <p className="text-sm text-accent-600 font-medium">
+              {t('programs.results', 'تم العثور على {count} برنامج', {
+                count: filteredPrograms.length,
+              })}
+            </p>
+          </div>
+        </motion.div>
       </section>
 
       {/* Programs Grid */}
@@ -182,14 +245,19 @@ const Programs: React.FC = () => {
                         <img
                           src={
                             program.image_url ||
-                            '/images/program-placeholder.jpg'
+                            '/images/program-placeholder.svg'
                           }
                           alt={program.title}
                           className="w-full h-48 object-cover rounded-lg"
                           loading="lazy"
-                          onError={(e) =>
-                            (e.currentTarget.src = '/images/fallback.jpg')
-                          }
+                          onError={(e) => {
+                            console.log(
+                              'Image failed to load:',
+                              program.image_url
+                            );
+                            e.currentTarget.src =
+                              '/images/program-placeholder.svg';
+                          }}
                         />
                       </div>
 
@@ -274,7 +342,6 @@ const Programs: React.FC = () => {
                       <Link to={`/programs/${program.id}`}>
                         <Button className="w-full">
                           {t('programs.viewDetails', 'عرض التفاصيل')}
-                          <ArrowRight className="w-4 h-4 mr-2" />
                         </Button>
                       </Link>
                     </div>

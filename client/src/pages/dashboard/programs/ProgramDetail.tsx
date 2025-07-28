@@ -228,10 +228,7 @@ const DashboardProgramDetail: React.FC = () => {
                     variant="outline"
                     className="flex items-center space-x-2"
                   >
-                    <ArrowLeft className="w-4 h-4" />
-                    <span>
-                      {t('programDetail.backToPrograms', 'العودة إلى البرامج')}
-                    </span>
+                    {t('programDetail.backToPrograms', 'العودة إلى البرامج')}
                   </Button>
                 </Link>
                 <div>

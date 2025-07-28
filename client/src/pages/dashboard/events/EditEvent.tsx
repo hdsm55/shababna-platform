@@ -263,14 +263,8 @@ const EditEvent: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Link to={`/dashboard/events/${id}`}>
-                  <Button
-                    variant="outline"
-                    className="flex items-center space-x-2"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                    <span>
-                      {t('editEvent.backToEvent', 'العودة إلى الفعالية')}
-                    </span>
+                  <Button variant="outline" className="flex items-center gap-2">
+                    {t('eventEdit.backToEvents', 'العودة إلى الفعاليات')}
                   </Button>
                 </Link>
                 <div>

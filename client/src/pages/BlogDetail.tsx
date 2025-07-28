@@ -90,7 +90,7 @@ const BlogDetail: React.FC = () => {
         </div>
         <div className="mt-8 flex justify-end">
           <Link to="/blogs">
-            <Button variant="outline" icon={ArrowLeft}>
+            <Button variant="outline">
               {t('blogs.back', 'العودة للمدونة')}
             </Button>
           </Link>

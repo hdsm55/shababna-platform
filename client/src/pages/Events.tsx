@@ -20,6 +20,7 @@ import {
   Search,
   Filter,
   ArrowRight,
+  X,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -34,11 +35,9 @@ const Events: React.FC = () => {
 
   const filters = [
     { key: 'all', label: t('events.filter.all', 'جميع الفعاليات') },
-    { key: 'محاضرة', label: t('events.filter.lecture', 'محاضرات') },
-    { key: 'دورة', label: t('events.filter.course', 'دورات') },
-    { key: 'معسكر', label: t('events.filter.camp', 'معسكرات') },
-    { key: 'ورشة', label: t('events.filter.workshop', 'ورش عمل') },
-    { key: 'مؤتمر', label: t('events.filter.conference', 'مؤتمرات') },
+    { key: 'workshop', label: t('events.filter.workshop', 'ورش عمل') },
+    { key: 'conference', label: t('events.filter.conference', 'مؤتمرات') },
+    { key: 'networking', label: t('events.filter.networking', 'شبكة تواصل') },
   ];
 
   // Prepare query parameters
@@ -157,42 +156,78 @@ const Events: React.FC = () => {
         </div>
       </section>
 
-      {/* Search and Filter */}
+      {/* Search and Filters Section - Enhanced */}
       <section className="container mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row gap-6 items-center justify-between bg-white p-6 rounded-2xl shadow-sm">
-          <div className="relative w-full max-w-md">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-gray-400" />
-            </div>
-            <Input
-              ref={inputRef}
-              type="text"
-              placeholder={t(
-                'events.search.placeholder',
-                'ابحث في الفعاليات...'
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="bg-gradient-to-r from-white to-primary-50 p-6 rounded-2xl shadow-lg border border-primary-100"
+        >
+          <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
+            {/* Search Bar - Enhanced */}
+            <div className="relative w-full lg:w-96">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-primary-400" />
+              </div>
+              <Input
+                ref={inputRef}
+                type="text"
+                placeholder={t(
+                  'events.search.placeholder',
+                  'ابحث في الفعاليات...'
+                )}
+                value={searchTerm}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="pl-12 pr-4 py-3 bg-white border-primary-200 focus:border-primary-500 focus:ring-primary-500 shadow-sm"
+                fullWidth
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => handleSearchChange('')}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
               )}
-              value={searchTerm}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="pl-10"
-              fullWidth
-            />
+            </div>
+
+            {/* Filters - Enhanced */}
+            <div className="flex flex-wrap gap-3">
+              {filters.map((filter) => (
+                <motion.div
+                  key={filter.key}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button
+                    variant={
+                      selectedFilter === filter.key ? 'primary' : 'outline'
+                    }
+                    size="md"
+                    onClick={() => handleFilterChange(filter.key)}
+                    className={`transition-all duration-200 ${
+                      selectedFilter === filter.key
+                        ? 'shadow-lg shadow-primary-200 ring-2 ring-primary-300'
+                        : 'hover:shadow-md hover:shadow-primary-100'
+                    }`}
+                  >
+                    {filter.label}
+                  </Button>
+                </motion.div>
+              ))}
+            </div>
           </div>
-          <div className="flex gap-2 overflow-x-auto">
-            {filters.map((filter) => (
-              <Button
-                key={filter.key}
-                variant={selectedFilter === filter.key ? 'primary' : 'outline'}
-                size="md"
-                onClick={() => handleFilterChange(filter.key)}
-                className={
-                  selectedFilter === filter.key ? 'ring-2 ring-primary-400' : ''
-                }
-              >
-                {filter.label}
-              </Button>
-            ))}
+
+          {/* Results Counter */}
+          <div className="mt-4 pt-4 border-t border-primary-100">
+            <p className="text-sm text-primary-600 font-medium">
+              {t('events.results', 'تم العثور على {count} فعالية', {
+                count: events.length,
+              })}
+            </p>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Events Grid */}
@@ -226,13 +261,14 @@ const Events: React.FC = () => {
                     {/* Event Image */}
                     <div className="mb-4">
                       <img
-                        src={event.image_url || '/images/event-placeholder.jpg'}
+                        src={event.image_url || '/images/event-placeholder.svg'}
                         alt={event.title}
                         className="w-full h-48 object-cover rounded-lg"
                         loading="lazy"
-                        onError={(e) =>
-                          (e.currentTarget.src = '/images/fallback.jpg')
-                        }
+                        onError={(e) => {
+                          console.log('Image failed to load:', event.image_url);
+                          e.currentTarget.src = '/images/event-placeholder.svg';
+                        }}
                       />
                     </div>
 
@@ -285,7 +321,6 @@ const Events: React.FC = () => {
                     <Link to={`/events/${event.id}`}>
                       <Button className="w-full">
                         {t('events.viewDetails', 'عرض التفاصيل')}
-                        <ArrowRight className="w-4 h-4 mr-2" />
                       </Button>
                     </Link>
                   </div>

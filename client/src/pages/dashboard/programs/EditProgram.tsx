@@ -248,14 +248,8 @@ const EditProgram: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Link to={`/dashboard/programs/${id}`}>
-                  <Button
-                    variant="outline"
-                    className="flex items-center space-x-2"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                    <span>
-                      {t('editProgram.backToProgram', 'العودة إلى البرنامج')}
-                    </span>
+                  <Button variant="outline" className="flex items-center gap-2">
+                    {t('programEdit.backToPrograms', 'العودة إلى البرامج')}
                   </Button>
                 </Link>
                 <div>

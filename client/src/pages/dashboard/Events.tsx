@@ -644,11 +644,11 @@ const EventsDashboard: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         className="mb-6"
       >
-        <Card className="p-6">
+        <Card className="p-6 bg-gradient-to-r from-white to-primary-50 border-primary-100">
           <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
             <div className="flex-1 w-full lg:w-auto">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-400 w-4 h-4" />
                 <Input
                   type="text"
                   placeholder={t(
@@ -657,8 +657,16 @@ const EventsDashboard: React.FC = () => {
                   )}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 w-full"
+                  className="pl-10 w-full bg-white border-primary-200 focus:border-primary-500 focus:ring-primary-500 shadow-sm"
                 />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
               </div>
             </div>
 
@@ -667,7 +675,7 @@ const EventsDashboard: React.FC = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 bg-white border-primary-200 hover:border-primary-300 hover:bg-primary-50"
               >
                 <Filter className="w-4 h-4" />
                 {t('events.filters', 'الفلترة')}
@@ -682,7 +690,7 @@ const EventsDashboard: React.FC = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => handleUnavailable()}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 bg-white border-primary-200 hover:border-primary-300 hover:bg-primary-50"
               >
                 <Download className="w-4 h-4" />
                 {t('events.export', 'تصدير')}
@@ -690,122 +698,88 @@ const EventsDashboard: React.FC = () => {
             </div>
           </div>
 
-          <AnimatePresence>
-            {showFilters && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-4 pt-4 border-t border-gray-200"
-              >
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('events.filters.status', 'الحالة')}
-                    </label>
-                    <select
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                    >
-                      <option value="all">
-                        {t('events.filters.allStatus', 'جميع الحالات')}
-                      </option>
-                      <option value="upcoming">
-                        {t('events.status.upcoming', 'قادمة')}
-                      </option>
-                      <option value="active">
-                        {t('events.status.active', 'نشطة')}
-                      </option>
-                      <option value="completed">
-                        {t('events.status.completed', 'مكتملة')}
-                      </option>
-                      <option value="cancelled">
-                        {t('events.status.cancelled', 'ملغية')}
-                      </option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('events.filters.category', 'الفئة')}
-                    </label>
-                    <select
-                      value={categoryFilter}
-                      onChange={(e) => setCategoryFilter(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                    >
-                      <option value="all">
-                        {t('events.filters.allCategories', 'جميع الفئات')}
-                      </option>
-                      <option value="تدريب">
-                        {t('events.categories.training', 'تدريب')}
-                      </option>
-                      <option value="تطوع">
-                        {t('events.categories.volunteer', 'تطوع')}
-                      </option>
-                      <option value="تقنية">
-                        {t('events.categories.tech', 'تقنية')}
-                      </option>
-                      <option value="صحة">
-                        {t('events.categories.health', 'صحة')}
-                      </option>
-                      <option value="أعمال">
-                        {t('events.categories.business', 'أعمال')}
-                      </option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('events.filters.sortBy', 'ترتيب حسب')}
-                    </label>
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                    >
-                      <option value="date">
-                        {t('events.sort.date', 'التاريخ')}
-                      </option>
-                      <option value="title">
-                        {t('events.sort.title', 'العنوان')}
-                      </option>
-                      <option value="category">
-                        {t('events.sort.category', 'الفئة')}
-                      </option>
-                      <option value="status">
-                        {t('events.sort.status', 'الحالة')}
-                      </option>
-                      <option value="attendees">
-                        {t('events.sort.attendees', 'المشاركين')}
-                      </option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('events.filters.order', 'الترتيب')}
-                    </label>
-                    <select
-                      value={sortOrder}
-                      onChange={(e) =>
-                        setSortOrder(e.target.value as 'asc' | 'desc')
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                    >
-                      <option value="desc">
-                        {t('events.sort.desc', 'تنازلي')}
-                      </option>
-                      <option value="asc">
-                        {t('events.sort.asc', 'تصاعدي')}
-                      </option>
-                    </select>
-                  </div>
+          {/* Advanced Filters - Enhanced */}
+          {showFilters && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mt-4 pt-4 border-t border-primary-100"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('events.filters.status', 'الحالة')}
+                  </label>
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white"
+                  >
+                    <option value="all">
+                      {t('events.filters.allStatus', 'جميع الحالات')}
+                    </option>
+                    <option value="upcoming">
+                      {t('events.filters.upcoming', 'قادمة')}
+                    </option>
+                    <option value="ongoing">
+                      {t('events.filters.ongoing', 'جارية')}
+                    </option>
+                    <option value="completed">
+                      {t('events.filters.completed', 'مكتملة')}
+                    </option>
+                  </select>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('events.filters.category', 'الفئة')}
+                  </label>
+                  <select
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white"
+                  >
+                    <option value="all">
+                      {t('events.filters.allCategories', 'جميع الفئات')}
+                    </option>
+                    <option value="workshop">
+                      {t('events.filters.workshop', 'ورش عمل')}
+                    </option>
+                    <option value="conference">
+                      {t('events.filters.conference', 'مؤتمرات')}
+                    </option>
+                    <option value="networking">
+                      {t('events.filters.networking', 'شبكة تواصل')}
+                    </option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('events.filters.sort', 'ترتيب حسب')}
+                  </label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white"
+                  >
+                    <option value="date">
+                      {t('events.filters.sortByDate', 'التاريخ')}
+                    </option>
+                    <option value="title">
+                      {t('events.filters.sortByTitle', 'العنوان')}
+                    </option>
+                    <option value="category">
+                      {t('events.filters.sortByCategory', 'الفئة')}
+                    </option>
+                    <option value="status">
+                      {t('events.filters.sortByStatus', 'الحالة')}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </Card>
       </motion.div>
 

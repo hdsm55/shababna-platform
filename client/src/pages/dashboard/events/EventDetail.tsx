@@ -222,10 +222,7 @@ const DashboardEventDetail: React.FC = () => {
                     variant="outline"
                     className="flex items-center space-x-2"
                   >
-                    <ArrowLeft className="w-4 h-4" />
-                    <span>
-                      {t('eventDetail.backToEvents', 'العودة إلى الفعاليات')}
-                    </span>
+                    {t('eventDetail.backToEvents', 'العودة إلى الفعاليات')}
                   </Button>
                 </Link>
                 <div>

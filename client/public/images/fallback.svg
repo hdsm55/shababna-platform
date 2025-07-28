@@ -1,0 +1,24 @@
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fallbackGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6B7280;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#9CA3AF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D1D5DB;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="300" fill="url(#fallbackGradient)"/>
+
+  <!-- Image Icon -->
+  <g transform="translate(150, 100)">
+    <rect x="0" y="0" width="100" height="80" rx="8" fill="white" opacity="0.9"/>
+    <rect x="20" y="20" width="60" height="40" fill="#E5E7EB"/>
+    <circle cx="50" cy="40" r="8" fill="#9CA3AF"/>
+    <path d="M30 60 L50 45 L70 60" stroke="#9CA3AF" stroke-width="2" fill="none"/>
+  </g>
+
+  <!-- Text -->
+  <text x="200" y="220" text-anchor="middle" fill="white" font-family="Arial" font-size="16" font-weight="bold">صورة غير متاحة</text>
+  <text x="200" y="240" text-anchor="middle" fill="white" font-family="Arial" font-size="12" opacity="0.8">Image not available</text>
+</svg>

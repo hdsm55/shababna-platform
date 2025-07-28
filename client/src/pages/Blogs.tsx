@@ -12,6 +12,8 @@ import { useDebounce } from '../hooks/useDebounce';
 import { Input } from '../components/ui/Input/Input';
 import Skeleton from '../components/common/Skeleton';
 import { Link } from 'react-router-dom';
+import { Search, X } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const Blogs: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -39,22 +41,38 @@ const Blogs: React.FC = () => {
           {t('blogs.title', 'المدونة')}
         </h1>
         <div className="flex flex-col md:flex-row gap-4 items-center mb-10">
-          <div className="relative w-full max-w-md">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="relative w-full max-w-md"
+          >
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-primary-400" />
+            </div>
             <Input
               ref={inputRef}
               type="text"
               placeholder={t('common.search', 'بحث عن مقال...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pr-10"
+              className="pl-12 pr-10 py-3 bg-white border-primary-200 focus:border-primary-500 focus:ring-primary-500 shadow-sm"
               fullWidth
             />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
             {isLoading && (
               <span className="absolute right-3 top-1/2 -translate-y-1/2 rtl:left-3 rtl:right-auto">
                 <LoadingSpinner size="sm" />
               </span>
             )}
-          </div>
+          </motion.div>
         </div>
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

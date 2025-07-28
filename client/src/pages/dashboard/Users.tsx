@@ -619,11 +619,11 @@ const UsersDashboard: React.FC = () => {
 
       {/* Filters and Search */}
       <div className="mb-6">
-        <Card className="p-6">
+        <Card className="p-6 bg-gradient-to-r from-white to-secondary-50 border-secondary-100">
           <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
             <div className="flex-1 w-full lg:w-auto">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-400 w-4 h-4" />
                 <Input
                   type="text"
                   placeholder={t(
@@ -632,8 +632,16 @@ const UsersDashboard: React.FC = () => {
                   )}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 w-full"
+                  className="pl-10 w-full bg-white border-secondary-200 focus:border-secondary-500 focus:ring-secondary-500 shadow-sm"
                 />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
               </div>
             </div>
 
@@ -642,7 +650,7 @@ const UsersDashboard: React.FC = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 bg-white border-secondary-200 hover:border-secondary-300 hover:bg-secondary-50"
               >
                 <Filter className="w-4 h-4" />
                 {t('users.filters', 'الفلترة')}
@@ -657,7 +665,7 @@ const UsersDashboard: React.FC = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => handleUnavailable()}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 bg-white border-secondary-200 hover:border-secondary-300 hover:bg-secondary-50"
               >
                 <Download className="w-4 h-4" />
                 {t('users.export', 'تصدير')}
@@ -665,99 +673,91 @@ const UsersDashboard: React.FC = () => {
             </div>
           </div>
 
-          <AnimatePresence>
-            {showFilters && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-4 pt-4 border-t border-gray-200"
-              >
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('users.filters.status', 'الحالة')}
-                    </label>
-                    <select
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                    >
-                      <option value="all">
-                        {t('users.filters.allStatus', 'جميع الحالات')}
-                      </option>
-                      <option value="active">
-                        {t('users.status.active', 'نشط')}
-                      </option>
-                      <option value="inactive">
-                        {t('users.status.inactive', 'غير نشط')}
-                      </option>
-                      <option value="pending">
-                        {t('users.status.pending', 'قيد الانتظار')}
-                      </option>
-                      <option value="suspended">
-                        {t('users.status.suspended', 'معلق')}
-                      </option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('users.filters.role', 'الدور')}
-                    </label>
-                    <select
-                      value={roleFilter}
-                      onChange={(e) => setRoleFilter(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                    >
-                      <option value="all">
-                        {t('users.filters.allRoles', 'جميع الأدوار')}
-                      </option>
-                      <option value="admin">
-                        {t('users.roles.admin', 'مدير')}
-                      </option>
-                      <option value="moderator">
-                        {t('users.roles.moderator', 'مشرف')}
-                      </option>
-                      <option value="member">
-                        {t('users.roles.member', 'عضو')}
-                      </option>
-                      <option value="guest">
-                        {t('users.roles.guest', 'زائر')}
-                      </option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('users.filters.sortBy', 'ترتيب حسب')}
-                    </label>
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                    >
-                      <option value="name">
-                        {t('users.sort.name', 'الاسم')}
-                      </option>
-                      <option value="email">
-                        {t('users.sort.email', 'البريد الإلكتروني')}
-                      </option>
-                      <option value="role">
-                        {t('users.sort.role', 'الدور')}
-                      </option>
-                      <option value="status">
-                        {t('users.sort.status', 'الحالة')}
-                      </option>
-                      <option value="joinDate">
-                        {t('users.sort.joinDate', 'تاريخ الانضمام')}
-                      </option>
-                    </select>
-                  </div>
+          {/* Advanced Filters - Enhanced */}
+          {showFilters && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mt-4 pt-4 border-t border-secondary-100"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('users.filters.status', 'الحالة')}
+                  </label>
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 bg-white"
+                  >
+                    <option value="all">
+                      {t('users.filters.allStatus', 'جميع الحالات')}
+                    </option>
+                    <option value="active">
+                      {t('users.filters.active', 'نشط')}
+                    </option>
+                    <option value="inactive">
+                      {t('users.filters.inactive', 'غير نشط')}
+                    </option>
+                    <option value="suspended">
+                      {t('users.filters.suspended', 'معلق')}
+                    </option>
+                  </select>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('users.filters.role', 'الدور')}
+                  </label>
+                  <select
+                    value={roleFilter}
+                    onChange={(e) => setRoleFilter(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 bg-white"
+                  >
+                    <option value="all">
+                      {t('users.filters.allRoles', 'جميع الأدوار')}
+                    </option>
+                    <option value="admin">
+                      {t('users.filters.admin', 'مدير')}
+                    </option>
+                    <option value="user">
+                      {t('users.filters.user', 'مستخدم')}
+                    </option>
+                    <option value="moderator">
+                      {t('users.filters.moderator', 'مشرف')}
+                    </option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('users.filters.sort', 'ترتيب حسب')}
+                  </label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500 bg-white"
+                  >
+                    <option value="name">
+                      {t('users.filters.sortByName', 'الاسم')}
+                    </option>
+                    <option value="email">
+                      {t('users.filters.sortByEmail', 'البريد الإلكتروني')}
+                    </option>
+                    <option value="role">
+                      {t('users.filters.sortByRole', 'الدور')}
+                    </option>
+                    <option value="status">
+                      {t('users.filters.sortByStatus', 'الحالة')}
+                    </option>
+                    <option value="lastLogin">
+                      {t('users.filters.sortByLastLogin', 'آخر تسجيل دخول')}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </motion.div>
+          )}
         </Card>
       </div>
 
