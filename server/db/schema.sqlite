@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS contact_forms (
 -- === 10. إنشاء فهارس لتحسين الأداء ===
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_role ON users(role);
-CREATE INDEX idx_events_start_date ON events(start_date);
+CREATE INDEX idx_events_event_date ON events(event_date);
 CREATE INDEX idx_programs_start_date ON programs(start_date);
 CREATE INDEX idx_donations_user_id ON donations(user_id);
 CREATE INDEX idx_program_registrations_user_id ON program_registrations(user_id);

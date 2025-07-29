@@ -63,15 +63,29 @@ export function useRegistrants() {
       // انضمام
       const joinRes = await fetchJoinRequests();
       console.log('join requests:', JSON.stringify(joinRes, null, 2));
-      setJoins((joinRes?.data?.requests || []).map((j: any) => ({
-        id: `join-${j.id}`,
-        name: `${j.first_name || ''} ${j.last_name || ''}`.trim(),
-        email: j.email,
-        phone: j.phone,
-        source: 'انضمام',
-        sourceDetails: j.country || '-',
-        registeredAt: j.created_at || '',
-      })));
+      console.log('join requests data structure:', joinRes?.data);
+      console.log('join requests array:', joinRes?.data?.requests);
+      console.log('join requests length:', joinRes?.data?.requests?.length);
+
+      if (joinRes?.data?.requests) {
+        setJoins((joinRes.data.requests || []).map((j: any) => ({
+          id: `join-${j.id}`,
+          name: `${j.first_name || ''} ${j.last_name || ''}`.trim(),
+          email: j.email,
+          phone: j.phone,
+          source: 'انضمام',
+          sourceDetails: j.country || '-',
+          registeredAt: j.created_at || '',
+          age: j.age,
+          interests: j.interests,
+          motivation: j.motivation,
+          country: j.country,
+          status: j.status,
+        })));
+      } else {
+        console.log('❌ لا توجد بيانات طلبات انضمام في الاستجابة');
+        setJoins([]);
+      }
       // نشرة بريدية (مؤجل)
       // if (fetchNewsletterSubscribers) {
       //   const newsletterRes = await fetchNewsletterSubscribers();

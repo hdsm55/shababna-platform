@@ -162,10 +162,11 @@ router.post('/join-requests', async (req, res) => {
             phone,
             country,
             age,
+            interests,
             motivation
         } = req.body;
 
-        if (!first_name || !last_name || !email || !country || !age || !motivation) {
+        if (!first_name || !last_name || !email || !country || !age || !motivation || !interests) {
             return res.status(400).json({
                 success: false,
                 message: 'جميع الحقول مطلوبة'
@@ -173,10 +174,10 @@ router.post('/join-requests', async (req, res) => {
         }
 
         const result = await query(
-            `INSERT INTO join_requests (first_name, last_name, email, phone, country, age, motivation, created_at, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), 'pending')
+            `INSERT INTO join_requests (first_name, last_name, email, phone, country, age, interests, motivation, created_at, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), 'pending')
        RETURNING *`,
-            [first_name, last_name, email, phone, country, age, motivation]
+            [first_name, last_name, email, phone, country, age, interests, motivation]
         );
 
         res.json({
@@ -422,7 +423,7 @@ router.get('/join-requests', authenticateToken, requireAdmin, async (req, res) =
         const offset = (page - 1) * limit;
 
         let queryStr = `
-            SELECT id, first_name, last_name, email, phone, country, age, motivation, created_at, status
+            SELECT id, first_name, last_name, email, phone, country, age, interests, motivation, created_at, status
             FROM join_requests
         `;
 
@@ -510,7 +511,7 @@ router.get('/program-registrations', authenticateToken, requireAdmin, async (req
                    u.first_name || ' ' || u.last_name as user_name, u.email as user_email
             FROM program_registrations pr
             JOIN programs p ON pr.program_id = p.id
-            JOIN users u ON pr.user_id = u.id
+            LEFT JOIN users u ON pr.user_id = u.id
         `;
 
         const params = [];
@@ -529,7 +530,6 @@ router.get('/program-registrations', authenticateToken, requireAdmin, async (req
             SELECT COUNT(*) as total
             FROM program_registrations pr
             JOIN programs p ON pr.program_id = p.id
-            JOIN users u ON pr.user_id = u.id
         `;
         if (program_id) {
             countQuery += ` WHERE pr.program_id = $1`;
@@ -565,12 +565,13 @@ router.get('/event-registrations', authenticateToken, requireAdmin, async (req, 
         const offset = (page - 1) * limit;
 
         let queryStr = `
-            SELECT er.id, er.created_at,
+            SELECT er.id, er.created_at, er.first_name, er.last_name, er.email, er.phone,
                    e.title as event_title, e.description as event_description,
-                   u.first_name || ' ' || u.last_name as user_name, u.email as user_email
+                   COALESCE(u.first_name || ' ' || u.last_name, er.first_name || ' ' || er.last_name) as user_name,
+                   COALESCE(u.email, er.email) as user_email
             FROM event_registrations er
             JOIN events e ON er.event_id = e.id
-            JOIN users u ON er.user_id = u.id
+            LEFT JOIN users u ON er.user_id = u.id
         `;
 
         const params = [];
@@ -589,7 +590,6 @@ router.get('/event-registrations', authenticateToken, requireAdmin, async (req, 
             SELECT COUNT(*) as total
             FROM event_registrations er
             JOIN events e ON er.event_id = e.id
-            JOIN users u ON er.user_id = u.id
         `;
         if (event_id) {
             countQuery += ` WHERE er.event_id = $1`;

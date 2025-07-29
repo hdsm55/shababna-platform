@@ -51,7 +51,33 @@ const Programs: React.FC = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  const programs = programsData?.data?.items || [];
+  const programs = (() => {
+    try {
+      // هيكل البيانات الفعلي من الخادم
+      if (
+        (programsData as any)?.data?.items?.rows &&
+        Array.isArray((programsData as any).data.items.rows)
+      ) {
+        return (programsData as any).data.items.rows;
+      }
+      if (programsData?.data?.items && Array.isArray(programsData.data.items)) {
+        return programsData.data.items;
+      }
+      if (
+        (programsData as any)?.items &&
+        Array.isArray((programsData as any).items)
+      ) {
+        return (programsData as any).items;
+      }
+      if (Array.isArray(programsData)) {
+        return programsData;
+      }
+      return [];
+    } catch (error) {
+      console.error('Error parsing programs data:', error);
+      return [];
+    }
+  })();
 
   // فلترة البرامج
   const [categoryFilter, setCategoryFilter] = useState('all');

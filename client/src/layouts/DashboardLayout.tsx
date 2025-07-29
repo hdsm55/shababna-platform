@@ -11,6 +11,7 @@ import {
   LogOut,
   User,
   Bell,
+  UserCheck,
 } from 'lucide-react';
 
 interface DashboardNavItemProps {
@@ -66,6 +67,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       to: '/dashboard/programs',
       icon: <Target className="w-4 h-4" />,
       label: 'البرامج',
+    },
+    {
+      to: '/dashboard/registrants',
+      icon: <UserCheck className="w-4 h-4" />,
+      label: 'المسجلون',
     },
     {
       to: '/dashboard/users',

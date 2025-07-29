@@ -4,12 +4,14 @@ import { useAuthStore } from '../store/authStore';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: 'admin' | 'staff' | 'member';
+  requiredRole?: 'admin' | 'staff' | 'member' | 'user';
 }
 
 function isAllowed(user: any, requiredRole?: string) {
   if (!requiredRole) return true;
   if (requiredRole === 'admin') return user?.role === 'admin';
+  if (requiredRole === 'user')
+    return user?.role === 'user' || user?.role === 'admin';
   return false;
 }
 

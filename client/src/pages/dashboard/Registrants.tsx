@@ -52,6 +52,7 @@ const RegistrantsDashboard: React.FC = () => {
               <th className="py-2 px-3">الهاتف</th>
               {type === 'join' && <th className="py-2 px-3">الدولة</th>}
               {type === 'join' && <th className="py-2 px-3">العمر</th>}
+              {type === 'join' && <th className="py-2 px-3">الاهتمامات</th>}
               {type === 'join' && <th className="py-2 px-3">التحفيز</th>}
               <th className="py-2 px-3">تفاصيل</th>
               <th className="py-2 px-3">تاريخ التسجيل</th>
@@ -69,6 +70,13 @@ const RegistrantsDashboard: React.FC = () => {
                 )}
                 {type === 'join' && (
                   <td className="py-2 px-3">{r.age || '-'}</td>
+                )}
+                {type === 'join' && (
+                  <td className="py-2 px-3">
+                    {Array.isArray(r.interests)
+                      ? r.interests.join(', ')
+                      : r.interests || '-'}
+                  </td>
                 )}
                 {type === 'join' && (
                   <td className="py-2 px-3">{r.motivation || '-'}</td>
@@ -150,6 +158,12 @@ const RegistrantsDashboard: React.FC = () => {
                 </div>
                 <div>
                   <strong>العمر:</strong> {selectedRegistrant.age || '-'}
+                </div>
+                <div>
+                  <strong>الاهتمامات:</strong>{' '}
+                  {Array.isArray(selectedRegistrant.interests)
+                    ? selectedRegistrant.interests.join(', ')
+                    : selectedRegistrant.interests || '-'}
                 </div>
                 <div>
                   <strong>الدافع:</strong>{' '}

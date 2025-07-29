@@ -62,7 +62,33 @@ const Events: React.FC = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  const events = eventsData?.data?.items || [];
+  const events = (() => {
+    try {
+      // هيكل البيانات الفعلي من الخادم
+      if (
+        (eventsData as any)?.data?.items?.rows &&
+        Array.isArray((eventsData as any).data.items.rows)
+      ) {
+        return (eventsData as any).data.items.rows;
+      }
+      if (eventsData?.data?.items && Array.isArray(eventsData.data.items)) {
+        return eventsData.data.items;
+      }
+      if (
+        (eventsData as any)?.items &&
+        Array.isArray((eventsData as any).items)
+      ) {
+        return (eventsData as any).items;
+      }
+      if (Array.isArray(eventsData)) {
+        return eventsData;
+      }
+      return [];
+    } catch (error) {
+      console.error('Error parsing events data:', error);
+      return [];
+    }
+  })();
   const pagination = eventsData?.data?.pagination;
 
   // Handle filter changes

@@ -56,7 +56,36 @@ const Home: React.FC = () => {
     queryFn: () => fetchEvents({ page: 1, limit: 3 }),
     staleTime: 5 * 60 * 1000,
   });
-  const latestEvents = eventsData?.data?.items || [];
+
+  // Debug: طباعة هيكل البيانات
+  console.log('🔍 Events Data Structure:', eventsData);
+  const latestEvents = (() => {
+    try {
+      // هيكل البيانات الفعلي من الخادم
+      if (
+        (eventsData as any)?.data?.items?.rows &&
+        Array.isArray((eventsData as any).data.items.rows)
+      ) {
+        return (eventsData as any).data.items.rows;
+      }
+      if (eventsData?.data?.items && Array.isArray(eventsData.data.items)) {
+        return eventsData.data.items;
+      }
+      if (
+        (eventsData as any)?.items &&
+        Array.isArray((eventsData as any).items)
+      ) {
+        return (eventsData as any).items;
+      }
+      if (Array.isArray(eventsData)) {
+        return eventsData;
+      }
+      return [];
+    } catch (error) {
+      console.error('Error parsing events data:', error);
+      return [];
+    }
+  })();
 
   // Fetch latest programs
   const { data: programsData, isLoading: programsLoading } = useQuery({
@@ -64,7 +93,33 @@ const Home: React.FC = () => {
     queryFn: () => fetchPrograms({ page: 1, limit: 2 }),
     staleTime: 5 * 60 * 1000,
   });
-  const latestPrograms = programsData?.data?.items || [];
+  const latestPrograms = (() => {
+    try {
+      // هيكل البيانات الفعلي من الخادم
+      if (
+        (programsData as any)?.data?.items?.rows &&
+        Array.isArray((programsData as any).data.items.rows)
+      ) {
+        return (programsData as any).data.items.rows;
+      }
+      if (programsData?.data?.items && Array.isArray(programsData.data.items)) {
+        return programsData.data.items;
+      }
+      if (
+        (programsData as any)?.items &&
+        Array.isArray((programsData as any).items)
+      ) {
+        return (programsData as any).items;
+      }
+      if (Array.isArray(programsData)) {
+        return programsData;
+      }
+      return [];
+    } catch (error) {
+      console.error('Error parsing programs data:', error);
+      return [];
+    }
+  })();
 
   // Platform stats with real data
   const stats = [

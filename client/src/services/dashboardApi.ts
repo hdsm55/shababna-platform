@@ -104,8 +104,15 @@ export const fetchJoinRequests = async (params?: {
   limit?: number;
   status?: string;
 }) => {
-  const { data } = await api.get('/forms/join-requests', { params });
-  return data;
+  try {
+    console.log('🔍 جلب طلبات الانضمام...');
+    const { data } = await api.get('/forms/join-requests', { params });
+    console.log('✅ استجابة طلبات الانضمام:', data);
+    return data;
+  } catch (error) {
+    console.error('❌ خطأ في جلب طلبات الانضمام:', error);
+    throw error;
+  }
 };
 
 // تحديث حالة طلب الانضمام

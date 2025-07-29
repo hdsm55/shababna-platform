@@ -2,7 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
-import { query } from '../config/database.js';
+import { getRow, getRows, query } from '../config/database.js';
 
 const router = express.Router();
 
@@ -74,9 +74,9 @@ router.post('/register', validateRegistration, async (req, res) => {
     const { email, password, first_name, last_name } = req.body;
 
     // Check if user already exists
-    const existingUserResult = await query('SELECT * FROM users WHERE email = $1', [email]);
+    const existingUserResult = await getRow('SELECT * FROM users WHERE email = $1', [email]);
 
-    if (existingUserResult.rows.length > 0) {
+    if (existingUserResult) {
       return res.status(409).json({
         success: false,
         message: 'User with this email already exists'
@@ -88,18 +88,24 @@ router.post('/register', validateRegistration, async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // Check if this is the first user (make them admin)
-    const userCountResult = await query('SELECT COUNT(*) as count FROM users');
-    const userCount = parseInt(userCountResult.rows[0].count);
+    const userCountResult = await getRow('SELECT COUNT(*) as count FROM users');
+    const userCount = parseInt(userCountResult.count);
     const role = userCount === 0 ? 'admin' : 'user';
 
     // Create new user
     const newUserResult = await query(`
       INSERT INTO users (email, password, first_name, last_name, role)
       VALUES ($1, $2, $3, $4, $5)
-      RETURNING id, email, first_name, last_name, role
+      RETURNING id
     `, [email, hashedPassword, first_name, last_name, role]);
 
-    const newUser = newUserResult.rows[0];
+    const newUser = {
+      id: newUserResult.rows[0].id,
+      email,
+      first_name,
+      last_name,
+      role
+    };
 
     // Generate JWT token
     const token = generateToken(newUser);
@@ -138,16 +144,16 @@ router.post('/login', validateLogin, async (req, res) => {
     const { email, password } = req.body;
 
     // Find user by email
-    const userResult = await query('SELECT * FROM users WHERE email = $1', [email]);
+    const userResult = await getRow('SELECT * FROM users WHERE email = $1', [email]);
 
-    if (userResult.rows.length === 0) {
+    if (!userResult) {
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password'
       });
     }
 
-    const user = userResult.rows[0];
+    const user = userResult;
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -207,7 +213,7 @@ router.get('/me', async (req, res) => {
     );
 
     // Get user from database
-    const user = await query('SELECT * FROM users WHERE id = $1', [decoded.id]);
+    const user = await getRow('SELECT * FROM users WHERE id = ?', [decoded.id]);
 
     if (user.rows.length === 0) {
       return res.status(401).json({

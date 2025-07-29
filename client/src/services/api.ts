@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
 
 // Create axios instance with default config
 export const http = axios.create({
@@ -9,12 +10,15 @@ export const http = axios.create({
 
 // إضافة Interceptor لإرسال التوكن تلقائياً
 http.interceptors.request.use((config) => {
-  // الحصول على التوكن من localStorage
-  const token = localStorage.getItem('token');
+  // الحصول على التوكن من auth store
+  const token = useAuthStore.getState().token;
 
   if (token) {
     config.headers = config.headers || {};
     config.headers['Authorization'] = `Bearer ${token}`;
+    console.log('🔑 إرسال token:', token.substring(0, 20) + '...');
+  } else {
+    console.log('⚠️  لا يوجد token');
   }
   return config;
 });
@@ -27,7 +31,7 @@ http.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Token expired or invalid, redirect to login
-      localStorage.removeItem('token');
+      useAuthStore.getState().logout();
       window.location.href = '/login';
     }
     return Promise.reject(error);
@@ -35,8 +39,11 @@ http.interceptors.response.use(
 );
 
 export const loginApi = async (email: string, password: string) => {
-  const { data } = await http.post('/auth/login', { email, password });
-  return data;
+  console.log('🔍 API: إرسال طلب تسجيل الدخول إلى:', `${http.defaults.baseURL}/auth/login`);
+  console.log('🔍 API: البيانات المرسلة:', { email, password: '***' });
+  const res = await http.post('/auth/login', { email, password });
+  console.log('🔍 API: استجابة الخادم:', res.data);
+  return res.data;
 };
 
 export const registerApi = async (data: {
