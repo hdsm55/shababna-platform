@@ -1,6 +1,6 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
-import { query } from '../config/database.js';
+import { query } from '../config/database-sqlite.js';
 import { getAllPrograms, getProgramById, registerForProgram, createProgram, updateProgram, deleteProgram, supportProgram } from '../controllers/programsController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import { adminMiddleware } from '../middleware/adminMiddleware.js';

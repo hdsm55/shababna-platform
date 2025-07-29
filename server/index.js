@@ -12,15 +12,15 @@ import path from 'path';
 import bodyParser from 'body-parser';
 
 // Import database configuration
-import './config/database.js';
+import './config/database-sqlite.js';
 
 // Import routes
 import authRoutes from './routes/auth.js';
 import eventsRoutes from './routes/events.js';
 import programsRoutes from './routes/programs.js';
 import usersRoutes from './routes/users.js';
-// إزالة أو تعطيل استيراد donations.js
-// import donationsRoutes from './routes/donations.js';
+import paymentsRoutes from './routes/payments.js';
+import volunteersRoutes from './routes/volunteers.js';
 import formsRoutes from './routes/forms.js';
 import dashboardRoutes from './routes/dashboard.js';
 import errorHandler from './middleware/errorHandler.js';
@@ -45,7 +45,14 @@ app.use(helmet({
   },
 }));
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:5174',
+    process.env.CORS_ORIGIN,
+    process.env.CLIENT_URL
+  ].filter(Boolean),
   credentials: true
 }));
 app.use(bodyParser.json());
@@ -59,8 +66,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/programs', programsRoutes);
 app.use('/api/users', usersRoutes);
-// إزالة أو تعطيل استيراد donations.js
-// app.use('/api/donations', donationsRoutes);
+app.use('/api/payments', paymentsRoutes);
+app.use('/api/volunteers', volunteersRoutes);
 app.use('/api/forms', formsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/blogs', blogsRoutes);
@@ -92,5 +99,15 @@ app.use('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📱 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'http://localhost:5173'}`);
+  console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'http://localhost:5174'}`);
+  console.log(`🔗 API URL: http://localhost:${PORT}/api`);
+  console.log(`💚 Health Check: http://localhost:${PORT}/api/health`);
+}).on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${PORT} is already in use. Please try a different port or kill the process using it.`);
+    console.error(`💡 Try: netstat -ano | findstr :${PORT} then taskkill /PID <PID> /F`);
+  } else {
+    console.error('❌ Server failed to start:', err.message);
+  }
+  process.exit(1);
 });

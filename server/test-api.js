@@ -1,4 +1,4 @@
-import { testConnection } from './config/database.js';
+import { testConnection } from './config/database-sqlite.js';
 
 async function testAPI() {
     try {
@@ -28,7 +28,7 @@ async function testAPI() {
         const eventsResponse = await fetch('http://localhost:5001/api/events');
         if (eventsResponse.ok) {
             const eventsData = await eventsResponse.json();
-            console.log(`✅ تم جلب ${eventsData.events.length} فعالية`);
+            console.log(`✅ تم جلب ${eventsData.data?.items?.length || 0} فعالية`);
         } else {
             console.error('❌ فشل في جلب الفعاليات');
         }
@@ -38,7 +38,7 @@ async function testAPI() {
         const programsResponse = await fetch('http://localhost:5001/api/programs');
         if (programsResponse.ok) {
             const programsData = await programsResponse.json();
-            console.log(`✅ تم جلب ${programsData.programs.length} برنامج`);
+            console.log(`✅ تم جلب ${programsData.data?.items?.length || 0} برنامج`);
         } else {
             console.error('❌ فشل في جلب البرامج');
         }

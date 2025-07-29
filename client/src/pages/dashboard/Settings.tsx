@@ -320,20 +320,20 @@ const SettingsDashboard: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         className="mt-8"
       >
-        <Card className="p-6 border-red-200 bg-red-50">
+        <Card className="p-6 border-primary-200 bg-primary-50">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-red-900 mb-1">
+              <h3 className="text-lg font-semibold text-primary-900 mb-1">
                 {t('settings.logout.title', 'تسجيل الخروج')}
               </h3>
-              <p className="text-sm text-red-700">
+              <p className="text-sm text-primary-700">
                 {t('settings.logout.description', 'تسجيل الخروج من الحساب')}
               </p>
             </div>
             <Button
               variant="outline"
               onClick={handleLogout}
-              className="border-red-300 text-red-700 hover:bg-red-100"
+              className="border-primary-300 text-primary-700 hover:bg-primary-100"
             >
               <LogOut className="w-4 h-4 mr-2" />
               {t('settings.logout.button', 'تسجيل الخروج')}

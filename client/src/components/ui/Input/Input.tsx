@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import { motion } from 'framer-motion';
-import { tokens, microInteractions } from '../../../theme/tokens';
+import { getInputClasses } from '../../common/DesignSystem';
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -17,41 +17,19 @@ export interface InputProps
   children?: React.ReactNode;
 }
 
-// Input states مع التحسينات الجديدة
-const inputStates = {
-  default:
-    'border-neutral-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200',
-  error:
-    'border-error-300 focus:border-error-500 focus:ring-2 focus:ring-error-200',
-  success:
-    'border-success-300 focus:border-success-500 focus:ring-2 focus:ring-success-200',
-  warning:
-    'border-warning-300 focus:border-warning-500 focus:ring-2 focus:ring-warning-200',
-  info: 'border-info-300 focus:border-info-500 focus:ring-2 focus:ring-info-200',
-};
-
-// Input variants مع التحسينات الجديدة
-const inputVariants = {
-  default: 'bg-white border border-neutral-300',
-  outlined: 'bg-transparent border-2 border-neutral-300',
-  filled: 'bg-neutral-50 border border-neutral-300',
-  ghost: 'bg-transparent border-b-2 border-neutral-300 rounded-none',
-};
-
-// Input sizes مع التحسينات الجديدة
+// Input sizes
 const inputSizes = {
   sm: 'px-3 py-1.5 text-sm',
   md: 'px-4 py-2 text-base',
   lg: 'px-5 py-3 text-lg',
 };
 
-// Text colors للـ states
-const textColors = {
-  default: 'text-neutral-900',
-  error: 'text-error-600',
-  success: 'text-success-600',
-  warning: 'text-warning-600',
-  info: 'text-info-600',
+// Input variants
+const inputVariants = {
+  default: 'bg-white border border-neutral-300',
+  outlined: 'bg-transparent border-2 border-neutral-300',
+  filled: 'bg-neutral-50 border border-neutral-300',
+  ghost: 'bg-transparent border-b-2 border-neutral-300 rounded-none',
 };
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -77,22 +55,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const currentState = error ? 'error' : success ? 'success' : state;
 
     // تجميع classes
-    const baseClasses =
-      'rounded-lg transition-all duration-200 focus:outline-none placeholder-neutral-400';
-
+    const baseClasses = getInputClasses(currentState);
     const variantClasses = inputVariants[variant];
     const sizeClasses = inputSizes[size];
-    const stateClasses = inputStates[currentState];
     const widthClasses = fullWidth ? 'w-full' : '';
-    const microClasses = microInteractions.inputFocus;
 
     const inputClasses = [
       baseClasses,
       variantClasses,
       sizeClasses,
-      stateClasses,
       widthClasses,
-      microClasses,
+      'transition-all duration-200 placeholder-neutral-400',
       className,
     ]
       .filter(Boolean)
@@ -149,7 +122,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <motion.label
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className={`block text-sm font-medium text-neutral-700 mb-2`}
+            className="block text-sm font-medium text-neutral-700 mb-2"
           >
             {label}
           </motion.label>
@@ -212,13 +185,10 @@ export const Textarea: React.FC<
 }) => {
   const currentState = error ? 'error' : success ? 'success' : state;
 
-  const baseClasses =
-    'rounded-lg transition-all duration-200 focus:outline-none placeholder-neutral-400 resize-none';
+  const baseClasses = getInputClasses(currentState);
   const variantClasses = inputVariants[variant];
   const sizeClasses = inputSizes[size];
-  const stateClasses = inputStates[currentState];
   const widthClasses = fullWidth ? 'w-full' : '';
-  const microClasses = microInteractions.inputFocus;
   const resizeClasses = {
     none: 'resize-none',
     vertical: 'resize-y',
@@ -230,10 +200,9 @@ export const Textarea: React.FC<
     baseClasses,
     variantClasses,
     sizeClasses,
-    stateClasses,
     widthClasses,
-    microClasses,
     resizeClasses[resize],
+    'transition-all duration-200 placeholder-neutral-400',
     className,
   ]
     .filter(Boolean)
@@ -316,21 +285,17 @@ export const Select: React.FC<
 }) => {
   const currentState = error ? 'error' : success ? 'success' : state;
 
-  const baseClasses =
-    'rounded-lg transition-all duration-200 focus:outline-none';
+  const baseClasses = getInputClasses(currentState);
   const variantClasses = inputVariants[variant];
   const sizeClasses = inputSizes[size];
-  const stateClasses = inputStates[currentState];
   const widthClasses = fullWidth ? 'w-full' : '';
-  const microClasses = microInteractions.inputFocus;
 
   const selectClasses = [
     baseClasses,
     variantClasses,
     sizeClasses,
-    stateClasses,
     widthClasses,
-    microClasses,
+    'transition-all duration-200',
     className,
   ]
     .filter(Boolean)
@@ -411,6 +376,177 @@ export const Select: React.FC<
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-sm text-success-600 mt-1"
+        >
+          {success}
+        </motion.p>
+      )}
+    </div>
+  );
+};
+
+// إضافة Checkbox component
+export const Checkbox: React.FC<
+  Omit<InputProps, 'children'> & {
+    checked?: boolean;
+    onChange?: (checked: boolean) => void;
+  }
+> = ({
+  label,
+  helperText,
+  error,
+  success,
+  fullWidth = false,
+  className = '',
+  checked = false,
+  onChange,
+  ...props
+}) => {
+  const currentState = error ? 'error' : success ? 'success' : 'default';
+
+  const checkboxClasses = [
+    'w-4 h-4 text-primary-600 bg-white border border-neutral-300 rounded focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
+    currentState === 'error' && 'border-error-500 focus:ring-error-500',
+    currentState === 'success' && 'border-success-500 focus:ring-success-500',
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  return (
+    <div className={`${fullWidth ? 'w-full' : ''}`}>
+      <div className="flex items-center">
+        <motion.input
+          type="checkbox"
+          className={checkboxClasses}
+          checked={checked}
+          onChange={(e) => onChange?.(e.target.checked)}
+          whileTap={{ scale: 0.95 }}
+          transition={{ duration: 0.1 }}
+          {...props}
+        />
+        {label && (
+          <motion.label
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="ml-2 text-sm font-medium text-neutral-700 cursor-pointer"
+          >
+            {label}
+          </motion.label>
+        )}
+      </div>
+
+      {helperText && (
+        <motion.p
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-sm text-neutral-500 mt-1 ml-6"
+        >
+          {helperText}
+        </motion.p>
+      )}
+
+      {error && (
+        <motion.p
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-sm text-error-600 mt-1 ml-6"
+        >
+          {error}
+        </motion.p>
+      )}
+
+      {success && (
+        <motion.p
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-sm text-success-600 mt-1 ml-6"
+        >
+          {success}
+        </motion.p>
+      )}
+    </div>
+  );
+};
+
+// إضافة Radio component
+export const Radio: React.FC<
+  Omit<InputProps, 'children'> & {
+    checked?: boolean;
+    onChange?: (checked: boolean) => void;
+    name?: string;
+  }
+> = ({
+  label,
+  helperText,
+  error,
+  success,
+  fullWidth = false,
+  className = '',
+  checked = false,
+  onChange,
+  name,
+  ...props
+}) => {
+  const currentState = error ? 'error' : success ? 'success' : 'default';
+
+  const radioClasses = [
+    'w-4 h-4 text-primary-600 bg-white border border-neutral-300 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
+    currentState === 'error' && 'border-error-500 focus:ring-error-500',
+    currentState === 'success' && 'border-success-500 focus:ring-success-500',
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  return (
+    <div className={`${fullWidth ? 'w-full' : ''}`}>
+      <div className="flex items-center">
+        <motion.input
+          type="radio"
+          className={radioClasses}
+          checked={checked}
+          onChange={(e) => onChange?.(e.target.checked)}
+          name={name}
+          whileTap={{ scale: 0.95 }}
+          transition={{ duration: 0.1 }}
+          {...props}
+        />
+        {label && (
+          <motion.label
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="ml-2 text-sm font-medium text-neutral-700 cursor-pointer"
+          >
+            {label}
+          </motion.label>
+        )}
+      </div>
+
+      {helperText && (
+        <motion.p
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-sm text-neutral-500 mt-1 ml-6"
+        >
+          {helperText}
+        </motion.p>
+      )}
+
+      {error && (
+        <motion.p
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-sm text-error-600 mt-1 ml-6"
+        >
+          {error}
+        </motion.p>
+      )}
+
+      {success && (
+        <motion.p
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-sm text-success-600 mt-1 ml-6"
         >
           {success}
         </motion.p>

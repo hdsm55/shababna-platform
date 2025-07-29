@@ -596,11 +596,11 @@ const UsersDashboard: React.FC = () => {
         <div>
           <Card className="p-5 hover:shadow-sm transition-all duration-200 border border-gray-100 bg-white">
             <div className="flex items-center justify-between mb-3">
-              <div className="p-2 rounded-lg bg-red-50">
-                <UserX className="w-5 h-5 text-red-500" />
+              <div className="p-2 rounded-lg bg-primary-50">
+                <UserX className="w-5 h-5 text-primary-500" />
               </div>
               <div className="text-right">
-                <span className="text-xs text-red-600">
+                <span className="text-xs text-primary-600">
                   {t('users.stats.inactive', 'غير نشط')}
                 </span>
               </div>

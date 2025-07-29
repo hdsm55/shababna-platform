@@ -24,6 +24,8 @@ export interface Program {
   image_url?: string;
   goal_amount?: number;
   current_amount?: number;
+  participants_count?: number;
+  status?: string;
   start_date: string;
   end_date: string;
   created_at: string;
@@ -71,7 +73,11 @@ export interface PaginatedResponse<T> {
   message: string;
   data: {
     items: T[];
-    pagination: {
+    total?: number;
+    page?: number;
+    limit?: number;
+    totalPages?: number;
+    pagination?: {
       page: number;
       limit: number;
       total: number;

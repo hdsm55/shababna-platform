@@ -1,11 +1,43 @@
 import axios from 'axios';
 
-// Create axios instance with default config
+// Cache for API responses
+const cache = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+// Create axios instance with optimized config
 export const http = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api',
   withCredentials: true,
-  timeout: 10000, // 10 seconds timeout
+  timeout: 8000, // Reduced timeout for faster failure detection
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
+
+// Cache interceptor
+const cacheInterceptor = (config: any) => {
+  if (config.method === 'get' && !config.noCache) {
+    const cacheKey = `${config.url}${JSON.stringify(config.params || {})}`;
+    const cached = cache.get(cacheKey);
+
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      return Promise.resolve(cached.data);
+    }
+  }
+  return config;
+};
+
+// Response cache interceptor
+const responseCacheInterceptor = (response: any) => {
+  if (response.config.method === 'get' && !response.config.noCache) {
+    const cacheKey = `${response.config.url}${JSON.stringify(response.config.params || {})}`;
+    cache.set(cacheKey, {
+      data: response,
+      timestamp: Date.now(),
+    });
+  }
+  return response;
+};
 
 // إضافة Interceptor لإرسال التوكن تلقائياً
 http.interceptors.request.use((config) => {
@@ -16,13 +48,16 @@ http.interceptors.request.use((config) => {
     config.headers = config.headers || {};
     config.headers['Authorization'] = `Bearer ${token}`;
   }
-  return config;
+
+  // Apply cache interceptor
+  return cacheInterceptor(config);
 });
 
-// Response interceptor to handle common errors
+// Response interceptor to handle common errors and caching
 http.interceptors.response.use(
   (response) => {
-    return response;
+    // Apply response cache interceptor
+    return responseCacheInterceptor(response);
   },
   (error) => {
     if (error.response?.status === 401) {
@@ -33,6 +68,17 @@ http.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Clear cache function
+export const clearCache = () => {
+  cache.clear();
+};
+
+// Clear specific cache entry
+export const clearCacheEntry = (url: string, params?: any) => {
+  const cacheKey = `${url}${JSON.stringify(params || {})}`;
+  cache.delete(cacheKey);
+};
 
 export const loginApi = async (email: string, password: string) => {
   const { data } = await http.post('/auth/login', { email, password });

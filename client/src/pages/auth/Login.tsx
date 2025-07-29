@@ -50,11 +50,18 @@ const Login: React.FC = () => {
       setLoginError('');
       setIsLoading(true);
 
+      console.log('محاولة تسجيل الدخول:', data);
+
       // استدعاء API الحقيقي
       const response = await loginApi(data.email, data.password);
 
+      console.log('استجابة API:', response);
+
       if (response.success) {
         const { user, token } = response.data;
+
+        console.log('بيانات المستخدم:', user);
+        console.log('التوكن:', token);
 
         // تحويل البيانات لتتطابق مع النوع المطلوب
         const authUser = {
@@ -68,26 +75,44 @@ const Login: React.FC = () => {
             `${user.first_name?.charAt(0)}${user.last_name?.charAt(0)}`,
         };
 
+        console.log('بيانات المصادقة:', authUser);
+
         login(authUser, token);
         localStorage.setItem('token', token);
 
+        console.log('تم تسجيل الدخول بنجاح، الدور:', user.role);
+
         if (user.role === 'admin') {
+          console.log('توجيه إلى لوحة التحكم...');
           navigate('/dashboard');
         } else {
+          console.log('توجيه إلى الصفحة الرئيسية...');
           navigate('/');
         }
       } else {
+        console.log('فشل في تسجيل الدخول:', response.message);
         setLoginError(response.message || 'فشل في تسجيل الدخول');
       }
     } catch (error: any) {
-      console.error('Login error:', error);
-      setLoginError(
-        error.response?.data?.message ||
+      console.error('خطأ في تسجيل الدخول:', error);
+
+      // معالجة أخطاء مختلفة
+      if (error.response) {
+        // خطأ من الخادم
+        const errorMessage = error.response.data?.message || 'خطأ في الخادم';
+        setLoginError(errorMessage);
+      } else if (error.request) {
+        // خطأ في الاتصال
+        setLoginError('فشل في الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت.');
+      } else {
+        // خطأ آخر
+        setLoginError(
           t(
             'auth.login.error',
             'فشل في تسجيل الدخول. يرجى التحقق من البيانات والمحاولة مرة أخرى.'
           )
-      );
+        );
+      }
     } finally {
       setIsLoading(false);
     }
@@ -191,17 +216,20 @@ const Login: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="w-full max-w-md"
           >
-            <Card className="p-8 shadow-2xl rounded-2xl border-0">
+            <Card className="p-8 shadow-2xl rounded-2xl border-0 bg-white/95 backdrop-blur-sm">
               {/* Header */}
               <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-accent-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-accent-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg transform hover:scale-105 transition-transform duration-200">
                   <span className="text-white font-bold text-2xl">ش</span>
                 </div>
-                <h1 className="text-3xl font-bold text-primary-900 mb-2">
+                <h1 className="text-3xl font-bold text-primary-900 mb-3">
                   {t('auth.login.title', 'تسجيل الدخول')}
                 </h1>
-                <p className="text-gray-600">
-                  {t('auth.login.subtitle', 'سجل الدخول إلى حسابك')}
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  {t(
+                    'auth.login.subtitle',
+                    'ادخل بياناتك للانضمام إلى مجتمع شبابنا.'
+                  )}
                 </p>
               </div>
 
@@ -221,7 +249,7 @@ const Login: React.FC = () => {
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-semibold text-gray-700 mb-3"
                   >
                     {t('auth.login.email.label', 'البريد الإلكتروني')}
                   </label>
@@ -244,7 +272,7 @@ const Login: React.FC = () => {
                           ),
                         },
                       })}
-                      className="pl-10"
+                      className="pl-10 py-3 border-2 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200"
                       placeholder={t(
                         'auth.login.email.placeholder',
                         'أدخل بريدك الإلكتروني'
@@ -253,7 +281,8 @@ const Login: React.FC = () => {
                     />
                   </div>
                   {errors.email && (
-                    <p className="text-red-600 text-sm mt-1">
+                    <p className="text-red-600 text-sm mt-2 flex items-center">
+                      <span className="w-1 h-1 bg-red-500 rounded-full mr-2"></span>
                       {errors.email.message}
                     </p>
                   )}
@@ -263,7 +292,7 @@ const Login: React.FC = () => {
                 <div>
                   <label
                     htmlFor="password"
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-semibold text-gray-700 mb-3"
                   >
                     {t('auth.login.password.label', 'كلمة المرور')}
                   </label>
@@ -279,7 +308,7 @@ const Login: React.FC = () => {
                           'كلمة المرور مطلوبة'
                         ),
                       })}
-                      className="pl-10 pr-12"
+                      className="pl-10 pr-12 py-3 border-2 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-200"
                       placeholder={t(
                         'auth.login.password.placeholder',
                         'أدخل كلمة المرور'
@@ -289,7 +318,7 @@ const Login: React.FC = () => {
                     <button
                       type="button"
                       onClick={togglePasswordVisibility}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                       aria-label={
                         showPassword
                           ? t('auth.login.password.hide', 'إخفاء كلمة المرور')
@@ -304,7 +333,8 @@ const Login: React.FC = () => {
                     </button>
                   </div>
                   {errors.password && (
-                    <p className="text-red-600 text-sm mt-1">
+                    <p className="text-red-600 text-sm mt-2 flex items-center">
+                      <span className="w-1 h-1 bg-red-500 rounded-full mr-2"></span>
                       {errors.password.message}
                     </p>
                   )}
@@ -312,18 +342,18 @@ const Login: React.FC = () => {
 
                 {/* Remember Me & Forgot Password */}
                 <div className="flex items-center justify-between">
-                  <label className="flex items-center">
+                  <label className="flex items-center cursor-pointer">
                     <input
                       type="checkbox"
-                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500 focus:ring-2 transition-all duration-200"
                     />
-                    <span className="mr-2 text-sm text-gray-600">
+                    <span className="mr-2 text-sm text-gray-600 font-medium">
                       {t('auth.login.remember', 'تذكرني')}
                     </span>
                   </label>
                   <Link
                     to="/forgot-password"
-                    className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+                    className="text-primary-600 hover:text-primary-700 text-sm font-semibold transition-colors duration-200 hover:underline"
                   >
                     {t('auth.login.forgotPassword', 'نسيت كلمة المرور؟')}
                   </Link>
@@ -332,28 +362,35 @@ const Login: React.FC = () => {
                 {/* Submit Button */}
                 <Button
                   type="submit"
-                  className="w-full py-3 text-lg font-semibold"
+                  variant="primary"
+                  size="lg"
+                  fullWidth
+                  className="py-4 text-lg font-semibold bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-primary-500/30"
                   disabled={isSubmitting || isLoading}
+                  icon={isLoading ? undefined : <LogIn className="w-5 h-5" />}
+                  iconPosition="left"
                 >
                   {isLoading ? (
-                    <LoadingSpinner size="sm" />
+                    <div className="flex items-center justify-center">
+                      <LoadingSpinner size="sm" color="white" />
+                      <span className="mr-2">
+                        {t('auth.login.loading', 'جاري التحميل...')}
+                      </span>
+                    </div>
                   ) : (
-                    <>
-                      {t('auth.login.submit', 'تسجيل الدخول')}
-                      <ArrowRight className="w-5 h-5 mr-2" />
-                    </>
+                    t('auth.login.submit', 'تسجيل الدخول')
                   )}
                 </Button>
               </form>
 
               {/* Divider */}
-              <div className="my-6">
+              <div className="my-8">
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300"></div>
+                    <div className="w-full border-t border-gray-200"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white text-gray-500">
+                    <span className="px-4 bg-white text-gray-500 font-medium">
                       {t('auth.login.or', 'أو')}
                     </span>
                   </div>
@@ -362,13 +399,13 @@ const Login: React.FC = () => {
 
               {/* Register Link */}
               <div className="text-center">
-                <p className="text-gray-600">
+                <p className="text-gray-600 text-sm">
                   {t('auth.login.noAccount', 'ليس لديك حساب؟')}{' '}
                   <Link
                     to="/register"
-                    className="text-primary-600 hover:text-primary-700 font-semibold"
+                    className="text-primary-600 hover:text-primary-700 font-bold transition-colors duration-200 hover:underline"
                   >
-                    {t('auth.login.register', 'سجل هنا')}
+                    {t('auth.login.register', 'سجل الآن')}
                   </Link>
                 </p>
               </div>

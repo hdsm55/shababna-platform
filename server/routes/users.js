@@ -1,6 +1,6 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
-import { query } from '../config/database.js';
+import { query } from '../config/database-sqlite.js';
 import bcrypt from 'bcryptjs';
 import { getAllUsers, getUserProfile, createUser, updateUser, deleteUser, joinOrganization, contactForm } from '../controllers/usersController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';

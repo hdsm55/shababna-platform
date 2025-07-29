@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { query } from '../config/database.js';
+import { query } from '../config/database-sqlite.js';
 import { emailConfig, emailSettings, validateEmailConfig } from '../config/email.js';
 
 class EmailService {

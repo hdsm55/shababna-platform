@@ -1,6 +1,6 @@
 import express from 'express';
 import emailService from '../services/emailService.js';
-import { query } from '../config/database.js';
+import { query } from '../config/database-sqlite.js';
 import { authenticateToken, requireAdmin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();

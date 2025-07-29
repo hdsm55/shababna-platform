@@ -1,14 +1,19 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
+import { getButtonClasses } from './DesignSystem';
 
 export type ButtonVariant =
   | 'primary'
   | 'secondary'
+  | 'accent'
   | 'ghost'
-  | 'icon'
-  | 'outline';
-export type ButtonSize = 'sm' | 'md' | 'lg';
+  | 'outline'
+  | 'danger'
+  | 'success'
+  | 'warning'
+  | 'info';
+export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -22,24 +27,6 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   to?: string; // for Link
   href?: string; // for <a>
 }
-
-const baseStyles =
-  'inline-flex items-center justify-center font-semibold transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed rounded-md';
-
-const variantStyles: Record<ButtonVariant, string> = {
-  primary: 'bg-primary-600 text-white hover:bg-primary-700 shadow-md',
-  secondary: 'bg-secondary-600 text-white hover:bg-secondary-700',
-  ghost: 'bg-transparent text-primary-600 hover:bg-primary-50',
-  icon: 'bg-transparent text-primary-600 p-2 rounded-full hover:bg-primary-50',
-  outline:
-    'bg-transparent border-2 border-primary-600 text-primary-600 hover:bg-primary-50',
-};
-
-const sizeStyles: Record<ButtonSize, string> = {
-  sm: 'text-sm px-3 py-1.5',
-  md: 'text-base px-4 py-2',
-  lg: 'text-lg px-6 py-3',
-};
 
 const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
@@ -59,23 +46,47 @@ const Button: React.FC<ButtonProps> = ({
   const content = (
     <>
       {loading ? (
-        <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 rtl:ml-2 rtl:mr-0"></span>
-      ) : Icon && iconPosition === 'left' ? (
-        <Icon className="w-5 h-5 mr-2 rtl:ml-2 rtl:mr-0" />
-      ) : null}
-      <span>{children}</span>
-      {Icon && iconPosition === 'right' && !loading && (
-        <Icon className="w-5 h-5 ml-2 rtl:mr-2 rtl:ml-0" />
+        <div className="flex items-center">
+          <svg
+            className="w-4 h-4 animate-spin mr-2 rtl:ml-2 rtl:mr-0"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+              fill="none"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+          <span>{children}</span>
+        </div>
+      ) : (
+        <>
+          {Icon && iconPosition === 'left' && (
+            <Icon className="w-4 h-4 mr-2 rtl:ml-2 rtl:mr-0" />
+          )}
+          <span>{children}</span>
+          {Icon && iconPosition === 'right' && (
+            <Icon className="w-4 h-4 ml-2 rtl:mr-2 rtl:ml-0" />
+          )}
+        </>
       )}
     </>
   );
 
   const baseProps = {
     className: clsx(
-      baseStyles,
-      variantStyles[variant],
-      sizeStyles[size],
+      getButtonClasses(variant, size),
       fullWidth && 'w-full',
+      'inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed',
       className
     ),
     ...props,
@@ -88,17 +99,19 @@ const Button: React.FC<ButtonProps> = ({
         type="button"
         {...baseProps}
         disabled={disabled || loading}
-        whileTap={{ scale: 0.97 }}
-        onAnimationStart={() => {}}
+        whileTap={{ scale: 0.98 }}
+        whileHover={{ y: -1 }}
+        transition={{ duration: 0.2 }}
       >
         {content}
       </MotionButton>
     );
   }
+
   // For Link or <a> or custom component
   const MotionComponent = motion(Component);
-  // لا تمرر disabled هنا ولا onClick إذا كان معطل
   const { onClick, disabled: _d, ...restProps } = baseProps;
+
   const handleClick = (e: React.MouseEvent<any, MouseEvent>) => {
     if (disabled || loading) {
       e.preventDefault();
@@ -108,6 +121,7 @@ const Button: React.FC<ButtonProps> = ({
       onClick(e);
     }
   };
+
   return (
     <MotionComponent
       {...restProps}
@@ -115,7 +129,9 @@ const Button: React.FC<ButtonProps> = ({
       href={href}
       tabIndex={disabled ? -1 : 0}
       aria-disabled={disabled || loading}
-      whileTap={{ scale: 0.97 }}
+      whileTap={{ scale: 0.98 }}
+      whileHover={{ y: -1 }}
+      transition={{ duration: 0.2 }}
       onClick={handleClick}
     >
       {content}

@@ -2,9 +2,9 @@
 export const tokens = {
   colors: {
     primary: {
-      main: '#1E3A8A', // أزرق غامق أكثر
-      light: '#3B5B9A',
-      dark: '#0F1F4A', // غامق جداً
+      main: '#27548A', // YInMn Blue - اللون الأساسي
+      light: '#4A7AB8',
+      dark: '#183B4E', // Japanese Indigo - اللون الغامق
       25: '#F8FAFC',
       50: '#F0F4F8',
       75: '#E2E8F0',
@@ -13,16 +13,16 @@ export const tokens = {
       200: '#B3C5D6',
       300: '#8CA8BF',
       400: '#668BA8',
-      500: '#1E3A8A', // أزرق غامق
-      600: '#1A2F6B', // غامق أكثر
-      700: '#162552', // غامق جداً
-      800: '#121B39', // غامق للغاية
-      900: '#0E1120' // أسود مائل للأزرق
+      500: '#27548A', // YInMn Blue
+      600: '#1E3F6B',
+      700: '#183B4E', // Japanese Indigo
+      800: '#0F2A3A',
+      900: '#003362' // Dark Midnight Blue
     },
     accent: {
-      main: '#B45309', // برتقالي غامق أكثر
-      light: '#D97706',
-      dark: '#92400E', // غامق
+      main: '#DDA853', // Indian Yellow - اللون المميز
+      light: '#E8C275',
+      dark: '#C19A4A',
       25: '#FEFCF8',
       50: '#FDF8F0',
       75: '#F7F0E0',
@@ -31,16 +31,16 @@ export const tokens = {
       200: '#F5D5AD',
       300: '#F0C084',
       400: '#EBAB5B',
-      500: '#B45309', // برتقالي غامق
-      600: '#92400E', // غامق أكثر
-      700: '#78350F', // غامق جداً
-      800: '#5C2A0B', // غامق للغاية
-      900: '#401F08' // أسود مائل للبرتقالي
+      500: '#DDA853', // Indian Yellow
+      600: '#C19A4A',
+      700: '#A68B41',
+      800: '#8B7C38',
+      900: '#706D2F'
     },
     secondary: {
-      main: '#0F172A', // رمادي غامق جداً
-      light: '#1E293B',
-      dark: '#020617', // أسود تقريباً
+      main: '#183B4E', // Japanese Indigo
+      light: '#2A5A6B',
+      dark: '#003362', // Dark Midnight Blue
       25: '#F8FAFB',
       50: '#E6EBEE',
       75: '#D1D8DC',
@@ -49,99 +49,104 @@ export const tokens = {
       200: '#99AFBB',
       300: '#668799',
       400: '#335F77',
-      500: '#0F172A', // رمادي غامق جداً
-      600: '#0C1421', // غامق أكثر
-      700: '#091018', // غامق جداً
-      800: '#060C0F', // غامق للغاية
-      900: '#030607' // أسود تقريباً
+      500: '#183B4E', // Japanese Indigo
+      600: '#0F2A3A',
+      700: '#0A1F2A',
+      800: '#06141A',
+      900: '#003362' // Dark Midnight Blue
+    },
+    neutral: {
+      main: '#F3F3E0', // Beige - اللون المحايد
+      light: '#FAFAF5',
+      dark: '#E8E8D0',
+      25: '#FCFCFC',
+      50: '#FAFAFA',
+      75: '#F5F5F5',
+      100: '#F3F3E0', // Beige
+      150: '#E5E5D0',
+      200: '#D4D4C0',
+      300: '#C4C4B0',
+      400: '#A3A390',
+      500: '#737370',
+      600: '#525250',
+      700: '#404040',
+      800: '#262626',
+      900: '#171717'
     },
     semantic: {
       success: {
-        main: '#15803D', // أخضر غامق
+        main: '#15803D',
         50: '#F0FDF4',
         100: '#DCFCE7',
         200: '#BBF7D0',
         300: '#86EFAC',
         400: '#4ADE80',
-        500: '#15803D', // أخضر غامق
-        600: '#166534', // غامق أكثر
-        700: '#14532D', // غامق جداً
-        800: '#134E2A', // غامق للغاية
-        900: '#0F3D1F' // أسود مائل للأخضر
+        500: '#15803D',
+        600: '#166534',
+        700: '#14532D',
+        800: '#134E2A',
+        900: '#0F3D1F'
       },
       error: {
-        main: '#B91C1C', // أحمر غامق
+        main: '#B91C1C',
         50: '#FEF2F2',
         100: '#FEE2E2',
         200: '#FECACA',
         300: '#FCA5A5',
         400: '#F87171',
-        500: '#B91C1C', // أحمر غامق
-        600: '#991B1B', // غامق أكثر
-        700: '#7F1D1D', // غامق جداً
-        800: '#6B1A1A', // غامق للغاية
-        900: '#571717' // أسود مائل للأحمر
+        500: '#B91C1C',
+        600: '#991B1B',
+        700: '#7F1D1D',
+        800: '#6B1A1A',
+        900: '#571717'
       },
       warning: {
-        main: '#D97706', // برتقالي غامق
+        main: '#DDA853', // Indian Yellow
         50: '#FFFBEB',
         100: '#FEF3C7',
         200: '#FDE68A',
         300: '#FCD34D',
         400: '#FBBF24',
-        500: '#D97706', // برتقالي غامق
-        600: '#B45309', // غامق أكثر
-        700: '#92400E', // غامق جداً
-        800: '#78350F', // غامق للغاية
-        900: '#5C2A0B' // أسود مائل للبرتقالي
+        500: '#DDA853', // Indian Yellow
+        600: '#C19A4A',
+        700: '#A68B41',
+        800: '#8B7C38',
+        900: '#706D2F'
       },
       info: {
-        main: '#0369A1', // أزرق غامق
+        main: '#27548A', // YInMn Blue
         50: '#F0F9FF',
         100: '#E0F2FE',
         200: '#BAE6FD',
         300: '#7DD3FC',
         400: '#38BDF8',
-        500: '#0369A1', // أزرق غامق
-        600: '#075985', // غامق أكثر
-        700: '#0C4A6E', // غامق جداً
-        800: '#0B3D5B', // غامق للغاية
-        900: '#0A2E47' // أسود مائل للأزرق
+        500: '#27548A', // YInMn Blue
+        600: '#1E3F6B',
+        700: '#183B4E',
+        800: '#0F2A3A',
+        900: '#003362'
       }
     },
-    neutral: {
-      25: '#FCFCFC',
-      50: '#FAFAFA',
-      75: '#F5F5F5',
-      100: '#F5F5F5',
-      150: '#E5E5E5',
-      200: '#E5E5E5',
-      300: '#D4D4D4',
-      400: '#A3A3A3',
-      500: '#737373',
-      600: '#525252',
-      700: '#404040',
-      800: '#262626',
-      900: '#171717'
-    },
-    // إضافة gradients جديدة مع الألوان الغامقة
+    // إضافة gradients جديدة مع الألوان الجديدة
     gradients: {
-      primary: 'linear-gradient(135deg, #1E3A8A 0%, #0F1F4A 100%)',
-      accent: 'linear-gradient(135deg, #B45309 0%, #92400E 100%)',
-      hero: 'linear-gradient(135deg, #1E3A8A 0%, #0F172A 100%)',
-      secondary: 'linear-gradient(135deg, #0F172A 0%, #020617 100%)',
+      primary: 'linear-gradient(135deg, #27548A 0%, #183B4E 100%)',
+      accent: 'linear-gradient(135deg, #DDA853 0%, #C19A4A 100%)',
+      hero: 'linear-gradient(135deg, #27548A 0%, #003362 100%)',
+      secondary: 'linear-gradient(135deg, #183B4E 0%, #003362 100%)',
       success: 'linear-gradient(135deg, #15803D 0%, #14532D 100%)',
       error: 'linear-gradient(135deg, #B91C1C 0%, #7F1D1D 100%)',
-      warning: 'linear-gradient(135deg, #D97706 0%, #92400E 100%)',
-      info: 'linear-gradient(135deg, #0369A1 0%, #0C4A6E 100%)',
-      glass: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+      warning: 'linear-gradient(135deg, #DDA853 0%, #C19A4A 100%)',
+      info: 'linear-gradient(135deg, #27548A 0%, #183B4E 100%)',
+      glass: 'linear-gradient(135deg, rgba(243,243,224,0.1) 0%, rgba(243,243,224,0.05) 100%)',
+      warm: 'linear-gradient(135deg, #DDA853 0%, #F3F3E0 100%)',
+      cool: 'linear-gradient(135deg, #27548A 0%, #F3F3E0 100%)',
     }
   },
   typography: {
     fonts: {
       arabic: 'Tajawal, "Noto Sans Arabic", system-ui, sans-serif',
       latin: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      display: 'Poppins, system-ui, sans-serif', // للعناوين
+      display: 'Poppins, system-ui, sans-serif',
       mono: 'JetBrains Mono, "Fira Code", Consolas, monospace',
     },
     weights: {
@@ -154,24 +159,22 @@ export const tokens = {
       black: 900
     },
     sizes: {
-      xs: '0.75rem',   // 12px
-      sm: '0.875rem',  // 14px
-      base: '1rem',    // 16px
-      lg: '1.125rem',  // 18px
-      xl: '1.25rem',   // 20px
-      '2xl': '1.5rem', // 24px
-      '3xl': '1.875rem', // 30px
-      '4xl': '2.25rem', // 36px
-      '5xl': '3rem',    // 48px
-      '6xl': '3.75rem', // 60px
-      // أحجام display جديدة
-      'display-1': '3.5rem', // 56px
-      'display-2': '3rem',   // 48px
-      'display-3': '2.5rem', // 40px
-      // أحجام body جديدة
-      'body-lg': '1.125rem', // 18px
-      'body-md': '1rem',     // 16px
-      'body-sm': '0.875rem', // 14px
+      xs: '0.75rem',
+      sm: '0.875rem',
+      base: '1rem',
+      lg: '1.125rem',
+      xl: '1.25rem',
+      '2xl': '1.5rem',
+      '3xl': '1.875rem',
+      '4xl': '2.25rem',
+      '5xl': '3rem',
+      '6xl': '3.75rem',
+      'display-1': '3.5rem',
+      'display-2': '3rem',
+      'display-3': '2.5rem',
+      'body-lg': '1.125rem',
+      'body-md': '1rem',
+      'body-sm': '0.875rem',
     },
     lineHeights: {
       tight: '1.1',
@@ -183,36 +186,36 @@ export const tokens = {
   },
   spacing: {
     0: '0',
-    '0.5': '0.125rem',  // 2px
-    1: '0.25rem',  // 4px
-    '1.5': '0.375rem',  // 6px
-    2: '0.5rem',   // 8px
-    '2.5': '0.625rem',  // 10px
-    3: '0.75rem',  // 12px
-    '3.5': '0.875rem',  // 14px
-    4: '1rem',     // 16px
-    '4.5': '1.125rem',  // 18px
-    5: '1.25rem',  // 20px
-    '5.5': '1.375rem',  // 22px
-    6: '1.5rem',   // 24px
-    8: '2rem',     // 32px
-    10: '2.5rem',  // 40px
-    12: '3rem',    // 48px
-    16: '4rem',    // 64px
-    20: '5rem',    // 80px
-    24: '6rem',    // 96px
-    32: '8rem',    // 128px
-    40: '10rem',   // 160px
-    48: '12rem',   // 192px
+    '0.5': '0.125rem',
+    1: '0.25rem',
+    '1.5': '0.375rem',
+    2: '0.5rem',
+    '2.5': '0.625rem',
+    3: '0.75rem',
+    '3.5': '0.875rem',
+    4: '1rem',
+    '4.5': '1.125rem',
+    5: '1.25rem',
+    '5.5': '1.375rem',
+    6: '1.5rem',
+    8: '2rem',
+    10: '2.5rem',
+    12: '3rem',
+    16: '4rem',
+    20: '5rem',
+    24: '6rem',
+    32: '8rem',
+    40: '10rem',
+    48: '12rem',
   },
   radius: {
     none: '0',
-    sm: '0.25rem',    // 4px
-    md: '0.5rem',     // 8px
-    lg: '1rem',       // 16px
-    xl: '1.5rem',     // 24px
-    '2xl': '2rem',    // 32px
-    '3xl': '3rem',    // 48px
+    sm: '0.25rem',
+    md: '0.5rem',
+    lg: '1rem',
+    xl: '1.5rem',
+    '2xl': '2rem',
+    '3xl': '3rem',
     full: '9999px'
   },
   shadows: {
@@ -223,7 +226,6 @@ export const tokens = {
     xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
     '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
     inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
-    // إضافة shadows جديدة
     'glow-primary': '0 0 20px rgba(39, 84, 138, 0.3)',
     'glow-accent': '0 0 20px rgba(221, 168, 83, 0.3)',
     'glow-success': '0 0 20px rgba(34, 197, 94, 0.3)',
@@ -258,9 +260,8 @@ export const tokens = {
       xl: '5rem',
       '2xl': '6rem',
     },
-    maxWidth: '80rem' // 1280px
+    maxWidth: '80rem'
   },
-  // إضافة animations جديدة
   animations: {
     fadeIn: 'fadeIn 0.5s ease-in-out',
     slideUp: 'slideUp 0.5s ease-out',
@@ -275,9 +276,8 @@ export const tokens = {
     ping: 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
     wiggle: 'wiggle 1s ease-in-out infinite',
   },
-  // إضافة effects جديدة
   effects: {
-    glass: 'backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);',
+    glass: 'backdrop-filter: blur(10px); background: rgba(243, 243, 224, 0.1); border: 1px solid rgba(243, 243, 224, 0.2);',
     blur: 'backdrop-filter: blur(8px);',
     grayscale: 'filter: grayscale(100%);',
     sepia: 'filter: sepia(100%);',

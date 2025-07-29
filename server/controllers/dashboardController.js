@@ -8,19 +8,9 @@ export const getDashboardStats = async (req, res) => {
         const eventsResult = await query('SELECT COUNT(*) as count FROM events');
         const totalEvents = parseInt(eventsResult.rows[0].count) || 0;
 
-        // لا يوجد عمود status في جدول events
-        // const activeEventsResult = await query('SELECT COUNT(*) as count FROM events WHERE status = \'active\'');
-        // const activeEvents = parseInt(activeEventsResult.rows[0].count) || 0;
-        // const upcomingEventsResult = await query('SELECT COUNT(*) as count FROM events WHERE status = \'upcoming\'');
-        // const upcomingEvents = parseInt(upcomingEventsResult.rows[0].count) || 0;
-
         // إحصائيات البرامج
         const programsResult = await query('SELECT COUNT(*) as count FROM programs');
         const totalPrograms = parseInt(programsResult.rows[0].count) || 0;
-
-        // لا يوجد عمود status في جدول programs
-        // const activeProgramsResult = await query('SELECT COUNT(*) as count FROM programs WHERE status = \'active\'');
-        // const activePrograms = parseInt(activeProgramsResult.rows[0].count) || 0;
 
         // إحصائيات المستخدمين
         const usersResult = await query('SELECT COUNT(*) as count FROM users');
@@ -28,15 +18,6 @@ export const getDashboardStats = async (req, res) => {
 
         const newUsersResult = await query('SELECT COUNT(*) as count FROM users WHERE created_at >= NOW() - INTERVAL \'30 days\'');
         const newUsers = parseInt(newUsersResult.rows[0].count) || 0;
-
-        // إزالة إحصائيات التبرعات
-        // const donationsResult = await query('SELECT COALESCE(SUM(amount), 0) as total FROM donations');
-        // const totalDonations = parseInt(donationsResult.rows[0].total || 0);
-        // const monthlyDonationsResult = await query("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE donated_at >= NOW() - INTERVAL '30 days'");
-        // const monthlyDonations = parseInt(monthlyDonationsResult.rows[0].total || 0);
-        // const previousMonthDonationsResult = await query("SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE donated_at >= NOW() - INTERVAL '60 days' AND donated_at < NOW() - INTERVAL '30 days'");
-        // const previousMonthDonations = parseInt(previousMonthDonationsResult.rows[0].total || 0);
-        // const donationGrowth = previousMonthDonations > 0 ? ((monthlyDonations - previousMonthDonations) / previousMonthDonations * 100).toFixed(1) : monthlyDonations > 0 ? '100' : '0';
 
         // إحصائيات التسجيل في البرامج
         const programRegistrationsResult = await query('SELECT COUNT(*) as count FROM program_registrations');
@@ -57,34 +38,53 @@ export const getDashboardStats = async (req, res) => {
         const unreadContactFormsResult = await query('SELECT COUNT(*) as count FROM contact_forms WHERE is_read = false');
         const unreadContactForms = parseInt(unreadContactFormsResult.rows[0].count) || 0;
 
+        // إحصائيات طلبات الانضمام
+        const joinRequestsResult = await query('SELECT COUNT(*) as count FROM join_requests');
+        const totalJoinRequests = parseInt(joinRequestsResult.rows[0].count) || 0;
+
+        const pendingJoinRequestsResult = await query('SELECT COUNT(*) as count FROM join_requests WHERE status = \'pending\'');
+        const pendingJoinRequests = parseInt(pendingJoinRequestsResult.rows[0].count) || 0;
+
         // حساب النمو
         const previousMonthUsersResult = await query('SELECT COUNT(*) as count FROM users WHERE created_at >= NOW() - INTERVAL \'60 days\' AND created_at < NOW() - INTERVAL \'30 days\'');
         const previousMonthUsers = parseInt(previousMonthUsersResult.rows[0].count) || 0;
 
         const userGrowth = previousMonthUsers > 0 ? ((newUsers - previousMonthUsers) / previousMonthUsers * 100).toFixed(1) : newUsers > 0 ? '100' : '0';
 
+        // إحصائيات إضافية
+        const recentEventsResult = await query('SELECT COUNT(*) as count FROM events WHERE created_at >= NOW() - INTERVAL \'7 days\'');
+        const recentEvents = parseInt(recentEventsResult.rows[0].count) || 0;
+
+        const recentProgramsResult = await query('SELECT COUNT(*) as count FROM programs WHERE created_at >= NOW() - INTERVAL \'7 days\'');
+        const recentPrograms = parseInt(recentProgramsResult.rows[0].count) || 0;
+
+        const recentRegistrationsResult = await query('SELECT COUNT(*) as count FROM event_registrations WHERE created_at >= NOW() - INTERVAL \'7 days\'');
+        const recentRegistrations = parseInt(recentRegistrationsResult.rows[0].count) || 0;
+
         return successResponse(res, {
             overview: [
                 {
                     title: 'إجمالي الفعاليات',
                     value: totalEvents,
-                    change: '',
-                    changeType: 'increase',
+                    change: recentEvents > 0 ? `+${recentEvents} هذا الأسبوع` : '',
+                    changeType: recentEvents > 0 ? 'increase' : 'neutral',
                     icon: 'Calendar',
-                    color: 'primary',
+                    color: 'blue',
                     details: {
-                        total: totalEvents
+                        total: totalEvents,
+                        recent: recentEvents
                     }
                 },
                 {
                     title: 'البرامج',
                     value: totalPrograms,
-                    change: '',
-                    changeType: 'increase',
+                    change: recentPrograms > 0 ? `+${recentPrograms} هذا الأسبوع` : '',
+                    changeType: recentPrograms > 0 ? 'increase' : 'neutral',
                     icon: 'TrendingUp',
-                    color: 'success',
+                    color: 'green',
                     details: {
-                        total: totalPrograms
+                        total: totalPrograms,
+                        recent: recentPrograms
                     }
                 },
                 {
@@ -93,10 +93,22 @@ export const getDashboardStats = async (req, res) => {
                     change: `+${userGrowth}%`,
                     changeType: userGrowth >= 0 ? 'increase' : 'decrease',
                     icon: 'Users',
-                    color: 'info',
+                    color: 'purple',
                     details: {
                         new: newUsers,
                         total: totalUsers
+                    }
+                },
+                {
+                    title: 'طلبات الانضمام',
+                    value: totalJoinRequests,
+                    change: pendingJoinRequests > 0 ? `${pendingJoinRequests} معلقة` : '',
+                    changeType: pendingJoinRequests > 0 ? 'warning' : 'neutral',
+                    icon: 'UserPlus',
+                    color: 'orange',
+                    details: {
+                        total: totalJoinRequests,
+                        pending: pendingJoinRequests
                     }
                 }
             ],
@@ -104,29 +116,43 @@ export const getDashboardStats = async (req, res) => {
                 {
                     title: 'تسجيل البرامج',
                     value: totalProgramRegistrations,
+                    target: totalPrograms * 5, // هدف افتراضي
+                    percentage: totalPrograms > 0 ? Math.min((totalProgramRegistrations / (totalPrograms * 5)) * 100, 100).toFixed(1) : 0,
                     icon: 'Users',
-                    color: 'primary'
+                    color: 'blue'
                 },
                 {
                     title: 'دعم البرامج',
                     value: totalProgramSupporters,
+                    target: totalPrograms * 3, // هدف افتراضي
+                    percentage: totalPrograms > 0 ? Math.min((totalProgramSupporters / (totalPrograms * 3)) * 100, 100).toFixed(1) : 0,
                     icon: 'Heart',
-                    color: 'success'
+                    color: 'red'
                 },
                 {
                     title: 'تسجيل الفعاليات',
                     value: totalEventRegistrations,
+                    target: totalEvents * 10, // هدف افتراضي
+                    percentage: totalEvents > 0 ? Math.min((totalEventRegistrations / (totalEvents * 10)) * 100, 100).toFixed(1) : 0,
                     icon: 'Calendar',
-                    color: 'info'
+                    color: 'green'
                 },
                 {
                     title: 'رسائل التواصل',
                     value: totalContactForms,
+                    target: 50, // هدف افتراضي
+                    percentage: Math.min((totalContactForms / 50) * 100, 100).toFixed(1),
                     icon: 'MessageCircle',
-                    color: 'warning',
+                    color: 'yellow',
                     alert: unreadContactForms > 0 ? `${unreadContactForms} غير مقروءة` : null
                 }
-            ]
+            ],
+            recentActivity: {
+                newRegistrations: recentRegistrations,
+                newEvents: recentEvents,
+                newPrograms: recentPrograms,
+                newUsers: newUsers
+            }
         }, 'تم جلب إحصائيات الداشبورد بنجاح');
     } catch (error) {
         console.error('Dashboard stats error:', error);
@@ -339,7 +365,7 @@ function getTimeAgo(dateString) {
 export const deleteDashboardEvent = async (req, res) => {
     try {
         const { id } = req.params;
-        const result = await query('DELETE FROM events WHERE id = $1 RETURNING *', [id]);
+        const result = await query('DELETE FROM events WHERE id = ?', [id]);
         if (result.rows.length === 0) {
             return errorResponse(res, 'الفعالية غير موجودة', 404);
         }
@@ -354,7 +380,7 @@ export const deleteDashboardEvent = async (req, res) => {
 export const deleteDashboardProgram = async (req, res) => {
     try {
         const { id } = req.params;
-        const result = await query('DELETE FROM programs WHERE id = $1 RETURNING *', [id]);
+        const result = await query('DELETE FROM programs WHERE id = ?', [id]);
         if (result.rows.length === 0) {
             return errorResponse(res, 'البرنامج غير موجود', 404);
         }
@@ -369,7 +395,7 @@ export const deleteDashboardProgram = async (req, res) => {
 export const deleteDashboardUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const result = await query('DELETE FROM users WHERE id = $1 RETURNING *', [id]);
+        const result = await query('DELETE FROM users WHERE id = ?', [id]);
         if (result.rows.length === 0) {
             return errorResponse(res, 'المستخدم غير موجود', 404);
         }

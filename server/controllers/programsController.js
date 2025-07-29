@@ -1,22 +1,69 @@
 import { validationResult } from 'express-validator';
-import { query } from '../config/database.js';
+import { query } from '../config/database-sqlite.js';
 import { successResponse, errorResponse } from '../utils/response.js';
 
 // Get all programs (public)
 export const getAllPrograms = async (req, res) => {
     try {
-        const result = await query(`
-      SELECT
-        id,
-        title,
-        description,
-        start_date,
-        end_date,
-        created_at
-        FROM programs
-        ORDER BY created_at DESC
-    `);
-        return successResponse(res, { items: result.rows, total: result.rows.length }, 'تم جلب البرامج بنجاح');
+        const { page = 1, limit = 10, category, search } = req.query;
+        const offset = (page - 1) * limit;
+
+        let whereClause = '';
+        const params = [];
+        let paramIndex = 1;
+
+        if (category && category !== 'all') {
+            whereClause += ` WHERE category = ?`;
+            params.push(category);
+        }
+
+        if (search) {
+            const searchCondition = ` WHERE (title LIKE ? OR description LIKE ?)`;
+            if (whereClause) {
+                whereClause += ` AND (title LIKE ? OR description LIKE ?)`;
+            } else {
+                whereClause = searchCondition;
+            }
+            params.push(`%${search}%`, `%${search}%`);
+        }
+
+        // Get total count
+        const countQuery = `SELECT COUNT(*) FROM programs${whereClause}`;
+        const countResult = await query(countQuery, params);
+        const total = parseInt(countResult.rows[0].count);
+
+        // Get programs with pagination
+        const programsQuery = `
+            SELECT
+                id,
+                title,
+                description,
+                category,
+                goal_amount,
+                current_amount,
+                start_date,
+                end_date,
+                participants_count,
+                status,
+                image_url,
+                created_at,
+                updated_at
+            FROM programs
+            ${whereClause}
+            ORDER BY created_at DESC
+            LIMIT ? OFFSET ?
+        `;
+
+        const programsParams = [...params, limit, offset];
+        const result = await query(programsQuery, programsParams);
+
+        return successResponse(res, {
+            items: result.rows,
+            total,
+            page: parseInt(page),
+            limit: parseInt(limit),
+            totalPages: Math.ceil(total / limit)
+        }, 'تم جلب البرامج بنجاح');
     } catch (error) {
         console.error('Programs fetch error:', error);
         return errorResponse(res, 'خطأ في جلب البرامج', 500, error);
@@ -26,7 +73,15 @@ export const getAllPrograms = async (req, res) => {
 // Get single program (public)
 export const getProgramById = async (req, res) => {
     try {
-        const result = await query('SELECT * FROM programs WHERE id = $1', [req.params.id]);
+        const result = await query(`
+            SELECT
+                id, title, description, category, goal_amount, current_amount,
+                participants_count, status, image_url, start_date, end_date,
+                created_at, updated_at
+            FROM programs
+            WHERE id = ?
+        `, [req.params.id]);
+
         if (result.rows.length === 0) {
             return errorResponse(res, 'البرنامج غير موجود', 404);
         }
@@ -46,7 +101,7 @@ export const registerForProgram = async (req, res) => {
             return errorResponse(res, 'الاسم والبريد الإلكتروني مطلوبان', 400);
         }
         const result = await query(
-            `INSERT INTO program_registrations (program_id, first_name, last_name, email, phone, created_at) VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING *`,
+            `INSERT INTO program_registrations (program_id, first_name, last_name, email, phone, created_at) VALUES (?, ?, ?, ?, ?, datetime('now'))`,
             [id, firstName, lastName, email, phone || null]
         );
         return successResponse(res, result.rows[0], 'تم التسجيل في البرنامج بنجاح');
@@ -62,14 +117,23 @@ export const createProgram = async (req, res) => {
         const {
             title,
             description,
+            category = 'عام',
+            goal_amount = 0,
+            current_amount = 0,
+            participants_count = 0,
+            status = 'active',
             start_date,
             end_date
         } = req.body;
+
         const result = await query(`
-      INSERT INTO programs (title, description, start_date, end_date)
-      VALUES ($1, $2, $3, $4)
-      RETURNING id, title, description, start_date, end_date, created_at
-    `, [title, description, start_date, end_date]);
+            INSERT INTO programs (
+                title, description, category, goal_amount, current_amount,
+                participants_count, status, start_date, end_date, created_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+        `, [title, description, category, goal_amount, current_amount, participants_count, status, start_date, end_date]);
+
         return successResponse(res, result.rows[0], 'تم إضافة البرنامج بنجاح');
     } catch (error) {
         console.error('Program creation error:', error);
@@ -84,15 +148,23 @@ export const updateProgram = async (req, res) => {
         const {
             title,
             description,
+            category,
+            goal_amount,
+            current_amount,
+            participants_count,
+            status,
             start_date,
             end_date
         } = req.body;
+
         const result = await query(`
-      UPDATE programs
-      SET title = $1, description = $2, start_date = $3, end_date = $4
-      WHERE id = $5
-      RETURNING id, title, description, start_date, end_date, created_at
-    `, [title, description, start_date, end_date, id]);
+            UPDATE programs
+            SET title = ?, description = ?, category = ?, goal_amount = ?,
+                current_amount = ?, participants_count = ?, status = ?,
+                start_date = ?, end_date = ?, updated_at = datetime('now')
+            WHERE id = ?
+        `, [title, description, category, goal_amount, current_amount, participants_count, status, start_date, end_date, id]);
+
         if (result.rows.length === 0) {
             return errorResponse(res, 'البرنامج غير موجود', 404);
         }
@@ -107,7 +179,7 @@ export const updateProgram = async (req, res) => {
 export const deleteProgram = async (req, res) => {
     try {
         const { id } = req.params;
-        const result = await query('DELETE FROM programs WHERE id = $1 RETURNING *', [id]);
+        const result = await query('DELETE FROM programs WHERE id = ?', [id]);
         if (result.rows.length === 0) {
             return errorResponse(res, 'البرنامج غير موجود', 404);
         }

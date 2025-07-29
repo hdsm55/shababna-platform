@@ -2,7 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
-import { query } from '../config/database.js';
+import { query } from '../config/database-sqlite.js';
 
 const router = express.Router();
 

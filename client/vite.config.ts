@@ -7,11 +7,53 @@ import { visualizer } from 'rollup-plugin-visualizer';
 export default defineConfig({
   plugins: [
     react(),
-    viteCompression(),
-    visualizer({ open: true })
+    viteCompression({
+      algorithm: 'gzip',
+      ext: '.gz',
+    }),
+    viteCompression({
+      algorithm: 'brotliCompress',
+      ext: '.br',
+    }),
+    visualizer({
+      open: true,
+      filename: 'dist/stats.html',
+    })
   ],
   optimizeDeps: {
     exclude: ['lucide-react'],
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      'axios',
+      'framer-motion',
+      'zustand',
+      'i18next',
+      'react-i18next',
+    ],
+  },
+  build: {
+    target: 'es2015',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          ui: ['framer-motion', 'lucide-react'],
+          utils: ['axios', 'zustand'],
+          i18n: ['i18next', 'react-i18next'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
   },
   define: {
     // Expose environment variables to the client
@@ -25,5 +67,12 @@ export default defineConfig({
         secure: false,
       },
     },
+    hmr: {
+      overlay: false,
+    },
+  },
+  preview: {
+    port: 4173,
+    host: true,
   },
 });

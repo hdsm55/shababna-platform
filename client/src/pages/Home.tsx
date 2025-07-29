@@ -1,1034 +1,852 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import SEO from '../components/common/SEO';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import SEO from '../components/common/SEO';
+import { Card } from '../components/ui/Card/Card';
 import { Button } from '../components/ui/Button/Button';
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  CardTitle,
-  CardSubtitle,
-  CardImage,
-  CardActions,
-} from '../components/ui/Card/Card';
-import { Input } from '../components/ui/Input/Input';
-import Alert from '../components/common/Alert';
-import { Modal } from '../components/ui/Modal/Modal';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import ProgressBar from '../components/common/ProgressBar';
+import NewsletterSignup from '../components/common/NewsletterSignup';
+import StatsCounter from '../components/common/StatsCounter';
 import { fetchEvents } from '../services/eventsApi';
 import { fetchPrograms } from '../services/programsApi';
-import { Program } from '../types';
-import { motion, AnimatePresence } from 'framer-motion';
+import { testHomePageData } from '../test-data';
 import {
-  Sparkles,
   Users,
   Calendar,
-  Globe,
-  TrendingUp,
-  Lightbulb,
-  HeartHandshake,
+  MapPin,
   ArrowRight,
-  Star,
-  Award,
   Target,
+  TrendingUp,
+  Award,
+  Heart,
+  Star,
+  Clock,
+  CheckCircle,
+  Play,
+  BookOpen,
+  Globe,
+  Shield,
   Zap,
+  Lightbulb,
+  Users2,
+  Building2,
+  GraduationCap,
+  Briefcase,
+  Smile,
+  Sparkles,
+  Rocket,
+  Trophy,
+  Gift,
+  Eye,
+  Sparkle,
 } from 'lucide-react';
-import { useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 const Home: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [newsletterStatus, setNewsletterStatus] = useState<
-    'idle' | 'loading' | 'success' | 'error'
-  >('idle');
-  const [newsletterMsg, setNewsletterMsg] = useState('');
-  const [showModal, setShowModal] = useState(false);
   const isRTL = i18n.dir() === 'rtl';
+  const [isLoading, setIsLoading] = useState(true);
+  const { scrollY } = useScroll();
+  const y = useTransform(scrollY, [0, 300], [0, -50]);
 
-  // Fetch latest events
-  const { data: eventsData, isLoading: eventsLoading } = useQuery({
-    queryKey: ['latest-events'],
-    queryFn: () => fetchEvents({ page: 1, limit: 3 }),
-    staleTime: 5 * 60 * 1000,
+  // إضافة اختبار البيانات في وحدة التحكم
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(
+        '🔧 تم تحميل اختبار البيانات. استخدم testHomePageData() في وحدة التحكم'
+      );
+      window.testHomePageData = testHomePageData;
+    }
+  }, []);
+
+  // Fetch real data from API
+  const {
+    data: eventsData,
+    isLoading: eventsLoading,
+    error: eventsError,
+  } = useQuery({
+    queryKey: ['home-events'],
+    queryFn: () => fetchEvents({ limit: 6, status: 'upcoming' }),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
-  const latestEvents = eventsData?.data?.items || [];
 
-  // Fetch latest programs
-  const { data: programsData, isLoading: programsLoading } = useQuery({
-    queryKey: ['latest-programs'],
-    queryFn: () => fetchPrograms({ page: 1, limit: 2 }),
-    staleTime: 5 * 60 * 1000,
+  const {
+    data: programsData,
+    isLoading: programsLoading,
+    error: programsError,
+  } = useQuery({
+    queryKey: ['home-programs'],
+    queryFn: () => fetchPrograms({ limit: 6 }),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
-  const latestPrograms = programsData?.data?.items || [];
 
-  // Platform stats with real data
+  useEffect(() => {
+    // Simulate initial loading
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Get real events data
+  const featuredEvents = eventsData?.data?.items || [];
+  const featuredPrograms = programsData?.data?.items || [];
+
+  // Calculate real statistics from data
+  const totalEvents = eventsData?.data?.pagination?.total || 0;
+  const totalPrograms =
+    programsData?.data?.total || programsData?.data?.items?.length || 0;
+  const totalParticipants = featuredEvents.reduce(
+    (sum: number, event: any) => sum + (event.attendees || 0),
+    0
+  );
+  const totalProgramParticipants = featuredPrograms.reduce(
+    (sum: number, program: any) => sum + (program.participants_count || 0),
+    0
+  );
+
+  // إضافة console.log للتتبع
+  useEffect(() => {
+    console.log('📊 بيانات الصفحة الرئيسية:');
+    console.log('   - الفعاليات:', featuredEvents.length);
+    console.log('   - البرامج:', featuredPrograms.length);
+    console.log('   - إجمالي الفعاليات:', totalEvents);
+    console.log('   - إجمالي البرامج:', totalPrograms);
+    console.log(
+      '   - إجمالي المشاركين:',
+      totalParticipants + totalProgramParticipants
+    );
+  }, [
+    featuredEvents,
+    featuredPrograms,
+    totalEvents,
+    totalPrograms,
+    totalParticipants,
+    totalProgramParticipants,
+  ]);
+
   const stats = [
     {
-      number: 1240,
-      label: t('home.stats.members'),
-      icon: <Users className="w-8 h-8 text-primary-500" />,
-      color: 'from-primary-500 to-primary-600',
-      bgColor: 'bg-primary-50',
+      icon: <Users className="w-8 h-8" />,
+      value: `${totalParticipants + totalProgramParticipants}+`,
+      label: 'شاب مشارك',
+      color: 'bg-gradient-to-br from-primary-500 to-primary-600',
+      delay: 0.1,
     },
     {
-      number: 87,
-      label: t('home.stats.events'),
-      icon: <Calendar className="w-8 h-8 text-accent-500" />,
-      color: 'from-accent-500 to-accent-600',
-      bgColor: 'bg-accent-50',
+      icon: <Calendar className="w-8 h-8" />,
+      value: `${totalEvents}+`,
+      label: 'فعالية منجزة',
+      color: 'bg-gradient-to-br from-accent-500 to-accent-600',
+      delay: 0.2,
     },
     {
-      number: 18,
-      label: t('home.stats.countries'),
-      icon: <Globe className="w-8 h-8 text-secondary-500" />,
-      color: 'from-secondary-500 to-secondary-600',
-      bgColor: 'bg-secondary-50',
+      icon: <Target className="w-8 h-8" />,
+      value: `${totalPrograms}+`,
+      label: 'برنامج مستمر',
+      color: 'bg-gradient-to-br from-secondary-500 to-secondary-600',
+      delay: 0.3,
     },
     {
-      number: 12,
-      label: t('home.stats.programs'),
-      icon: <TrendingUp className="w-8 h-8 text-green-500" />,
-      color: 'from-green-500 to-green-600',
-      bgColor: 'bg-green-50',
+      icon: <TrendingUp className="w-8 h-8" />,
+      value: '95%',
+      label: 'معدل الرضا',
+      color: 'bg-gradient-to-br from-success-500 to-success-600',
+      delay: 0.4,
     },
   ];
 
-  // Newsletter submit handler
-  const handleNewsletter = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setNewsletterStatus('loading');
-    setNewsletterMsg('');
-    try {
-      // Simulate API call
-      await new Promise((res) => setTimeout(res, 1200));
-      setNewsletterStatus('success');
-      setNewsletterMsg(t('home.newsletter.success'));
-      setNewsletterEmail('');
-    } catch {
-      setNewsletterStatus('error');
-      setNewsletterMsg(t('home.newsletter.error'));
-    }
-    setTimeout(() => setNewsletterStatus('idle'), 4000);
-  };
-
-  // Scroll to programs if state is set
-  useEffect(() => {
-    if (location.state && location.state.scrollToPrograms) {
-      const el = document.getElementById('programs');
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-  }, [location]);
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1,
-      },
+  const features = [
+    {
+      icon: <GraduationCap className="w-12 h-12" />,
+      title: 'برامج تطويرية',
+      description: 'برامج شاملة لتطوير المهارات الشخصية والمهنية',
+      color: 'text-primary-600',
+      bgColor: 'bg-gradient-to-br from-primary-50 to-primary-100',
+      gradient: 'from-primary-500 to-primary-600',
     },
+    {
+      icon: <Users2 className="w-12 h-12" />,
+      title: 'مجتمع نشط',
+      description: 'انضم إلى مجتمع من الشباب الطموحين والمبدعين',
+      color: 'text-accent-600',
+      bgColor: 'bg-gradient-to-br from-accent-50 to-accent-100',
+      gradient: 'from-accent-500 to-accent-600',
+    },
+    {
+      icon: <Building2 className="w-12 h-12" />,
+      title: 'فعاليات متنوعة',
+      description: 'ورش عمل ومؤتمرات وندوات في مختلف المجالات',
+      color: 'text-secondary-600',
+      bgColor: 'bg-gradient-to-br from-secondary-50 to-secondary-100',
+      gradient: 'from-secondary-500 to-secondary-600',
+    },
+    {
+      icon: <Shield className="w-12 h-12" />,
+      title: 'بيئة آمنة',
+      description: 'بيئة داعمة وآمنة للتطوير والنمو',
+      color: 'text-success-600',
+      bgColor: 'bg-gradient-to-br from-success-50 to-success-100',
+      gradient: 'from-success-500 to-success-600',
+    },
+    {
+      icon: <Globe className="w-12 h-12" />,
+      title: 'تواصل عالمي',
+      description: 'فرص للتواصل مع شباب من مختلف أنحاء العالم',
+      color: 'text-warning-600',
+      bgColor: 'bg-gradient-to-br from-warning-50 to-warning-100',
+      gradient: 'from-warning-500 to-warning-600',
+    },
+    {
+      icon: <Zap className="w-12 h-12" />,
+      title: 'تطوير سريع',
+      description: 'برامج مكثفة لتحقيق النتائج بسرعة وفعالية',
+      color: 'text-info-600',
+      bgColor: 'bg-gradient-to-br from-info-50 to-info-100',
+      gradient: 'from-info-500 to-info-600',
+    },
+  ];
+
+  const testimonials = [
+    {
+      name: 'أحمد محمد',
+      role: 'مطور برمجيات',
+      content: 'منصة رائعة ساعدتني في تطوير مهاراتي التقنية والقيادية',
+      avatar: '👨‍💻',
+      rating: 5,
+      gradient: 'from-primary-500 to-primary-600',
+    },
+    {
+      name: 'سارة أحمد',
+      role: 'ريادية أعمال',
+      content: 'البرامج المقدمة ممتازة وساعدتني في تطوير مشروعي',
+      avatar: '👩‍💼',
+      rating: 5,
+      gradient: 'from-accent-500 to-accent-600',
+    },
+    {
+      name: 'محمد علي',
+      role: 'طالب جامعي',
+      content: 'فعاليات مميزة وبيئة داعمة للتطوير والنمو',
+      avatar: '👨‍🎓',
+      rating: 5,
+      gradient: 'from-secondary-500 to-secondary-600',
+    },
+  ];
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('ar-SA', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: 'easeOut',
-      },
-    },
+  const getProgressPercentage = (current: number, max: number) => {
+    return Math.min((current / max) * 100, 100);
   };
 
-  const heroVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.8,
-        ease: 'easeOut',
-      },
-    },
-  };
+  if (isLoading || eventsLoading || programsLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-accent-50">
+        <LoadingSpinner size="xl" text="جاري تحميل الموقع..." />
+      </div>
+    );
+  }
 
   return (
     <div
-      className="min-h-screen bg-gradient-to-br from-white via-primary-50/30 to-accent-50/30"
+      className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <SEO
-        title={t('home.seo.title', 'منصة شبابنا العالمية - الصفحة الرئيسية')}
-        description={t(
-          'home.seo.description',
-          'منصة شبابية عالمية للفعاليات والبرامج والتطوع.'
-        )}
+        title="منصة شبابنا العالمية - الصفحة الرئيسية"
+        description="منصة شاملة للشباب العرب تقدم البرامج والفعاليات والأنشطة المجتمعية"
         type="website"
       />
 
-      {/* Hero Section - Enhanced */}
-      <section
-        className="relative min-h-[85vh] flex items-center justify-center overflow-hidden"
-        dir={isRTL ? 'rtl' : 'ltr'}
-        aria-label={t('home.hero.aria', 'قسم البطل - مقدمة المنصة')}
-      >
-        {/* Enhanced Background with multiple layers */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-accent-50"></div>
-
-        {/* Animated geometric patterns */}
-        <div className="absolute inset-0 pointer-events-none select-none opacity-10">
-          <motion.div
-            animate={{
-              rotate: [0, 360],
-            }}
-            transition={{
-              duration: 60,
-              repeat: Infinity,
-              ease: 'linear',
-            }}
-            className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-primary-200 to-transparent rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{
-              rotate: [360, 0],
-            }}
-            transition={{
-              duration: 80,
-              repeat: Infinity,
-              ease: 'linear',
-            }}
-            className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-br from-accent-200 to-transparent rounded-full blur-3xl"
-          />
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 text-white min-h-screen flex items-center">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-20 w-32 h-32 bg-white/10 rounded-full blur-xl animate-pulse"></div>
+          <div className="absolute top-40 right-40 w-24 h-24 bg-accent-500/20 rounded-full blur-lg animate-bounce"></div>
+          <div className="absolute bottom-20 left-1/3 w-40 h-40 bg-white/5 rounded-full blur-2xl animate-pulse"></div>
         </div>
 
-        {/* Floating elements */}
         <motion.div
-          animate={{
-            y: [-10, 10, -10],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-          className="absolute top-20 left-20 w-4 h-4 bg-primary-400 rounded-full opacity-60"
-        />
-        <motion.div
-          animate={{
-            y: [10, -10, 10],
-          }}
-          transition={{
-            duration: 6,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-          className="absolute top-40 right-32 w-3 h-3 bg-accent-400 rounded-full opacity-60"
-        />
-
-        <div className="relative z-10 w-full max-w-4xl mx-auto text-center flex flex-col items-center justify-center gap-5 py-14 px-4">
+          style={{ y }}
+          className="absolute inset-0 bg-black/10"
+        ></motion.div>
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-900/50 to-transparent"></div>
+        <div className="relative z-10 container mx-auto px-4 py-20">
           <motion.div
-            variants={heroVariants}
-            initial="hidden"
-            animate="visible"
-            className="space-y-4"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center max-w-4xl mx-auto"
           >
-            {/* Badge */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-primary-100 to-accent-100 rounded-full border border-primary-200"
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="mb-8"
             >
-              <Sparkles className="w-3 h-3 text-primary-600" />
-              <span className="text-xs font-medium text-primary-700">
-                {t('home.hero.badge', 'منصة عالمية')}
-              </span>
+              <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-accent-500 to-accent-600 rounded-full mb-6 shadow-2xl">
+                <Heart className="w-12 h-12 text-white" />
+              </div>
             </motion.div>
 
-            <h1
-              className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary-700 via-primary-800 to-accent-700 leading-tight drop-shadow-sm"
-              tabIndex={0}
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="text-5xl md:text-7xl font-bold mb-6 leading-tight bg-gradient-to-r from-white to-accent-100 bg-clip-text text-transparent"
             >
-              {t('home.hero.title', 'منصة شبابنا العالمية')}
-            </h1>
+              منصة شبابنا العالمية
+            </motion.h1>
 
-            <p
-              className="text-base md:text-lg text-primary-800 font-medium mb-3 max-w-3xl mx-auto leading-relaxed"
-              tabIndex={0}
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto leading-relaxed"
             >
-              {t(
-                'home.hero.subtitle',
-                'نصنع الأثر معاً... حيث يلتقي الشباب المسلم في إسطنبول والعالم للإبداع والعمل التطوعي والتطوير.'
-              )}
-            </p>
+              منصة شاملة للشباب العرب تقدم البرامج والفعاليات والأنشطة المجتمعية
+              <br />
+              <span className="text-accent-200 font-semibold">
+                نطور الشباب، نبني المستقبل
+              </span>
+            </motion.p>
 
-            <p
-              className="text-sm md:text-base text-neutral-700 mb-5 max-w-2xl mx-auto leading-relaxed"
-              tabIndex={0}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
             >
-              {t(
-                'home.hero.shortDesc',
-                'منصة رقمية تجمع الشباب لصناعة التغيير الإيجابي عبر فعاليات وبرامج ملهمة.'
-              )}
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-              <Button
-                size="lg"
-                variant="primary"
-                className="px-7 py-3 text-base font-bold shadow-xl hover:shadow-primary-500/25 transition-all duration-300"
-                aria-label={t('home.hero.cta', 'اكتشف برامجنا')}
-                onClick={() => {
-                  if (location.pathname === '/') {
-                    const el = document.getElementById('programs');
-                    if (el) {
-                      el.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  } else {
-                    navigate('/', { state: { scrollToPrograms: true } });
-                  }
-                }}
+              <Link
+                to="/events"
+                className="group bg-gradient-to-r from-white to-accent-50 text-primary-600 hover:from-accent-50 hover:to-white px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 shadow-2xl hover:shadow-3xl inline-flex items-center justify-center transform hover:scale-105 hover:-translate-y-1"
               >
-                {t('home.hero.cta', 'اكتشف برامجنا')}
-              </Button>
-
-              <Button
-                size="lg"
-                variant="outline"
-                className="px-7 py-3 text-base font-bold border-2 hover:bg-primary-50 transition-all duration-300"
-                onClick={() => setShowModal(true)}
+                <span className="flex items-center justify-center">
+                  استكشف الفعاليات
+                  <ArrowRight className="w-5 h-5 mr-2 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </Link>
+              <Link
+                to="/programs"
+                className="group border-2 border-white text-white hover:bg-white hover:text-primary-600 px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 inline-flex items-center justify-center transform hover:scale-105 hover:-translate-y-1 backdrop-blur-sm"
               >
-                {t('home.hero.learnMore', 'اعرف المزيد')}
-              </Button>
-            </div>
+                اكتشف البرامج
+              </Link>
+            </motion.div>
+
+            {/* Quick Stats */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="grid grid-cols-3 gap-8 max-w-2xl mx-auto"
+            >
+              <div className="text-center">
+                <div className="text-3xl font-bold mb-2 bg-gradient-to-r from-white to-accent-100 bg-clip-text text-transparent">
+                  {totalEvents}+
+                </div>
+                <div className="text-white/70 text-sm">فعالية</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold mb-2 bg-gradient-to-r from-white to-accent-100 bg-clip-text text-transparent">
+                  {totalPrograms}+
+                </div>
+                <div className="text-white/70 text-sm">برنامج</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold mb-2 bg-gradient-to-r from-white to-accent-100 bg-clip-text text-transparent">
+                  {totalParticipants + totalProgramParticipants}+
+                </div>
+                <div className="text-white/70 text-sm">مشارك</div>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* Stats Section - Enhanced with animated counters */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.2 }}
-        transition={{ duration: 0.8 }}
-        className="py-20 bg-white relative overflow-hidden"
-      >
-        {/* Background decoration */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary-50/50 via-transparent to-accent-50/50"></div>
+      {/* Stats Section */}
+      <section className="py-20 bg-white relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2327548A' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            }}
+          ></div>
+        </div>
 
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="relative z-10 container mx-auto px-4">
           <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-5"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-8"
           >
             {stats.map((stat, index) => (
               <motion.div
                 key={index}
-                variants={itemVariants}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: stat.delay }}
                 className="text-center group"
               >
                 <div
-                  className={`inline-flex items-center justify-center w-14 h-14 rounded-xl ${stat.bgColor} mb-3 group-hover:scale-110 transition-transform duration-300`}
+                  className={`${stat.color} w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6 text-white group-hover:scale-110 transition-transform duration-300 shadow-xl group-hover:shadow-2xl`}
                 >
                   {stat.icon}
                 </div>
-                <div className="text-2xl md:text-3xl font-black bg-gradient-to-r from-primary-700 to-accent-700 bg-clip-text text-transparent mb-1">
-                  <CountUpNumber value={stat.number} />
-                  <span className="text-lg">+</span>
-                </div>
-                <p className="text-sm font-medium text-neutral-700">
-                  {stat.label}
-                </p>
+                <StatsCounter
+                  value={parseInt(stat.value.replace('+', ''))}
+                  suffix="+"
+                  className="text-4xl font-bold text-gray-900 mb-3"
+                />
+                <div className="text-gray-600 font-medium">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
         </div>
-      </motion.section>
+      </section>
 
-      {/* Features Section - Enhanced */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.2 }}
-        transition={{ duration: 0.8 }}
-        className="py-24 bg-gradient-to-br from-white via-primary-50/30 to-accent-50/30 relative overflow-hidden"
-      >
-        {/* Background decoration */}
+      {/* Features Section */}
+      <section className="py-20 bg-gradient-to-br from-neutral-50 to-primary-50 relative overflow-hidden">
+        {/* Floating Elements */}
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-primary-200/20 to-transparent rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-br from-accent-200/20 to-transparent rounded-full blur-3xl"></div>
+          <motion.div
+            animate={{
+              y: [0, -20, 0],
+              rotate: [0, 5, 0],
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+            className="absolute top-20 left-10 w-16 h-16 bg-gradient-to-br from-primary-200 to-primary-300 rounded-full opacity-20"
+          ></motion.div>
+          <motion.div
+            animate={{
+              y: [0, 20, 0],
+              rotate: [0, -5, 0],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+            className="absolute top-40 right-20 w-12 h-12 bg-gradient-to-br from-accent-200 to-accent-300 rounded-full opacity-20"
+          ></motion.div>
         </div>
 
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="relative z-10 container mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-10"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-center mb-16"
           >
-            <h2
-              className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary-700 to-accent-700 mb-4"
-              tabIndex={0}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl mb-6 shadow-xl"
             >
-              {t('home.features.title', 'ماذا نقدم؟')}
+              <Sparkles className="w-10 h-10 text-white" />
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+              لماذا منصة شبابنا؟
             </h2>
-            <p className="text-base text-neutral-700 max-w-2xl mx-auto">
-              {t(
-                'home.features.subtitle',
-                'نقدم مجموعة شاملة من الخدمات والبرامج المصممة خصيصاً لاحتياجات الشباب'
-              )}
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              نقدم مجموعة شاملة من الخدمات والبرامج المصممة خصيصاً لتطوير الشباب
             </p>
           </motion.div>
 
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
-          >
-            <motion.div variants={itemVariants}>
-              <Card
-                variant="glass"
-                className="h-full group hover:scale-105 transition-all duration-500"
-                interactive
-                glow
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
+                className="group"
               >
-                <CardHeader className="text-center pb-4">
-                  <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-accent-100 to-primary-100 mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
-                    <Globe className="w-7 h-7 text-accent-600" />
-                  </div>
-                  <CardTitle className="text-lg font-bold text-primary-800 mb-2">
-                    {t('home.features.events.title', 'الفعاليات وورش العمل')}
-                  </CardTitle>
-                  <CardSubtitle className="text-sm text-neutral-700">
-                    {t(
-                      'home.features.events.description',
-                      'جلسات وورش تفاعلية لتطوير المهارات وبناء العلاقات.'
-                    )}
-                  </CardSubtitle>
-                </CardHeader>
-                <CardBody className="flex-1">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm text-neutral-600">
-                      <Star className="w-4 h-4 text-yellow-500" />
-                      <span>ورش عمل تفاعلية</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-neutral-600">
-                      <Target className="w-4 h-4 text-green-500" />
-                      <span>تطوير المهارات</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-neutral-600">
-                      <Users className="w-4 h-4 text-blue-500" />
-                      <span>بناء العلاقات</span>
-                    </div>
-                  </div>
-                </CardBody>
-                <CardFooter>
-                  <Button
-                    variant="accent"
-                    className="w-full group-hover:shadow-lg group-hover:shadow-accent-200"
-                    onClick={() => navigate('/events')}
+                <Card className="p-8 hover:shadow-2xl transition-all duration-300 h-full group-hover:scale-105 border-0 bg-white/80 backdrop-blur-sm">
+                  <div
+                    className={`${feature.bgColor} w-20 h-20 rounded-3xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}
                   >
-                    {t('home.features.learnMore', 'اعرف المزيد')}
-                  </Button>
-                </CardFooter>
-              </Card>
-            </motion.div>
-
-            <motion.div variants={itemVariants}>
-              <Card
-                variant="glass"
-                className="h-full group hover:scale-105 transition-all duration-500"
-                interactive
-                glow
-              >
-                <CardHeader className="text-center pb-4">
-                  <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-primary-100 to-accent-100 mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
-                    <Lightbulb className="w-7 h-7 text-primary-600" />
+                    <div className={feature.color}>{feature.icon}</div>
                   </div>
-                  <CardTitle className="text-lg font-bold text-primary-800 mb-2">
-                    {t('home.features.programs.title', 'برامج تطويرية')}
-                  </CardTitle>
-                  <CardSubtitle className="text-sm text-neutral-700">
-                    {t(
-                      'home.features.programs.description',
-                      'برامج طويلة الأمد للقيادة والتطوير.'
-                    )}
-                  </CardSubtitle>
-                </CardHeader>
-                <CardBody className="flex-1">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm text-neutral-600">
-                      <Award className="w-4 h-4 text-purple-500" />
-                      <span>برامج قيادية</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-neutral-600">
-                      <Zap className="w-4 h-4 text-orange-500" />
-                      <span>تطوير المهارات</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-neutral-600">
-                      <TrendingUp className="w-4 h-4 text-green-500" />
-                      <span>نمو مستمر</span>
-                    </div>
-                  </div>
-                </CardBody>
-                <CardFooter>
-                  <Button
-                    variant="primary"
-                    className="w-full group-hover:shadow-lg group-hover:shadow-primary-200"
-                    onClick={() => navigate('/programs')}
-                  >
-                    {t('home.features.learnMore', 'اعرف المزيد')}
-                  </Button>
-                </CardFooter>
-              </Card>
-            </motion.div>
-
-            <motion.div variants={itemVariants}>
-              <Card
-                variant="glass"
-                className="h-full group hover:scale-105 transition-all duration-500"
-                interactive
-                glow
-              >
-                <CardHeader className="text-center pb-4">
-                  <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-green-100 to-primary-100 mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
-                    <HeartHandshake className="w-7 h-7 text-green-600" />
-                  </div>
-                  <CardTitle className="text-lg font-bold text-primary-800 mb-2">
-                    {t('home.features.community.title', 'مجتمع عالمي')}
-                  </CardTitle>
-                  <CardSubtitle className="text-sm text-neutral-700">
-                    {t(
-                      'home.features.community.description',
-                      'تواصل مع شباب من أنحاء العالم واصنع صداقات دائمة.'
-                    )}
-                  </CardSubtitle>
-                </CardHeader>
-                <CardBody className="flex-1">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm text-neutral-600">
-                      <Globe className="w-4 h-4 text-blue-500" />
-                      <span>شباب من 18 دولة</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-neutral-600">
-                      <HeartHandshake className="w-4 h-4 text-red-500" />
-                      <span>صداقات دائمة</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-neutral-600">
-                      <Users className="w-4 h-4 text-green-500" />
-                      <span>مجتمع داعم</span>
-                    </div>
-                  </div>
-                </CardBody>
-                <CardFooter>
-                  <Button
-                    variant="success"
-                    className="w-full group-hover:shadow-lg group-hover:shadow-green-200"
-                    onClick={() => navigate('/join-us')}
-                  >
-                    {t('home.features.learnMore', 'اعرف المزيد')}
-                  </Button>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          </motion.div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-primary-600 transition-colors">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    {feature.description}
+                  </p>
+                  <div
+                    className={`mt-4 w-12 h-1 bg-gradient-to-r ${feature.gradient} rounded-full group-hover:w-16 transition-all duration-300`}
+                  ></div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
         </div>
-      </motion.section>
+      </section>
 
-      {/* Latest Events Section - Enhanced */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.2 }}
-        transition={{ duration: 0.8 }}
-        className="py-20 bg-gradient-to-br from-neutral-50 to-white"
-      >
+      {/* Featured Events */}
+      <section className="py-20 bg-white relative overflow-hidden">
         <div className="container mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-10"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-center mb-16"
           >
-            <h2
-              className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary-700 to-accent-700 mb-4"
-              tabIndex={0}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-accent-500 to-accent-600 rounded-2xl mb-6 shadow-xl"
             >
-              {t('home.latestEvents', 'آخر الفعاليات')}
+              <Calendar className="w-10 h-10 text-white" />
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-accent-600 to-primary-600 bg-clip-text text-transparent">
+              أحدث الفعاليات
             </h2>
-            <p className="text-base text-neutral-700 max-w-2xl mx-auto">
-              {t(
-                'home.latestEvents.subtitle',
-                'اكتشف أحدث الفعاليات والورش التي نقدمها'
-              )}
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              اكتشف أحدث الفعاليات والورش التي نقدمها
             </p>
           </motion.div>
 
-          {eventsLoading ? (
-            <div className="flex justify-center">
-              <LoadingSpinner />
-            </div>
-          ) : latestEvents.length === 0 ? (
-            <Alert type="info">
-              {t('home.noEvents', 'لا توجد فعاليات حالياً')}
-            </Alert>
-          ) : (
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="grid md:grid-cols-3 gap-8"
-            >
-              {latestEvents.map((event: any, index: number) => (
-                <motion.div
-                  key={event.id}
-                  variants={itemVariants}
-                  custom={index}
-                >
-                  <Card
-                    variant="default"
-                    className="h-full group hover:scale-105 transition-all duration-500"
-                    interactive
-                    glow
-                  >
-                    <CardHeader>
-                      <CardTitle className="text-base font-bold text-primary-800 mb-2 group-hover:text-primary-700 transition-colors">
-                        {event.title}
-                      </CardTitle>
-                      <CardSubtitle className="text-sm text-neutral-600 mb-3">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4" />
-                          {event.start_date}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {featuredEvents.slice(0, 6).map((event, index) => (
+              <motion.div
+                key={event.id}
+                initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
+                className="group"
+              >
+                <Card className="p-6 hover:shadow-2xl transition-all duration-300 h-full group-hover:scale-105 border-0 bg-gradient-to-br from-white to-neutral-50">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                          {event.category}
+                        </span>
+                        <div className="flex items-center text-yellow-500">
+                          <Star className="w-5 h-5 fill-current" />
                         </div>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Globe className="w-4 h-4" />
+                      </div>
+
+                      <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors">
+                        {event.title}
+                      </h3>
+
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center text-gray-600">
+                          <Calendar className="w-4 h-4 mr-2" />
+                          {formatDate(event.start_date)}
+                        </div>
+                        <div className="flex items-center text-gray-600">
+                          <MapPin className="w-4 h-4 mr-2" />
                           {event.location}
                         </div>
-                      </CardSubtitle>
-                    </CardHeader>
-                    <CardBody className="flex-1">
-                      <p className="text-neutral-700 line-clamp-3 mb-4">
+                        <div className="flex items-center text-gray-600">
+                          <Clock className="w-4 h-4 mr-2" />
+                          {event.attendees || 0} مشارك
+                        </div>
+                      </div>
+
+                      <p className="text-gray-600 mb-4 line-clamp-2">
                         {event.description}
                       </p>
-                    </CardBody>
-                    <CardFooter>
+
+                      <ProgressBar
+                        progress={getProgressPercentage(
+                          event.attendees || 0,
+                          event.max_attendees || 1
+                        )}
+                        label={`${event.attendees || 0}/${
+                          event.max_attendees || 1
+                        } مشارك`}
+                        color="primary"
+                        size="sm"
+                      />
+
                       <Link
                         to={`/events/${event.id}`}
-                        className="w-full"
-                        tabIndex={0}
-                        aria-label={t('home.viewDetails', 'عرض التفاصيل')}
+                        className="w-full mt-4 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-xl transition-all duration-200 inline-flex items-center justify-center py-3 group-hover:shadow-lg transform group-hover:scale-105"
                       >
-                        <Button
-                          variant="accent"
-                          size="sm"
-                          className="w-full group-hover:shadow-lg group-hover:shadow-accent-200"
-                        >
-                          {t('home.viewDetails', 'عرض التفاصيل')}
-                        </Button>
+                        <span className="flex items-center justify-center">
+                          عرض التفاصيل
+                          <ArrowRight className="w-4 h-4 mr-2 group-hover:translate-x-1 transition-transform" />
+                        </span>
                       </Link>
-                    </CardFooter>
-                  </Card>
-                </motion.div>
-              ))}
-            </motion.div>
-          )}
-        </div>
-      </motion.section>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
 
-      {/* Latest Programs Section - Enhanced */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.2 }}
-        transition={{ duration: 0.8 }}
-        id="programs"
-        className="py-20 bg-gradient-to-br from-white to-primary-50/30"
-      >
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            className="text-center mt-12"
+          >
+            <Link
+              to="/events"
+              className="inline-flex items-center justify-center px-8 py-3 text-lg font-semibold text-primary-600 border-2 border-primary-600 rounded-xl hover:bg-primary-600 hover:text-white transition-all duration-300 transform hover:scale-105"
+            >
+              عرض جميع الفعاليات
+              <ArrowRight className="w-5 h-5 mr-2" />
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Featured Programs */}
+      <section className="py-20 bg-gradient-to-br from-neutral-50 to-accent-50 relative overflow-hidden">
         <div className="container mx-auto px-4">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-10"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="text-center mb-16"
           >
-            <h2
-              className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary-700 to-accent-700 mb-4"
-              tabIndex={0}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.7 }}
+              className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-accent-500 to-accent-600 rounded-2xl mb-6 shadow-xl"
             >
-              {t('home.latestPrograms', 'آخر البرامج')}
+              <Trophy className="w-10 h-10 text-white" />
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-accent-600 to-secondary-600 bg-clip-text text-transparent">
+              أحدث البرامج
             </h2>
-            <p className="text-base text-neutral-700 max-w-2xl mx-auto">
-              {t(
-                'home.latestPrograms.subtitle',
-                'اكتشف برامجنا التطويرية المميزة'
-              )}
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              اكتشف برامجنا التطويرية المميزة
             </p>
           </motion.div>
 
-          {programsLoading ? (
-            <div className="flex justify-center">
-              <LoadingSpinner />
-            </div>
-          ) : latestPrograms.length === 0 ? (
-            <Alert type="info">
-              {t('home.noPrograms', 'لا توجد برامج حالياً')}
-            </Alert>
-          ) : (
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="grid md:grid-cols-2 gap-8"
-            >
-              {latestPrograms.map((program: Program, index: number) => (
-                <motion.div
-                  key={program.id}
-                  variants={itemVariants}
-                  custom={index}
-                >
-                  <Card
-                    variant="default"
-                    className="h-full group hover:scale-105 transition-all duration-500"
-                    interactive
-                    glow
-                  >
-                    <CardHeader>
-                      <CardTitle className="text-base font-bold text-primary-800 mb-2 group-hover:text-primary-700 transition-colors">
-                        {program.title}
-                      </CardTitle>
-                      <CardSubtitle className="text-sm text-neutral-600 mb-3">
-                        <div className="flex items-center gap-2">
-                          <Target className="w-4 h-4" />
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {featuredPrograms.slice(0, 6).map((program, index) => (
+              <motion.div
+                key={program.id}
+                initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.7 + index * 0.1 }}
+                className="group"
+              >
+                <Card className="p-6 hover:shadow-2xl transition-all duration-300 h-full group-hover:scale-105 border-0 bg-gradient-to-br from-white to-accent-50">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="bg-gradient-to-r from-accent-500 to-accent-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
                           {program.category}
+                        </span>
+                        <div className="flex items-center text-gray-600 text-sm">
+                          <Users className="w-4 h-4 mr-1" />
+                          {program.participants_count || 0} مشارك
                         </div>
-                      </CardSubtitle>
-                    </CardHeader>
-                    <CardBody className="flex-1">
-                      <p className="text-neutral-700 line-clamp-3 mb-4">
+                      </div>
+
+                      <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-accent-600 transition-colors">
+                        {program.title}
+                      </h3>
+
+                      <p className="text-gray-600 mb-4 line-clamp-3">
                         {program.description}
                       </p>
-                      {program.current_amount && program.goal_amount && (
-                        <div className="mb-4">
-                          <div className="flex justify-between text-sm text-neutral-600 mb-1">
-                            <span>التقدم</span>
-                            <span>
-                              {Math.round(
-                                (program.current_amount / program.goal_amount) *
-                                  100
-                              )}
-                              %
-                            </span>
-                          </div>
-                          <div className="w-full bg-neutral-200 rounded-full h-2">
-                            <div
-                              className="bg-gradient-to-r from-primary-500 to-accent-500 h-2 rounded-full transition-all duration-300"
-                              style={{
-                                width: `${Math.min(
-                                  (program.current_amount /
-                                    program.goal_amount) *
-                                    100,
-                                  100
-                                )}%`,
-                              }}
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </CardBody>
-                    <CardFooter>
+
+                      <ProgressBar
+                        progress={getProgressPercentage(
+                          program.current_amount || 0,
+                          program.goal_amount || 1
+                        )}
+                        label={`${(
+                          program.current_amount || 0
+                        ).toLocaleString()}/${(
+                          program.goal_amount || 0
+                        ).toLocaleString()} ريال`}
+                        color="success"
+                        size="sm"
+                      />
+
                       <Link
                         to={`/programs/${program.id}`}
-                        className="w-full"
-                        tabIndex={0}
-                        aria-label={t('home.viewDetails', 'عرض التفاصيل')}
+                        className="bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white border-accent-600 hover:border-accent-700 font-semibold rounded-xl transition-all duration-200 inline-flex items-center justify-center px-4 py-2 text-sm mt-4 w-full transform group-hover:scale-105"
                       >
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          className="w-full group-hover:shadow-lg group-hover:shadow-primary-200"
-                        >
-                          {t('home.viewDetails', 'عرض التفاصيل')}
-                        </Button>
+                        <span className="flex items-center justify-center">
+                          تبرع الآن
+                          <Heart className="w-4 h-4 mr-2" />
+                        </span>
                       </Link>
-                    </CardFooter>
-                  </Card>
-                </motion.div>
-              ))}
-            </motion.div>
-          )}
-        </div>
-      </motion.section>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
 
-      {/* Newsletter Section - Enhanced */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.2 }}
-        transition={{ duration: 0.8 }}
-        className="py-20 bg-gradient-to-br from-primary-50 via-accent-50 to-white relative overflow-hidden"
-      >
-        {/* Background decoration */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-primary-200/20 to-transparent rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-br from-accent-200/20 to-transparent rounded-full blur-3xl"></div>
-        </div>
-
-        <div className="container mx-auto px-4 max-w-2xl relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-8"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.9 }}
+            className="text-center mt-12"
           >
-            <h2
-              className="text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary-700 to-accent-700 mb-3"
-              tabIndex={0}
+            <Link
+              to="/programs"
+              className="inline-flex items-center justify-center px-8 py-3 text-lg font-semibold text-accent-600 border-2 border-accent-600 rounded-xl hover:bg-accent-600 hover:text-white transition-all duration-300 transform hover:scale-105"
             >
-              {t('home.newsletter.title', 'اشترك في النشرة البريدية')}
+              عرض جميع البرامج
+              <ArrowRight className="w-5 h-5 mr-2" />
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-white relative overflow-hidden">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-center mb-16"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-success-500 to-success-600 rounded-2xl mb-6 shadow-xl"
+            >
+              <Smile className="w-10 h-10 text-white" />
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 bg-gradient-to-r from-success-600 to-primary-600 bg-clip-text text-transparent">
+              ماذا يقول المشاركون؟
             </h2>
-            <p className="text-sm text-neutral-700">
-              {t(
-                'home.newsletter.subtitle',
-                'احصل على آخر الأخبار والفعاليات مباشرة في بريدك الإلكتروني'
-              )}
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              استمع إلى تجارب الشباب الذين استفادوا من منصتنا
             </p>
           </motion.div>
 
-          <motion.form
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            onSubmit={handleNewsletter}
-            className="flex flex-col md:flex-row gap-4 items-center"
-            aria-label={t('home.newsletter.formAria', 'نموذج النشرة البريدية')}
-          >
-            <Input
-              type="email"
-              placeholder={t(
-                'home.newsletter.placeholder',
-                'أدخل بريدك الإلكتروني'
-              )}
-              value={newsletterEmail}
-              onChange={(e) => setNewsletterEmail(e.target.value)}
-              required
-              fullWidth
-              className="flex-1"
-              aria-label={t(
-                'home.newsletter.placeholder',
-                'أدخل بريدك الإلكتروني'
-              )}
-            />
-            <Button
-              type="submit"
-              size="md"
-              variant="accent"
-              disabled={newsletterStatus === 'loading'}
-              aria-busy={newsletterStatus === 'loading'}
-              className="w-full md:w-auto px-6 font-bold shadow-lg hover:shadow-accent-200 transition-all duration-300"
-            >
-              {newsletterStatus === 'loading'
-                ? t('home.newsletter.loading', 'جاري الإرسال...')
-                : t('home.newsletter.cta', 'اشترك')}
-            </Button>
-          </motion.form>
-
-          <AnimatePresence>
-            {newsletterStatus !== 'idle' && (
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="mt-6"
+                transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
+                className="group"
               >
-                <Alert
-                  type={newsletterStatus === 'success' ? 'success' : 'error'}
-                  className="text-center"
-                  aria-live="polite"
-                >
-                  {newsletterMsg}
-                </Alert>
+                <Card className="p-8 hover:shadow-2xl transition-all duration-300 h-full group-hover:scale-105 border-0 bg-gradient-to-br from-white to-neutral-50">
+                  <div className="text-center">
+                    <div className="text-4xl mb-4">{testimonial.avatar}</div>
+                    <div className="flex justify-center mb-4">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className="w-5 h-5 text-yellow-500 fill-current"
+                        />
+                      ))}
+                    </div>
+                    <p className="text-gray-600 mb-6 italic leading-relaxed">
+                      "{testimonial.content}"
+                    </p>
+                    <div
+                      className={`bg-gradient-to-r ${testimonial.gradient} text-white px-4 py-2 rounded-xl inline-block`}
+                    >
+                      <div className="font-semibold">{testimonial.name}</div>
+                      <div className="text-sm opacity-90">
+                        {testimonial.role}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
               </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.section>
-
-      {/* Enhanced Learn More Modal */}
-      <Modal
-        open={showModal}
-        onClose={() => setShowModal(false)}
-        title={t('home.hero.learnMore', 'اعرف المزيد')}
-        aria-label={t('home.hero.learnMore', 'اعرف المزيد')}
-      >
-        <div className="p-6 space-y-6">
-          {/* Platform Overview */}
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Sparkles className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
-              {t('home.modal.title', 'منصة شبابنا العالمية')}
-            </h3>
-            <p className="text-gray-600">
-              {t(
-                'home.modal.subtitle',
-                'منصة رقمية تجمع الشباب من جميع أنحاء العالم لصناعة التغيير الإيجابي'
-              )}
-            </p>
-          </div>
-
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-start space-x-3 p-4 bg-primary-50 rounded-lg">
-              <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Calendar className="w-5 h-5 text-primary-600" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-1">
-                  {t('home.modal.features.events', 'فعاليات متنوعة')}
-                </h4>
-                <p className="text-sm text-gray-600">
-                  {t(
-                    'home.modal.features.eventsDesc',
-                    'ورش عمل، مؤتمرات، وفرص شبكة تواصل'
-                  )}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start space-x-3 p-4 bg-accent-50 rounded-lg">
-              <div className="w-10 h-10 bg-accent-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <TrendingUp className="w-5 h-5 text-accent-600" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-1">
-                  {t('home.modal.features.programs', 'برامج تطويرية')}
-                </h4>
-                <p className="text-sm text-gray-600">
-                  {t(
-                    'home.modal.features.programsDesc',
-                    'برامج تعليمية وتدريبية لتنمية المهارات'
-                  )}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start space-x-3 p-4 bg-secondary-50 rounded-lg">
-              <div className="w-10 h-10 bg-secondary-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Users className="w-5 h-5 text-secondary-600" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-1">
-                  {t('home.modal.features.community', 'مجتمع عالمي')}
-                </h4>
-                <p className="text-sm text-gray-600">
-                  {t(
-                    'home.modal.features.communityDesc',
-                    'انضم إلى شبكة من الشباب المتحمسين'
-                  )}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start space-x-3 p-4 bg-green-50 rounded-lg">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <HeartHandshake className="w-5 h-5 text-green-600" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-1">
-                  {t('home.modal.features.impact', 'تأثير إيجابي')}
-                </h4>
-                <p className="text-sm text-gray-600">
-                  {t(
-                    'home.modal.features.impactDesc',
-                    'ساهم في صناعة التغيير في مجتمعك'
-                  )}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Call to Action */}
-          <div className="text-center pt-4 border-t border-gray-200">
-            <p className="text-gray-600 mb-4">
-              {t('home.modal.cta', 'ابدأ رحلتك معنا اليوم')}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button
-                variant="primary"
-                onClick={() => {
-                  setShowModal(false);
-                  navigate('/programs');
-                }}
-                className="px-6 py-2"
-              >
-                {t('home.modal.explorePrograms', 'استكشف البرامج')}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowModal(false);
-                  navigate('/events');
-                }}
-                className="px-6 py-2"
-              >
-                {t('home.modal.exploreEvents', 'استكشف الفعاليات')}
-              </Button>
-            </div>
+            ))}
           </div>
         </div>
-      </Modal>
+      </section>
+
+      {/* Newsletter Section */}
+      <section className="py-20 bg-gradient-to-br from-primary-50 to-accent-50 relative overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <NewsletterSignup />
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-primary-600 via-primary-700 to-accent-600 text-white relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-xl animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-24 h-24 bg-accent-500/20 rounded-full blur-lg animate-bounce"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/5 rounded-full blur-3xl animate-pulse"></div>
+        </div>
+
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative z-10 container mx-auto px-4 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.9 }}
+              className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-white to-accent-50 rounded-2xl mb-6 shadow-2xl"
+            >
+              <Rocket className="w-12 h-12 text-primary-600" />
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-accent-100 bg-clip-text text-transparent">
+              انضم إلى مجتمعنا النشط
+            </h2>
+            <p className="text-xl mb-8 text-white/90 max-w-3xl mx-auto leading-relaxed">
+              سجل الآن واستفد من جميع المميزات والخدمات التي نقدمها
+              <br />
+              <span className="text-accent-200 font-semibold">
+                ابدأ رحلة التطوير معنا اليوم
+              </span>
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/register"
+                className="group bg-gradient-to-r from-white to-accent-50 text-primary-600 hover:from-accent-50 hover:to-white px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 shadow-2xl hover:shadow-3xl inline-flex items-center justify-center transform hover:scale-105 hover:-translate-y-1"
+              >
+                <span className="flex items-center justify-center">
+                  إنشاء حساب مجاني
+                  <CheckCircle className="w-5 h-5 mr-2" />
+                </span>
+              </Link>
+              <Link
+                to="/login"
+                className="group border-2 border-white text-white hover:bg-white hover:text-primary-600 px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 inline-flex items-center justify-center transform hover:scale-105 hover:-translate-y-1 backdrop-blur-sm"
+              >
+                تسجيل الدخول
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </section>
     </div>
   );
-};
-
-// Enhanced animated counter component
-const CountUpNumber: React.FC<{ value: number; className?: string }> = ({
-  value,
-  className,
-}) => {
-  const [count, setCount] = React.useState(0);
-
-  useEffect(() => {
-    let start = 0;
-    const duration = 2000;
-    const step = Math.ceil(value / 60);
-    const interval = setInterval(() => {
-      start += step;
-      if (start >= value) {
-        setCount(value);
-        clearInterval(interval);
-      } else {
-        setCount(start);
-      }
-    }, duration / 60);
-    return () => clearInterval(interval);
-  }, [value]);
-
-  return <span className={className}>{count.toLocaleString()}</span>;
 };
 
 export default Home;

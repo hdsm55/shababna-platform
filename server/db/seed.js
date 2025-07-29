@@ -16,29 +16,29 @@ async function seedDatabase() {
 
         console.log('Seeding users...');
         await query(`
-            INSERT INTO users (email, password, first_name, last_name, role, created_at)
+            INSERT INTO users (name, email, password, role, created_at)
             VALUES
-                ('admin@shababna.com', $1, 'Admin', 'User', 'admin', NOW()),
-                ('user1@example.com', $2, 'User', 'One', 'user', NOW()),
-                ('user2@example.com', $2, 'User', 'Two', 'user', NOW())
+                ('Admin User', 'admin@shababna.com', $1, 'admin', NOW()),
+                ('User One', 'user1@example.com', $2, 'user', NOW()),
+                ('User Two', 'user2@example.com', $2, 'user', NOW())
         `, [adminPassword, hashedPassword]);
 
         console.log('Seeding events...');
         await query(`
-            INSERT INTO events (title, description, start_date, location, created_at)
+            INSERT INTO events (title, description, start_date, end_date, location, max_attendees, attendees, category, status, created_at)
             VALUES
-                ('Islamic Lecture', 'Valuable lecture on Quran interpretation', '2024-02-15', 'Masjid Al-Noor - Riyadh', NOW()),
-                ('Quran Memorization Course', 'Intensive course for beginners', '2024-02-20', 'Quran Center - Jeddah', NOW()),
-                ('Youth Islamic Camp', 'Summer camp with sports and spiritual activities', '2024-03-01', 'Green Mountain Resort - Taif', NOW())
+                ('ندوة التطوع المجتمعي', 'ندوة حول أهمية العمل التطوعي ودوره في تنمية المجتمع', '2024-03-10', '2024-03-10', 'مركز المجتمع - الرياض', 100, 75, 'seminar', 'upcoming', NOW()),
+                ('دورة تدريبية في الإسعافات الأولية', 'دورة شاملة لتعلم الإسعافات الأولية الأساسية للشباب', '2024-02-25', '2024-02-25', 'مركز الصحة - جدة', 40, 30, 'training', 'upcoming', NOW()),
+                ('ورشة الكتابة الإبداعية', 'تعلم فنون الكتابة الإبداعية وتطوير المهارات الأدبية', '2024-03-08', '2024-03-08', 'مركز الثقافة - الدمام', 30, 22, 'workshop', 'upcoming', NOW())
         `);
 
         console.log('Seeding programs...');
         await query(`
-            INSERT INTO programs (title, description, start_date, end_date, created_at)
+            INSERT INTO programs (title, description, category, goal_amount, current_amount, participants_count, status, start_date, end_date, created_at)
             VALUES
-                ('Build Mosque in Remote Village', 'Project to build mosque in poor village', '2024-01-01', '2024-06-30', NOW()),
-                ('Orphan Sponsorship', 'Program to sponsor orphans for education and healthcare', '2024-01-15', '2024-12-31', NOW()),
-                ('Distribute Quran Copies', 'Project to distribute Quran and Islamic books', '2024-02-01', '2024-05-31', NOW())
+                ('برنامج الصحة واللياقة البدنية', 'تشجيع الشباب على ممارسة الرياضة واتباع نمط حياة صحي من خلال برامج تدريبية متنوعة', 'صحي', 25000.00, 12000.00, 89, 'active', '2024-02-01', '2024-08-31', datetime('now')),
+                ('مشروع الحرف اليدوية التقليدية', 'الحفاظ على الحرف اليدوية التقليدية وتعليمها للشباب لضمان استمراريتها للأجيال القادمة', 'ثقافي', 20000.00, 8000.00, 34, 'active', '2024-03-15', '2024-09-30', datetime('now')),
+                ('برنامج دعم الطلاب المتفوقين', 'دعم الطلاب المتفوقين أكاديمياً وتوفير المنح الدراسية والكتب', 'تعليمي', 60000.00, 35000.00, 67, 'active', '2024-01-01', '2024-12-31', datetime('now'))
         `);
 
         console.log('Database seeding completed successfully!');

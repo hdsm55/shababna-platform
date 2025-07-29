@@ -1,4 +1,4 @@
-import { query } from '../config/database.js';
+import { query } from '../config/database-sqlite.js';
 import { successResponse, errorResponse } from '../utils/response.js';
 
 export const getAllBlogs = async (req, res) => {
@@ -13,7 +13,7 @@ export const getAllBlogs = async (req, res) => {
 export const getBlogById = async (req, res) => {
     try {
         const { id } = req.params;
-        const result = await query('SELECT * FROM blogs WHERE id = $1', [id]);
+        const result = await query('SELECT * FROM blogs WHERE id = ?', [id]);
         if (result.rows.length === 0) {
             return res.status(404).json({ message: 'لم يتم العثور على التدوينة' });
         }
@@ -27,7 +27,7 @@ export const createBlog = async (req, res) => {
     try {
         const { title, content, image_url, author_id } = req.body;
         const result = await query(
-            'INSERT INTO blogs (title, content, image_url, author_id) VALUES ($1, $2, $3, $4) RETURNING *',
+            'INSERT INTO blogs (title, content, image_url, author_id, created_at) VALUES (?, ?, ?, ?, datetime("now"))',
             [title, content, image_url, author_id]
         );
         return successResponse(res, result.rows[0], 'تم إنشاء التدوينة بنجاح');
@@ -41,7 +41,7 @@ export const updateBlog = async (req, res) => {
         const { id } = req.params;
         const { title, content, image_url, author_id } = req.body;
         const result = await query(
-            'UPDATE blogs SET title = $1, content = $2, image_url = $3, author_id = $4, updated_at = NOW() WHERE id = $5 RETURNING *',
+            'UPDATE blogs SET title = ?, content = ?, image_url = ?, author_id = ?, updated_at = datetime("now") WHERE id = ?',
             [title, content, image_url, author_id, id]
         );
         if (result.rows.length === 0) {
@@ -56,7 +56,7 @@ export const updateBlog = async (req, res) => {
 export const deleteBlog = async (req, res) => {
     try {
         const { id } = req.params;
-        const result = await query('DELETE FROM blogs WHERE id = $1 RETURNING *', [id]);
+        const result = await query('DELETE FROM blogs WHERE id = ?', [id]);
         if (result.rows.length === 0) {
             return res.status(404).json({ message: 'لم يتم العثور على التدوينة' });
         }

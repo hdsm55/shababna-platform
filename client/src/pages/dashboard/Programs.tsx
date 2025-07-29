@@ -840,7 +840,7 @@ const ProgramsDashboard: React.FC = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDelete(program.id)}
-                        className="p-1 text-red-600 hover:text-red-700"
+                        className="p-1 text-primary-600 hover:text-primary-700"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>

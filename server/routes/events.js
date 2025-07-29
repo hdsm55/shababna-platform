@@ -1,6 +1,6 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
-import { query } from '../config/database.js';
+import { query } from '../config/database-sqlite.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import { adminMiddleware } from '../middleware/adminMiddleware.js';
 import { getAllEvents, getEventById, createEvent, updateEvent, deleteEvent, registerForEvent } from '../controllers/eventsController.js';

@@ -260,6 +260,38 @@ const DashboardOverview: React.FC = () => {
     }
   };
 
+  const getActivityColor = (type: string) => {
+    switch (type) {
+      case 'event_registration':
+        return 'blue';
+      case 'program_creation':
+        return 'purple';
+      case 'user_registration':
+        return 'green';
+      case 'content_update':
+        return 'orange';
+      case 'system_alert':
+        return 'red';
+      default:
+        return 'gray';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'success':
+        return t('dashboard.status.success', 'نجاح');
+      case 'warning':
+        return t('dashboard.status.warning', 'تحذير');
+      case 'error':
+        return t('dashboard.status.error', 'خطأ');
+      case 'info':
+        return t('dashboard.status.info', 'معلومة');
+      default:
+        return status;
+    }
+  };
+
   const handleUnavailable = (
     msg = t('dashboard.unavailable', 'هذه الخاصية قيد التطوير، قريبًا!')
   ) => {
@@ -304,11 +336,9 @@ const DashboardOverview: React.FC = () => {
         <Alert
           type="error"
           title={t('dashboard.error.title', 'خطأ في تحميل البيانات')}
-          message={t(
-            'dashboard.error.message',
-            'حدث خطأ أثناء تحميل بيانات الداشبورد'
-          )}
-        />
+        >
+          {t('dashboard.error.message', 'حدث خطأ أثناء تحميل بيانات الداشبورد')}
+        </Alert>
       </DashboardLayout>
     );
   }
@@ -355,47 +385,81 @@ const DashboardOverview: React.FC = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {Array.isArray(stats.overview) && stats.overview.length > 0 ? (
           stats.overview.map((stat: any, index: number) => (
-            <div
+            <motion.div
               key={index}
-              className="bg-white rounded-lg p-4 border border-gray-100"
+              className="bg-white rounded-lg p-4 border border-gray-100 hover:shadow-md transition-shadow"
+              variants={itemVariants}
+              initial="hidden"
+              animate="visible"
             >
               <div className="flex items-center justify-between mb-2">
                 <div
-                  className={`w-8 h-8 rounded-lg bg-${stat.color}-50 flex items-center justify-center`}
+                  className={`w-10 h-10 rounded-lg bg-${stat.color}-50 flex items-center justify-center`}
                 >
-                  <stat.icon className={`w-4 h-4 text-${stat.color}-500`} />
-                </div>
-                <div className="flex items-center gap-1">
                   {(() => {
-                    const IconComponent = getGrowthIcon(stat.changeType);
+                    const IconComponent = stat.icon;
                     return (
                       IconComponent && (
                         <IconComponent
-                          className={`w-3 h-3 ${
-                            stat.changeType === 'increase'
-                              ? 'text-green-500'
-                              : 'text-red-500'
-                          }`}
+                          className={`w-5 h-5 text-${stat.color}-500`}
                         />
                       )
                     );
                   })()}
-                  <span
-                    className={`text-xs ${
-                      stat.changeType === 'increase'
-                        ? 'text-green-600'
-                        : 'text-red-600'
-                    }`}
-                  >
-                    {stat.change}
-                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  {stat.change && (
+                    <>
+                      {(() => {
+                        const IconComponent = getGrowthIcon(stat.changeType);
+                        return (
+                          IconComponent && (
+                            <IconComponent
+                              className={`w-3 h-3 ${
+                                stat.changeType === 'increase'
+                                  ? 'text-green-500'
+                                  : stat.changeType === 'decrease'
+                                  ? 'text-red-500'
+                                  : stat.changeType === 'warning'
+                                  ? 'text-yellow-500'
+                                  : 'text-gray-500'
+                              }`}
+                            />
+                          )
+                        );
+                      })()}
+                      <span
+                        className={`text-xs ${
+                          stat.changeType === 'increase'
+                            ? 'text-green-600'
+                            : stat.changeType === 'decrease'
+                            ? 'text-red-600'
+                            : stat.changeType === 'warning'
+                            ? 'text-yellow-600'
+                            : 'text-gray-600'
+                        }`}
+                      >
+                        {stat.change}
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
               <div className="text-2xl font-bold text-gray-900 mb-1">
-                {stat.value}
+                {stat.value.toLocaleString('ar-SA')}
               </div>
               <div className="text-xs text-gray-500">{stat.title}</div>
-            </div>
+              {stat.details && (
+                <div className="mt-2 text-xs text-gray-400">
+                  {stat.details.recent && (
+                    <div>جديد هذا الأسبوع: {stat.details.recent}</div>
+                  )}
+                  {stat.details.pending && (
+                    <div>معلق: {stat.details.pending}</div>
+                  )}
+                </div>
+              )}
+            </motion.div>
           ))
         ) : (
           <div className="col-span-4 text-center py-8">
@@ -435,39 +499,55 @@ const DashboardOverview: React.FC = () => {
               </select>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {Array.isArray(stats.engagement) &&
               stats.engagement.length > 0 ? (
                 stats.engagement.map((metric: any, index: number) => (
-                  <div
+                  <motion.div
                     key={index}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    variants={itemVariants}
+                    initial="hidden"
+                    animate="visible"
                   >
                     <div className="flex items-center gap-3">
                       <div
-                        className={`w-8 h-8 rounded-lg bg-${metric.color}-50 flex items-center justify-center`}
+                        className={`w-10 h-10 rounded-lg bg-${metric.color}-50 flex items-center justify-center`}
                       >
-                        <metric.icon
-                          className={`w-4 h-4 text-${metric.color}-500`}
-                        />
+                        {(() => {
+                          const IconComponent = metric.icon;
+                          return (
+                            IconComponent && (
+                              <IconComponent
+                                className={`w-5 h-5 text-${metric.color}-500`}
+                              />
+                            )
+                          );
+                        })()}
                       </div>
                       <div>
                         <div className="font-medium text-sm text-gray-800">
                           {metric.title}
                         </div>
                         <div className="text-xs text-gray-500">
-                          الهدف: {metric.target}
+                          الهدف:{' '}
+                          {metric.target?.toLocaleString('ar-SA') || 'غير محدد'}
                         </div>
+                        {metric.alert && (
+                          <div className="text-xs text-yellow-600 mt-1">
+                            ⚠️ {metric.alert}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-lg font-bold text-gray-900">
-                        {metric.value}
+                        {metric.value.toLocaleString('ar-SA')}
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div
-                            className={`h-full bg-${metric.color}-500 rounded-full`}
+                            className={`h-full bg-${metric.color}-500 rounded-full transition-all duration-300`}
                             style={{ width: `${metric.percentage}%` }}
                           />
                         </div>
@@ -476,14 +556,14 @@ const DashboardOverview: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))
               ) : (
-                <div className="text-center py-6">
+                <div className="text-center py-8">
                   <p className="text-sm text-gray-400">
                     {t(
-                      'dashboard.noPerformance',
-                      'لا توجد بيانات أداء متاحة حالياً.'
+                      'dashboard.noMetrics',
+                      'لا توجد مقاييس أداء متاحة حالياً.'
                     )}
                   </p>
                 </div>
@@ -492,116 +572,136 @@ const DashboardOverview: React.FC = () => {
           </div>
         </div>
 
-        {/* Recent Activities */}
-        <div>
-          <div className="bg-white rounded-lg p-6 border border-gray-100 h-full">
+        {/* Recent Activity */}
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-lg p-6 border border-gray-100">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-800">
-                {t('dashboard.activities.title', 'الأنشطة الحديثة')}
+                {t('dashboard.recentActivity.title', 'النشاط الحديث')}
               </h2>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                onClick={() => handleUnavailable()}
-                className="text-xs text-blue-600"
+                onClick={() => refetchActivities()}
+                className="text-xs"
               >
-                {t('dashboard.activities.viewAll', 'عرض الكل')}
+                <RefreshCw className="w-3 h-3 mr-1" />
+                {t('dashboard.refresh', 'تحديث')}
               </Button>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-3">
               {Array.isArray(activities) && activities.length > 0 ? (
-                activities.slice(0, 5).map((activity, index) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50"
+                activities.slice(0, 5).map((activity: any, index: number) => (
+                  <motion.div
+                    key={activity.id || index}
+                    className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    variants={itemVariants}
+                    initial="hidden"
+                    animate="visible"
                   >
                     <div
-                      className={`w-6 h-6 rounded-lg bg-${activity.color}-50 flex items-center justify-center flex-shrink-0`}
+                      className={`w-8 h-8 rounded-lg bg-${getActivityColor(
+                        activity.type
+                      )}-50 flex items-center justify-center mt-1`}
                     >
-                      <activity.icon
-                        className={`w-3 h-3 text-${activity.color}-500`}
-                      />
+                      {(() => {
+                        const IconComponent = getActivityIcon(activity.type);
+                        return (
+                          IconComponent && (
+                            <IconComponent
+                              className={`w-4 h-4 text-${getActivityColor(
+                                activity.type
+                              )}-500`}
+                            />
+                          )
+                        );
+                      })()}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-xs text-gray-800 mb-1">
-                        {activity.title}
+                      <div className="text-sm font-medium text-gray-800 truncate">
+                        {activity.message}
                       </div>
-                      <div className="text-xs text-gray-500 mb-2">
-                        {activity.description}
+                      <div className="text-xs text-gray-500 mt-1">
+                        {activity.date}
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-400">
-                          {activity.time}
-                        </span>
-                        <span
-                          className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(
-                            activity.status
-                          )}`}
-                        >
-                          {activity.status}
-                        </span>
-                      </div>
+                      {activity.user && (
+                        <div className="text-xs text-gray-400 mt-1">
+                          بواسطة: {activity.user}
+                        </div>
+                      )}
                     </div>
-                  </div>
+                    <div className="flex items-center gap-1">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${getStatusColor(
+                          activity.status
+                        )}`}
+                      >
+                        {getStatusText(activity.status)}
+                      </span>
+                    </div>
+                  </motion.div>
                 ))
               ) : (
-                <div className="text-center py-6">
+                <div className="text-center py-8">
                   <p className="text-sm text-gray-400">
-                    {t('dashboard.noActivities', 'لا توجد أنشطة متاحة حالياً.')}
+                    {t('dashboard.noActivity', 'لا توجد أنشطة حديثة.')}
                   </p>
                 </div>
               )}
             </div>
+
+            {Array.isArray(activities) && activities.length > 5 && (
+              <div className="mt-4 text-center">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    handleUnavailable('سيتم إضافة صفحة الأنشطة قريباً')
+                  }
+                >
+                  {t('dashboard.viewAll', 'عرض الكل')}
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="mt-6">
-        <div className="bg-white rounded-lg p-6 border border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">
-            {t('dashboard.quickActions.title', 'إجراءات سريعة')}
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Button
-              variant="outline"
-              className="flex flex-col items-center gap-2 p-3 h-auto text-xs"
-              onClick={() => handleUnavailable()}
-            >
-              <Plus className="w-4 h-4" />
-              <span>
-                {t('dashboard.quickActions.newEvent', 'فعالية جديدة')}
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              className="flex flex-col items-center gap-2 p-3 h-auto text-xs"
-              onClick={() => handleUnavailable()}
-            >
-              <Target className="w-4 h-4" />
-              <span>
-                {t('dashboard.quickActions.newProgram', 'برنامج جديد')}
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              className="flex flex-col items-center gap-2 p-3 h-auto text-xs"
-              onClick={() => handleUnavailable()}
-            >
-              <UserPlus className="w-4 h-4" />
-              <span>{t('dashboard.quickActions.newUser', 'مستخدم جديد')}</span>
-            </Button>
-            <Button
-              variant="outline"
-              className="flex flex-col items-center gap-2 p-3 h-auto text-xs"
-              onClick={() => handleUnavailable()}
-            >
-              <FileText className="w-4 h-4" />
-              <span>{t('dashboard.quickActions.newBlog', 'مقال جديد')}</span>
-            </Button>
-          </div>
-        </div>
+      <div className="mt-8">
+        <QuickActions
+          actions={[
+            {
+              to: '/dashboard/events/new',
+              label: 'dashboard.quickActions.newEvent',
+              icon: Calendar,
+              color: 'primary',
+              description: 'إضافة فعالية جديدة',
+            },
+            {
+              to: '/dashboard/programs/new',
+              label: 'dashboard.quickActions.newProgram',
+              icon: TrendingUp,
+              color: 'success',
+              description: 'إضافة برنامج جديد',
+            },
+            {
+              to: '/dashboard/users/new',
+              label: 'dashboard.quickActions.newUser',
+              icon: UserPlus,
+              color: 'info',
+              description: 'إضافة مستخدم جديد',
+            },
+            {
+              to: '/dashboard/blogs/new',
+              label: 'dashboard.quickActions.newBlog',
+              icon: FileText,
+              color: 'warning',
+              description: 'إضافة مقال جديد',
+            },
+          ]}
+        />
       </div>
 
       {/* Modal */}

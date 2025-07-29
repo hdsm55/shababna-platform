@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { query } from '../config/database.js';
+import { query } from '../config/database-sqlite.js';
 
 /**
  * Authentication middleware that verifies JWT tokens

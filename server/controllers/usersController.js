@@ -1,5 +1,5 @@
 import { validationResult } from 'express-validator';
-import { query } from '../config/database.js';
+import { query } from '../config/database-sqlite.js';
 import bcrypt from 'bcryptjs';
 import { successResponse, errorResponse } from '../utils/response.js';
 
@@ -65,8 +65,7 @@ export const getAllUsers = async (req, res) => {
         const result = await query(`
       SELECT
         u.id,
-        u.first_name,
-        u.last_name,
+        u.name,
         u.email,
         u.role,
         u.created_at
@@ -84,18 +83,16 @@ export const getAllUsers = async (req, res) => {
 export const createUser = async (req, res) => {
     try {
         const {
-            first_name,
-            last_name,
+            name,
             email,
             password,
             role = 'user'
         } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
         const result = await query(`
-      INSERT INTO users (first_name, last_name, email, password, role)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING id, first_name, last_name, email, role, created_at
-    `, [first_name, last_name, email, hashedPassword, role]);
+      INSERT INTO users (name, email, password, role, created_at)
+      VALUES (?, ?, ?, ?, datetime('now'))
+    `, [name, email, hashedPassword, role]);
         return successResponse(res, result.rows[0], 'تم إضافة المستخدم بنجاح');
     } catch (error) {
         console.error('User creation error:', error);
@@ -108,27 +105,24 @@ export const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
         const {
-            first_name,
-            last_name,
+            name,
             email,
             password,
             role
         } = req.body;
-        let updateFields = [first_name, last_name, email, role, id];
+        let updateFields = [name, email, role, id];
         let queryStr = `
       UPDATE users
-      SET first_name = $1, last_name = $2, email = $3, role = $4
-      WHERE id = $5
-      RETURNING id, first_name, last_name, email, role, created_at
+      SET name = ?, email = ?, role = ?
+      WHERE id = ?
     `;
         if (password) {
             const hashedPassword = await bcrypt.hash(password, 10);
-            updateFields = [first_name, last_name, email, hashedPassword, role, id];
+            updateFields = [name, email, hashedPassword, role, id];
             queryStr = `
         UPDATE users
-        SET first_name = $1, last_name = $2, email = $3, password = $4, role = $5
-        WHERE id = $6
-        RETURNING id, first_name, last_name, email, role, created_at
+        SET name = ?, email = ?, password = ?, role = ?
+        WHERE id = ?
       `;
         }
         const result = await query(queryStr, updateFields);
@@ -146,7 +140,7 @@ export const updateUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const result = await query('DELETE FROM users WHERE id = $1 RETURNING *', [id]);
+        const result = await query('DELETE FROM users WHERE id = ?', [id]);
         if (result.rows.length === 0) {
             return errorResponse(res, 'المستخدم غير موجود', 404);
         }

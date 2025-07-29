@@ -18,6 +18,13 @@ import {
   ArrowRight,
   Search,
   X,
+  Trophy,
+  Target,
+  Award,
+  Sparkles,
+  Heart,
+  Eye,
+  Zap,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Input } from '../components/ui/Input/Input';
@@ -34,21 +41,25 @@ interface Program {
   created_at: string;
   updated_at?: string;
   image_url?: string;
+  participants_count?: number;
 }
 
 const Programs: React.FC = () => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.dir() === 'rtl';
 
-  // جلب البرامج
+  // جلب البرامج مع تحسين الاستعلام
   const {
     data: programsData,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ['programs'],
     queryFn: () => fetchPrograms({ page: 1, limit: 12 }),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 2,
+    refetchOnWindowFocus: false,
   });
 
   const programs = programsData?.data?.items || [];
@@ -73,7 +84,7 @@ const Programs: React.FC = () => {
   });
 
   const getStatusColor = (status: string) => {
-    return 'bg-green-100 text-green-800';
+    return 'bg-gradient-to-r from-success-500 to-success-600 text-white';
   };
 
   const getStatusText = (status: string) => {
@@ -93,16 +104,24 @@ const Programs: React.FC = () => {
   };
 
   const categories = [
-    { value: 'all', label: 'جميع الفئات' },
-    { value: 'صحية', label: 'صحية' },
-    { value: 'تعليمية', label: 'تعليمية' },
-    { value: 'اجتماعية', label: 'اجتماعية' },
-    { value: 'رياضية', label: 'رياضية' },
-    { value: 'ثقافية', label: 'ثقافية' },
+    { value: 'all', label: 'جميع الفئات', icon: <Eye className="w-4 h-4" /> },
+    { value: 'تقني', label: 'تقني', icon: <Zap className="w-4 h-4" /> },
+    {
+      value: 'ريادة أعمال',
+      label: 'ريادة أعمال',
+      icon: <TrendingUp className="w-4 h-4" />,
+    },
+    { value: 'اجتماعي', label: 'اجتماعي', icon: <Users className="w-4 h-4" /> },
+    { value: 'تعليمي', label: 'تعليمي', icon: <Award className="w-4 h-4" /> },
+    { value: 'صحي', label: 'صحي', icon: <Heart className="w-4 h-4" /> },
+    { value: 'ثقافي', label: 'ثقافي', icon: <Sparkles className="w-4 h-4" /> },
   ];
 
   return (
-    <div className="min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div
+      className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50"
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
       <SEO
         title={t('programs.seo.title', 'البرامج - منصة شبابنا العالمية')}
         description={t(
@@ -113,21 +132,37 @@ const Programs: React.FC = () => {
       />
 
       {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-br from-primary-50 via-white to-accent-50">
-        <div className="container mx-auto px-4 text-center">
+      <section className="relative py-20 bg-gradient-to-br from-accent-600 via-accent-700 to-accent-800 text-white overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-20 w-32 h-32 bg-white/10 rounded-full blur-xl animate-pulse"></div>
+          <div className="absolute top-40 right-40 w-24 h-24 bg-primary-500/20 rounded-full blur-lg animate-bounce"></div>
+          <div className="absolute bottom-20 left-1/3 w-40 h-40 bg-white/5 rounded-full blur-2xl animate-pulse"></div>
+        </div>
+
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative z-10 container mx-auto px-4 text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-white to-primary-50 rounded-2xl mb-6 shadow-2xl"
+          >
+            <Trophy className="w-12 h-12 text-accent-600" />
+          </motion.div>
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-4xl md:text-5xl font-bold text-primary-900 mb-6"
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-primary-100 bg-clip-text text-transparent"
           >
             {t('programs.hero.title', 'برامجنا المتنوعة')}
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-lg md:text-xl text-primary-700 max-w-3xl mx-auto mb-8"
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed"
           >
             {t(
               'programs.hero.subtitle',
@@ -140,12 +175,12 @@ const Programs: React.FC = () => {
       {/* Search and Filters Section - Enhanced */}
       <section className="container mx-auto px-4 py-8">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="bg-gradient-to-r from-white to-accent-50 p-6 rounded-2xl shadow-lg border border-accent-100"
+          className="bg-gradient-to-r from-white to-accent-50 p-8 rounded-3xl shadow-2xl border border-accent-100"
         >
-          <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
+          <div className="flex flex-col lg:flex-row gap-8 items-center justify-between">
             {/* Search Bar - Enhanced */}
             <div className="relative w-full lg:w-96">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -160,7 +195,7 @@ const Programs: React.FC = () => {
                 )}
                 value={searchTerm}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                className="pl-12 pr-4 py-3 bg-white border-accent-200 focus:border-accent-500 focus:ring-accent-500 shadow-sm"
+                className="pl-12 pr-4 py-4 bg-white border-accent-200 focus:border-accent-500 focus:ring-accent-500 shadow-lg rounded-xl"
                 fullWidth
               />
               {searchTerm && (
@@ -192,6 +227,7 @@ const Programs: React.FC = () => {
                         ? 'shadow-lg shadow-accent-200 ring-2 ring-accent-300'
                         : 'hover:shadow-md hover:shadow-accent-100'
                     }`}
+                    icon={category.icon}
                   >
                     {category.label}
                   </Button>
@@ -201,18 +237,30 @@ const Programs: React.FC = () => {
           </div>
 
           {/* Results Counter */}
-          <div className="mt-4 pt-4 border-t border-accent-100">
-            <p className="text-sm text-accent-600 font-medium">
-              {t('programs.results', 'تم العثور على {count} برنامج', {
-                count: filteredPrograms.length,
-              })}
-            </p>
+          <div className="mt-6 pt-6 border-t border-accent-100">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-accent-600 font-medium">
+                {t('programs.results', 'تم العثور على {count} برنامج', {
+                  count: filteredPrograms.length,
+                })}
+              </p>
+              {error && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => refetch()}
+                  className="text-accent-600"
+                >
+                  إعادة المحاولة
+                </Button>
+              )}
+            </div>
           </div>
         </motion.div>
       </section>
 
       {/* Programs Grid */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-12 bg-gradient-to-br from-neutral-50 to-accent-50">
         <div className="container mx-auto px-4">
           {isLoading ? (
             <div className="flex justify-center py-12">
@@ -231,40 +279,52 @@ const Programs: React.FC = () => {
             </Alert>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredPrograms.map((program: any) => (
+              {filteredPrograms.map((program: any, index: number) => (
                 <motion.div
                   key={program.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="group"
                 >
-                  <Card className="h-full hover:shadow-lg transition-shadow duration-300">
+                  <Card className="h-full hover:shadow-2xl transition-all duration-300 group-hover:scale-105 border-0 bg-gradient-to-br from-white to-accent-50">
                     <div className="p-6">
                       {/* Program Image */}
-                      <div className="mb-4">
-                        <img
-                          src={
-                            program.image_url ||
-                            '/images/program-placeholder.svg'
-                          }
-                          alt={program.title}
-                          className="w-full h-48 object-cover rounded-lg"
-                          loading="lazy"
-                          onError={(e) => {
-                            console.log(
-                              'Image failed to load:',
-                              program.image_url
-                            );
-                            e.currentTarget.src =
-                              '/images/program-placeholder.svg';
-                          }}
-                        />
+                      <div className="mb-6">
+                        <div className="relative overflow-hidden rounded-2xl">
+                          <img
+                            src={
+                              program.image_url ||
+                              '/images/program-placeholder.svg'
+                            }
+                            alt={program.title}
+                            className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                            loading="lazy"
+                            onError={(e) => {
+                              console.log(
+                                'Image failed to load:',
+                                program.image_url
+                              );
+                              e.currentTarget.src =
+                                '/images/program-placeholder.svg';
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                          <div className="absolute top-4 right-4">
+                            <div className="flex items-center text-yellow-500">
+                              <Star className="w-4 h-4 fill-current" />
+                              <span className="text-white text-sm font-medium ml-1">
+                                مميز
+                              </span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
 
                       {/* Program Status */}
                       <div className="flex items-center justify-between mb-4">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                          className={`px-3 py-1 rounded-full text-xs font-medium shadow-lg ${getStatusColor(
                             'active'
                           )}`}
                         >
@@ -277,7 +337,7 @@ const Programs: React.FC = () => {
                       </div>
 
                       {/* Program Title */}
-                      <h3 className="text-xl font-bold text-primary-900 mb-2">
+                      <h3 className="text-xl font-bold text-primary-900 mb-3 group-hover:text-accent-600 transition-colors">
                         {program.title}
                       </h3>
 
@@ -301,7 +361,7 @@ const Programs: React.FC = () => {
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
-                              className="bg-gradient-to-r from-primary-500 to-accent-500 h-2 rounded-full transition-all duration-300"
+                              className="bg-gradient-to-r from-accent-500 to-primary-500 h-2 rounded-full transition-all duration-300"
                               style={{
                                 width: `${getProgressPercentage(
                                   program.current_amount,
@@ -340,8 +400,11 @@ const Programs: React.FC = () => {
 
                       {/* Action Button */}
                       <Link to={`/programs/${program.id}`}>
-                        <Button className="w-full">
-                          {t('programs.viewDetails', 'عرض التفاصيل')}
+                        <Button className="w-full group-hover:shadow-lg transform group-hover:scale-105">
+                          <span className="flex items-center justify-center">
+                            عرض التفاصيل
+                            <ArrowRight className="w-4 h-4 mr-2 group-hover:translate-x-1 transition-transform" />
+                          </span>
                         </Button>
                       </Link>
                     </div>
@@ -354,33 +417,58 @@ const Programs: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-primary-900 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            {t('programs.cta.title', 'انضم إلينا في صناعة التغيير')}
-          </h2>
-          <p className="text-lg mb-8 max-w-2xl mx-auto">
-            {t(
-              'programs.cta.description',
-              'ساعدنا في تحقيق أهدافنا ودعم برامجنا المتنوعة. كل مساهمة تحدث فرقاً.'
-            )}
-          </p>
-          <div className="flex flex-col md:flex-row gap-4 justify-center">
-            <Link to="/join-us">
-              <Button size="lg" className="bg-accent-500 hover:bg-accent-600">
-                {t('programs.cta.join', 'انضم إلينا')}
-              </Button>
-            </Link>
-            <Link to="/contact">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-white text-white hover:bg-white hover:text-primary-900"
-              >
-                {t('programs.cta.contact', 'تواصل معنا')}
-              </Button>
-            </Link>
-          </div>
+      <section className="py-20 bg-gradient-to-r from-accent-600 via-accent-700 to-primary-600 text-white relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-xl animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-24 h-24 bg-primary-500/20 rounded-full blur-lg animate-bounce"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/5 rounded-full blur-3xl animate-pulse"></div>
+        </div>
+
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative z-10 container mx-auto px-4 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.9 }}
+              className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-white to-primary-50 rounded-2xl mb-6 shadow-2xl"
+            >
+              <Target className="w-12 h-12 text-accent-600" />
+            </motion.div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-primary-100 bg-clip-text text-transparent">
+              {t('programs.cta.title', 'انضم إلينا في صناعة التغيير')}
+            </h2>
+            <p className="text-xl mb-8 text-white/90 max-w-3xl mx-auto leading-relaxed">
+              {t(
+                'programs.cta.description',
+                'ساعدنا في تحقيق أهدافنا ودعم برامجنا المتنوعة. كل مساهمة تحدث فرقاً.'
+              )}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/join-us">
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 shadow-2xl hover:shadow-3xl transform hover:scale-105 hover:-translate-y-1"
+                >
+                  {t('programs.cta.join', 'انضم إلينا')}
+                </Button>
+              </Link>
+              <Link to="/contact">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-white text-white hover:bg-white hover:text-accent-900 shadow-2xl hover:shadow-3xl transform hover:scale-105 hover:-translate-y-1 backdrop-blur-sm"
+                >
+                  {t('programs.cta.contact', 'تواصل معنا')}
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
         </div>
       </section>
     </div>

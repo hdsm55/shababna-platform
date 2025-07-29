@@ -40,6 +40,7 @@ import SettingsDashboard from './pages/dashboard/Settings';
 import ReportsDashboard from './pages/dashboard/Reports';
 import AnalyticsDashboard from './pages/dashboard/Analytics';
 import ActivitiesDashboard from './pages/dashboard/Activities';
+import DataDisplay from './pages/dashboard/DataDisplay';
 
 function App() {
   const { i18n } = useTranslation();
@@ -89,6 +90,7 @@ function App() {
                         path="activities"
                         element={<ActivitiesDashboard />}
                       />
+                      <Route path="data-display" element={<DataDisplay />} />
                       {/* صفحات الإجراءات السريعة */}
                       <Route path="events/new" element={<NewEvent />} />
                       <Route path="programs/new" element={<NewProgram />} />
