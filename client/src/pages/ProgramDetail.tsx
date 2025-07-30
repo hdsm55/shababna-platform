@@ -90,31 +90,32 @@ const ProgramDetail: React.FC = () => {
       const response = await fetch(
         `${
           import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
-        }/programs/${id}/register`,
+        }/programs/${id}/support`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            firstName: donationForm.firstName,
-            lastName: donationForm.lastName,
-            email: donationForm.email,
-            phone: donationForm.phone,
+            supporter_name: `${donationForm.firstName} ${donationForm.lastName}`,
+            supporter_email: donationForm.email,
+            supporter_phone: donationForm.phone,
+            support_type: 'donation',
             message: donationForm.message,
+            amount: donationForm.amount,
           }),
         }
       );
 
       if (!response.ok) {
-        throw new Error('فشل في التسجيل');
+        throw new Error('فشل في التبرع');
       }
 
       const result = await response.json();
 
       if (result.success) {
         setDonationStatus('success');
-        setDonationMessage('تم التسجيل في البرنامج بنجاح! شكراً لك.');
+        setDonationMessage('تم التبرع بنجاح! شكراً لك.');
         setShowDonation(false);
         // إعادة تعيين النموذج
         setDonationForm({
@@ -126,12 +127,12 @@ const ProgramDetail: React.FC = () => {
           message: '',
         });
       } else {
-        throw new Error(result.message || 'حدث خطأ أثناء التسجيل');
+        throw new Error(result.message || 'حدث خطأ أثناء التبرع');
       }
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('Donation error:', error);
       setDonationStatus('error');
-      setDonationMessage('حدث خطأ أثناء التسجيل. يرجى المحاولة مرة أخرى.');
+      setDonationMessage('حدث خطأ أثناء التبرع. يرجى المحاولة مرة أخرى.');
     }
   };
 

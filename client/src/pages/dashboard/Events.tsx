@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import DashboardLayout from '../../layouts/DashboardLayout';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   fetchEvents,
@@ -530,31 +529,27 @@ const EventsDashboard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <LoadingSpinner size="lg" />
-        </div>
-      </DashboardLayout>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <LoadingSpinner size="lg" />
+      </div>
     );
   }
 
   if (error) {
     return (
-      <DashboardLayout>
-        <Alert
-          type="error"
-          title={t('events.error.title', 'خطأ في تحميل البيانات')}
-          message={t(
-            'events.error.message',
-            'حدث خطأ أثناء تحميل بيانات الفعاليات'
-          )}
-        />
-      </DashboardLayout>
+      <Alert
+        type="error"
+        title={t('events.error.title', 'خطأ في تحميل البيانات')}
+        message={t(
+          'events.error.message',
+          'حدث خطأ أثناء تحميل بيانات الفعاليات'
+        )}
+      />
     );
   }
 
   return (
-    <DashboardLayout>
+    <div className="min-h-screen bg-gray-100">
       <SEO
         title={t('events.seo.title', 'إدارة الفعاليات')}
         description={t(
@@ -1221,7 +1216,7 @@ const EventsDashboard: React.FC = () => {
           </div>
         </div>
       </Modal>
-    </DashboardLayout>
+    </div>
   );
 };
 

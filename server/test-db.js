@@ -1,34 +1,27 @@
-import { getDatabase } from './config/database.js';
+import { query } from './config/database.js';
 
 async function testDatabase() {
     try {
-        console.log('🚀 بدء اختبار قاعدة البيانات...');
+        console.log('🔍 اختبار قاعدة البيانات...');
 
-        const database = await getDatabase();
-        console.log('✅ تم الاتصال بقاعدة البيانات');
+        // اختبار الاتصال
+        const connectionTest = await query('SELECT NOW() as current_time');
+        console.log('✅ الاتصال بقاعدة البيانات:', connectionTest.rows[0].current_time);
 
-        // إنشاء جدول بسيط للاختبار
-        await database.exec(`
-            CREATE TABLE IF NOT EXISTS test_table (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            )
-        `);
-        console.log('✅ تم إنشاء جدول الاختبار');
+        // اختبار عدد الفعاليات
+        const eventsCount = await query('SELECT COUNT(*) as count FROM events');
+        console.log('📊 عدد الفعاليات:', eventsCount.rows[0].count);
 
-        // إدخال بيانات اختبار
-        const result = await database.run(
-            'INSERT INTO test_table (name) VALUES (?)',
-            ['test user']
-        );
-        console.log('✅ تم إدخال بيانات الاختبار، ID:', result.lastID);
+        // عرض الفعاليات
+        const events = await query('SELECT id, title, status FROM events LIMIT 5');
+        console.log('📋 الفعاليات الموجودة:');
+        events.rows.forEach(event => {
+            console.log(`  - ${event.id}: ${event.title} (${event.status})`);
+        });
 
-        // قراءة البيانات
-        const rows = await database.all('SELECT * FROM test_table');
-        console.log('✅ تم قراءة البيانات:', rows);
-
-        console.log('🎉 تم اختبار قاعدة البيانات بنجاح!');
+        // اختبار جدول التسجيلات
+        const registrationsCount = await query('SELECT COUNT(*) as count FROM event_registrations');
+        console.log('📝 عدد التسجيلات:', registrationsCount.rows[0].count);
 
     } catch (error) {
         console.error('❌ خطأ في اختبار قاعدة البيانات:', error);

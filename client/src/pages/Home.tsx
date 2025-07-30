@@ -51,7 +51,11 @@ const Home: React.FC = () => {
   const isRTL = i18n.dir() === 'rtl';
 
   // Fetch latest events
-  const { data: eventsData, isLoading: eventsLoading } = useQuery({
+  const {
+    data: eventsData,
+    isLoading: eventsLoading,
+    error: eventsError,
+  } = useQuery({
     queryKey: ['latest-events'],
     queryFn: () => fetchEvents({ page: 1, limit: 3 }),
     staleTime: 5 * 60 * 1000,
@@ -59,33 +63,47 @@ const Home: React.FC = () => {
 
   // Debug: طباعة هيكل البيانات
   console.log('🔍 Events Data Structure:', eventsData);
+  console.log('🔍 Events Loading:', eventsLoading);
+  console.log('🔍 Events Error:', eventsError);
+
   const latestEvents = (() => {
     try {
       // هيكل البيانات الفعلي من الخادم
+      if (eventsData?.data?.events && Array.isArray(eventsData.data.events)) {
+        console.log('✅ Found events in eventsData.data.events');
+        return eventsData.data.events;
+      }
       if (
         (eventsData as any)?.data?.items?.rows &&
         Array.isArray((eventsData as any).data.items.rows)
       ) {
+        console.log('✅ Found events in eventsData.data.items.rows');
         return (eventsData as any).data.items.rows;
       }
       if (eventsData?.data?.items && Array.isArray(eventsData.data.items)) {
+        console.log('✅ Found events in eventsData.data.items');
         return eventsData.data.items;
       }
       if (
         (eventsData as any)?.items &&
         Array.isArray((eventsData as any).items)
       ) {
+        console.log('✅ Found events in eventsData.items');
         return (eventsData as any).items;
       }
       if (Array.isArray(eventsData)) {
+        console.log('✅ Found events in eventsData array');
         return eventsData;
       }
+      console.log('❌ No events found in any expected structure');
       return [];
     } catch (error) {
       console.error('Error parsing events data:', error);
       return [];
     }
   })();
+
+  console.log('🔍 Final latestEvents:', latestEvents);
 
   // Fetch latest programs
   const { data: programsData, isLoading: programsLoading } = useQuery({

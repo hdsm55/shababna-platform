@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { fetchUsers, fetchEventRegistrations, fetchProgramRegistrations, fetchJoinRequests } from '../services/dashboardApi';
+import { fetchUsers, fetchEventRegistrations, fetchProgramRegistrations, fetchJoinRequests, fetchProgramSupporters } from '../services/dashboardApi';
 
 export interface Registrant {
   id: string;
@@ -15,6 +15,7 @@ export function useRegistrants() {
   const [users, setUsers] = useState<Registrant[]>([]);
   const [events, setEvents] = useState<Registrant[]>([]);
   const [programs, setPrograms] = useState<Registrant[]>([]);
+  const [supporters, setSupporters] = useState<Registrant[]>([]);
   const [joins, setJoins] = useState<Registrant[]>([]);
   // const [newsletter, setNewsletter] = useState<Registrant[]>([]); // مؤجل
   const [loading, setLoading] = useState(true);
@@ -36,6 +37,7 @@ export function useRegistrants() {
         sourceDetails: '-',
         registeredAt: u.created_at || u.joinDate || '',
       })));
+
       // فعاليات
       const eventsRes = await fetchEventRegistrations();
       console.log('event registrations:', JSON.stringify(eventsRes, null, 2));
@@ -48,7 +50,8 @@ export function useRegistrants() {
         sourceDetails: r.event_title || r.event?.title || '-',
         registeredAt: r.created_at || r.registered_at || '',
       })));
-      // برامج
+
+      // برامج (تسجيلات)
       const programsRes = await fetchProgramRegistrations();
       console.log('program registrations:', JSON.stringify(programsRes, null, 2));
       setPrograms((programsRes?.data?.registrations || []).map((r: any) => ({
@@ -60,6 +63,24 @@ export function useRegistrants() {
         sourceDetails: r.program_title || r.program?.title || '-',
         registeredAt: r.created_at || r.registered_at || '',
       })));
+
+      // داعمين البرامج
+      const supportersRes = await fetchProgramSupporters();
+      console.log('program supporters:', JSON.stringify(supportersRes, null, 2));
+      setSupporters((supportersRes?.data?.supporters || []).map((s: any) => ({
+        id: `supporter-${s.id}`,
+        name: s.supporter_name || '-',
+        email: s.supporter_email || '-',
+        phone: s.supporter_phone || '-',
+        source: 'تبرع',
+        sourceDetails: s.program_title || s.program?.title || '-',
+        registeredAt: s.created_at || '',
+        amount: s.amount,
+        supportType: s.support_type,
+        message: s.message,
+        status: s.status,
+      })));
+
       // انضمام
       const joinRes = await fetchJoinRequests();
       console.log('join requests:', JSON.stringify(joinRes, null, 2));
@@ -110,5 +131,5 @@ export function useRegistrants() {
     fetchAll();
   }, [fetchAll]);
 
-  return { users, events, programs, joins, loading, error, refetch: fetchAll };
+  return { users, events, programs, supporters, joins, loading, error, refetch: fetchAll };
 }

@@ -189,7 +189,7 @@ const ContactForms: React.FC = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  icon={Download}
+                  icon={<Download />}
                   onClick={() => {
                     // TODO: Implement export functionality
                   }}

@@ -69,7 +69,11 @@ CREATE TABLE IF NOT EXISTS program_supporters (
     program_id INTEGER REFERENCES programs(id) ON DELETE CASCADE,
     supporter_name VARCHAR(255) NOT NULL,
     supporter_email VARCHAR(255),
+    supporter_phone VARCHAR(50),
+    support_type VARCHAR(100) DEFAULT 'donation',
+    message TEXT,
     amount NUMERIC(10,2),
+    status VARCHAR(50) DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

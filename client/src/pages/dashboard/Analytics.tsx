@@ -204,14 +204,14 @@ const AnalyticsDashboard: React.FC = () => {
             <div className="flex gap-2">
               <Button
                 variant="secondary"
-                icon={Download}
+                icon={<Download />}
                 aria-label="تصدير التقارير"
               >
                 تصدير
               </Button>
               <Button
                 variant="secondary"
-                icon={RefreshCw}
+                icon={<RefreshCw />}
                 aria-label="تحديث البيانات"
               >
                 تحديث
@@ -408,7 +408,7 @@ const AnalyticsDashboard: React.FC = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleOpenModal('users-trend')}
-                              icon={Eye}
+                              icon={<Eye />}
                             >
                               عرض التفاصيل
                             </Button>
@@ -435,7 +435,7 @@ const AnalyticsDashboard: React.FC = () => {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleOpenModal('donations-trend')}
-                              icon={Eye}
+                              icon={<Eye />}
                             >
                               عرض التفاصيل
                             </Button>
@@ -933,7 +933,11 @@ const AnalyticsDashboard: React.FC = () => {
               </div>
 
               <div className="flex gap-2">
-                <Button variant="secondary" icon={Download} className="flex-1">
+                <Button
+                  variant="secondary"
+                  icon={<Download />}
+                  className="flex-1"
+                >
                   تصدير البيانات
                 </Button>
                 <Button onClick={handleCloseModal} className="flex-1">

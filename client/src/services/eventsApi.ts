@@ -13,7 +13,17 @@ export const fetchEvents = async (params: EventsQueryParams = {}): Promise<Pagin
     queryParams.append('page', page.toString());
     queryParams.append('limit', limit.toString());
 
+    console.log('🔍 Events API Query Params:', {
+      category,
+      search,
+      status,
+      page,
+      limit,
+      queryString: queryParams.toString()
+    });
+
     const response = await http.get(`/events?${queryParams.toString()}`);
+    console.log('📊 Events API Response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Events API failed:', error);
@@ -24,7 +34,9 @@ export const fetchEvents = async (params: EventsQueryParams = {}): Promise<Pagin
 // Fetch single event by ID
 export const fetchEventById = async (id: string): Promise<any> => {
   try {
+    console.log('🔍 Fetching event by ID:', id);
     const response = await http.get(`/events/${id}`);
+    console.log('📊 Event API Response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Event API failed:', error);

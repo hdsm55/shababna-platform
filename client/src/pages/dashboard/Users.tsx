@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import DashboardLayout from '../../layouts/DashboardLayout';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   fetchUsers,
@@ -133,7 +132,6 @@ import {
   UserMinus,
   Users as UsersIcon,
   UserCog,
-  UserSearch,
   UserCheck as UserVerified,
   UserX as UserBlocked,
 } from 'lucide-react';
@@ -295,7 +293,7 @@ const UsersDashboard: React.FC = () => {
         );
       }
 
-      queryClient.invalidateQueries(['dashboard-users']);
+      queryClient.invalidateQueries({ queryKey: ['dashboard-users'] });
       handleCloseModal();
     } catch (error: any) {
       console.error('❌ خطأ في حفظ المستخدم:', error);
@@ -420,7 +418,7 @@ const UsersDashboard: React.FC = () => {
     ) {
       try {
         await deleteUser(id);
-        queryClient.invalidateQueries(['dashboard-users']);
+        queryClient.invalidateQueries({ queryKey: ['dashboard-users'] });
         setModalMsg(t('users.success.deleted', 'تم حذف المستخدم بنجاح'));
       } catch (error) {
         setFormError(t('users.error.delete', 'حدث خطأ أثناء حذف المستخدم'));
@@ -486,31 +484,25 @@ const UsersDashboard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <LoadingSpinner size="lg" />
-        </div>
-      </DashboardLayout>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <LoadingSpinner size="lg" />
+      </div>
     );
   }
 
   if (error) {
     return (
-      <DashboardLayout>
-        <Alert
-          type="error"
-          title={t('users.error.title', 'خطأ في تحميل البيانات')}
-          message={t(
-            'users.error.message',
-            'حدث خطأ أثناء تحميل بيانات المستخدمين'
-          )}
-        />
-      </DashboardLayout>
+      <Alert
+        type="error"
+        title={t('users.error.title', 'خطأ في تحميل البيانات')}
+      >
+        {t('users.error.message', 'حدث خطأ أثناء تحميل بيانات المستخدمين')}
+      </Alert>
     );
   }
 
   return (
-    <DashboardLayout>
+    <div className="space-y-6">
       <SEO
         title={t('users.seo.title', 'إدارة المستخدمين')}
         description={t(
@@ -1182,7 +1174,7 @@ const UsersDashboard: React.FC = () => {
           </div>
         </div>
       </Modal>
-    </DashboardLayout>
+    </div>
   );
 };
 

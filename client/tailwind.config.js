@@ -1,6 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-const defaultTheme = require('tailwindcss/defaultTheme');
-const plugin = require('tailwindcss/plugin');
+import plugin from 'tailwindcss/plugin'
 
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
@@ -15,18 +14,6 @@ export default {
         body: ["'Tajawal'", 'sans-serif'],
       },
       colors: {
-        primary: '#2563EB',
-        secondary: '#6B7280',
-        accent: '#F43F5E',
-        background: '#F9FAFB',
-        surface: '#FFFFFF',
-        textPrimary: '#111827',
-        textSecondary: '#6B7280',
-        highlight: '#A855F7',
-        info: '#0EA5E9',
-        success: '#22C55E',
-        warning: '#F59E0B',
-        error: '#EF4444',
         primary: {
           50: '#eff6ff',
           100: '#dbeafe',
@@ -55,6 +42,7 @@ export default {
           800: '#1e293b',
           900: '#0f172a',
           950: '#020617',
+          DEFAULT: '#6B7280',
         },
         accent: {
           50: '#fef2f2',
@@ -68,8 +56,14 @@ export default {
           800: '#991b1b',
           900: '#7f1d1d',
           950: '#450a0a',
-          DEFAULT: '#ef4444',
+          DEFAULT: '#F43F5E',
         },
+        background: '#F9FAFB',
+        surface: '#FFFFFF',
+        textPrimary: '#111827',
+        textSecondary: '#6B7280',
+        highlight: '#A855F7',
+        info: '#0EA5E9',
         success: {
           50: '#f0fdf4',
           100: '#dcfce7',
@@ -82,6 +76,7 @@ export default {
           800: '#166534',
           900: '#14532d',
           950: '#052e16',
+          DEFAULT: '#22C55E',
         },
         warning: {
           50: '#fffbeb',
@@ -95,6 +90,7 @@ export default {
           800: '#92400e',
           900: '#78350f',
           950: '#451a03',
+          DEFAULT: '#F59E0B',
         },
         error: {
           50: '#fef2f2',
@@ -108,6 +104,7 @@ export default {
           800: '#991b1b',
           900: '#7f1d1d',
           950: '#450a0a',
+          DEFAULT: '#EF4444',
         },
         neutral: {
           50: '#fafafa',
@@ -299,11 +296,10 @@ export default {
     },
   },
   plugins: [
-    require('tailwindcss-rtl'),
     plugin(function ({ addBase }) {
       addBase({
         'html': { fontFamily: "'Tajawal', sans-serif" },
       });
     }),
   ],
-};
+}

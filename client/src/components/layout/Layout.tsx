@@ -2,9 +2,10 @@ import React from 'react';
 import { useLanguageStore } from '../../store/languageStore';
 import Header from './Header';
 import Footer from './Footer';
+import { Outlet } from 'react-router-dom';
 
 interface LayoutProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
@@ -15,11 +16,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, [isRTL]);
 
   return (
-    <div className={`min-h-screen flex flex-col ${isRTL ? 'font-arabic' : 'font-sans'}`}>
+    <div
+      className={`min-h-screen flex flex-col ${
+        isRTL ? 'font-arabic' : 'font-sans'
+      }`}
+    >
       <Header />
-      <main className="flex-1">
-        {children}
-      </main>
+      <main className="flex-1">{children || <Outlet />}</main>
       <Footer />
     </div>
   );

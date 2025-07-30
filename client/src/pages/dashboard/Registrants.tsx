@@ -1,10 +1,23 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import DashboardLayout from '../../layouts/DashboardLayout';
-import Card from '../../components/common/Card';
-import Button from '../../components/common/Button';
+import { useTranslation } from 'react-i18next';
+import { Button } from '../../components/ui/Button/Button';
+import { Card } from '../../components/ui/Card/Card';
+import { Input } from '../../components/ui/Input/Input';
+import Alert from '../../components/ui/Alert';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import Alert from '../../components/common/Alert';
-import { Eye } from 'lucide-react';
+import SEO from '../../components/common/SEO';
+import {
+  Users,
+  Search,
+  Filter,
+  Download,
+  Eye,
+  Calendar,
+  MapPin,
+  User as UserIcon,
+  Mail,
+  Phone,
+} from 'lucide-react';
 import {
   fetchUsers,
   fetchEventRegistrations,
@@ -30,8 +43,8 @@ const RegistrantsDashboard: React.FC = () => {
     users,
     events,
     programs,
+    supporters,
     joins,
-    newsletter,
     loading,
     error,
     refetch,
@@ -54,6 +67,8 @@ const RegistrantsDashboard: React.FC = () => {
               {type === 'join' && <th className="py-2 px-3">العمر</th>}
               {type === 'join' && <th className="py-2 px-3">الاهتمامات</th>}
               {type === 'join' && <th className="py-2 px-3">التحفيز</th>}
+              {type === 'supporter' && <th className="py-2 px-3">المبلغ</th>}
+              {type === 'supporter' && <th className="py-2 px-3">نوع الدعم</th>}
               <th className="py-2 px-3">تفاصيل</th>
               <th className="py-2 px-3">تاريخ التسجيل</th>
               <th className="py-2 px-3">عرض</th>
@@ -81,6 +96,14 @@ const RegistrantsDashboard: React.FC = () => {
                 {type === 'join' && (
                   <td className="py-2 px-3">{r.motivation || '-'}</td>
                 )}
+                {type === 'supporter' && (
+                  <td className="py-2 px-3">
+                    {r.amount ? `$${r.amount.toLocaleString()}` : '-'}
+                  </td>
+                )}
+                {type === 'supporter' && (
+                  <td className="py-2 px-3">{r.supportType || '-'}</td>
+                )}
                 <td className="py-2 px-3">{r.sourceDetails}</td>
                 <td className="py-2 px-3">
                   {r.registeredAt?.slice(0, 10) || '-'}
@@ -89,7 +112,7 @@ const RegistrantsDashboard: React.FC = () => {
                   <Button
                     size="sm"
                     variant="secondary"
-                    icon={Eye}
+                    icon={<Eye />}
                     onClick={() => setSelectedRegistrant(r)}
                   >
                     عرض
@@ -109,96 +132,121 @@ const RegistrantsDashboard: React.FC = () => {
   );
 
   return (
-    <DashboardLayout>
-      <div className="max-w-7xl mx-auto py-6 px-2 sm:px-4 lg:px-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">
-          إدارة جميع المسجلين
-        </h1>
-        {loading ? (
-          <div className="flex justify-center py-8">
-            <LoadingSpinner size="lg" />
-          </div>
-        ) : error ? (
-          <Alert type="error" title="خطأ في تحميل البيانات">
-            {error}
-          </Alert>
-        ) : (
-          <>
-            {renderTable('الأعضاء (عضوية)', users)}
-            {/* {renderTable('المسجلون في النشرة البريدية', newsletter)} */}
-            {renderTable('المسجلون في الفعاليات', events)}
-            {renderTable('المسجلون في البرامج', programs)}
-            {renderTable('طلبات الانضمام', joins, 'join')}
-          </>
-        )}
-        {/* نافذة التفاصيل */}
-        {selectedRegistrant && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full relative">
-              <button
-                className="absolute top-2 left-2 text-gray-400 hover:text-gray-700"
-                onClick={() => setSelectedRegistrant(null)}
-                aria-label="إغلاق"
-              >
-                ×
-              </button>
-              <h2 className="text-xl font-bold mb-4">تفاصيل المسجل</h2>
-              <div className="space-y-2">
-                <div>
-                  <strong>الاسم:</strong> {selectedRegistrant.name}
-                </div>
-                <div>
-                  <strong>البريد الإلكتروني:</strong> {selectedRegistrant.email}
-                </div>
-                <div>
-                  <strong>رقم الهاتف:</strong> {selectedRegistrant.phone || '-'}
-                </div>
-                <div>
-                  <strong>الدولة:</strong> {selectedRegistrant.country || '-'}
-                </div>
-                <div>
-                  <strong>العمر:</strong> {selectedRegistrant.age || '-'}
-                </div>
-                <div>
-                  <strong>الاهتمامات:</strong>{' '}
-                  {Array.isArray(selectedRegistrant.interests)
-                    ? selectedRegistrant.interests.join(', ')
-                    : selectedRegistrant.interests || '-'}
-                </div>
-                <div>
-                  <strong>الدافع:</strong>{' '}
-                  {selectedRegistrant.motivation || '-'}
-                </div>
-                <div>
-                  <strong>تفاصيل:</strong> {selectedRegistrant.sourceDetails}
-                </div>
-                <div>
-                  <strong>تاريخ التسجيل:</strong>{' '}
-                  {selectedRegistrant.registeredAt?.slice(0, 10) || '-'}
-                </div>
-                {/* الحقول الإدارية */}
-                {selectedRegistrant.id && (
-                  <div>
-                    <strong>رقم الطلب (ID):</strong> {selectedRegistrant.id}
-                  </div>
-                )}
-                {selectedRegistrant.status && (
-                  <div>
-                    <strong>الحالة:</strong> {selectedRegistrant.status}
-                  </div>
-                )}
-                {selectedRegistrant.created_at && (
-                  <div>
-                    <strong>تاريخ الإنشاء:</strong>{' '}
-                    {selectedRegistrant.created_at?.slice(0, 10)}
-                  </div>
-                )}
+    <div className="space-y-6">
+      <SEO
+        title="المسجلون - منصة شبابنا"
+        description="إدارة المسجلين في الفعاليات والبرامج"
+        type="website"
+      />
+
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">المسجلون</h1>
+          <p className="text-gray-600">إدارة المسجلين في الفعاليات والبرامج</p>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-8">
+          <LoadingSpinner size="lg" />
+        </div>
+      ) : error ? (
+        <Alert type="error" title="خطأ في تحميل البيانات">
+          {error}
+        </Alert>
+      ) : (
+        <>
+          {renderTable('الأعضاء (عضوية)', users)}
+          {/* {renderTable('المسجلون في النشرة البريدية', newsletter)} */}
+          {renderTable('المسجلون في الفعاليات', events)}
+          {renderTable('المسجلون في البرامج', programs)}
+          {renderTable('داعمين البرامج', supporters, 'supporter')}
+          {renderTable('طلبات الانضمام', joins, 'join')}
+        </>
+      )}
+      {/* نافذة التفاصيل */}
+      {selectedRegistrant && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full relative">
+            <button
+              className="absolute top-2 left-2 text-gray-400 hover:text-gray-700"
+              onClick={() => setSelectedRegistrant(null)}
+              aria-label="إغلاق"
+            >
+              ×
+            </button>
+            <h2 className="text-xl font-bold mb-4">تفاصيل المسجل</h2>
+            <div className="space-y-2">
+              <div>
+                <strong>الاسم:</strong> {selectedRegistrant.name}
               </div>
+              <div>
+                <strong>البريد الإلكتروني:</strong> {selectedRegistrant.email}
+              </div>
+              <div>
+                <strong>رقم الهاتف:</strong> {selectedRegistrant.phone || '-'}
+              </div>
+              <div>
+                <strong>الدولة:</strong> {selectedRegistrant.country || '-'}
+              </div>
+              <div>
+                <strong>العمر:</strong> {selectedRegistrant.age || '-'}
+              </div>
+              <div>
+                <strong>الاهتمامات:</strong>{' '}
+                {Array.isArray(selectedRegistrant.interests)
+                  ? selectedRegistrant.interests.join(', ')
+                  : selectedRegistrant.interests || '-'}
+              </div>
+              <div>
+                <strong>الدافع:</strong> {selectedRegistrant.motivation || '-'}
+              </div>
+              {selectedRegistrant.amount && (
+                <div>
+                  <strong>المبلغ:</strong> $
+                  {selectedRegistrant.amount.toLocaleString()}
+                </div>
+              )}
+              {selectedRegistrant.supportType && (
+                <div>
+                  <strong>نوع الدعم:</strong> {selectedRegistrant.supportType}
+                </div>
+              )}
+              {selectedRegistrant.message && (
+                <div>
+                  <strong>الرسالة:</strong> {selectedRegistrant.message}
+                </div>
+              )}
+              <div>
+                <strong>تفاصيل:</strong> {selectedRegistrant.sourceDetails}
+              </div>
+              <div>
+                <strong>تاريخ التسجيل:</strong>{' '}
+                {selectedRegistrant.registeredAt?.slice(0, 10) || '-'}
+              </div>
+              {/* الحقول الإدارية */}
+              {selectedRegistrant.id && (
+                <div>
+                  <strong>رقم الطلب (ID):</strong> {selectedRegistrant.id}
+                </div>
+              )}
+              {selectedRegistrant.status && (
+                <div>
+                  <strong>الحالة:</strong> {selectedRegistrant.status}
+                </div>
+              )}
+              {selectedRegistrant.created_at && (
+                <div>
+                  <strong>تاريخ الإنشاء:</strong>{' '}
+                  {selectedRegistrant.created_at?.slice(0, 10)}
+                </div>
+              )}
             </div>
           </div>
-        )}
-      </div>
-    </DashboardLayout>
+        </div>
+      )}
+    </div>
   );
 };
 

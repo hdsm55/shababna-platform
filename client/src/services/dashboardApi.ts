@@ -131,6 +131,21 @@ export const fetchProgramRegistrations = async (params?: {
   return data;
 };
 
+// جلب بيانات الداعمين للبرامج
+export const fetchProgramSupporters = async (params?: {
+  page?: number;
+  limit?: number;
+  program_id?: string;
+}) => {
+  try {
+    const { data } = await api.get('/programs/supporters', { params });
+    return data;
+  } catch (error) {
+    console.error('Program supporters API failed:', error);
+    throw error;
+  }
+};
+
 // جلب تسجيلات الفعاليات
 export const fetchEventRegistrations = async (params?: {
   page?: number;

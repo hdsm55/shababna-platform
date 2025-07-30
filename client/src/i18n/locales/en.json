@@ -121,19 +121,106 @@
   "events": {
     "title": "Upcoming Events",
     "subtitle": "Discover exciting events and workshops designed for youth development",
+    "hero": {
+      "title": "Our Diverse Events",
+      "subtitle": "Discover our diverse activities in the fields of education, spirituality, and professional development. Join us in making positive change."
+    },
+    "search": {
+      "placeholder": "Search events..."
+    },
     "filter": {
       "all": "All Events",
       "workshop": "Workshops",
       "conference": "Conferences",
-      "networking": "Networking"
+      "networking": "Networking",
+      "seminar": "Seminars",
+      "training": "Training",
+      "competition": "Competitions",
+      "cultural": "Cultural Events"
     },
+    "advancedFilters": {
+      "title": "Advanced Filters",
+      "dateRange": "Date Range",
+      "location": "Location",
+      "price": "Price",
+      "status": "Status",
+      "capacity": "Capacity",
+      "duration": "Duration",
+      "organizer": "Organizer",
+      "tags": "Tags",
+      "apply": "Apply Filters",
+      "clear": "Clear Filters",
+      "showMore": "Show More",
+      "showLess": "Show Less"
+    },
+    "filters": {
+      "status": "Status",
+      "category": "Category",
+      "location": "Location",
+      "date": "Date",
+      "price": "Price",
+      "allStatus": "All Status",
+      "upcoming": "Upcoming",
+      "ongoing": "Ongoing",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "allCategories": "All Categories",
+      "allLocations": "All Locations",
+      "allPrices": "All Prices",
+      "free": "Free",
+      "paid": "Paid",
+      "donation": "Optional Donation",
+      "lowPrice": "Low Price",
+      "mediumPrice": "Medium Price",
+      "highPrice": "High Price"
+    },
+    "sort": {
+      "title": "Sort by",
+      "date": "Date",
+      "title": "Title",
+      "price": "Price",
+      "popularity": "Popularity",
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "priceLow": "Price: Low to High",
+      "priceHigh": "Price: High to Low"
+    },
+    "results": "Found {{count}} events",
+    "noResults": "No events found matching your search criteria",
+    "noResultsDesc": "Try adjusting your filters or search terms",
     "register": "Register Now",
+    "completed": "Completed",
+    "full": "Full",
     "learnMore": "Learn More",
+    "registration": {
+      "title": "Register for Event",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone Number",
+      "submit": "Confirm Registration",
+      "success": "Registration Successful!",
+      "successMessage": "Thank you! You have been successfully registered for the event. You will receive a confirmation email shortly.",
+      "registerAnother": "Register Another",
+      "unavailable": "Registration Unavailable",
+      "completedMessage": "Cannot register for a completed event",
+      "fullMessage": "Event is full and registration is not available"
+    },
     "date": "Date",
     "location": "Location",
     "category": "Category",
     "notFound": "Sorry, this event could not be found.",
-    "viewDetails": "View Details"
+    "viewDetails": "View Details",
+    "seo": {
+      "title": "Events - Shababna Global Platform",
+      "description": "Discover our diverse activities in the fields of education, spirituality, and professional development."
+    },
+    "cta": {
+      "title": "Join Us in Making Change",
+      "subtitle": "Be part of a global Islamic youth community that innovates and impacts the world",
+      "join": "Join Us Now",
+      "contact": "Contact Us"
+    }
   },
   "programs": {
     "title": "Our Programs",
@@ -145,6 +232,7 @@
       "entrepreneurship": "Entrepreneurship",
       "volunteering": "Volunteering"
     },
+    "results": "Found {{count}} programs",
     "support": "Support This Program",
     "sponsor": "Become a Sponsor",
     "volunteer": "Volunteer",

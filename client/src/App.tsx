@@ -1,142 +1,122 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
-import { useTranslation } from 'react-i18next';
-import { useLanguageStore } from './store/languageStore';
-import Layout from './components/layout/Layout';
-import ProtectedRoute from './components/ProtectedRoute';
 import ErrorBoundary from './components/common/ErrorBoundary';
-import ScrollToTop from './components/common/ScrollToTop';
 import { ToastProvider } from './components/common/Toast';
+import { ThemeProvider } from './components/ThemeProvider';
+import Layout from './components/layout/Layout';
+import DashboardLayout from './layouts/DashboardLayout';
 
 // Pages
 import Home from './pages/Home';
 import Events from './pages/Events';
 import EventDetail from './pages/EventDetail';
+import EventRegistration from './pages/EventRegistration';
 import Programs from './pages/Programs';
 import ProgramDetail from './pages/ProgramDetail';
-import JoinUs from './pages/JoinUs';
-import Contact from './pages/Contact';
-import Login from './pages/auth/Login';
-import Register from './pages/auth/Register';
-import DashboardOverview from './pages/dashboard/Dashboard';
-import ProgramsDashboard from './pages/dashboard/Programs';
-import EventsDashboard from './pages/dashboard/Events';
-import NewEvent from './pages/dashboard/events/NewEvent';
-import NewProgram from './pages/dashboard/programs/NewProgram';
-import NewUser from './pages/dashboard/users/NewUser';
-import ContactForms from './pages/dashboard/ContactForms';
-import RegistrantsDashboard from './pages/dashboard/Registrants';
-import EditEvent from './pages/dashboard/events/EditEvent';
-import DashboardEventDetail from './pages/dashboard/events/EventDetail';
-import DashboardProgramDetail from './pages/dashboard/programs/ProgramDetail';
-import EditProgram from './pages/dashboard/programs/EditProgram';
-import NotFound from './pages/NotFound';
 import Blogs from './pages/Blogs';
 import BlogDetail from './pages/BlogDetail';
-import BlogsDashboard from './pages/dashboard/Blogs';
-import UsersDashboard from './pages/dashboard/Users';
-import SettingsDashboard from './pages/dashboard/Settings';
-import ReportsDashboard from './pages/dashboard/Reports';
-import AnalyticsDashboard from './pages/dashboard/Analytics';
-import ActivitiesDashboard from './pages/dashboard/Activities';
+import Contact from './pages/Contact';
+import Donations from './pages/Donations';
+import JoinUs from './pages/JoinUs';
+import NotFound from './pages/NotFound';
+
+// Auth Pages
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
+import CreateAdmin from './pages/auth/CreateAdmin';
+
+// Dashboard Pages
+import Dashboard from './pages/dashboard/Dashboard';
+import DashboardEvents from './pages/dashboard/Events';
+import DashboardPrograms from './pages/dashboard/Programs';
+import DashboardBlogs from './pages/dashboard/Blogs';
+import DashboardUsers from './pages/dashboard/Users';
+import DashboardRegistrants from './pages/dashboard/Registrants';
+import DashboardContactForms from './pages/dashboard/ContactForms';
+import DashboardAnalytics from './pages/dashboard/Analytics';
+import DashboardActivities from './pages/dashboard/Activities';
+import DashboardReports from './pages/dashboard/Reports';
+import DashboardSettings from './pages/dashboard/Settings';
+
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 1,
+    },
+  },
+});
 
 function App() {
-  const { i18n } = useTranslation();
-  const { language, isRTL } = useLanguageStore();
-
-  // ضبط اتجاه الصفحة ولغة html بشكل مركزي واحترافي
-  useEffect(() => {
-    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
-    document.documentElement.lang = language;
-  }, [language, isRTL]);
-
   return (
-    <HelmetProvider>
-      <ErrorBoundary>
-        <ToastProvider>
-          <Router>
-            <ScrollToTop />
-            <Routes>
-              {/* Auth Routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+    <ErrorBoundary>
+      <HelmetProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
+            <ToastProvider>
+              <BrowserRouter
+                future={{
+                  v7_startTransition: true,
+                  v7_relativeSplatPath: true,
+                }}
+              >
+                <Routes>
+                  {/* Public Routes داخل Layout */}
+                  <Route element={<Layout />}>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/events" element={<Events />} />
+                    <Route path="/events/:id" element={<EventDetail />} />
+                    <Route
+                      path="/events/:id/register"
+                      element={<EventRegistration />}
+                    />
+                    <Route path="/programs" element={<Programs />} />
+                    <Route path="/programs/:id" element={<ProgramDetail />} />
+                    <Route path="/blogs" element={<Blogs />} />
+                    <Route path="/blogs/:id" element={<BlogDetail />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/donations" element={<Donations />} />
+                    <Route path="/join-us" element={<JoinUs />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Route>
 
-              {/* Dashboard Routes */}
-              <Route
-                path="/dashboard/*"
-                element={
-                  <ProtectedRoute requiredRole="user">
-                    <Routes>
-                      <Route path="" element={<DashboardOverview />} />
-                      <Route path="programs" element={<ProgramsDashboard />} />
-                      <Route path="events" element={<EventsDashboard />} />
-                      <Route path="contact-forms" element={<ContactForms />} />
-                      <Route path="forms" element={<ContactForms />} />
-                      <Route
-                        path="registrants"
-                        element={<RegistrantsDashboard />}
-                      />
-                      <Route path="blogs" element={<BlogsDashboard />} />
-                      <Route path="users" element={<UsersDashboard />} />
-                      <Route path="settings" element={<SettingsDashboard />} />
-                      <Route path="reports" element={<ReportsDashboard />} />
-                      <Route
-                        path="analytics"
-                        element={<AnalyticsDashboard />}
-                      />
-                      <Route
-                        path="activities"
-                        element={<ActivitiesDashboard />}
-                      />
-                      {/* صفحات الإجراءات السريعة */}
-                      <Route path="events/new" element={<NewEvent />} />
-                      <Route path="programs/new" element={<NewProgram />} />
-                      <Route path="users/new" element={<NewUser />} />
-                      <Route path="events/:id/edit" element={<EditEvent />} />
-                      <Route
-                        path="events/:id"
-                        element={<DashboardEventDetail />}
-                      />
-                      <Route
-                        path="programs/:id"
-                        element={<DashboardProgramDetail />}
-                      />
-                      <Route
-                        path="programs/:id/edit"
-                        element={<EditProgram />}
-                      />
-                      {/* يمكن إضافة فروع أخرى هنا لاحقًا */}
-                    </Routes>
-                  </ProtectedRoute>
-                }
-              />
+                  {/* Auth Routes */}
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/create-admin" element={<CreateAdmin />} />
 
-              {/* Public Routes */}
-              <Route
-                path="/*"
-                element={
-                  <Layout>
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/events" element={<Events />} />
-                      <Route path="/events/:id" element={<EventDetail />} />
-                      <Route path="/programs" element={<Programs />} />
-                      <Route path="/programs/:id" element={<ProgramDetail />} />
-                      <Route path="/join-us" element={<JoinUs />} />
-                      <Route path="/contact" element={<Contact />} />
-                      <Route path="/blogs" element={<Blogs />} />
-                      <Route path="/blogs/:id" element={<BlogDetail />} />
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </Layout>
-                }
-              />
-            </Routes>
-          </Router>
-        </ToastProvider>
-      </ErrorBoundary>
-    </HelmetProvider>
+                  {/* Dashboard Routes - منفصلة عن Layout العام */}
+                  <Route path="/dashboard" element={<DashboardLayout />}>
+                    <Route index element={<Dashboard />} />
+                    <Route path="events" element={<DashboardEvents />} />
+                    <Route path="programs" element={<DashboardPrograms />} />
+                    <Route path="blogs" element={<DashboardBlogs />} />
+                    <Route path="users" element={<DashboardUsers />} />
+                    <Route
+                      path="registrants"
+                      element={<DashboardRegistrants />}
+                    />
+                    <Route
+                      path="contact-forms"
+                      element={<DashboardContactForms />}
+                    />
+                    <Route path="analytics" element={<DashboardAnalytics />} />
+                    <Route
+                      path="activities"
+                      element={<DashboardActivities />}
+                    />
+                    <Route path="reports" element={<DashboardReports />} />
+                    <Route path="settings" element={<DashboardSettings />} />
+                  </Route>
+                </Routes>
+              </BrowserRouter>
+            </ToastProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </HelmetProvider>
+    </ErrorBoundary>
   );
 }
 

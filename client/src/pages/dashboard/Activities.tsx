@@ -305,7 +305,7 @@ const ActivitiesDashboard: React.FC = () => {
             <div className="flex gap-2">
               <Button
                 variant="secondary"
-                icon={Download}
+                icon={<Download />}
                 onClick={exportActivities}
                 aria-label="تصدير الأنشطة"
               >
@@ -313,7 +313,7 @@ const ActivitiesDashboard: React.FC = () => {
               </Button>
               <Button
                 variant="secondary"
-                icon={RefreshCw}
+                icon={<RefreshCw />}
                 aria-label="تحديث الأنشطة"
                 onClick={() => refetch()}
               >
@@ -342,7 +342,7 @@ const ActivitiesDashboard: React.FC = () => {
                   variant="secondary"
                   size="sm"
                   onClick={() => setShowFilters(!showFilters)}
-                  icon={Filter}
+                  icon={<Filter />}
                 >
                   الفلاتر
                 </Button>
@@ -518,7 +518,7 @@ const ActivitiesDashboard: React.FC = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                icon={Eye}
+                                icon={<Eye />}
                                 aria-label="عرض التفاصيل"
                                 onClick={() => {
                                   // يمكن إضافة منطق عرض التفاصيل هنا

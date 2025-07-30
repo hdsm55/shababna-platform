@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, Outlet } from 'react-router-dom';
 import { theme } from '../theme';
 import {
   LayoutDashboard,
@@ -37,7 +37,7 @@ const DashboardNavItem: React.FC<DashboardNavItemProps> = ({
           ? 'bg-blue-100 text-blue-700 border-r-2 border-blue-500'
           : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
       }
-      ${theme.fontFamily.arabic}
+      font-['Tajawal',_sans-serif]
     `}
   >
     <span className="w-4 h-4 mr-3 rtl:ml-3 rtl:mr-0">{icon}</span>
@@ -49,7 +49,7 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+const DashboardLayout = ({ children }: { children?: React.ReactNode }) => {
   const { pathname } = useLocation();
 
   const navItems = [
@@ -142,7 +142,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 min-w-0 p-6">{children}</main>
+      <main className="flex-1 min-w-0 p-6">{children || <Outlet />}</main>
     </div>
   );
 };

@@ -68,19 +68,93 @@
   },
   "events": {
     "title": "Yaklaşan Etkinlikler",
-    "subtitle": "Gençlik gelişimi için tasarlanmış heyecan verici etkinlik ve atölyeleri keşfedin",
+    "subtitle": "Gençlik gelişimi için tasarlanmış heyecan verici etkinlikler ve atölyeler keşfedin",
+    "hero": {
+      "title": "Çeşitli Etkinliklerimiz",
+      "subtitle": "Eğitim, maneviyat ve mesleki gelişim alanlarındaki çeşitli faaliyetlerimizi keşfedin. Pozitif değişim yaratmada bize katılın."
+    },
+    "search": {
+      "placeholder": "Etkinliklerde ara..."
+    },
     "filter": {
       "all": "Tüm Etkinlikler",
       "workshop": "Atölyeler",
       "conference": "Konferanslar",
-      "networking": "Networking"
+      "networking": "Ağ Oluşturma",
+      "seminar": "Seminerler",
+      "training": "Eğitim",
+      "competition": "Yarışmalar",
+      "cultural": "Kültürel Etkinlikler"
     },
+    "advancedFilters": {
+      "title": "Gelişmiş Filtreler",
+      "dateRange": "Tarih Aralığı",
+      "location": "Konum",
+      "price": "Fiyat",
+      "status": "Durum",
+      "capacity": "Kapasite",
+      "duration": "Süre",
+      "organizer": "Organizatör",
+      "tags": "Etiketler",
+      "apply": "Filtreleri Uygula",
+      "clear": "Filtreleri Temizle",
+      "showMore": "Daha Fazla Göster",
+      "showLess": "Daha Az Göster"
+    },
+    "filters": {
+      "status": "Durum",
+      "category": "Kategori",
+      "location": "Konum",
+      "date": "Tarih",
+      "price": "Fiyat",
+      "allStatus": "Tüm Durumlar",
+      "upcoming": "Yaklaşan",
+      "ongoing": "Devam Eden",
+      "completed": "Tamamlanan",
+      "cancelled": "İptal Edilen",
+      "allCategories": "Tüm Kategoriler",
+      "allLocations": "Tüm Konumlar",
+      "allPrices": "Tüm Fiyatlar",
+      "free": "Ücretsiz",
+      "paid": "Ücretli",
+      "donation": "İsteğe Bağlı Bağış",
+      "lowPrice": "Düşük Fiyat",
+      "mediumPrice": "Orta Fiyat",
+      "highPrice": "Yüksek Fiyat"
+    },
+    "sort": {
+      "title": "Sırala",
+      "date": "Tarih",
+      "title": "Başlık",
+      "price": "Fiyat",
+      "popularity": "Popülerlik",
+      "newest": "En Yeni",
+      "oldest": "En Eski",
+      "priceLow": "Fiyat: Düşükten Yükseğe",
+      "priceHigh": "Fiyat: Yüksekten Düşüğe"
+    },
+    "results": "{{count}} etkinlik bulundu",
+    "noResults": "Arama kriterlerinize uygun etkinlik bulunamadı",
+    "noResultsDesc": "Filtrelerinizi veya arama terimlerinizi ayarlamayı deneyin",
     "register": "Şimdi Kayıt Ol",
-    "learnMore": "Daha Fazla Öğren",
+    "completed": "Tamamlandı",
+    "full": "Dolu",
+    "learnMore": "Daha Fazla Bilgi",
     "date": "Tarih",
     "location": "Konum",
     "category": "Kategori",
-    "viewDetails": "Detayları Görüntüle"
+    "notFound": "Üzgünüz, bu etkinlik bulunamadı.",
+    "viewDetails": "Detayları Görüntüle",
+    "seo": {
+      "title": "Etkinlikler - Shababna Global Platform",
+      "description": "Eğitim, maneviyat ve mesleki gelişim alanlarındaki çeşitli faaliyetlerimizi keşfedin."
+    },
+    "cta": {
+      "title": "Değişim Yaratmada Bize Katılın",
+      "subtitle": "Dünyada yenilik yapan ve etki yaratan küresel İslami gençlik topluluğunun bir parçası olun",
+      "join": "Şimdi Bize Katılın",
+      "contact": "Bizimle İletişime Geçin"
+    }
   },
   "programs": {
     "title": "Programlarımız",
@@ -92,6 +166,7 @@
       "entrepreneurship": "Girişimcilik",
       "volunteering": "Gönüllülük"
     },
+    "results": "{{count}} program bulundu",
     "support": "Bu Programı Destekle",
     "sponsor": "Sponsor Ol",
     "volunteer": "Gönüllü Ol",
@@ -197,5 +272,19 @@
     "apply": "Uygula",
     "backToPrograms": "Programlara Geri Dön",
     "backToEvents": "Etkinliklere Geri Dön"
+  },
+  "registration": {
+    "title": "Etkinliğe Kayıt Ol",
+    "firstName": "Ad",
+    "lastName": "Soyad",
+    "email": "E-posta",
+    "phone": "Telefon Numarası",
+    "submit": "Kayıt Onayla",
+    "success": "Kayıt Başarılı!",
+    "successMessage": "Teşekkürler! Etkinliğe başarıyla kayıt oldunuz. Yakında e-posta ile onay alacaksınız.",
+    "registerAnother": "Başka Kayıt",
+    "unavailable": "Kayıt Mevcut Değil",
+    "completedMessage": "Tamamlanmış bir etkinliğe kayıt olamazsınız",
+    "fullMessage": "Etkinlik dolu ve kayıt mevcut değil"
   }
 }

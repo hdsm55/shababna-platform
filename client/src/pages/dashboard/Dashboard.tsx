@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../store/authStore';
-import DashboardLayout from '../../layouts/DashboardLayout';
 import { useQuery } from '@tanstack/react-query';
 import {
   getDashboardStats,
@@ -290,31 +289,25 @@ const DashboardOverview: React.FC = () => {
 
   if (statsLoading || activitiesLoading) {
     return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <LoadingSpinner size="lg" />
-        </div>
-      </DashboardLayout>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <LoadingSpinner size="lg" />
+      </div>
     );
   }
 
   if (statsError || activitiesError) {
     return (
-      <DashboardLayout>
-        <Alert
-          type="error"
-          title={t('dashboard.error.title', 'خطأ في تحميل البيانات')}
-          message={t(
-            'dashboard.error.message',
-            'حدث خطأ أثناء تحميل بيانات الداشبورد'
-          )}
-        />
-      </DashboardLayout>
+      <Alert
+        type="error"
+        title={t('dashboard.error.title', 'خطأ في تحميل البيانات')}
+      >
+        {t('dashboard.error.message', 'حدث خطأ أثناء تحميل بيانات الداشبورد')}
+      </Alert>
     );
   }
 
   return (
-    <DashboardLayout>
+    <div className="space-y-6">
       <SEO
         title={t('dashboard.seo.title', 'لوحة التحكم - نظرة عامة')}
         description={t(
@@ -617,7 +610,7 @@ const DashboardOverview: React.FC = () => {
           </Button>
         </div>
       </Modal>
-    </DashboardLayout>
+    </div>
   );
 };
 

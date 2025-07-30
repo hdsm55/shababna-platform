@@ -1,7 +1,7 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
 import { query } from '../config/database.js';
-import { getAllPrograms, getProgramById, registerForProgram, createProgram, updateProgram, deleteProgram, supportProgram } from '../controllers/programsController.js';
+import { getAllPrograms, getProgramById, registerForProgram, createProgram, updateProgram, deleteProgram, supportProgram, getProgramSupporters } from '../controllers/programsController.js';
 import { authMiddleware } from '../middleware/authMiddleware.js';
 import { adminMiddleware } from '../middleware/adminMiddleware.js';
 import multer from 'multer';
@@ -23,6 +23,9 @@ const upload = multer({ storage });
 
 // Get all programs (public)
 router.get('/', getAllPrograms);
+
+// Get program supporters (admin only) - يجب أن يكون قبل /:id
+router.get('/supporters', authMiddleware, adminMiddleware, getProgramSupporters);
 
 // Get single program (public)
 router.get('/:id', getProgramById);

@@ -121,18 +121,78 @@ export const deleteProgram = async (req, res) => {
 export const supportProgram = async (req, res) => {
     try {
         const { id } = req.params; // program_id
-        const { supporter_name, supporter_email, phone, amount, note } = req.body;
-        if (!supporter_name || !supporter_email || !amount) {
-            return res.status(400).json({ success: false, message: 'الاسم والبريد والمبلغ مطلوبة' });
+        const { supporter_name, supporter_email, supporter_phone, support_type, message, amount } = req.body;
+        if (!supporter_name || !supporter_email) {
+            return res.status(400).json({ success: false, message: 'الاسم والبريد الإلكتروني مطلوبان' });
         }
         const result = await query(
-            `INSERT INTO program_supporters (program_id, supporter_name, supporter_email, phone, amount, note, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING *`,
-            [id, supporter_name, supporter_email, phone || null, amount, note || null]
+            `INSERT INTO program_supporters (program_id, supporter_name, supporter_email, supporter_phone, support_type, message, amount, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW()) RETURNING *`,
+            [id, supporter_name, supporter_email, supporter_phone || null, support_type || 'donation', message || null, amount || null]
         );
         return res.json({ success: true, data: result.rows[0], message: 'تم تسجيل الدعم بنجاح' });
     } catch (error) {
         console.error('Support program error:', error);
         return res.status(500).json({ success: false, message: 'حدث خطأ أثناء تسجيل الدعم' });
+    }
+};
+
+// جلب بيانات الداعمين للبرامج
+export const getProgramSupporters = async (req, res) => {
+    try {
+        const { page = 1, limit = 50, program_id } = req.query;
+        const offset = (page - 1) * limit;
+
+        let queryText = `
+            SELECT
+                ps.*,
+                p.title as program_title
+            FROM program_supporters ps
+            LEFT JOIN programs p ON ps.program_id = p.id
+        `;
+
+        const queryParams = [];
+
+        if (program_id) {
+            queryText += ' WHERE ps.program_id = $1';
+            queryParams.push(program_id);
+        }
+
+        queryText += ' ORDER BY ps.created_at DESC';
+
+        if (limit) {
+            queryText += ` LIMIT $${queryParams.length + 1} OFFSET $${queryParams.length + 2}`;
+            queryParams.push(limit, offset);
+        }
+
+        const result = await query(queryText, queryParams);
+
+        // جلب العدد الإجمالي
+        let countQuery = 'SELECT COUNT(*) FROM program_supporters';
+        if (program_id) {
+            countQuery += ' WHERE program_id = $1';
+        }
+        const countResult = await query(countQuery, program_id ? [program_id] : []);
+        const total = parseInt(countResult.rows[0].count);
+
+        return res.json({
+            success: true,
+            data: {
+                supporters: result.rows,
+                pagination: {
+                    page: parseInt(page),
+                    limit: parseInt(limit),
+                    total,
+                    pages: Math.ceil(total / limit)
+                }
+            },
+            message: 'تم جلب بيانات الداعمين بنجاح'
+        });
+    } catch (error) {
+        console.error('Get program supporters error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'حدث خطأ أثناء جلب بيانات الداعمين'
+        });
     }
 };

@@ -227,12 +227,10 @@ const Programs: React.FC = () => {
           </div>
 
           {/* Results Counter */}
-          <div className="mt-4 pt-4 border-t border-accent-100">
-            <p className="text-sm text-accent-600 font-medium">
-              {t('programs.results', 'تم العثور على {count} برنامج', {
-                count: filteredPrograms.length,
-              })}
-            </p>
+          <div className="text-sm text-gray-600">
+            {t('programs.results', 'تم العثور على {{count}} برنامج', {
+              count: programs.length,
+            })}
           </div>
         </motion.div>
       </section>

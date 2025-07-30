@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import DashboardLayout from '../../layouts/DashboardLayout';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   fetchPrograms,
@@ -523,31 +522,27 @@ const ProgramsDashboard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <LoadingSpinner size="lg" />
-        </div>
-      </DashboardLayout>
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <LoadingSpinner size="lg" />
+      </div>
     );
   }
 
   if (error) {
     return (
-      <DashboardLayout>
-        <Alert
-          type="error"
-          title={t('programs.error.title', 'خطأ في تحميل البيانات')}
-          message={t(
-            'programs.error.message',
-            'حدث خطأ أثناء تحميل بيانات البرامج'
-          )}
-        />
-      </DashboardLayout>
+      <Alert
+        type="error"
+        title={t('programs.error.title', 'خطأ في تحميل البيانات')}
+        message={t(
+          'programs.error.message',
+          'حدث خطأ أثناء تحميل بيانات البرامج'
+        )}
+      />
     );
   }
 
   return (
-    <DashboardLayout>
+    <div className="min-h-screen bg-gray-50">
       <SEO
         title={t('programs.seo.title', 'إدارة البرامج')}
         description={t(
@@ -1181,7 +1176,7 @@ const ProgramsDashboard: React.FC = () => {
           </div>
         </div>
       </Modal>
-    </DashboardLayout>
+    </div>
   );
 };
 

@@ -7,27 +7,104 @@ export const getAllEvents = async (req, res) => {
     try {
         const {
             search,
+            category,
+            status,
             page = 1,
             limit = 10
         } = req.query;
+
+        console.log('🔍 Events Controller Query Params:', {
+            search,
+            category,
+            status,
+            page,
+            limit
+        });
+
         const offset = (parseInt(page) - 1) * parseInt(limit);
-        let sql = 'SELECT id, title, description, start_date, end_date, location, max_attendees, attendees, category, image_url, status, created_at, updated_at FROM events WHERE 1=1';
+        let sql = `
+            SELECT
+                e.id,
+                e.title,
+                e.description,
+                e.start_date,
+                e.end_date,
+                e.location,
+                e.max_attendees,
+                COALESCE(COUNT(er.id), 0) as attendees,
+                e.category,
+                e.image_url,
+                e.status,
+                e.created_at,
+                e.updated_at
+            FROM events e
+            LEFT JOIN event_registrations er ON e.id = er.event_id
+            WHERE 1=1
+        `;
         const params = [];
         let paramIndex = 1;
+
         if (search) {
-            sql += ` AND (title LIKE $${paramIndex} OR description LIKE $${paramIndex + 1} OR location LIKE $${paramIndex + 2})`;
+            sql += ` AND (e.title LIKE $${paramIndex} OR e.description LIKE $${paramIndex + 1} OR e.location LIKE $${paramIndex + 2})`;
             params.push(`%${search}%`, `%${search}%`, `%${search}%`);
             paramIndex += 3;
         }
-        const countSql = sql.replace('SELECT id, title, description, start_date, end_date, location, max_attendees, attendees, category, image_url, status, created_at, updated_at', 'SELECT COUNT(*) as count');
-        const countResult = await getRow(countSql, params);
+
+        if (category && category !== 'all') {
+            sql += ` AND e.category = $${paramIndex}`;
+            params.push(category);
+            paramIndex += 1;
+        }
+
+        if (status && status !== 'all') {
+            sql += ` AND e.status = $${paramIndex}`;
+            params.push(status);
+            paramIndex += 1;
+        }
+
+        sql += ` GROUP BY e.id, e.title, e.description, e.start_date, e.end_date, e.location, e.max_attendees, e.category, e.image_url, e.status, e.created_at, e.updated_at`;
+
+        console.log('🔍 SQL Query:', sql);
+        console.log('🔍 SQL Params:', params);
+
+        const countSql = `SELECT COUNT(DISTINCT e.id) as count FROM events e WHERE 1=1`;
+        const countParams = [];
+        let countParamIndex = 1;
+
+        if (search) {
+            countSql += ` AND (e.title LIKE $${countParamIndex} OR e.description LIKE $${countParamIndex + 1} OR e.location LIKE $${countParamIndex + 2})`;
+            countParams.push(`%${search}%`, `%${search}%`, `%${search}%`);
+            countParamIndex += 3;
+        }
+
+        if (category && category !== 'all') {
+            countSql += ` AND e.category = $${countParamIndex}`;
+            countParams.push(category);
+            countParamIndex += 1;
+        }
+
+        if (status && status !== 'all') {
+            countSql += ` AND e.status = $${countParamIndex}`;
+            countParams.push(status);
+            countParamIndex += 1;
+        }
+
+        const countResult = await getRow(countSql, countParams);
         const total = parseInt(countResult.count);
-        sql += ` ORDER BY start_date DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+        sql += ` ORDER BY e.start_date DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
         params.push(parseInt(limit), offset);
         const result = await getRows(sql, params);
         const totalPages = Math.ceil(total / parseInt(limit));
+
+        console.log('📊 Events Result:', {
+            total,
+            totalPages,
+            itemsCount: result.length,
+            categories: [...new Set(result.map(item => item.category))]
+        });
+
         return successResponse(res, {
-            items: result,
+            events: result,
             pagination: {
                 page: parseInt(page),
                 limit: parseInt(limit),
@@ -44,10 +121,33 @@ export const getAllEvents = async (req, res) => {
 // Get single event by ID (public)
 export const getEventById = async (req, res) => {
     try {
-        const result = await getRow('SELECT id, title, description, start_date, end_date, location, max_attendees, attendees, category, image_url, status, created_at, updated_at FROM events WHERE id = $1', [req.params.id]);
+        console.log('🔍 Getting event by ID:', req.params.id);
+        const result = await getRow(`
+            SELECT
+                e.id,
+                e.title,
+                e.description,
+                e.start_date,
+                e.end_date,
+                e.location,
+                e.max_attendees,
+                COALESCE(COUNT(er.id), 0) as attendees,
+                e.category,
+                e.image_url,
+                e.status,
+                e.created_at,
+                e.updated_at
+            FROM events e
+            LEFT JOIN event_registrations er ON e.id = er.event_id
+            WHERE e.id = $1
+            GROUP BY e.id, e.title, e.description, e.start_date, e.end_date, e.location, e.max_attendees, e.category, e.image_url, e.status, e.created_at, e.updated_at
+        `, [req.params.id]);
+        console.log('📊 Event result:', result);
         if (!result) {
+            console.log('❌ Event not found');
             return errorResponse(res, 'الفعالية غير موجودة', 404);
         }
+        console.log('✅ Event found successfully');
         return successResponse(res, result, 'تم جلب الفعالية بنجاح');
     } catch (error) {
         console.error('Get event error:', error);
@@ -159,18 +259,75 @@ export const registerForEvent = async (req, res) => {
         console.log('registerForEvent payload:', req.body, 'event_id:', req.params.id);
         const { id } = req.params; // event_id
         const { user_id, first_name, last_name, email, phone } = req.body;
+
         // يجب أن يكون إما user_id أو (first_name و last_name و email)
         if (!user_id && (!first_name || !last_name || !email)) {
             return res.status(400).json({ success: false, message: 'يجب إدخال بيانات العضو أو بيانات شخصية (الاسم والبريد الإلكتروني)' });
         }
-        const result = await query(
-            `INSERT INTO event_registrations (event_id, user_id, first_name, last_name, email, phone, created_at)
-             VALUES ($1, $2, $3, $4, $5, $6, NOW())
-             RETURNING id`,
-            [id, user_id || null, first_name || null, last_name || null, email || null, phone || null]
+
+        // التحقق من وجود الفعالية وحالتها
+        const event = await getRow('SELECT * FROM events WHERE id = $1', [id]);
+        if (!event) {
+            return res.status(404).json({ success: false, message: 'الفعالية غير موجودة' });
+        }
+
+        // التحقق من حالة الفعالية
+        if (event.status === 'completed') {
+            return res.status(400).json({ success: false, message: 'لا يمكن التسجيل في فعالية مكتملة' });
+        }
+
+        // التحقق من عدد المسجلين
+        if (event.max_attendees && event.attendees >= event.max_attendees) {
+            return res.status(400).json({ success: false, message: 'الفعالية ممتلئة ولا يمكن التسجيل فيها' });
+        }
+
+        // التحقق من عدم التسجيل مسبقاً
+        const existingRegistration = await getRow(
+            'SELECT * FROM event_registrations WHERE event_id = $1 AND email = $2',
+            [id, email]
         );
-        const newRegistration = await getRow('SELECT * FROM event_registrations WHERE id = $1', [result.rows[0].id]);
-        return res.json({ success: true, data: newRegistration, message: 'تم التسجيل في الفعالية بنجاح' });
+        if (existingRegistration) {
+            return res.status(400).json({ success: false, message: 'أنت مسجل مسبقاً في هذه الفعالية' });
+        }
+
+        // بدء المعاملة
+        await query('BEGIN');
+
+        try {
+            // إضافة التسجيل
+            const result = await query(
+                `INSERT INTO event_registrations (event_id, user_id, first_name, last_name, email, phone, created_at)
+                 VALUES ($1, $2, $3, $4, $5, $6, NOW())
+                 RETURNING id`,
+                [id, user_id || null, first_name || null, last_name || null, email || null, phone || null]
+            );
+
+            // تحديث عدد المسجلين في الفعالية
+            await query(
+                'UPDATE events SET attendees = attendees + 1, updated_at = NOW() WHERE id = $1',
+                [id]
+            );
+
+            // تأكيد المعاملة
+            await query('COMMIT');
+
+            // جلب البيانات المحدثة
+            const updatedEvent = await getRow('SELECT * FROM events WHERE id = $1', [id]);
+            const newRegistration = await getRow('SELECT * FROM event_registrations WHERE id = $1', [result.rows[0].id]);
+
+            return res.json({
+                success: true,
+                data: {
+                    registration: newRegistration,
+                    event: updatedEvent
+                },
+                message: 'تم التسجيل في الفعالية بنجاح'
+            });
+        } catch (error) {
+            // التراجع عن المعاملة في حالة الخطأ
+            await query('ROLLBACK');
+            throw error;
+        }
     } catch (error) {
         console.error('Event registration error:', error);
         return res.status(500).json({ success: false, message: 'حدث خطأ أثناء التسجيل في الفعالية. يرجى المحاولة لاحقًا.' });
