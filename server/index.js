@@ -25,6 +25,7 @@ import formsRoutes from './routes/forms.js';
 import dashboardRoutes from './routes/dashboard.js';
 import errorHandler from './middleware/errorHandler.js';
 import blogsRoutes from './routes/blogs.js';
+import newsletterRoutes from './routes/newsletter.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -64,6 +65,7 @@ app.use('/api/users', usersRoutes);
 app.use('/api/forms', formsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/blogs', blogsRoutes);
+app.use('/api/newsletter', newsletterRoutes);
 
 // Additional routes for dashboard data
 app.use('/api/contact-forms', formsRoutes);

@@ -200,3 +200,18 @@ export const updateUser = async (id: string, data: any) => {
     return { success: true, message: 'تم تحديث المستخدم بنجاح' };
   }
 };
+
+// جلب مشتركي النشرة البريدية
+export const fetchNewsletterSubscribers = async (params?: {
+  page?: number;
+  limit?: number;
+  status?: string;
+}) => {
+  try {
+    const { data } = await api.get('/newsletter/subscribers', { params });
+    return data;
+  } catch (error) {
+    console.error('Newsletter subscribers API failed:', error);
+    throw error;
+  }
+};

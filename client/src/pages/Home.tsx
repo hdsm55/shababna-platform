@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import { useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { subscribeToNewsletter } from '../services/newsletterApi';
 
 const Home: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -176,16 +177,25 @@ const Home: React.FC = () => {
     e.preventDefault();
     setNewsletterStatus('loading');
     setNewsletterMsg('');
+
     try {
-      // Simulate API call
-      await new Promise((res) => setTimeout(res, 1200));
+      const result = await subscribeToNewsletter({
+        email: newsletterEmail,
+      });
+
       setNewsletterStatus('success');
-      setNewsletterMsg(t('home.newsletter.success'));
+      setNewsletterMsg(
+        result.message || 'تم الاشتراك في النشرة البريدية بنجاح!'
+      );
       setNewsletterEmail('');
-    } catch {
+    } catch (error: any) {
       setNewsletterStatus('error');
-      setNewsletterMsg(t('home.newsletter.error'));
+      setNewsletterMsg(
+        error.response?.data?.message ||
+          'حدث خطأ أثناء الاشتراك في النشرة البريدية'
+      );
     }
+
     setTimeout(() => setNewsletterStatus('idle'), 4000);
   };
 

@@ -45,6 +45,7 @@ const RegistrantsDashboard: React.FC = () => {
     programs,
     supporters,
     joins,
+    newsletter,
     loading,
     error,
     refetch,
@@ -158,7 +159,7 @@ const RegistrantsDashboard: React.FC = () => {
       ) : (
         <>
           {renderTable('الأعضاء (عضوية)', users)}
-          {/* {renderTable('المسجلون في النشرة البريدية', newsletter)} */}
+          {renderTable('المسجلون في النشرة البريدية', newsletter)}
           {renderTable('المسجلون في الفعاليات', events)}
           {renderTable('المسجلون في البرامج', programs)}
           {renderTable('داعمين البرامج', supporters, 'supporter')}

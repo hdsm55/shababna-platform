@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { fetchUsers, fetchEventRegistrations, fetchProgramRegistrations, fetchJoinRequests, fetchProgramSupporters } from '../services/dashboardApi';
+import { fetchUsers, fetchEventRegistrations, fetchProgramRegistrations, fetchJoinRequests, fetchProgramSupporters, fetchNewsletterSubscribers } from '../services/dashboardApi';
 
 export interface Registrant {
   id: string;
@@ -17,7 +17,7 @@ export function useRegistrants() {
   const [programs, setPrograms] = useState<Registrant[]>([]);
   const [supporters, setSupporters] = useState<Registrant[]>([]);
   const [joins, setJoins] = useState<Registrant[]>([]);
-  // const [newsletter, setNewsletter] = useState<Registrant[]>([]); // مؤجل
+  const [newsletter, setNewsletter] = useState<Registrant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -107,19 +107,20 @@ export function useRegistrants() {
         console.log('❌ لا توجد بيانات طلبات انضمام في الاستجابة');
         setJoins([]);
       }
-      // نشرة بريدية (مؤجل)
-      // if (fetchNewsletterSubscribers) {
-      //   const newsletterRes = await fetchNewsletterSubscribers();
-      //   setNewsletter((newsletterRes?.data?.items || []).map((n: any) => ({
-      //     id: `newsletter-${n.id}`,
-      //     name: n.first_name ? `${n.first_name} ${n.last_name || ''}`.trim() : n.email,
-      //     email: n.email,
-      //     phone: n.phone,
-      //     source: 'نشرة بريدية',
-      //     sourceDetails: '-',
-      //     registeredAt: n.created_at || '',
-      //   })));
-      // }
+
+      // نشرة بريدية
+      const newsletterRes = await fetchNewsletterSubscribers();
+      console.log('newsletter subscribers:', JSON.stringify(newsletterRes, null, 2));
+      setNewsletter((newsletterRes?.data?.subscribers || []).map((n: any) => ({
+        id: `newsletter-${n.id}`,
+        name: n.first_name ? `${n.first_name} ${n.last_name || ''}`.trim() : n.email,
+        email: n.email,
+        phone: '-',
+        source: 'نشرة بريدية',
+        sourceDetails: n.status || 'active',
+        registeredAt: n.subscribed_at || '',
+        status: n.status,
+      })));
     } catch (err) {
       setError('حدث خطأ أثناء جلب بيانات المسجلين');
     } finally {
@@ -131,5 +132,5 @@ export function useRegistrants() {
     fetchAll();
   }, [fetchAll]);
 
-  return { users, events, programs, supporters, joins, loading, error, refetch: fetchAll };
+  return { users, events, programs, supporters, joins, newsletter, loading, error, refetch: fetchAll };
 }
