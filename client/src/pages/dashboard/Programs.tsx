@@ -14,6 +14,7 @@ import { Card } from '../../components/ui/Card/Card';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Alert from '../../components/common/Alert';
 import { Input } from '../../components/ui/Input/Input';
+import { Program } from '../../types';
 import {
   Search,
   Filter,
@@ -130,24 +131,8 @@ import {
   UserX as UserBlocked,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import SEO from '../../components/common/SEO';
-
-interface Program {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  goal_amount: number;
-  current_amount: number;
-  status: 'active' | 'completed' | 'pending' | 'cancelled';
-  start_date: string;
-  end_date: string;
-  participants_count: number;
-  created_at: string;
-  updated_at: string;
-  image_url?: string;
-}
 
 const ProgramsDashboard: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -193,24 +178,29 @@ const ProgramsDashboard: React.FC = () => {
 
   // استخدام البيانات الحقيقية من API
   const programs = data?.data?.items || [];
+  console.log('📊 البيانات المستلمة من API:', data);
+  console.log('📋 قائمة البرامج:', programs);
 
   const handleOpenModal = (
     type: 'add' | 'edit' | 'view',
     program?: Program
   ) => {
+    console.log('🔧 فتح النافذة:', type, program);
     setModalType(type);
     if (program) {
+      console.log('📋 تعبئة النموذج بالبيانات:', program);
       setSelectedProgram(program);
       setForm({
         title: program.title,
         description: program.description,
         category: program.category,
-        goal_amount: program.goal_amount.toString(),
+        goal_amount: (program.goal_amount || 0).toString(),
         start_date: program.start_date.split('T')[0],
         end_date: program.end_date.split('T')[0],
       });
       setImagePreview(program.image_url || null);
     } else {
+      console.log('📝 تفريغ النموذج');
       setSelectedProgram(null);
       setForm({
         title: '',
@@ -224,6 +214,7 @@ const ProgramsDashboard: React.FC = () => {
     }
     setFormError('');
     setModalOpen(true);
+    console.log('✅ تم فتح النافذة بنجاح');
   };
 
   const handleCloseModal = () => {
@@ -258,7 +249,6 @@ const ProgramsDashboard: React.FC = () => {
   const removeImage = () => {
     setImage(null);
     setImagePreview(null);
-    setForm({ ...form, image_url: '' });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -307,16 +297,57 @@ const ProgramsDashboard: React.FC = () => {
 
       if (modalType === 'add') {
         await createProgram(programData);
-        setModalMsg(t('programs.success.created', 'تم إنشاء البرنامج بنجاح'));
+        setModalMsg(
+          `✅ تم إنشاء البرنامج "${form.title}" بنجاح! 🎉\n\n` +
+            `📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `💰 المبلغ المطلوب: ${parseFloat(form.goal_amount).toLocaleString(
+              'ar-SA'
+            )} ريال\n` +
+            `📊 الفئة: ${form.category}\n` +
+            `📈 الهدف: ${form.goal_amount} ريال`
+        );
       } else if (modalType === 'edit' && selectedProgram) {
         await updateProgram(selectedProgram.id, programData);
-        setModalMsg(t('programs.success.updated', 'تم تحديث البرنامج بنجاح'));
+        setModalMsg(
+          `✅ تم تحديث البرنامج "${form.title}" بنجاح! 🔄\n\n` +
+            `📅 آخر تحديث: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `💰 المبلغ المطلوب: ${parseFloat(form.goal_amount).toLocaleString(
+              'ar-SA'
+            )} ريال\n` +
+            `📊 الفئة: ${form.category}\n` +
+            `📈 التقدم: ${selectedProgram?.current_amount || 0} من ${
+              form.goal_amount
+            } ريال`
+        );
       }
 
       queryClient.invalidateQueries(['dashboard-programs']);
       handleCloseModal();
-    } catch (error) {
-      setFormError(t('programs.error.general', 'حدث خطأ أثناء حفظ البيانات'));
+    } catch (error: any) {
+      console.error('❌ خطأ في حفظ البرنامج:', error);
+
+      // رسائل خطأ مفصلة حسب نوع الخطأ
+      let errorMessage = 'حدث خطأ أثناء حفظ البيانات';
+
+      if (error.response?.status === 400) {
+        errorMessage =
+          '❌ بيانات غير صحيحة:\n' +
+          (error.response.data?.message ||
+            'يرجى التحقق من جميع الحقول المطلوبة');
+      } else if (error.response?.status === 401) {
+        errorMessage =
+          '❌ غير مصرح لك بإجراء هذا الإجراء\nيرجى تسجيل الدخول مرة أخرى';
+      } else if (error.response?.status === 404) {
+        errorMessage = '❌ البرنامج غير موجود\nربما تم حذفه من قبل';
+      } else if (error.response?.status === 500) {
+        errorMessage = '❌ خطأ في الخادم\nيرجى المحاولة مرة أخرى لاحقاً';
+      } else if (error.message?.includes('Network Error')) {
+        errorMessage = '❌ مشكلة في الاتصال\nيرجى التحقق من اتصال الإنترنت';
+      } else if (error.message?.includes('timeout')) {
+        errorMessage = '❌ انتهت مهلة الطلب\nيرجى المحاولة مرة أخرى';
+      }
+
+      setFormError(errorMessage);
     }
   };
 
@@ -368,18 +399,47 @@ const ProgramsDashboard: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
+    const programToDelete = programs.find((program) => program.id === id);
+    const programTitle = programToDelete?.title || 'البرنامج';
+    const currentAmount = programToDelete?.current_amount || 0;
+
     if (
       window.confirm(
-        t('programs.delete.confirm', 'هل أنت متأكد من حذف هذا البرنامج؟')
+        `🗑️ هل أنت متأكد من حذف البرنامج "${programTitle}"؟\n\n` +
+          `⚠️ هذا الإجراء لا يمكن التراجع عنه\n` +
+          `💰 المبلغ المجمع: ${currentAmount.toLocaleString('ar-SA')} ريال\n` +
+          `📊 سيتم حذف جميع البيانات المرتبطة بالبرنامج`
       )
     ) {
       try {
-        await deleteProgram(id);
+        await deleteProgram(id.toString());
         queryClient.invalidateQueries(['dashboard-programs']);
-        setModalMsg(t('programs.success.deleted', 'تم حذف البرنامج بنجاح'));
-      } catch (error) {
-        setFormError(t('programs.error.delete', 'حدث خطأ أثناء حذف البرنامج'));
+        setModalMsg(
+          `✅ تم حذف البرنامج "${programTitle}" بنجاح! 🗑️\n\n` +
+            `📅 تاريخ الحذف: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `💰 المبلغ المجمع: ${currentAmount.toLocaleString(
+              'ar-SA'
+            )} ريال\n` +
+            `📊 تم حذف جميع البيانات المرتبطة بالبرنامج`
+        );
+      } catch (error: any) {
+        console.error('❌ خطأ في حذف البرنامج:', error);
+
+        let errorMessage = 'حدث خطأ أثناء حذف البرنامج';
+
+        if (error.response?.status === 404) {
+          errorMessage = `❌ البرنامج "${programTitle}" غير موجود\nربما تم حذفه من قبل`;
+        } else if (error.response?.status === 401) {
+          errorMessage =
+            '❌ غير مصرح لك بحذف البرامج\nيرجى تسجيل الدخول مرة أخرى';
+        } else if (error.response?.status === 500) {
+          errorMessage = '❌ خطأ في الخادم\nيرجى المحاولة مرة أخرى لاحقاً';
+        } else if (error.message?.includes('Network Error')) {
+          errorMessage = '❌ مشكلة في الاتصال\nيرجى التحقق من اتصال الإنترنت';
+        }
+
+        setFormError(errorMessage);
       }
     }
   };
@@ -405,7 +465,7 @@ const ProgramsDashboard: React.FC = () => {
   });
 
   const sortedPrograms = [...filteredPrograms].sort((a, b) => {
-    let aValue, bValue;
+    let aValue: any, bValue: any;
 
     switch (sortBy) {
       case 'date':
@@ -425,8 +485,8 @@ const ProgramsDashboard: React.FC = () => {
         bValue = b.status;
         break;
       case 'amount':
-        aValue = a.current_amount;
-        bValue = b.current_amount;
+        aValue = a.current_amount || 0;
+        bValue = b.current_amount || 0;
         break;
       default:
         aValue = new Date(a.start_date).getTime();
@@ -831,7 +891,13 @@ const ProgramsDashboard: React.FC = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleOpenModal('edit', program)}
+                        onClick={() => {
+                          console.log(
+                            '🖱️ تم النقر على زر التعديل للبرنامج:',
+                            program
+                          );
+                          handleOpenModal('edit', program);
+                        }}
                         className="p-1"
                       >
                         <Edit className="w-4 h-4" />
@@ -879,16 +945,16 @@ const ProgramsDashboard: React.FC = () => {
                           className="bg-primary-500 h-2 rounded-full transition-all duration-500"
                           style={{
                             width: `${getProgressPercentage(
-                              program.current_amount,
-                              program.goal_amount
+                              program.current_amount || 0,
+                              program.goal_amount || 0
                             )}%`,
                           }}
                         />
                       </div>
                       <div className="text-xs text-gray-500 text-center">
                         {getProgressPercentage(
-                          program.current_amount,
-                          program.goal_amount
+                          program.current_amount || 0,
+                          program.goal_amount || 0
                         ).toFixed(1)}
                         %
                       </div>
@@ -1082,6 +1148,38 @@ const ProgramsDashboard: React.FC = () => {
             )}
           </div>
         </form>
+      </Modal>
+
+      {/* Success Message Modal */}
+      <Modal
+        open={!!modalMsg}
+        onClose={() => setModalMsg('')}
+        title="نجح العملية! 🎉"
+      >
+        <div className="text-center py-6">
+          <div className="text-green-600 text-lg mb-6 whitespace-pre-line">
+            {modalMsg}
+          </div>
+          <div className="flex justify-center gap-3">
+            <Button
+              onClick={() => setModalMsg('')}
+              variant="primary"
+              className="px-6"
+            >
+              تم
+            </Button>
+            <Button
+              onClick={() => {
+                setModalMsg('');
+                handleCloseModal();
+              }}
+              variant="outline"
+              className="px-6"
+            >
+              إغلاق النافذة
+            </Button>
+          </div>
+        </div>
       </Modal>
     </DashboardLayout>
   );

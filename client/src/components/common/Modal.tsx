@@ -35,7 +35,7 @@ const Modal: React.FC<ModalProps> = ({
         >
           <motion.div
             className={clsx(
-              'bg-surface rounded-lg shadow-lg max-w-lg w-full p-lg relative',
+              'bg-surface rounded-lg shadow-lg max-w-4xl w-full mx-4 p-6 relative max-h-[90vh] overflow-y-auto',
               className
             )}
             initial={{ scale: 0.95, opacity: 0 }}

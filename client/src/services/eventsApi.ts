@@ -77,7 +77,11 @@ export const updateEvent = async (id: number, eventData: Partial<Event> | FormDa
     ? { 'Content-Type': 'multipart/form-data' }
     : { 'Content-Type': 'application/json' };
 
+  console.log('🔧 تحديث الفعالية:', id);
+  console.log('📋 البيانات المرسلة:', eventData);
+
   const response = await http.put(`/events/${id}`, eventData, { headers });
+  console.log('✅ استجابة التحديث:', response.data);
   return response.data;
 };
 

@@ -213,7 +213,7 @@ router.get('/me', async (req, res) => {
     );
 
     // Get user from database
-    const user = await getRow('SELECT * FROM users WHERE id = ?', [decoded.id]);
+            const user = await getRow('SELECT * FROM users WHERE id = $1', [decoded.id]);
 
     if (user.rows.length === 0) {
       return res.status(401).json({

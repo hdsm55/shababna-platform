@@ -305,20 +305,59 @@ const EventsDashboard: React.FC = () => {
           ? parseInt(form.max_attendees)
           : undefined,
         attendees: form.attendees ? parseInt(form.attendees) : 0,
+        status: form.status as
+          | 'upcoming'
+          | 'active'
+          | 'completed'
+          | 'cancelled',
       };
 
       if (modalType === 'add') {
         await createEvent(eventData);
-        setModalMsg(t('events.success.created', 'تم إنشاء الفعالية بنجاح'));
+        setModalMsg(
+          `✅ تم إنشاء الفعالية "${form.title}" بنجاح! 🎉\n\n` +
+            `📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `📍 الموقع: ${form.location}\n` +
+            `👥 الحد الأقصى: ${form.max_attendees || 'غير محدد'} مشارك`
+        );
       } else if (modalType === 'edit' && selectedEvent) {
         await updateEvent(selectedEvent.id, eventData);
-        setModalMsg(t('events.success.updated', 'تم تحديث الفعالية بنجاح'));
+        setModalMsg(
+          `✅ تم تحديث الفعالية "${form.title}" بنجاح! 🔄\n\n` +
+            `📅 آخر تحديث: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `📍 الموقع: ${form.location}\n` +
+            `👥 الحد الأقصى: ${form.max_attendees || 'غير محدد'} مشارك\n` +
+            `📊 المشاركين الحاليين: ${form.attendees || 0}`
+        );
       }
 
       queryClient.invalidateQueries(['dashboard-events']);
       handleCloseModal();
-    } catch (error) {
-      setFormError(t('events.error.general', 'حدث خطأ أثناء حفظ البيانات'));
+    } catch (error: any) {
+      console.error('❌ خطأ في حفظ الفعالية:', error);
+
+      // رسائل خطأ مفصلة حسب نوع الخطأ
+      let errorMessage = 'حدث خطأ أثناء حفظ البيانات';
+
+      if (error.response?.status === 400) {
+        errorMessage =
+          '❌ بيانات غير صحيحة:\n' +
+          (error.response.data?.message ||
+            'يرجى التحقق من جميع الحقول المطلوبة');
+      } else if (error.response?.status === 401) {
+        errorMessage =
+          '❌ غير مصرح لك بإجراء هذا الإجراء\nيرجى تسجيل الدخول مرة أخرى';
+      } else if (error.response?.status === 404) {
+        errorMessage = '❌ الفعالية غير موجودة\nربما تم حذفها من قبل';
+      } else if (error.response?.status === 500) {
+        errorMessage = '❌ خطأ في الخادم\nيرجى المحاولة مرة أخرى لاحقاً';
+      } else if (error.message?.includes('Network Error')) {
+        errorMessage = '❌ مشكلة في الاتصال\nيرجى التحقق من اتصال الإنترنت';
+      } else if (error.message?.includes('timeout')) {
+        errorMessage = '❌ انتهت مهلة الطلب\nيرجى المحاولة مرة أخرى';
+      }
+
+      setFormError(errorMessage);
     }
   };
 
@@ -373,17 +412,41 @@ const EventsDashboard: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
+    const eventToDelete = events.find((event) => event.id === id);
+    const eventTitle = eventToDelete?.title || 'الفعالية';
+
     if (
       window.confirm(
-        t('events.delete.confirm', 'هل أنت متأكد من حذف هذه الفعالية؟')
+        `🗑️ هل أنت متأكد من حذف الفعالية "${eventTitle}"؟\n\n` +
+          `⚠️ هذا الإجراء لا يمكن التراجع عنه\n` +
+          `📊 سيتم حذف جميع البيانات المرتبطة بالفعالية`
       )
     ) {
       try {
         await deleteEvent(id.toString());
         queryClient.invalidateQueries(['dashboard-events']);
-        setModalMsg(t('events.success.deleted', 'تم حذف الفعالية بنجاح'));
-      } catch (error) {
-        setFormError(t('events.error.delete', 'حدث خطأ أثناء حذف الفعالية'));
+        setModalMsg(
+          `✅ تم حذف الفعالية "${eventTitle}" بنجاح! 🗑️\n\n` +
+            `📅 تاريخ الحذف: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `📊 تم حذف جميع البيانات المرتبطة بالفعالية`
+        );
+      } catch (error: any) {
+        console.error('❌ خطأ في حذف الفعالية:', error);
+
+        let errorMessage = 'حدث خطأ أثناء حذف الفعالية';
+
+        if (error.response?.status === 404) {
+          errorMessage = `❌ الفعالية "${eventTitle}" غير موجودة\nربما تم حذفها من قبل`;
+        } else if (error.response?.status === 401) {
+          errorMessage =
+            '❌ غير مصرح لك بحذف الفعاليات\nيرجى تسجيل الدخول مرة أخرى';
+        } else if (error.response?.status === 500) {
+          errorMessage = '❌ خطأ في الخادم\nيرجى المحاولة مرة أخرى لاحقاً';
+        } else if (error.message?.includes('Network Error')) {
+          errorMessage = '❌ مشكلة في الاتصال\nيرجى التحقق من اتصال الإنترنت';
+        }
+
+        setFormError(errorMessage);
       }
     }
   };
@@ -1125,6 +1188,38 @@ const EventsDashboard: React.FC = () => {
             )}
           </div>
         </form>
+      </Modal>
+
+      {/* Success Message Modal */}
+      <Modal
+        open={!!modalMsg}
+        onClose={() => setModalMsg('')}
+        title="نجح العملية! 🎉"
+      >
+        <div className="text-center py-6">
+          <div className="text-green-600 text-lg mb-6 whitespace-pre-line">
+            {modalMsg}
+          </div>
+          <div className="flex justify-center gap-3">
+            <Button
+              onClick={() => setModalMsg('')}
+              variant="primary"
+              className="px-6"
+            >
+              تم
+            </Button>
+            <Button
+              onClick={() => {
+                setModalMsg('');
+                handleCloseModal();
+              }}
+              variant="outline"
+              className="px-6"
+            >
+              إغلاق النافذة
+            </Button>
+          </div>
+        </div>
       </Modal>
     </DashboardLayout>
   );

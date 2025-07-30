@@ -26,6 +26,8 @@ export interface Program {
   current_amount?: number;
   start_date: string;
   end_date: string;
+  status: 'active' | 'completed' | 'pending' | 'cancelled';
+  participants_count: number;
   created_at: string;
   updated_at?: string;
 }

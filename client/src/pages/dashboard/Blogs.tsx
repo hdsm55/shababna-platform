@@ -38,6 +38,7 @@ const BlogsDashboard: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [modalMsg, setModalMsg] = useState('');
 
   // تعبئة النموذج عند التعديل
   useEffect(() => {
@@ -54,36 +55,93 @@ const BlogsDashboard: React.FC = () => {
   }, [modalType, selectedBlog]);
 
   // إضافة أو تعديل مقالة
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setErrorMsg('');
     try {
       if (modalType === 'add') {
         await createBlog(form);
+        setModalMsg(
+          `✅ تم إنشاء المقالة "${form.title}" بنجاح! 🎉\n\n` +
+            `📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `✍️ الكاتب: ${form.author || 'غير محدد'}\n` +
+            `📝 المحتوى: ${form.content.length} حرف`
+        );
       } else if (modalType === 'edit' && selectedBlog) {
         await updateBlog(selectedBlog.id, form);
+        setModalMsg(
+          `✅ تم تحديث المقالة "${form.title}" بنجاح! 🔄\n\n` +
+            `📅 آخر تحديث: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `✍️ الكاتب: ${form.author || 'غير محدد'}\n` +
+            `📝 المحتوى: ${form.content.length} حرف`
+        );
       }
       setModalOpen(false);
       refetch();
-    } catch (err) {
-      setErrorMsg('حدث خطأ أثناء الحفظ');
+    } catch (err: any) {
+      console.error('❌ خطأ في حفظ المقالة:', err);
+      let errorMessage = 'حدث خطأ أثناء حفظ البيانات';
+      if (err.response?.status === 400) {
+        errorMessage =
+          '❌ بيانات غير صحيحة:\n' +
+          (err.response.data?.message || 'يرجى التحقق من جميع الحقول المطلوبة');
+      } else if (err.response?.status === 401) {
+        errorMessage =
+          '❌ غير مصرح لك بإجراء هذا الإجراء\nيرجى تسجيل الدخول مرة أخرى';
+      } else if (err.response?.status === 404) {
+        errorMessage = '❌ المقالة غير موجودة\nربما تم حذفها من قبل';
+      } else if (err.response?.status === 500) {
+        errorMessage = '❌ خطأ في الخادم\nيرجى المحاولة مرة أخرى لاحقاً';
+      } else if (err.message?.includes('Network Error')) {
+        errorMessage = '❌ مشكلة في الاتصال\nيرجى التحقق من اتصال الإنترنت';
+      } else if (err.message?.includes('timeout')) {
+        errorMessage = '❌ انتهت مهلة الطلب\nيرجى المحاولة مرة أخرى';
+      }
+      setErrorMsg(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   // حذف مقالة
-  const handleDelete = async (id) => {
-    if (!window.confirm('هل أنت متأكد من حذف هذه المقالة؟')) return;
-    setLoading(true);
-    try {
-      await deleteBlog(id);
-      refetch();
-    } catch (err) {
-      alert('حدث خطأ أثناء الحذف');
-    } finally {
-      setLoading(false);
+  const handleDelete = async (id: number) => {
+    const blogToDelete = blogs.find((blog) => blog.id === id);
+    const blogTitle = blogToDelete?.title || 'المقالة';
+
+    if (
+      window.confirm(
+        `🗑️ هل أنت متأكد من حذف المقالة "${blogTitle}"؟\n\n` +
+          `⚠️ هذا الإجراء لا يمكن التراجع عنه\n` +
+          `📊 سيتم حذف جميع البيانات المرتبطة بالمقالة`
+      )
+    ) {
+      setLoading(true);
+      try {
+        await deleteBlog(id);
+        refetch();
+        setModalMsg(
+          `✅ تم حذف المقالة "${blogTitle}" بنجاح! 🗑️\n\n` +
+            `📅 تاريخ الحذف: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `📊 تم حذف جميع البيانات المرتبطة بالمقالة`
+        );
+      } catch (err: any) {
+        console.error('❌ خطأ في حذف المقالة:', err);
+        let errorMessage = 'حدث خطأ أثناء حذف المقالة';
+        if (err.response?.status === 404) {
+          errorMessage = `❌ المقالة "${blogTitle}" غير موجودة\nربما تم حذفها من قبل`;
+        } else if (err.response?.status === 401) {
+          errorMessage =
+            '❌ غير مصرح لك بحذف المقالات\nيرجى تسجيل الدخول مرة أخرى';
+        } else if (err.response?.status === 500) {
+          errorMessage = '❌ خطأ في الخادم\nيرجى المحاولة مرة أخرى لاحقاً';
+        } else if (err.message?.includes('Network Error')) {
+          errorMessage = '❌ مشكلة في الاتصال\nيرجى التحقق من اتصال الإنترنت';
+        }
+        alert(errorMessage);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -178,7 +236,7 @@ const BlogsDashboard: React.FC = () => {
         )}
         {/* نافذة منبثقة لإضافة/تعديل المقالة (للتطوير لاحقًا) */}
         <Modal
-          isOpen={modalOpen}
+          open={modalOpen}
           onClose={() => setModalOpen(false)}
           title={
             modalType === 'add'
@@ -232,6 +290,38 @@ const BlogsDashboard: React.FC = () => {
               </Button>
             </div>
           </form>
+        </Modal>
+
+        {/* Success Message Modal */}
+        <Modal
+          open={!!modalMsg}
+          onClose={() => setModalMsg('')}
+          title="نجح العملية! 🎉"
+        >
+          <div className="text-center py-6">
+            <div className="text-green-600 text-lg mb-6 whitespace-pre-line">
+              {modalMsg}
+            </div>
+            <div className="flex justify-center gap-3">
+              <Button
+                onClick={() => setModalMsg('')}
+                variant="primary"
+                className="px-6"
+              >
+                تم
+              </Button>
+              <Button
+                onClick={() => {
+                  setModalMsg('');
+                  setModalOpen(false);
+                }}
+                variant="outline"
+                className="px-6"
+              >
+                إغلاق النافذة
+              </Button>
+            </div>
+          </div>
         </Modal>
       </section>
     </DashboardLayout>

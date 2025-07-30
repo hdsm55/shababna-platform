@@ -44,7 +44,7 @@ export const getAllEvents = async (req, res) => {
 // Get single event by ID (public)
 export const getEventById = async (req, res) => {
     try {
-        const result = await getRow('SELECT id, title, description, start_date, end_date, location, max_attendees, attendees, category, image_url, status, created_at, updated_at FROM events WHERE id = ?', [req.params.id]);
+        const result = await getRow('SELECT id, title, description, start_date, end_date, location, max_attendees, attendees, category, image_url, status, created_at, updated_at FROM events WHERE id = $1', [req.params.id]);
         if (!result) {
             return errorResponse(res, 'الفعالية غير موجودة', 404);
         }
@@ -95,8 +95,12 @@ export const createEvent = async (req, res) => {
 // Update event (admin only)
 export const updateEvent = async (req, res) => {
     try {
+        console.log('🔧 تحديث الفعالية:', req.params.id);
+        console.log('📋 البيانات المرسلة:', req.body);
+
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
+            console.log('❌ أخطاء التحقق:', errors.array());
             return errorResponse(res, 'بيانات غير صالحة', 400, errors.array());
         }
         // Check if event exists
@@ -111,7 +115,7 @@ export const updateEvent = async (req, res) => {
         let paramIndex = 1;
         Object.keys(req.body).forEach(key => {
             if (allowedFields.includes(key) && req.body[key] !== undefined) {
-                updateFields.push(`${key} = ?`);
+                updateFields.push(`${key} = $${paramIndex}`);
                 values.push(req.body[key]);
                 paramIndex++;
             }
@@ -121,10 +125,11 @@ export const updateEvent = async (req, res) => {
         }
         updateFields.push(`updated_at = NOW()`);
         values.push(req.params.id);
-        await query(
-            `UPDATE events SET ${updateFields.join(', ')} WHERE id = $${values.length}`,
-            values
-        );
+        const updateQuery = `UPDATE events SET ${updateFields.join(', ')} WHERE id = $${paramIndex}`;
+        console.log('🔧 SQL Query:', updateQuery);
+        console.log('📋 Values:', values);
+
+        await query(updateQuery, values);
         const updatedEvent = await getRow('SELECT * FROM events WHERE id = $1', [req.params.id]);
         return successResponse(res, updatedEvent, 'تم تحديث الفعالية بنجاح');
     } catch (error) {

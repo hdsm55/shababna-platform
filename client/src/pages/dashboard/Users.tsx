@@ -277,16 +277,47 @@ const UsersDashboard: React.FC = () => {
     try {
       if (modalType === 'add') {
         await createUser(form);
-        setModalMsg(t('users.success.created', 'تم إنشاء المستخدم بنجاح'));
+        setModalMsg(
+          `✅ تم إنشاء المستخدم "${form.firstName} ${form.lastName}" بنجاح! 🎉\n\n` +
+            `📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `📧 البريد الإلكتروني: ${form.email}\n` +
+            `👤 الدور: ${getRoleText(form.role)}\n` +
+            `📱 الهاتف: ${form.phone || 'غير محدد'}`
+        );
       } else if (modalType === 'edit' && selectedUser) {
         await updateUser(selectedUser.id, form);
-        setModalMsg(t('users.success.updated', 'تم تحديث المستخدم بنجاح'));
+        setModalMsg(
+          `✅ تم تحديث المستخدم "${form.firstName} ${form.lastName}" بنجاح! 🔄\n\n` +
+            `📅 آخر تحديث: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `📧 البريد الإلكتروني: ${form.email}\n` +
+            `👤 الدور: ${getRoleText(form.role)}\n` +
+            `📱 الهاتف: ${form.phone || 'غير محدد'}`
+        );
       }
 
       queryClient.invalidateQueries(['dashboard-users']);
       handleCloseModal();
-    } catch (error) {
-      setFormError(t('users.error.general', 'حدث خطأ أثناء حفظ البيانات'));
+    } catch (error: any) {
+      console.error('❌ خطأ في حفظ المستخدم:', error);
+      let errorMessage = 'حدث خطأ أثناء حفظ البيانات';
+      if (error.response?.status === 400) {
+        errorMessage =
+          '❌ بيانات غير صحيحة:\n' +
+          (error.response.data?.message ||
+            'يرجى التحقق من جميع الحقول المطلوبة');
+      } else if (error.response?.status === 401) {
+        errorMessage =
+          '❌ غير مصرح لك بإجراء هذا الإجراء\nيرجى تسجيل الدخول مرة أخرى';
+      } else if (error.response?.status === 404) {
+        errorMessage = '❌ المستخدم غير موجود\nربما تم حذفه من قبل';
+      } else if (error.response?.status === 500) {
+        errorMessage = '❌ خطأ في الخادم\nيرجى المحاولة مرة أخرى لاحقاً';
+      } else if (error.message?.includes('Network Error')) {
+        errorMessage = '❌ مشكلة في الاتصال\nيرجى التحقق من اتصال الإنترنت';
+      } else if (error.message?.includes('timeout')) {
+        errorMessage = '❌ انتهت مهلة الطلب\nيرجى المحاولة مرة أخرى';
+      }
+      setFormError(errorMessage);
     }
   };
 
@@ -1118,6 +1149,38 @@ const UsersDashboard: React.FC = () => {
             )}
           </div>
         </form>
+      </Modal>
+
+      {/* Success Message Modal */}
+      <Modal
+        open={!!modalMsg}
+        onClose={() => setModalMsg('')}
+        title="نجح العملية! 🎉"
+      >
+        <div className="text-center py-6">
+          <div className="text-green-600 text-lg mb-6 whitespace-pre-line">
+            {modalMsg}
+          </div>
+          <div className="flex justify-center gap-3">
+            <Button
+              onClick={() => setModalMsg('')}
+              variant="primary"
+              className="px-6"
+            >
+              تم
+            </Button>
+            <Button
+              onClick={() => {
+                setModalMsg('');
+                handleCloseModal();
+              }}
+              variant="outline"
+              className="px-6"
+            >
+              إغلاق النافذة
+            </Button>
+          </div>
+        </div>
       </Modal>
     </DashboardLayout>
   );

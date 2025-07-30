@@ -41,6 +41,7 @@ const ContactForms: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedForm, setSelectedForm] = useState<any>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalMsg, setModalMsg] = useState('');
 
   // جلب رسائل التواصل
   const {
@@ -65,6 +66,15 @@ const ContactForms: React.FC = () => {
 
   const handleReadStatusToggle = (id: string, currentStatus: boolean) => {
     updateReadStatusMutation.mutate({ id, isRead: !currentStatus });
+    setModalMsg(
+      currentStatus
+        ? `✅ تم تمييز الرسالة كغير مقروءة! 📧\n\n📅 التاريخ: ${new Date().toLocaleDateString(
+            'ar-SA'
+          )}`
+        : `✅ تم تمييز الرسالة كمقروءة! ✅\n\n📅 التاريخ: ${new Date().toLocaleDateString(
+            'ar-SA'
+          )}`
+    );
   };
 
   const handleViewForm = (form: any) => {
@@ -396,6 +406,38 @@ const ContactForms: React.FC = () => {
               </div>
             </div>
           )}
+        </Modal>
+
+        {/* Success Message Modal */}
+        <Modal
+          open={!!modalMsg}
+          onClose={() => setModalMsg('')}
+          title="نجح العملية! 🎉"
+        >
+          <div className="text-center py-6">
+            <div className="text-green-600 text-lg mb-6 whitespace-pre-line">
+              {modalMsg}
+            </div>
+            <div className="flex justify-center gap-3">
+              <Button
+                onClick={() => setModalMsg('')}
+                variant="primary"
+                className="px-6"
+              >
+                تم
+              </Button>
+              <Button
+                onClick={() => {
+                  setModalMsg('');
+                  setModalOpen(false);
+                }}
+                variant="outline"
+                className="px-6"
+              >
+                إغلاق النافذة
+              </Button>
+            </div>
+          </div>
         </Modal>
       </div>
     </DashboardLayout>
