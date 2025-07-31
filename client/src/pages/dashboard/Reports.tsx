@@ -113,7 +113,7 @@ import {
   UserMinus,
   Users as UsersIcon,
   UserCog,
-  UserSearch,
+  // UserSearch, // Removed - not available in lucide-react
   UserCheck as UserVerified,
   UserX as UserBlocked,
 } from 'lucide-react';

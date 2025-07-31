@@ -125,7 +125,7 @@ import {
   UserMinus,
   Users as UsersIcon,
   UserCog,
-  UserSearch,
+  // UserSearch, // Removed - not available in lucide-react
   UserCheck as UserVerified,
   UserX as UserBlocked,
 } from 'lucide-react';
@@ -533,11 +533,9 @@ const ProgramsDashboard: React.FC = () => {
       <Alert
         type="error"
         title={t('programs.error.title', 'خطأ في تحميل البيانات')}
-        message={t(
-          'programs.error.message',
-          'حدث خطأ أثناء تحميل بيانات البرامج'
-        )}
-      />
+      >
+        {t('programs.error.message', 'حدث خطأ أثناء تحميل بيانات البرامج')}
+      </Alert>
     );
   }
 

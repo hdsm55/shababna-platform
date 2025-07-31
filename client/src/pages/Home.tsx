@@ -81,9 +81,12 @@ const Home: React.FC = () => {
         console.log('✅ Found events in eventsData.data.items.rows');
         return (eventsData as any).data.items.rows;
       }
-      if (eventsData?.data?.items && Array.isArray(eventsData.data.items)) {
+      if (
+        (eventsData as any)?.data?.items &&
+        Array.isArray((eventsData as any).data.items)
+      ) {
         console.log('✅ Found events in eventsData.data.items');
-        return eventsData.data.items;
+        return (eventsData as any).data.items;
       }
       if (
         (eventsData as any)?.items &&
@@ -121,8 +124,11 @@ const Home: React.FC = () => {
       ) {
         return (programsData as any).data.items.rows;
       }
-      if (programsData?.data?.items && Array.isArray(programsData.data.items)) {
-        return programsData.data.items;
+      if (
+        (programsData as any)?.data?.items &&
+        Array.isArray((programsData as any).data.items)
+      ) {
+        return (programsData as any).data.items;
       }
       if (
         (programsData as any)?.items &&

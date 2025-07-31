@@ -20,7 +20,12 @@ const DangerZoneSection: React.FC<DangerZoneSectionProps> = ({
           سيتم حذف جميع بياناتك بشكل نهائي ولا يمكن التراجع عن هذا الإجراء.
         </p>
       </div>
-      <Button variant="danger" icon={Trash2} onClick={handleDeleteAccount}>
+      <Button
+        variant="outline"
+        icon={Trash2}
+        onClick={handleDeleteAccount}
+        className="text-red-600 border-red-600 hover:bg-red-50"
+      >
         حذف الحساب
       </Button>
     </div>

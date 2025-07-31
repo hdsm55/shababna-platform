@@ -124,9 +124,10 @@ const SettingsDashboard: React.FC = () => {
           <Alert
             type={messageType}
             title={messageType === 'success' ? 'نجح' : 'خطأ'}
-            message={message}
             onClose={() => setMessage('')}
-          />
+          >
+            {message}
+          </Alert>
         </motion.div>
       )}
 

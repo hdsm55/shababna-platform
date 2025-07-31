@@ -168,7 +168,7 @@ const ProgramDetail: React.FC = () => {
       <SEO
         title={`${program.title} - منصة شبابنا العالمية`}
         description={program.description}
-        type="program"
+        type="website"
       />
 
       {/* Back Button */}

@@ -60,8 +60,11 @@ const Programs: React.FC = () => {
       ) {
         return (programsData as any).data.items.rows;
       }
-      if (programsData?.data?.items && Array.isArray(programsData.data.items)) {
-        return programsData.data.items;
+      if (
+        (programsData as any)?.data?.items &&
+        Array.isArray((programsData as any).data.items)
+      ) {
+        return (programsData as any).data.items;
       }
       if (
         (programsData as any)?.items &&
