@@ -79,9 +79,9 @@ const DashboardLayout = ({ children }: { children?: React.ReactNode }) => {
       label: 'المستخدمين',
     },
     {
-      to: '/dashboard/forms',
+      to: '/dashboard/contact-forms',
       icon: <FileText className="w-4 h-4" />,
-      label: 'النماذج',
+      label: 'رسائل التواصل',
     },
     {
       to: '/dashboard/settings',

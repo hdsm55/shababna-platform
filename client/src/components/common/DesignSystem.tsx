@@ -2,6 +2,169 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 // Unified Design System Components
+export const DESIGN_SYSTEM = {
+  colors: {
+    primary: {
+      50: '#eff6ff',
+      100: '#dbeafe',
+      200: '#bfdbfe',
+      300: '#93c5fd',
+      400: '#60a5fa',
+      500: '#3b82f6',
+      600: '#2563eb',
+      700: '#1d4ed8',
+      800: '#1e40af',
+      900: '#1e3a8a',
+      950: '#172554',
+    },
+    secondary: {
+      50: '#f8fafc',
+      100: '#f1f5f9',
+      200: '#e2e8f0',
+      300: '#cbd5e1',
+      400: '#94a3b8',
+      500: '#64748b',
+      600: '#475569',
+      700: '#334155',
+      800: '#1e293b',
+      900: '#0f172a',
+      950: '#020617',
+    },
+    accent: {
+      50: '#fef2f2',
+      100: '#fee2e2',
+      200: '#fecaca',
+      300: '#fca5a5',
+      400: '#f87171',
+      500: '#ef4444',
+      600: '#dc2626',
+      700: '#b91c1c',
+      800: '#991b1b',
+      900: '#7f1d1d',
+      950: '#450a0a',
+    },
+    success: {
+      50: '#f0fdf4',
+      100: '#dcfce7',
+      200: '#bbf7d0',
+      300: '#86efac',
+      400: '#4ade80',
+      500: '#22c55e',
+      600: '#16a34a',
+      700: '#15803d',
+      800: '#166534',
+      900: '#14532d',
+      950: '#052e16',
+    },
+    warning: {
+      50: '#fffbeb',
+      100: '#fef3c7',
+      200: '#fde68a',
+      300: '#fcd34d',
+      400: '#fbbf24',
+      500: '#f59e0b',
+      600: '#d97706',
+      700: '#b45309',
+      800: '#92400e',
+      900: '#78350f',
+      950: '#451a03',
+    },
+    error: {
+      50: '#fef2f2',
+      100: '#fee2e2',
+      200: '#fecaca',
+      300: '#fca5a5',
+      400: '#f87171',
+      500: '#ef4444',
+      600: '#dc2626',
+      700: '#b91c1c',
+      800: '#991b1b',
+      900: '#7f1d1d',
+      950: '#450a0a',
+    },
+  },
+  spacing: {
+    xs: '0.25rem',
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '1.5rem',
+    xl: '2rem',
+    '2xl': '3rem',
+    '3xl': '4rem',
+  },
+  borderRadius: {
+    none: '0',
+    sm: '0.125rem',
+    md: '0.375rem',
+    lg: '0.5rem',
+    xl: '0.75rem',
+  },
+};
+
+// Helper function for card classes
+export const getCardClasses = (variant: string = 'default') => {
+  const cardVariants = {
+    default: 'bg-white border border-neutral-200 shadow-sm',
+    elevated: 'bg-white border border-neutral-200 shadow-lg',
+    accent:
+      'bg-gradient-to-br from-accent-50 to-accent-100 border border-accent-200',
+    primary:
+      'bg-gradient-to-br from-primary-50 to-primary-100 border border-primary-200',
+    glass: 'bg-white/80 backdrop-blur-sm border border-white/20 shadow-lg',
+    success:
+      'bg-gradient-to-br from-success-50 to-success-100 border border-success-200',
+    error:
+      'bg-gradient-to-br from-error-50 to-error-100 border border-error-200',
+    warning:
+      'bg-gradient-to-br from-warning-50 to-warning-100 border border-warning-200',
+    info: 'bg-gradient-to-br from-info-50 to-info-100 border border-info-200',
+  };
+
+  return (
+    cardVariants[variant as keyof typeof cardVariants] || cardVariants.default
+  );
+};
+
+// Button variants for AccessibleComponents
+export const BUTTON_VARIANTS = {
+  primary: 'bg-primary-600 text-white hover:bg-primary-700 shadow-md',
+  secondary: 'bg-secondary-600 text-white hover:bg-secondary-700',
+  ghost: 'bg-transparent text-primary-600 hover:bg-primary-50',
+  icon: 'bg-transparent text-primary-600 p-2 rounded-full hover:bg-primary-50',
+  outline:
+    'bg-transparent border-2 border-primary-600 text-primary-600 hover:bg-primary-50',
+  danger: 'bg-red-600 text-white hover:bg-red-700',
+  success: 'bg-green-600 text-white hover:bg-green-700',
+  warning: 'bg-yellow-600 text-white hover:bg-yellow-700',
+  info: 'bg-blue-600 text-white hover:bg-blue-700',
+};
+
+// Card variants for AccessibleComponents
+export const CARD_VARIANTS = {
+  default: 'bg-white border border-neutral-200 shadow-sm',
+  elevated: 'bg-white border border-neutral-200 shadow-lg',
+  accent:
+    'bg-gradient-to-br from-accent-50 to-accent-100 border border-accent-200',
+  primary:
+    'bg-gradient-to-br from-primary-50 to-primary-100 border border-primary-200',
+  glass: 'bg-white/80 backdrop-blur-sm border border-white/20 shadow-lg',
+  success:
+    'bg-gradient-to-br from-success-50 to-success-100 border border-success-200',
+  error: 'bg-gradient-to-br from-error-50 to-error-100 border border-error-200',
+  warning:
+    'bg-gradient-to-br from-warning-50 to-warning-100 border border-warning-200',
+  info: 'bg-gradient-to-br from-info-50 to-info-100 border border-info-200',
+};
+
+// Section variants for AccessibleComponents
+export const SECTION_VARIANTS = {
+  content: 'py-8 px-4',
+  hero: 'py-16 px-4 bg-gradient-to-br from-primary-50 to-accent-50',
+  features: 'py-12 px-4 bg-white',
+  cta: 'py-12 px-4 bg-primary-600 text-white',
+  footer: 'py-8 px-4 bg-neutral-900 text-white',
+};
+
 export const DesignTokens = {
   colors: {
     primary: {

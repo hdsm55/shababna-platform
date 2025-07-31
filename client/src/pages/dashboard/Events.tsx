@@ -195,7 +195,9 @@ const EventsDashboard: React.FC = () => {
   const [modalMsg, setModalMsg] = useState('');
 
   // استخدام البيانات الحقيقية من API
-  const events = data?.data?.items || [];
+  const events = data?.data?.events || [];
+  console.log('📊 البيانات المستلمة من API:', data);
+  console.log('📋 قائمة الفعاليات:', events);
 
   const handleOpenModal = (type: 'add' | 'edit' | 'view', event?: Event) => {
     setModalType(type);

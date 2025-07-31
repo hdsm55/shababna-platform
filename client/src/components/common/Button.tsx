@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import clsx from 'clsx';
 
 export type ButtonVariant =
@@ -81,45 +80,40 @@ const Button: React.FC<ButtonProps> = ({
     ...props,
   };
 
+  // للـ button العادي
   if (Component === 'button') {
-    const MotionButton = motion.button;
     return (
-      <MotionButton
-        type="button"
-        {...baseProps}
-        disabled={disabled || loading}
-        whileTap={{ scale: 0.97 }}
-        onAnimationStart={() => {}}
-      >
+      <button type="button" {...baseProps} disabled={disabled || loading}>
         {content}
-      </MotionButton>
+      </button>
     );
   }
-  // For Link or <a> or custom component
-  const MotionComponent = motion(Component);
-  // لا تمرر disabled هنا ولا onClick إذا كان معطل
-  const { onClick, disabled: _d, ...restProps } = baseProps;
-  const handleClick = (e: React.MouseEvent<any, MouseEvent>) => {
-    if (disabled || loading) {
-      e.preventDefault();
-      return;
-    }
-    if (typeof onClick === 'function') {
-      onClick(e);
-    }
-  };
+
+  // للـ anchor tags
+  if (Component === 'a') {
+    return (
+      <a
+        {...baseProps}
+        href={href}
+        tabIndex={disabled ? -1 : 0}
+        aria-disabled={disabled || loading}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  // للعناصر الأخرى (مثل Link)
   return (
-    <MotionComponent
-      {...restProps}
+    <Component
+      {...baseProps}
       to={to}
       href={href}
       tabIndex={disabled ? -1 : 0}
       aria-disabled={disabled || loading}
-      whileTap={{ scale: 0.97 }}
-      onClick={handleClick}
     >
       {content}
-    </MotionComponent>
+    </Component>
   );
 };
 

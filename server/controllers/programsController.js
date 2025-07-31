@@ -16,7 +16,7 @@ export const getAllPrograms = async (req, res) => {
         FROM programs
         ORDER BY created_at DESC
     `);
-        return successResponse(res, { items: result.rows, total: result.rows.length }, 'تم جلب البرامج بنجاح');
+        return successResponse(res, { programs: result.rows, total: result.rows.length }, 'تم جلب البرامج بنجاح');
     } catch (error) {
         console.error('Programs fetch error:', error);
         return errorResponse(res, 'خطأ في جلب البرامج', 500, error);

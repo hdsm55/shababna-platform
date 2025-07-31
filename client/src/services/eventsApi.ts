@@ -37,7 +37,7 @@ export const fetchEventById = async (id: string): Promise<any> => {
     console.log('🔍 Fetching event by ID:', id);
     const response = await http.get(`/events/${id}`);
     console.log('📊 Event API Response:', response.data);
-    return response.data;
+    return response.data.data || response.data;
   } catch (error) {
     console.error('Event API failed:', error);
     throw error; // إعادة رمي الخطأ بدلاً من إرجاع بيانات وهمية

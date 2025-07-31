@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار المدونات</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .blog-detail {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .blog-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        .blog-meta {
+            display: flex;
+            gap: 15px;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .blog-content {
+            line-height: 1.8;
+            color: #333;
+            font-size: 16px;
+        }
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #666;
+        }
+        .error {
+            text-align: center;
+            padding: 50px;
+            color: #d32f2f;
+            background: #ffebee;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .back-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+        .back-button:hover {
+            background: #5a6fd8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 اختبار تفاصيل المدونة</h1>
+
+        <div id="loading" class="loading">جاري تحميل المدونة...</div>
+        <div id="error" class="error" style="display: none;">حدث خطأ في تحميل المدونة</div>
+        <div id="blog-content" class="blog-detail" style="display: none;"></div>
+    </div>
+
+    <script>
+        async function fetchBlog() {
+            try {
+                console.log('🔍 جاري جلب المدونة...');
+                const blogId = 5; // المدونة رقم 5
+                const response = await fetch(`http://localhost:5000/api/blogs/${blogId}`);
+                const data = await response.json();
+
+                console.log('📊 استجابة API المدونة:', data);
+
+                if (data.success && data.data) {
+                    displayBlog(data.data);
+                } else {
+                    throw new Error('بيانات غير صحيحة من الخادم');
+                }
+            } catch (error) {
+                console.error('❌ خطأ في جلب المدونة:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = `خطأ في تحميل المدونة: ${error.message}`;
+            }
+        }
+
+        function displayBlog(blog) {
+            const container = document.getElementById('blog-content');
+            const loading = document.getElementById('loading');
+
+            loading.style.display = 'none';
+            container.style.display = 'block';
+
+            container.innerHTML = `
+                <h1 class="blog-title">${blog.title}</h1>
+                <div class="blog-meta">
+                    <span>بواسطة: ${blog.author || 'فريق شبابنا'}</span>
+                    <span>•</span>
+                    <span>${new Date(blog.created_at).toLocaleDateString('ar-SA')}</span>
+                </div>
+                <div class="blog-content">
+                    ${blog.content}
+                </div>
+                <a href="/blogs" class="back-button">العودة للمدونة</a>
+            `;
+        }
+
+        // بدء التحميل
+        fetchBlog();
+    </script>
+</body>
+</html>

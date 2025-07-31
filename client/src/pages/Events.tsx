@@ -89,13 +89,17 @@ const Events: React.FC = () => {
   } = useQuery({
     queryKey: ['events', queryParams],
     queryFn: () => fetchEvents(queryParams),
-    retry: 1,
+    retry: 3,
     staleTime: 0,
     refetchInterval: 30000,
+    refetchOnWindowFocus: true,
   });
 
+  console.log('🔍 Events Data:', eventsData);
   const events = eventsData?.data?.events || [];
   const pagination = eventsData?.data?.pagination;
+  console.log('📊 Events:', events);
+  console.log('📊 Pagination:', pagination);
 
   const handleRegisterClick = (event: Event) => {
     setSelectedEvent(event);
@@ -259,18 +263,18 @@ const Events: React.FC = () => {
             </p>
             <div className="flex justify-center items-center gap-8 mt-8">
               <div className="text-center">
-                <div className="text-3xl font-bold">{events.length}</div>
+                <div className="text-3xl font-bold">{events?.length || 0}</div>
                 <div className="text-slate-300 text-sm">فعالية متاحة</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold">
-                  {events.filter((e) => e.status === 'upcoming').length}
+                  {events?.filter((e) => e.status === 'upcoming').length || 0}
                 </div>
                 <div className="text-slate-300 text-sm">قادمة</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold">
-                  {events.filter((e) => e.status === 'active').length}
+                  {events?.filter((e) => e.status === 'active').length || 0}
                 </div>
                 <div className="text-slate-300 text-sm">نشطة</div>
               </div>
@@ -383,7 +387,7 @@ const Events: React.FC = () => {
         {/* Events Display */}
         {!isLoading && !isError && (
           <AnimatePresence mode="wait">
-            {events.length > 0 ? (
+            {events && events.length > 0 ? (
               <motion.div
                 key={viewMode}
                 variants={containerVariants}

@@ -176,8 +176,11 @@ const ProgramsDashboard: React.FC = () => {
   const [modalMsg, setModalMsg] = useState('');
 
   // استخدام البيانات الحقيقية من API
-  const programs = data?.data?.items || [];
   console.log('📊 البيانات المستلمة من API:', data);
+  console.log('📊 data.data:', data?.data);
+  console.log('📊 data.data.programs:', data?.data?.programs);
+  console.log('📊 data.data.items:', data?.data?.items);
+  const programs = data?.data?.programs || data?.data?.items || [];
   console.log('📋 قائمة البرامج:', programs);
 
   const handleOpenModal = (

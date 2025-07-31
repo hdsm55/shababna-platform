@@ -15,6 +15,7 @@
     "db:setup": "node server/db/setup-sqlite.js",
     "db:setup-postgres": "node server/db/setup-postgres.js",
     "db:seed": "node server/db/seed.js",
+    "db:seed-blogs": "psql -U postgres -d shababna -f server/db/seed-blogs.sql",
     "db:setup-forms": "node server/db/setup_contact_forms.js",
     "test:api": "node server/test-api.js",
     "test": "jest",

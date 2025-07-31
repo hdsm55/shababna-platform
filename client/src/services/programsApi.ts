@@ -24,7 +24,7 @@ export const fetchPrograms = async (params: ProgramsQueryParams = {}): Promise<P
 export const fetchProgramById = async (id: string): Promise<any> => {
   try {
     const response = await http.get(`/programs/${id}`);
-    return response.data;
+    return response.data.data || response.data;
   } catch (error) {
     console.error('Program API failed:', error);
     throw error; // إعادة رمي الخطأ بدلاً من إرجاع بيانات وهمية

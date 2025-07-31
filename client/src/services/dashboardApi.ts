@@ -3,10 +3,12 @@ import api from './api';
 // جلب إحصائيات الداشبورد (عدد الفعاليات، البرامج، الأعضاء، التبرعات)
 export const getDashboardStats = async () => {
   try {
+    console.log('🔍 جلب إحصائيات الداشبورد...');
     const { data } = await api.get('/dashboard/stats');
+    console.log('✅ استجابة إحصائيات الداشبورد:', data);
     return data;
   } catch (error) {
-    console.error('Dashboard stats API failed:', error);
+    console.error('❌ خطأ في جلب إحصائيات الداشبورد:', error);
     throw error; // إعادة رمي الخطأ بدلاً من إرجاع بيانات وهمية
   }
 };
@@ -88,8 +90,15 @@ export const fetchContactForms = async (params?: {
   limit?: number;
   status?: string;
 }) => {
-  const { data } = await api.get('/forms/contact-forms', { params });
-  return data;
+  try {
+    console.log('🔍 جلب رسائل التواصل...', params);
+    const { data } = await api.get('/forms/contact-forms', { params });
+    console.log('✅ استجابة رسائل التواصل:', data);
+    return data;
+  } catch (error) {
+    console.error('❌ خطأ في جلب رسائل التواصل:', error);
+    throw error;
+  }
 };
 
 // تحديث حالة قراءة رسالة التواصل

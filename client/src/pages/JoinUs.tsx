@@ -96,7 +96,7 @@ const JoinUs: React.FC = () => {
         </div>
       </section>
       <section className="container mx-auto px-4 max-w-3xl">
-        <Card variant="base" padding="lg" className="mb-8">
+        <Card variant="default" size="lg" className="mb-8">
           <h2 className="text-2xl font-bold text-primary-700 mb-6 text-center">
             {t('joinUs.form.title', 'نموذج الانضمام')}
           </h2>

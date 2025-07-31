@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار API البرامج</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+    </style>
+</head>
+<body>
+    <h1>🔍 اختبار API البرامج</h1>
+
+    <button onclick="testProgramsAPI()">اختبار API البرامج</button>
+
+    <div id="result"></div>
+
+    <script>
+        async function testProgramsAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<div class="result">جاري الاختبار...</div>';
+
+            try {
+                const response = await fetch('http://localhost:5000/api/programs', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer test-token'
+                    }
+                });
+
+                const data = await response.json();
+
+                console.log('📊 البيانات الكاملة:', data);
+                console.log('📊 data.data:', data.data);
+                console.log('📊 data.data.programs:', data.data?.programs);
+                console.log('📊 data.data.items:', data.data?.items);
+
+                let html = `
+                    <div class="result success">
+                        <h3>✅ تم جلب البيانات بنجاح</h3>
+                        <p><strong>Status:</strong> ${response.status}</p>
+                        <p><strong>Success:</strong> ${data.success}</p>
+                        <p><strong>Message:</strong> ${data.message}</p>
+                        <p><strong>Data Structure:</strong></p>
+                        <pre>${JSON.stringify(data.data, null, 2)}</pre>
+                    </div>
+                `;
+
+                resultDiv.innerHTML = html;
+
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <h3>❌ خطأ في الاختبار</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

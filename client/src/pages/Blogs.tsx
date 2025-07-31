@@ -20,9 +20,11 @@ const Blogs: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearch = useDebounce(searchTerm, 400);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { data, isLoading, error } = useQuery(['blogs', debouncedSearch], () =>
-    fetchBlogs(debouncedSearch ? { search: debouncedSearch } : {})
-  );
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['blogs', debouncedSearch],
+    queryFn: () =>
+      fetchBlogs(debouncedSearch ? { search: debouncedSearch } : {}),
+  });
   const blogs = data || [];
   const isRTL = i18n.dir() === 'rtl';
 
