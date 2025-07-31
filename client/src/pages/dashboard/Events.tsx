@@ -687,7 +687,8 @@ const EventsDashboard: React.FC = () => {
             <div>
               <h3 className="text-2xl font-bold text-gray-900 mb-1">
                 {events.reduce((sum, e) => {
-                  const attendees = parseInt(e.attendees?.toString() || '0') || 0;
+                  const attendees =
+                    parseInt(e.attendees?.toString() || '0') || 0;
                   return sum + attendees;
                 }, 0)}
               </h3>
