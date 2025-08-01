@@ -8,33 +8,9 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import Alert from '../components/common/Alert';
 import { fetchPrograms } from '../services/programsApi';
 import { motion } from 'framer-motion';
-import {
-  Calendar,
-  MapPin,
-  Users,
-  TrendingUp,
-  Clock,
-  Star,
-  ArrowRight,
-  Search,
-  X,
-} from 'lucide-react';
+import { Calendar, Users, TrendingUp, Search, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Input } from '../components/ui/Input/Input';
-
-interface Program {
-  id: number;
-  title: string;
-  description: string;
-  category: string;
-  goal_amount?: number;
-  current_amount?: number;
-  start_date: string;
-  end_date: string;
-  created_at: string;
-  updated_at?: string;
-  image_url?: string;
-}
 
 const Programs: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -60,11 +36,11 @@ const Programs: React.FC = () => {
     try {
       // هيكل البيانات الفعلي من الخادم
       if (
-        programsData?.data?.programs &&
-        Array.isArray(programsData.data.programs)
+        (programsData as any)?.data?.programs &&
+        Array.isArray((programsData as any).data.programs)
       ) {
         console.log('✅ Found programs in programsData.data.programs');
-        return programsData.data.programs;
+        return (programsData as any).data.programs;
       }
       if (
         (programsData as any)?.data?.items?.rows &&
@@ -119,14 +95,6 @@ const Programs: React.FC = () => {
       program.description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearchTerm;
   });
-
-  const getStatusColor = (status: string) => {
-    return 'bg-green-100 text-green-800';
-  };
-
-  const getStatusText = (status: string) => {
-    return 'نشط';
-  };
 
   const getProgressPercentage = (current: number, goal: number) => {
     return Math.min((current / goal) * 100, 100);
@@ -310,12 +278,8 @@ const Programs: React.FC = () => {
 
                       {/* Program Status */}
                       <div className="flex items-center justify-between mb-4">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                            'active'
-                          )}`}
-                        >
-                          {getStatusText('active')}
+                        <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          نشط
                         </span>
                         <div className="flex items-center text-sm text-gray-500">
                           <Users className="w-4 h-4 mr-1" />

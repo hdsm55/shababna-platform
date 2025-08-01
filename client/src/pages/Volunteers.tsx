@@ -11,11 +11,7 @@ import {
   Clock,
   Heart,
   MapPin,
-  Mail,
-  Phone,
-  Calendar,
   CheckCircle,
-  XCircle,
   UserPlus,
 } from 'lucide-react';
 
@@ -209,17 +205,18 @@ const Volunteers: React.FC = () => {
                     onClick={() => setShowForm(false)}
                     className="text-gray-500 hover:text-gray-700"
                   >
-                    <XCircle className="w-5 h-5" />
+                    <CheckCircle className="w-5 h-5" />
                   </Button>
                 </div>
 
                 {message && (
                   <Alert
                     type={messageType}
-                    message={message}
                     onClose={() => setMessage('')}
                     className="mb-6"
-                  />
+                  >
+                    {message}
+                  </Alert>
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-6">

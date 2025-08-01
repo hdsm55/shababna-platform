@@ -21,7 +21,6 @@ import {
   Phone,
   Mail,
   Globe,
-  User,
   CheckCircle,
   TrendingUp,
   Target,

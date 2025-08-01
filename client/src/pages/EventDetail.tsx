@@ -20,9 +20,7 @@ import {
   Phone,
   Mail,
   Globe,
-  User,
   CheckCircle,
-  XCircle,
   Award,
   Tag,
 } from 'lucide-react';
@@ -424,11 +422,11 @@ const EventDetail: React.FC = () => {
                   <div className="space-y-2 text-sm text-gray-600">
                     <div className="flex items-center p-2 hover:bg-gray-50 rounded">
                       <Phone className="w-4 h-4 mr-2 text-green-500" />
-                      <span>+966 50 123 4567</span>
+                      <span>+905050505645</span>
                     </div>
                     <div className="flex items-center p-2 hover:bg-gray-50 rounded">
                       <Mail className="w-4 h-4 mr-2 text-blue-500" />
-                      <span>events@shababna.com</span>
+                      <span>info@shaababna.com</span>
                     </div>
                     <div className="flex items-center p-2 hover:bg-gray-50 rounded">
                       <Globe className="w-4 h-4 mr-2 text-purple-500" />

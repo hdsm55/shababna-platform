@@ -8,9 +8,7 @@ import {
   MapPin,
   Users,
   Search,
-  Filter,
   Clock,
-  Eye,
   Grid3X3,
   List,
   Info,
@@ -27,7 +25,7 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import { useDebounce } from '../hooks/useDebounce';
 
 const Events: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [selectedFilter, setSelectedFilter] = useState('all');
@@ -44,7 +42,6 @@ const Events: React.FC = () => {
     phone: '',
   });
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const isRTL = i18n.dir() === 'rtl';
 
   const filters = [
     { key: 'all', label: t('events.filter.all', 'كل الفعاليات'), icon: '🎯' },

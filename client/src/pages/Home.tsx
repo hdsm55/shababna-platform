@@ -10,8 +10,6 @@ import {
   CardFooter,
   CardTitle,
   CardSubtitle,
-  CardImage,
-  CardActions,
 } from '../components/ui/Card/Card';
 import { Input } from '../components/ui/Input/Input';
 import Alert from '../components/common/Alert';
@@ -29,7 +27,6 @@ import {
   TrendingUp,
   Lightbulb,
   HeartHandshake,
-  ArrowRight,
   Star,
   Award,
   Target,

@@ -1,0 +1,58 @@
+services:
+  # الخادم الخلفي
+  - type: web
+    name: shababna-backend
+    env: node
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_HOST
+        fromDatabase:
+          name: shababna-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: shababna-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: shababna-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: shababna-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: shababna-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: CLIENT_URL
+        value: https://shababna-frontend.onrender.com
+      - key: FRONTEND_URL
+        value: https://shababna-frontend.onrender.com
+
+  # الواجهة الأمامية
+  - type: web
+    name: shababna-frontend
+    env: static
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: client/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://shababna-backend.onrender.com/api
+
+databases:
+  # قاعدة البيانات (إذا لم تكن موجودة)
+  - name: shababna-db
+    databaseName: shaababna_db
+    user: shaababna_db_user
+    plan: free

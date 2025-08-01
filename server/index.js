@@ -40,7 +40,16 @@ app.use(helmet({
   contentSecurityPolicy: false, // تعطيل CSP مؤقتاً للتطوير
 }));
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173', 'http://127.0.0.1:3000'],
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:3000',
+    process.env.CLIENT_URL,
+    process.env.FRONTEND_URL,
+    'https://shababna-frontend.onrender.com',
+    'https://shababna-backend.onrender.com'
+  ].filter(Boolean),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
