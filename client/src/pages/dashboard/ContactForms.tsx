@@ -117,14 +117,14 @@ const ContactForms: React.FC = () => {
 
   if (error) {
     return (
-      <DashboardLayout>
+      <div className="container mx-auto px-2 md:px-6 py-8">
         <SkipToContent />
         <AccessibleSection>
           <Alert type="error" title="خطأ في تحميل البيانات">
             حدث خطأ أثناء تحميل رسائل التواصل. يرجى المحاولة مرة أخرى.
           </Alert>
         </AccessibleSection>
-      </DashboardLayout>
+      </div>
     );
   }
 

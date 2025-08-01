@@ -26,6 +26,8 @@ import dashboardRoutes from './routes/dashboard.js';
 import errorHandler from './middleware/errorHandler.js';
 import blogsRoutes from './routes/blogs.js';
 import newsletterRoutes from './routes/newsletter.js';
+import paymentsRoutes from './routes/payments.js';
+import volunteersRoutes from './routes/volunteers.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -35,19 +37,13 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "http://localhost:5000", "http://localhost:5173"],
-    },
-  },
+  contentSecurityPolicy: false, // تعطيل CSP مؤقتاً للتطوير
 }));
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || process.env.CLIENT_URL || 'http://localhost:5173',
-  credentials: true
+  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173', 'http://127.0.0.1:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -66,6 +62,8 @@ app.use('/api/forms', formsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/blogs', blogsRoutes);
 app.use('/api/newsletter', newsletterRoutes);
+app.use('/api/payments', paymentsRoutes);
+app.use('/api/volunteers', volunteersRoutes);
 
 // Additional routes for dashboard data
 app.use('/api/contact-forms', formsRoutes);

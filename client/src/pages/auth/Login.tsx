@@ -104,6 +104,7 @@ const Login: React.FC = () => {
                 <input
                   id="email"
                   type="email"
+                  autoComplete="email"
                   {...register('email', {
                     required: 'البريد الإلكتروني مطلوب',
                     pattern: {
@@ -139,6 +140,7 @@ const Login: React.FC = () => {
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
                   {...register('password', {
                     required: 'كلمة المرور مطلوبة',
                   })}

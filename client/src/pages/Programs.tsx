@@ -51,36 +51,55 @@ const Programs: React.FC = () => {
     staleTime: 5 * 60 * 1000,
   });
 
+  // Debug: طباعة هيكل البيانات
+  console.log('🔍 Programs Data Structure:', programsData);
+  console.log('🔍 Programs Loading:', isLoading);
+  console.log('🔍 Programs Error:', error);
+
   const programs = (() => {
     try {
       // هيكل البيانات الفعلي من الخادم
       if (
+        programsData?.data?.programs &&
+        Array.isArray(programsData.data.programs)
+      ) {
+        console.log('✅ Found programs in programsData.data.programs');
+        return programsData.data.programs;
+      }
+      if (
         (programsData as any)?.data?.items?.rows &&
         Array.isArray((programsData as any).data.items.rows)
       ) {
+        console.log('✅ Found programs in programsData.data.items.rows');
         return (programsData as any).data.items.rows;
       }
       if (
         (programsData as any)?.data?.items &&
         Array.isArray((programsData as any).data.items)
       ) {
+        console.log('✅ Found programs in programsData.data.items');
         return (programsData as any).data.items;
       }
       if (
         (programsData as any)?.items &&
         Array.isArray((programsData as any).items)
       ) {
+        console.log('✅ Found programs in programsData.items');
         return (programsData as any).items;
       }
       if (Array.isArray(programsData)) {
+        console.log('✅ Found programs in programsData array');
         return programsData;
       }
+      console.log('❌ No programs found in any expected structure');
       return [];
     } catch (error) {
       console.error('Error parsing programs data:', error);
       return [];
     }
   })();
+
+  console.log('🔍 Final programs:', programs);
 
   // فلترة البرامج
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -277,6 +296,7 @@ const Programs: React.FC = () => {
                           alt={program.title}
                           className="w-full h-48 object-cover rounded-lg"
                           loading="lazy"
+                          decoding="async"
                           onError={(e) => {
                             console.log(
                               'Image failed to load:',

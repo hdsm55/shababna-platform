@@ -174,7 +174,9 @@ export const CardSubtitle: React.FC<{
   children: React.ReactNode;
   className?: string;
 }> = ({ children, className = '' }) => {
-  return <p className={`text-sm text-neutral-600 ${className}`}>{children}</p>;
+  return (
+    <div className={`text-sm text-neutral-600 ${className}`}>{children}</div>
+  );
 };
 
 // إضافة Card Image component

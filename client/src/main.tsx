@@ -5,13 +5,15 @@ import App from './App.tsx';
 import './index.css';
 import './i18n';
 
-// Create a client
+// Create a client with optimized settings
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 10 * 60 * 1000, // 10 minutes - increased for better caching
       refetchOnWindowFocus: false,
+      refetchOnMount: false, // Don't refetch on mount if data is fresh
+      gcTime: 15 * 60 * 1000, // 15 minutes garbage collection time
     },
   },
 });

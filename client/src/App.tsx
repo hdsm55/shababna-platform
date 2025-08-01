@@ -1,50 +1,59 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
+import { Suspense, lazy } from 'react';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import { ToastProvider } from './components/common/Toast';
 import { ThemeProvider } from './components/ThemeProvider';
 import Layout from './components/layout/Layout';
 import DashboardLayout from './layouts/DashboardLayout';
+import LoadingSpinner from './components/common/LoadingSpinner';
 
-// Pages
-import Home from './pages/Home';
-import Events from './pages/Events';
-import EventDetail from './pages/EventDetail';
-import EventRegistration from './pages/EventRegistration';
-import Programs from './pages/Programs';
-import ProgramDetail from './pages/ProgramDetail';
-import Blogs from './pages/Blogs';
-import BlogDetail from './pages/BlogDetail';
-import Contact from './pages/Contact';
-import Donations from './pages/Donations';
-import JoinUs from './pages/JoinUs';
-import NotFound from './pages/NotFound';
+// Lazy load pages for better performance
+const Home = lazy(() => import('./pages/Home'));
+const Events = lazy(() => import('./pages/Events'));
+const EventDetail = lazy(() => import('./pages/EventDetail'));
+const EventRegistration = lazy(() => import('./pages/EventRegistration'));
+const Programs = lazy(() => import('./pages/Programs'));
+const ProgramDetail = lazy(() => import('./pages/ProgramDetail'));
+const Blogs = lazy(() => import('./pages/Blogs'));
+const BlogDetail = lazy(() => import('./pages/BlogDetail'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Donations = lazy(() => import('./pages/Donations'));
+const JoinUs = lazy(() => import('./pages/JoinUs'));
+const Volunteers = lazy(() => import('./pages/Volunteers'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Auth Pages
-import Login from './pages/auth/Login';
-import Register from './pages/auth/Register';
-import CreateAdmin from './pages/auth/CreateAdmin';
+const Login = lazy(() => import('./pages/auth/Login'));
+const Register = lazy(() => import('./pages/auth/Register'));
+const CreateAdmin = lazy(() => import('./pages/auth/CreateAdmin'));
 
 // Dashboard Pages
-import Dashboard from './pages/dashboard/Dashboard';
-import DashboardEvents from './pages/dashboard/Events';
-import DashboardPrograms from './pages/dashboard/Programs';
-import DashboardBlogs from './pages/dashboard/Blogs';
-import DashboardUsers from './pages/dashboard/Users';
-import DashboardRegistrants from './pages/dashboard/Registrants';
-import DashboardContactForms from './pages/dashboard/ContactForms';
-import DashboardAnalytics from './pages/dashboard/Analytics';
-import DashboardActivities from './pages/dashboard/Activities';
-import DashboardReports from './pages/dashboard/Reports';
-import DashboardSettings from './pages/dashboard/Settings';
+const Dashboard = lazy(() => import('./pages/dashboard/Dashboard'));
+const DashboardEvents = lazy(() => import('./pages/dashboard/Events'));
+const DashboardPrograms = lazy(() => import('./pages/dashboard/Programs'));
+const DashboardBlogs = lazy(() => import('./pages/dashboard/Blogs'));
+const DashboardUsers = lazy(() => import('./pages/dashboard/Users'));
+const DashboardRegistrants = lazy(
+  () => import('./pages/dashboard/Registrants')
+);
+const DashboardContactForms = lazy(
+  () => import('./pages/dashboard/ContactForms')
+);
+const DashboardAnalytics = lazy(() => import('./pages/dashboard/Analytics'));
+const DashboardActivities = lazy(() => import('./pages/dashboard/Activities'));
+const DashboardReports = lazy(() => import('./pages/dashboard/Reports'));
+const DashboardSettings = lazy(() => import('./pages/dashboard/Settings'));
 
-// Create a client
+// Create a client with optimized settings
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 10 * 60 * 1000, // 10 minutes - increased for better caching
       retry: 1,
+      refetchOnMount: false, // Don't refetch on mount if data is fresh
+      gcTime: 15 * 60 * 1000, // 15 minutes garbage collection time
     },
   },
 });
@@ -65,50 +74,228 @@ function App() {
                 <Routes>
                   {/* Public Routes داخل Layout */}
                   <Route element={<Layout />}>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/events" element={<Events />} />
-                    <Route path="/events/:id" element={<EventDetail />} />
+                    <Route
+                      path="/"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <Home />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/events"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <Events />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/events/:id"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <EventDetail />
+                        </Suspense>
+                      }
+                    />
                     <Route
                       path="/events/:id/register"
-                      element={<EventRegistration />}
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <EventRegistration />
+                        </Suspense>
+                      }
                     />
-                    <Route path="/programs" element={<Programs />} />
-                    <Route path="/programs/:id" element={<ProgramDetail />} />
-                    <Route path="/blogs" element={<Blogs />} />
-                    <Route path="/blogs/:id" element={<BlogDetail />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/donations" element={<Donations />} />
-                    <Route path="/join-us" element={<JoinUs />} />
-                    <Route path="*" element={<NotFound />} />
+                    <Route
+                      path="/programs"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <Programs />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/programs/:id"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <ProgramDetail />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/blogs"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <Blogs />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/blogs/:id"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <BlogDetail />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/contact"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <Contact />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/donations"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <Donations />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/join-us"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <JoinUs />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="/volunteers"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <Volunteers />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="*"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <NotFound />
+                        </Suspense>
+                      }
+                    />
                   </Route>
 
                   {/* Auth Routes */}
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/create-admin" element={<CreateAdmin />} />
+                  <Route
+                    path="/login"
+                    element={
+                      <Suspense fallback={<LoadingSpinner size="lg" />}>
+                        <Login />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/register"
+                    element={
+                      <Suspense fallback={<LoadingSpinner size="lg" />}>
+                        <Register />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/create-admin"
+                    element={
+                      <Suspense fallback={<LoadingSpinner size="lg" />}>
+                        <CreateAdmin />
+                      </Suspense>
+                    }
+                  />
 
                   {/* Dashboard Routes - منفصلة عن Layout العام */}
                   <Route path="/dashboard" element={<DashboardLayout />}>
-                    <Route index element={<Dashboard />} />
-                    <Route path="events" element={<DashboardEvents />} />
-                    <Route path="programs" element={<DashboardPrograms />} />
-                    <Route path="blogs" element={<DashboardBlogs />} />
-                    <Route path="users" element={<DashboardUsers />} />
+                    <Route
+                      index
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <Dashboard />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="events"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <DashboardEvents />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="programs"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <DashboardPrograms />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="blogs"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <DashboardBlogs />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="users"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <DashboardUsers />
+                        </Suspense>
+                      }
+                    />
                     <Route
                       path="registrants"
-                      element={<DashboardRegistrants />}
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <DashboardRegistrants />
+                        </Suspense>
+                      }
                     />
                     <Route
                       path="contact-forms"
-                      element={<DashboardContactForms />}
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <DashboardContactForms />
+                        </Suspense>
+                      }
                     />
-                    <Route path="analytics" element={<DashboardAnalytics />} />
+                    <Route
+                      path="analytics"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <DashboardAnalytics />
+                        </Suspense>
+                      }
+                    />
                     <Route
                       path="activities"
-                      element={<DashboardActivities />}
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <DashboardActivities />
+                        </Suspense>
+                      }
                     />
-                    <Route path="reports" element={<DashboardReports />} />
-                    <Route path="settings" element={<DashboardSettings />} />
+                    <Route
+                      path="reports"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <DashboardReports />
+                        </Suspense>
+                      }
+                    />
+                    <Route
+                      path="settings"
+                      element={
+                        <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <DashboardSettings />
+                        </Suspense>
+                      }
+                    />
                   </Route>
                 </Routes>
               </BrowserRouter>

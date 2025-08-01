@@ -8,6 +8,8 @@ DROP TABLE IF EXISTS programs CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS join_requests CASCADE;
 DROP TABLE IF EXISTS contact_forms CASCADE;
+DROP TABLE IF EXISTS volunteers CASCADE;
+DROP TABLE IF EXISTS volunteer_hours CASCADE;
 
 -- === 1. جدول المستخدمين ===
 CREATE TABLE IF NOT EXISTS users (
@@ -52,6 +54,9 @@ CREATE TABLE IF NOT EXISTS donations (
     id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
     amount NUMERIC(10,2) NOT NULL,
+    payment_method VARCHAR(50),
+    payment_id VARCHAR(255),
+    status VARCHAR(50) DEFAULT 'completed',
     donated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -118,19 +123,54 @@ CREATE TABLE IF NOT EXISTS contact_forms (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- === 10. إنشاء فهارس لتحسين الأداء ===
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_role ON users(role);
-CREATE INDEX idx_events_start_date ON events(start_date);
-CREATE INDEX idx_programs_start_date ON programs(start_date);
-CREATE INDEX idx_donations_user_id ON donations(user_id);
-CREATE INDEX idx_program_registrations_user_id ON program_registrations(user_id);
-CREATE INDEX idx_program_registrations_program_id ON program_registrations(program_id);
-CREATE INDEX idx_event_registrations_user_id ON event_registrations(user_id);
-CREATE INDEX idx_event_registrations_event_id ON event_registrations(event_id);
-CREATE INDEX idx_programs_title ON programs (title);
-CREATE INDEX idx_events_title ON events (title);
-CREATE INDEX idx_events_start_date ON events (start_date);
+-- === 10. جدول المتطوعين ===
+CREATE TABLE IF NOT EXISTS volunteers (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone VARCHAR(50),
+    country VARCHAR(100) NOT NULL,
+    city VARCHAR(100),
+    age INTEGER,
+    skills TEXT,
+    interests TEXT,
+    availability TEXT,
+    motivation TEXT,
+    experience TEXT,
+    status VARCHAR(50) DEFAULT 'pending',
+    approved_by INTEGER REFERENCES users(id),
+    approved_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- === 11. جدول ساعات التطوع ===
+CREATE TABLE IF NOT EXISTS volunteer_hours (
+    id SERIAL PRIMARY KEY,
+    volunteer_id INTEGER REFERENCES volunteers(id) ON DELETE CASCADE,
+    event_id INTEGER REFERENCES events(id) ON DELETE SET NULL,
+    program_id INTEGER REFERENCES programs(id) ON DELETE SET NULL,
+    hours_worked NUMERIC(4,2) NOT NULL,
+    date_worked DATE NOT NULL,
+    description TEXT,
+    verified_by INTEGER REFERENCES users(id),
+    verified_at TIMESTAMP,
+    status VARCHAR(50) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- === 12. إنشاء فهارس لتحسين الأداء ===
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_events_start_date ON events(start_date);
+CREATE INDEX IF NOT EXISTS idx_programs_start_date ON programs(start_date);
+CREATE INDEX IF NOT EXISTS idx_donations_donated_at ON donations(donated_at);
+CREATE INDEX IF NOT EXISTS idx_event_registrations_event_id ON event_registrations(event_id);
+CREATE INDEX IF NOT EXISTS idx_program_registrations_program_id ON program_registrations(program_id);
+CREATE INDEX IF NOT EXISTS idx_volunteers_status ON volunteers(status);
+CREATE INDEX IF NOT EXISTS idx_volunteer_hours_volunteer_id ON volunteer_hours(volunteer_id);
+CREATE INDEX IF NOT EXISTS idx_volunteer_hours_date ON volunteer_hours(date_worked);
 
 -- === 11. جدول تسجيل رسائل البريد الإلكتروني ===
 CREATE TABLE IF NOT EXISTS email_logs (

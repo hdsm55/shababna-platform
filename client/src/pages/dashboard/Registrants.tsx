@@ -66,7 +66,7 @@ const RegistrantsDashboard: React.FC = () => {
               <th className="py-2 px-3">الهاتف</th>
               {type === 'join' && <th className="py-2 px-3">الدولة</th>}
               {type === 'join' && <th className="py-2 px-3">العمر</th>}
-              {type === 'join' && <th className="py-2 px-3">الاهتمامات</th>}
+
               {type === 'join' && <th className="py-2 px-3">التحفيز</th>}
               {type === 'supporter' && <th className="py-2 px-3">المبلغ</th>}
               {type === 'supporter' && <th className="py-2 px-3">نوع الدعم</th>}
@@ -87,13 +87,7 @@ const RegistrantsDashboard: React.FC = () => {
                 {type === 'join' && (
                   <td className="py-2 px-3">{r.age || '-'}</td>
                 )}
-                {type === 'join' && (
-                  <td className="py-2 px-3">
-                    {Array.isArray(r.interests)
-                      ? r.interests.join(', ')
-                      : r.interests || '-'}
-                  </td>
-                )}
+
                 {type === 'join' && (
                   <td className="py-2 px-3">{r.motivation || '-'}</td>
                 )}

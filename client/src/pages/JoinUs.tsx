@@ -15,7 +15,6 @@ interface JoinUsFormData {
   phone: string; // مطلوب
   country: string;
   age: number; // مطلوب
-  interests: string[]; // جديد
   motivation: string; // مطلوب
 }
 
@@ -50,7 +49,6 @@ const JoinUs: React.FC = () => {
           phone: data.phone,
           country: data.country,
           age: data.age,
-          interests: data.interests,
           motivation: data.motivation,
         }),
       });
@@ -194,48 +192,7 @@ const JoinUs: React.FC = () => {
                 fullWidth
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
-                {t('joinUs.form.interests', 'الاهتمامات')}
-              </label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {[
-                  'التوعية الصحية',
-                  'التعليم',
-                  'البيئة',
-                  'التطوع',
-                  'التوعية',
-                  'الصحة',
-                  'الرياضة',
-                  'الفنون',
-                  'التقنية',
-                  'الاجتماعي',
-                ].map((interest) => (
-                  <label
-                    key={interest}
-                    className="flex items-center space-x-2 rtl:space-x-reverse"
-                  >
-                    <input
-                      type="checkbox"
-                      value={interest}
-                      {...register('interests', {
-                        required: t(
-                          'joinUs.form.interestsRequired',
-                          'يرجى اختيار اهتمام واحد على الأقل'
-                        ),
-                      })}
-                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                    />
-                    <span className="text-sm text-neutral-700">{interest}</span>
-                  </label>
-                ))}
-              </div>
-              {errors.interests && (
-                <p className="text-red-600 text-sm mt-1">
-                  {errors.interests.message}
-                </p>
-              )}
-            </div>
+
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">
                 {t('joinUs.form.motivation')}

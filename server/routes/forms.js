@@ -166,7 +166,7 @@ router.post('/join-requests', async (req, res) => {
             motivation
         } = req.body;
 
-        if (!first_name || !last_name || !email || !country || !age || !motivation || !interests) {
+        if (!first_name || !last_name || !email || !country || !age || !motivation) {
             return res.status(400).json({
                 success: false,
                 message: 'جميع الحقول مطلوبة'
@@ -174,10 +174,10 @@ router.post('/join-requests', async (req, res) => {
         }
 
         const result = await query(
-            `INSERT INTO join_requests (first_name, last_name, email, phone, country, age, interests, motivation, created_at, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), 'pending')
+            `INSERT INTO join_requests (first_name, last_name, email, phone, country, age, motivation, created_at, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), 'pending')
        RETURNING *`,
-            [first_name, last_name, email, phone, country, age, interests, motivation]
+            [first_name, last_name, email, phone, country, age, motivation]
         );
 
         res.json({
@@ -423,7 +423,7 @@ router.get('/join-requests', authenticateToken, requireAdmin, async (req, res) =
         const offset = (page - 1) * limit;
 
         let queryStr = `
-            SELECT id, first_name, last_name, email, phone, country, age, interests, motivation, created_at, status
+            SELECT id, first_name, last_name, email, phone, country, age, motivation, created_at, status
             FROM join_requests
         `;
 

@@ -87,25 +87,20 @@ const ProgramDetail: React.FC = () => {
 
     try {
       // إرسال البيانات الفعلية للـ API
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
-        }/programs/${id}/support`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            supporter_name: `${donationForm.firstName} ${donationForm.lastName}`,
-            supporter_email: donationForm.email,
-            supporter_phone: donationForm.phone,
-            support_type: 'donation',
-            message: donationForm.message,
-            amount: donationForm.amount,
-          }),
-        }
-      );
+      const response = await fetch(`/api/programs/${id}/support`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          supporter_name: `${donationForm.firstName} ${donationForm.lastName}`,
+          supporter_email: donationForm.email,
+          supporter_phone: donationForm.phone,
+          support_type: 'donation',
+          message: donationForm.message,
+          amount: donationForm.amount,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error('فشل في التبرع');
