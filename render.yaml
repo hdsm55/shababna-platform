@@ -4,8 +4,8 @@ services:
     name: shababna-backend
     env: node
     plan: free
-    buildCommand: cd server && npm install
-    startCommand: cd server && npm start
+    buildCommand: npm install
+    startCommand: npm run dev:server
     envVars:
       - key: NODE_ENV
         value: production
@@ -34,7 +34,7 @@ services:
   - type: web
     name: shababna-frontend
     env: static
-    buildCommand: cd client && npm install && npm run build
+    buildCommand: npm run build:client
     staticPublishPath: client/dist
     envVars:
       - key: VITE_API_URL
