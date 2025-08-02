@@ -4,8 +4,8 @@ services:
     name: shababna-backend
     env: node
     plan: free
-    buildCommand: npm install
-    startCommand: npm start
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
     envVars:
       - key: NODE_ENV
         value: production
@@ -29,12 +29,14 @@ services:
         value: https://shababna-frontend.onrender.com
       - key: FRONTEND_URL
         value: https://shababna-frontend.onrender.com
+      - key: DATABASE_URL
+        value: postgresql://shaababna_db_user:vqvaeTyJS1qD1NVwurk8knW1GnUoRCna@dpg-d26hc33uibrs739skhdg-a.frankfurt-postgres.render.com:5432/shaababna_db
 
   # الواجهة الأمامية
   - type: web
     name: shababna-frontend
     env: static
-    buildCommand: npm run build:client
+    buildCommand: cd client && npm install && npm run build
     staticPublishPath: client/dist
     envVars:
       - key: VITE_API_URL
