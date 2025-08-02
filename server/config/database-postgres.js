@@ -14,6 +14,10 @@ const pool = new Pool({
     max: 20, // الحد الأقصى لعدد الاتصالات
     idleTimeoutMillis: 30000, // وقت الانتظار قبل إغلاق الاتصال
     connectionTimeoutMillis: 2000, // وقت الانتظار للاتصال
+    ssl: {
+        rejectUnauthorized: false,
+        require: true
+    }
 });
 
 // دالة لاختبار الاتصال
