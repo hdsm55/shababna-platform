@@ -3,16 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import {
-  Calendar,
-  MapPin,
-  Users,
-  Search,
-  Clock,
-  Grid3X3,
-  List,
-  Info,
-} from 'lucide-react';
+import { Calendar, MapPin, Users, Search, Clock, Info } from 'lucide-react';
 
 import { fetchEvents } from '../services/eventsApi';
 import { Event } from '../types';
@@ -41,7 +32,7 @@ const Events: React.FC = () => {
     email: '',
     phone: '',
   });
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode] = useState<'grid'>('grid');
 
   const filters = [
     { key: 'all', label: t('events.filter.all', 'كل الفعاليات'), icon: '🎯' },
@@ -288,7 +279,7 @@ const Events: React.FC = () => {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="mb-8 space-y-6"
         >
-          {/* Search and View Toggle */}
+          {/* Search */}
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -303,27 +294,6 @@ const Events: React.FC = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
-            </div>
-
-            <div className="flex gap-2">
-              <Button
-                variant={viewMode === 'grid' ? 'primary' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('grid')}
-                className="flex items-center gap-2"
-              >
-                <Grid3X3 className="w-4 h-4" />
-                شبكي
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'primary' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('list')}
-                className="flex items-center gap-2"
-              >
-                <List className="w-4 h-4" />
-                قائمة
-              </Button>
             </div>
           </div>
 
@@ -386,15 +356,11 @@ const Events: React.FC = () => {
           <AnimatePresence mode="wait">
             {events && events.length > 0 ? (
               <motion.div
-                key={viewMode}
+                key="grid"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className={
-                  viewMode === 'grid'
-                    ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-                    : 'space-y-4'
-                }
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
               >
                 {events.map((event: Event, _index: number) => (
                   <motion.div
@@ -403,279 +369,165 @@ const Events: React.FC = () => {
                     whileHover={{ y: -5, scale: 1.02 }}
                     transition={{ duration: 0.2 }}
                   >
-                    {viewMode === 'grid' ? (
-                      <Card className="h-full hover:shadow-xl transition-all duration-300 border border-gray-200 bg-white overflow-hidden group">
-                        <div className="relative">
-                          {/* Event Image */}
-                          <div className="relative h-48 bg-gradient-to-br from-slate-600 via-blue-600 to-slate-700 overflow-hidden">
-                            <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <div className="text-center text-white">
-                                <div className="text-4xl mb-2">
-                                  {getCategoryIcon(event.category)}
-                                </div>
-                                <p className="text-lg font-medium">
-                                  {event.category || 'فعالية'}
-                                </p>
+                    <Card className="h-full hover:shadow-xl transition-all duration-300 border border-gray-200 bg-white overflow-hidden group">
+                      <div className="relative">
+                        {/* Event Image */}
+                        <div className="relative h-48 bg-gradient-to-br from-slate-600 via-blue-600 to-slate-700 overflow-hidden">
+                          <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="text-center text-white">
+                              <div className="text-4xl mb-2">
+                                {getCategoryIcon(event.category)}
                               </div>
-                            </div>
-
-                            {/* Status Badge */}
-                            <div className="absolute top-3 right-3">
-                              <span
-                                className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
-                                  event.status
-                                )}`}
-                              >
-                                {getStatusText(event.status)}
-                              </span>
-                            </div>
-
-                            {/* Category Badge */}
-                            <div className="absolute top-3 left-3">
-                              <span
-                                className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(
-                                  event.category
-                                )}`}
-                              >
-                                {event.category}
-                              </span>
-                            </div>
-
-                            {/* Days Until */}
-                            {event.status === 'upcoming' && (
-                              <div className="absolute bottom-3 left-3">
-                                <span className="bg-white bg-opacity-90 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
-                                  {calculateDaysUntil(event.start_date)} يوم
-                                </span>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Event Info */}
-                          <div className="p-6 space-y-4">
-                            <div>
-                              <h3 className="font-bold text-lg text-gray-900 line-clamp-2 mb-2 group-hover:text-blue-600 transition-colors">
-                                {event.title}
-                              </h3>
-                              <p className="text-gray-600 text-sm line-clamp-3">
-                                {event.description}
+                              <p className="text-lg font-medium">
+                                {event.category || 'فعالية'}
                               </p>
                             </div>
+                          </div>
 
-                            {/* Event Details */}
-                            <div className="space-y-3 text-sm">
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <Calendar className="w-4 h-4 text-blue-500" />
-                                <span>{formatDate(event.start_date)}</span>
-                              </div>
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <Clock className="w-4 h-4 text-green-500" />
-                                <span>{formatTime(event.start_date)}</span>
-                              </div>
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <MapPin className="w-4 h-4 text-red-500" />
-                                <span className="line-clamp-1">
-                                  {event.location}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <Users className="w-4 h-4 text-purple-500" />
-                                <span>
-                                  {event.attendees || 0}
-                                  {event.max_attendees &&
-                                    ` / ${event.max_attendees}`}{' '}
-                                  مشارك
-                                </span>
-                              </div>
+                          {/* Status Badge */}
+                          <div className="absolute top-3 right-3">
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                                event.status
+                              )}`}
+                            >
+                              {getStatusText(event.status)}
+                            </span>
+                          </div>
+
+                          {/* Category Badge */}
+                          <div className="absolute top-3 left-3">
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(
+                                event.category
+                              )}`}
+                            >
+                              {event.category}
+                            </span>
+                          </div>
+
+                          {/* Days Until */}
+                          {event.status === 'upcoming' && (
+                            <div className="absolute bottom-3 left-3">
+                              <span className="bg-white bg-opacity-90 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
+                                {calculateDaysUntil(event.start_date)} يوم
+                              </span>
                             </div>
+                          )}
+                        </div>
 
-                            {/* Progress Bar for Registration */}
-                            {event.max_attendees && (
-                              <div className="space-y-1">
-                                <div className="flex justify-between text-xs text-gray-500">
-                                  <span>التسجيل</span>
-                                  <span>
-                                    {Math.round(
+                        {/* Event Info */}
+                        <div className="p-6 space-y-4">
+                          <div>
+                            <h3 className="font-bold text-lg text-gray-900 line-clamp-2 mb-2 group-hover:text-blue-600 transition-colors">
+                              {event.title}
+                            </h3>
+                            <p className="text-gray-600 text-sm line-clamp-3">
+                              {event.description}
+                            </p>
+                          </div>
+
+                          {/* Event Details */}
+                          <div className="space-y-3 text-sm">
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <Calendar className="w-4 h-4 text-blue-500" />
+                              <span>{formatDate(event.start_date)}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <Clock className="w-4 h-4 text-green-500" />
+                              <span>{formatTime(event.start_date)}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <MapPin className="w-4 h-4 text-red-500" />
+                              <span className="line-clamp-1">
+                                {event.location}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <Users className="w-4 h-4 text-purple-500" />
+                              <span>
+                                {event.attendees || 0}
+                                {event.max_attendees &&
+                                  ` / ${event.max_attendees}`}{' '}
+                                مشارك
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Progress Bar for Registration */}
+                          {event.max_attendees && (
+                            <div className="space-y-1">
+                              <div className="flex justify-between text-xs text-gray-500">
+                                <span>التسجيل</span>
+                                <span>
+                                  {Math.round(
+                                    ((event.attendees || 0) /
+                                      event.max_attendees) *
+                                      100
+                                  )}
+                                  %
+                                </span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div
+                                  className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+                                  style={{
+                                    width: `${Math.min(
                                       ((event.attendees || 0) /
                                         event.max_attendees) *
-                                        100
-                                    )}
-                                    %
-                                  </span>
-                                </div>
-                                <div className="w-full bg-gray-200 rounded-full h-2">
-                                  <div
-                                    className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
-                                    style={{
-                                      width: `${Math.min(
-                                        ((event.attendees || 0) /
-                                          event.max_attendees) *
-                                          100,
-                                        100
-                                      )}%`,
-                                    }}
-                                  ></div>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Action Buttons */}
-                            <div className="pt-4 space-y-2">
-                              <Button
-                                variant="primary"
-                                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                                onClick={() => {
-                                  if (event.status === 'completed') {
-                                    handleUnavailable(
-                                      'لا يمكن التسجيل في فعالية مكتملة'
-                                    );
-                                  } else if (
-                                    event.attendees >=
-                                      (event.max_attendees || 0) &&
-                                    (event.max_attendees || 0) > 0
-                                  ) {
-                                    handleUnavailable('الفعالية ممتلئة');
-                                  } else {
-                                    navigate(`/events/${event.id}`);
-                                  }
-                                }}
-                              >
-                                {event.status === 'completed'
-                                  ? t('events.completed', 'مكتملة')
-                                  : event.attendees >=
-                                      (event.max_attendees || 0) &&
-                                    (event.max_attendees || 0) > 0
-                                  ? t('events.full', 'ممتلئة')
-                                  : t('events.register', 'سجل الآن')}
-                              </Button>
-
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="w-full flex items-center justify-center gap-1 group-hover:border-blue-500 group-hover:text-blue-600 transition-all duration-300"
-                                onClick={() => navigate(`/events/${event.id}`)}
-                              >
-                                <Info className="w-4 h-4" />
-                                التفاصيل
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    ) : (
-                      // List View
-                      <Card className="hover:shadow-lg transition-all duration-300 border border-gray-200 bg-white">
-                        <div className="p-6">
-                          <div className="flex items-start gap-4">
-                            {/* Event Image */}
-                            <div className="relative w-24 h-24 bg-gradient-to-br from-slate-600 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                              <div className="text-center text-white">
-                                <div className="text-2xl">
-                                  {getCategoryIcon(event.category)}
-                                </div>
-                              </div>
-                              <div className="absolute top-1 right-1">
-                                <span
-                                  className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                                    event.status
-                                  )}`}
-                                >
-                                  {getStatusText(event.status)}
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Event Info */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between mb-2">
-                                <h3 className="font-bold text-lg text-gray-900 line-clamp-1">
-                                  {event.title}
-                                </h3>
-                                <span
-                                  className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(
-                                    event.category
-                                  )}`}
-                                >
-                                  {event.category}
-                                </span>
-                              </div>
-
-                              <p className="text-gray-600 text-sm line-clamp-2 mb-3">
-                                {event.description}
-                              </p>
-
-                              <div className="flex items-center gap-6 text-sm text-gray-600 mb-4">
-                                <div className="flex items-center gap-1">
-                                  <Calendar className="w-4 h-4 text-blue-500" />
-                                  <span>{formatDate(event.start_date)}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Clock className="w-4 h-4 text-green-500" />
-                                  <span>{formatTime(event.start_date)}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <MapPin className="w-4 h-4 text-red-500" />
-                                  <span className="line-clamp-1">
-                                    {event.location}
-                                  </span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Users className="w-4 h-4 text-purple-500" />
-                                  <span>
-                                    {event.attendees || 0}
-                                    {event.max_attendees &&
-                                      ` / ${event.max_attendees}`}
-                                  </span>
-                                </div>
-                              </div>
-
-                              <div className="flex items-center gap-3">
-                                <Button
-                                  variant="primary"
-                                  size="sm"
-                                  onClick={() => {
-                                    if (event.status === 'completed') {
-                                      handleUnavailable(
-                                        'لا يمكن التسجيل في فعالية مكتملة'
-                                      );
-                                    } else if (
-                                      event.attendees >=
-                                        (event.max_attendees || 0) &&
-                                      (event.max_attendees || 0) > 0
-                                    ) {
-                                      handleUnavailable('الفعالية ممتلئة');
-                                    } else {
-                                      navigate(`/events/${event.id}`);
-                                    }
+                                        100,
+                                      100
+                                    )}%`,
                                   }}
-                                >
-                                  {event.status === 'completed'
-                                    ? t('events.completed', 'مكتملة')
-                                    : event.attendees >=
-                                        (event.max_attendees || 0) &&
-                                      (event.max_attendees || 0) > 0
-                                    ? t('events.full', 'ممتلئة')
-                                    : t('events.register', 'سجل الآن')}
-                                </Button>
-
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() =>
-                                    navigate(`/events/${event.id}`)
-                                  }
-                                  className="flex items-center gap-1 group-hover:border-blue-500 group-hover:text-blue-600 transition-all duration-300"
-                                >
-                                  <Info className="w-4 h-4" />
-                                  التفاصيل
-                                </Button>
+                                ></div>
                               </div>
                             </div>
+                          )}
+
+                          {/* Action Buttons */}
+                          <div className="pt-4 space-y-2">
+                            <Button
+                              variant="primary"
+                              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                              onClick={() => {
+                                if (event.status === 'completed') {
+                                  handleUnavailable(
+                                    'لا يمكن التسجيل في فعالية مكتملة'
+                                  );
+                                } else if (
+                                  event.attendees >=
+                                    (event.max_attendees || 0) &&
+                                  (event.max_attendees || 0) > 0
+                                ) {
+                                  handleUnavailable('الفعالية ممتلئة');
+                                } else {
+                                  navigate(`/events/${event.id}`);
+                                }
+                              }}
+                            >
+                              {event.status === 'completed'
+                                ? t('events.completed', 'مكتملة')
+                                : event.attendees >=
+                                    (event.max_attendees || 0) &&
+                                  (event.max_attendees || 0) > 0
+                                ? t('events.full', 'ممتلئة')
+                                : t('events.register', 'سجل الآن')}
+                            </Button>
+
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full flex items-center justify-center gap-1 group-hover:border-blue-500 group-hover:text-blue-600 transition-all duration-300"
+                              onClick={() => navigate(`/events/${event.id}`)}
+                            >
+                              <Info className="w-4 h-4" />
+                              التفاصيل
+                            </Button>
                           </div>
                         </div>
-                      </Card>
-                    )}
+                      </div>
+                    </Card>
                   </motion.div>
                 ))}
               </motion.div>
