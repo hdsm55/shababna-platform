@@ -117,9 +117,12 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Route not found' });
+// Serve static files from the React app
+app.use(express.static(path.join(process.cwd(), 'client', 'dist')));
+
+// Handle React routing, return all requests to React app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'client', 'dist', 'index.html'));
 });
 
 app.listen(PORT, () => {
