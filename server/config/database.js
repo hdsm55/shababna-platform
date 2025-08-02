@@ -6,18 +6,18 @@ dotenv.config();
 
 // إنشاء pool للاتصال بقاعدة البيانات
 const pool = new Pool({
-    host: process.env.DB_HOST || 'localhost',
+    host: process.env.DB_HOST || 'dpg-d26hc33uibrs739skhdg-a.frankfurt-postgres.render.com',
     port: process.env.DB_PORT || 5432,
-    database: process.env.DB_NAME || 'shababna_db',
+    database: process.env.DB_NAME || 'shaababna_db',
     user: process.env.DB_USER || 'shaababna_db_user',
     password: process.env.DB_PASSWORD || 'vqvaeTyJS1qD1NVwurk8knW1GnUoRCna',
     max: 20, // الحد الأقصى لعدد الاتصالات
     idleTimeoutMillis: 30000, // وقت الانتظار قبل إغلاق الاتصال
     connectionTimeoutMillis: 2000, // وقت الانتظار للاتصال
-    ssl: process.env.NODE_ENV === 'production' ? {
+    ssl: {
         rejectUnauthorized: false,
         require: true
-    } : false
+    }
 });
 
 // دالة لاختبار الاتصال
