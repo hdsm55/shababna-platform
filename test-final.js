@@ -1,9 +1,5 @@
 #!/usr/bin/env node
 
-/**
- * فحص سريع للخادم الخلفي
- */
-
 import https from 'https';
 
 const SERVERS = [
