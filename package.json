@@ -20,6 +20,7 @@
     "db:setup-render": "node server/db/setup-render-db.js",
     "test:render-db": "node test-render-db.js",
     "test:api": "node server/test-api.js",
+    "test:deployment": "node test-deployment.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
