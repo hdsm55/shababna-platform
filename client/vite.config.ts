@@ -13,6 +13,10 @@ export default defineConfig({
     // Expose environment variables to the client
     'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL),
   },
+  esbuild: {
+    // Ignore TypeScript errors during build
+    logOverride: { 'this-is-undefined-in-esm': 'silent' }
+  },
   server: {
     proxy: {
       '/api': {
