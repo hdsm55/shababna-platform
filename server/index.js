@@ -44,7 +44,7 @@ const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
+
     const allowedOrigins = [
       'http://localhost:5173',
       'http://localhost:3000',
@@ -57,7 +57,7 @@ const corsOptions = {
       'https://shababna-platform-1.onrender.com',
       'https://shababna-platform.onrender.com'
     ].filter(Boolean);
-    
+
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
