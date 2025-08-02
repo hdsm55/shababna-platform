@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+h hاا#!/usr/bin / env node
 
 /**
  * فحص سريع للخادم الخلفي
