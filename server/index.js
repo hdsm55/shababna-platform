@@ -135,7 +135,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Serve static files from the React app (must be after API routes)
-app.use(express.static(path.join(process.cwd(), '..', 'client', 'dist')));
+app.use(express.static(path.join(process.cwd(), 'client', 'dist')));
 
 // Handle React routing, return all requests to React app
 // This must be the LAST route handler
@@ -150,17 +150,23 @@ app.get('*', (req, res) => {
   }
 
   // Serve React app for all other routes
-  const indexPath = path.join(process.cwd(), '..', 'client', 'dist', 'index.html');
+  const indexPath = path.join(process.cwd(), 'client', 'dist', 'index.html');
 
   // Check if the file exists
   if (require('fs').existsSync(indexPath)) {
     res.sendFile(indexPath);
   } else {
-    // Fallback for development
+    // Fallback for development or production
+    console.log('⚠️ React app not found at:', indexPath);
+    console.log('📁 Current directory:', process.cwd());
+    console.log('📁 Available files:', require('fs').readdirSync(process.cwd()));
+
     res.status(404).json({
       success: false,
-      message: 'React app not built. Please run "npm run build" in the client directory.',
-      path: req.path
+      message: 'React app not built or not found. Please check the build process.',
+      path: req.path,
+      expectedPath: indexPath,
+      currentDir: process.cwd()
     });
   }
 });

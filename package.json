@@ -10,6 +10,8 @@
     "prod:server": "node server/index.js",
     "build:client": "cd client && vite build",
     "build": "npm run build:client",
+    "build:full": "npm install && npm run build:client",
+    "check:build": "node server/check-build.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "preview": "cd client && vite preview",
