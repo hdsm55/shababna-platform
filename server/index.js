@@ -6,6 +6,8 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import compression from 'compression';
+import rateLimit from 'express-rate-limit';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import path from 'path';
@@ -39,6 +41,24 @@ const PORT = process.env.PORT || 5000;
 app.use(helmet({
   contentSecurityPolicy: false, // تعطيل CSP مؤقتاً للتطوير
 }));
+
+// إضافة compression middleware
+app.use(compression());
+
+// إضافة rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 دقيقة
+  max: 100, // حد أقصى 100 طلب لكل IP
+  message: {
+    error: 'تم تجاوز الحد الأقصى للطلبات، يرجى المحاولة لاحقاً',
+    retryAfter: '15 دقيقة'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use('/api/', limiter);
+
 // CORS configuration
 const corsOptions = {
   origin: function (origin, callback) {
@@ -78,8 +98,11 @@ app.options('*', cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// جعل مجلد uploads متاحاً للقراءة عبر HTTP
-app.use('/uploads', express.static(path.join(process.cwd(), 'server', 'uploads')));
+// جعل مجلد uploads متاحاً للقراءة عبر HTTP مع caching
+app.use('/uploads', express.static(path.join(process.cwd(), 'server', 'uploads'), {
+  maxAge: '1d',
+  etag: true
+}));
 
 // Routes
 app.use('/api/auth', authRoutes);
