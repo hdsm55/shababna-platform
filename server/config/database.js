@@ -8,9 +8,9 @@ dotenv.config();
 const pool = new Pool({
     host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 5432,
-    database: process.env.DB_NAME || 'shababna',
-    user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'shababna_db',
+    user: process.env.DB_USER || 'shaababna_db_user',
+    password: process.env.DB_PASSWORD || 'vqvaeTyJS1qD1NVwurk8knW1GnUoRCna',
     max: 20, // الحد الأقصى لعدد الاتصالات
     idleTimeoutMillis: 30000, // وقت الانتظار قبل إغلاق الاتصال
     connectionTimeoutMillis: 2000, // وقت الانتظار للاتصال
