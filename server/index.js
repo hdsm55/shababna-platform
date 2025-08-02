@@ -39,21 +39,42 @@ const PORT = process.env.PORT || 5000;
 app.use(helmet({
   contentSecurityPolicy: false, // تعطيل CSP مؤقتاً للتطوير
 }));
-app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'http://127.0.0.1:5173',
-    'http://127.0.0.1:3000',
-    process.env.CLIENT_URL,
-    process.env.FRONTEND_URL,
-    'https://shababna-frontend.onrender.com',
-    'https://shababna-backend.onrender.com'
-  ].filter(Boolean),
+// CORS configuration
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'http://127.0.0.1:5173',
+      'http://127.0.0.1:3000',
+      process.env.CLIENT_URL,
+      process.env.FRONTEND_URL,
+      'https://shababna-frontend.onrender.com',
+      'https://shababna-backend.onrender.com',
+      'https://shababna-platform-1.onrender.com',
+      'https://shababna-platform.onrender.com'
+    ].filter(Boolean);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('🚫 CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+};
+
+app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 

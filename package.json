@@ -22,6 +22,7 @@
     "test:api": "node server/test-api.js",
     "setup:database": "node setup-render-database.js",
     "check:database": "node check-database.js",
+    "test:cors": "node test-cors.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
