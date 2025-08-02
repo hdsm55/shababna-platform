@@ -62,20 +62,24 @@ export const getUserProfile = async (req, res) => {
 // Get all users (admin only)
 export const getAllUsers = async (req, res) => {
     try {
+        console.log('🔍 جلب المستخدمين...');
+
         const result = await query(`
-      SELECT
-        u.id,
-        u.first_name,
-        u.last_name,
-        u.email,
-        u.role,
-        u.created_at
-      FROM users u
-      ORDER BY u.created_at DESC
-    `);
+            SELECT
+                u.id,
+                u.first_name,
+                u.last_name,
+                u.email,
+                u.role,
+                u.created_at
+            FROM users u
+            ORDER BY u.created_at DESC
+        `);
+
+        console.log(`✅ تم جلب ${result.rows.length} مستخدم`);
         return successResponse(res, { items: result.rows, total: result.rows.length }, 'تم جلب المستخدمين بنجاح');
     } catch (error) {
-        console.error('Users fetch error:', error);
+        console.error('❌ خطأ في جلب المستخدمين:', error);
         return errorResponse(res, 'خطأ في جلب المستخدمين', 500, error);
     }
 };
