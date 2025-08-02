@@ -3,6 +3,9 @@ import dotenv from 'dotenv';
 // Load environment variables first
 dotenv.config();
 
+// Set NODE_ENV to development for local development
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';

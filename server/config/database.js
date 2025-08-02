@@ -14,10 +14,10 @@ const pool = new Pool({
     max: 20, // الحد الأقصى لعدد الاتصالات
     idleTimeoutMillis: 30000, // وقت الانتظار قبل إغلاق الاتصال
     connectionTimeoutMillis: 2000, // وقت الانتظار للاتصال
-    ssl: {
+    ssl: process.env.NODE_ENV === 'production' ? {
         rejectUnauthorized: false,
         require: true
-    }
+    } : false
 });
 
 // دالة لاختبار الاتصال
