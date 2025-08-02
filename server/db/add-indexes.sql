@@ -47,4 +47,4 @@ ANALYZE event_registrations;
 ANALYZE users;
 ANALYZE blogs;
 ANALYZE join_requests;
-ANALYZE contact_forms; 
+ANALYZE contact_forms;
