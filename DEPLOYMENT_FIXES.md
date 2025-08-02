@@ -12,10 +12,22 @@
 
 ```yaml
 buildCommand: npm install
-startCommand: npm run dev:server
+startCommand: npm run prod:server
 ```
 
-### 2. مشكلة أخطاء TypeScript في الواجهة الأمامية
+### 2. مشكلة nodemon غير موجود
+
+**المشكلة:** `sh: 1: nodemon: not found`
+
+**السبب:** `nodemon` موجود في `devDependencies` ولا يتم تثبيته في بيئة الإنتاج.
+
+**الحل:**
+
+1. نقل `nodemon` إلى `dependencies` في `server/package.json`
+2. إضافة script `prod:server` يستخدم `node` بدلاً من `nodemon`
+3. تحديث `startCommand` في `render.yaml` لاستخدام `npm run prod:server`
+
+### 3. مشكلة أخطاء TypeScript في الواجهة الأمامية
 
 **المشكلة:** أخطاء TypeScript متعددة تمنع البناء
 
@@ -35,7 +47,7 @@ startCommand: npm run dev:server
 3. انقر على "Settings"
 4. قم بتحديث:
    - **Build Command:** `npm install`
-   - **Start Command:** `npm run dev:server`
+   - **Start Command:** `npm run prod:server`
 5. أعد نشر الخدمة
 
 ### للواجهة الأمامية (shababna-frontend):
