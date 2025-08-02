@@ -47,10 +47,18 @@ app.use(helmet({
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
       imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "http://localhost:5000", "http://127.0.0.1:5000"],
+      connectSrc: ["'self'", "http://localhost:5000", "http://127.0.0.1:5000", "http://localhost:5173", "http://127.0.0.1:5173"],
     },
   },
 }));
+
+// Add additional headers for better SPA support
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+});
 // CORS configuration
 const corsOptions = {
   origin: function (origin, callback) {
@@ -126,12 +134,35 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Serve static files from the React app
-app.use(express.static(path.join(process.cwd(), 'client', 'dist')));
+// Serve static files from the React app (must be after API routes)
+app.use(express.static(path.join(process.cwd(), '..', 'client', 'dist')));
 
 // Handle React routing, return all requests to React app
+// This must be the LAST route handler
 app.get('*', (req, res) => {
-  res.sendFile(path.join(process.cwd(), 'client', 'dist', 'index.html'));
+  // Skip API routes
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({
+      success: false,
+      message: 'API endpoint not found',
+      path: req.path
+    });
+  }
+
+  // Serve React app for all other routes
+  const indexPath = path.join(process.cwd(), '..', 'client', 'dist', 'index.html');
+
+  // Check if the file exists
+  if (require('fs').existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    // Fallback for development
+    res.status(404).json({
+      success: false,
+      message: 'React app not built. Please run "npm run build" in the client directory.',
+      path: req.path
+    });
+  }
 });
 
 app.listen(PORT, () => {

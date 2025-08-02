@@ -297,6 +297,16 @@ function App() {
                       }
                     />
                   </Route>
+
+                  {/* Catch-all route for 404 */}
+                  <Route
+                    path="*"
+                    element={
+                      <Suspense fallback={<LoadingSpinner size="lg" />}>
+                        <NotFound />
+                      </Suspense>
+                    }
+                  />
                 </Routes>
               </BrowserRouter>
             </ToastProvider>

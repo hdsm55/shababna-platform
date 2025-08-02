@@ -26,7 +26,7 @@ export default defineConfig({
       },
     },
     headers: {
-      'Content-Security-Policy': "default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' http://localhost:5000 http://localhost:5173 http://127.0.0.1:5000 http://127.0.0.1:5173;"
+      'Content-Security-Policy': "default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://localhost:5000 http://localhost:5173 http://127.0.0.1:5000 http://127.0.0.1:5173;"
     },
   },
   build: {
