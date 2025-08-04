@@ -3,7 +3,7 @@ services:
     name: shababna-backend
     env: node
     plan: free
-    buildCommand: npm install
+    buildCommand: npm install && cd client && npm install && npm run build
     startCommand: npm run prod:server
     envVars:
       - key: NODE_ENV
@@ -29,9 +29,8 @@ services:
     healthCheckPath: /api/health
     autoDeploy: true
 
-  - type: web
+  - type: static
     name: shababna-frontend
-    env: static
     buildCommand: cd client && npm install && npm run build
     staticPublishPath: client/dist
     envVars:

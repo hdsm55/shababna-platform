@@ -189,6 +189,7 @@ app.get('/api/health', (req, res) => {
 // Serve static files from the React app (must be after API routes)
 app.use(express.static(path.join(process.cwd(), 'client', 'dist')));
 app.use(express.static(path.join(process.cwd(), 'dist')));
+app.use(express.static(path.join(process.cwd())));
 
 // Handle React routing, return all requests to React app
 // This must be the LAST route handler
@@ -217,6 +218,7 @@ app.get('*', async (req, res) => {
   // Serve React app for all other routes (SPA fallback)
   const indexPath = path.join(process.cwd(), 'client', 'dist', 'index.html');
   const indexPathAlt = path.join(process.cwd(), 'dist', 'index.html');
+  const indexPathRoot = path.join(process.cwd(), 'index.html');
 
   console.log('🔍 Checking for React app at:', req.path);
   console.log('📁 Looking for index.html at:', indexPath);
@@ -231,9 +233,13 @@ app.get('*', async (req, res) => {
   } else if (existsSync(indexPathAlt)) {
     foundPath = indexPathAlt;
     console.log('✅ Found React app at:', indexPathAlt);
+  } else if (existsSync(indexPathRoot)) {
+    foundPath = indexPathRoot;
+    console.log('✅ Found React app at:', indexPathRoot);
   } else {
     console.log('⚠️ React app not found at:', indexPath);
     console.log('⚠️ Also checked:', indexPathAlt);
+    console.log('⚠️ Also checked:', indexPathRoot);
     console.log('📁 Current directory:', process.cwd());
 
     try {
