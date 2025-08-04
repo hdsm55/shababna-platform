@@ -6,11 +6,21 @@ export default function errorHandler(err, req, res, next) {
         err.message.includes('Connection terminated') ||
         err.message.includes('timeout') ||
         err.message.includes('ECONNRESET') ||
-        err.message.includes('ENOTFOUND')
+        err.message.includes('ENOTFOUND') ||
+        err.message.includes('ETIMEDOUT')
     )) {
         return res.status(503).json({
             success: false,
             message: 'خطأ في الاتصال بقاعدة البيانات، يرجى المحاولة مرة أخرى',
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
+    }
+
+    // معالجة أخطاء timeout
+    if (err.code === 'ETIMEDOUT' || err.code === 'ESOCKETTIMEDOUT') {
+        return res.status(408).json({
+            success: false,
+            message: 'طلب مهلة زمنية - يرجى المحاولة مرة أخرى',
             error: process.env.NODE_ENV === 'development' ? err.message : undefined
         });
     }
@@ -36,6 +46,15 @@ export default function errorHandler(err, req, res, next) {
         return res.status(400).json({
             success: false,
             message: 'البيانات المرتبطة غير موجودة'
+        });
+    }
+
+    // معالجة أخطاء connection pool
+    if (err.message && err.message.includes('pool')) {
+        return res.status(503).json({
+            success: false,
+            message: 'خطأ في الاتصال بقاعدة البيانات، يرجى المحاولة مرة أخرى',
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined
         });
     }
 

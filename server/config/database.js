@@ -11,17 +11,26 @@ const pool = new Pool({
     database: process.env.DB_NAME || 'shaababna_db',
     user: process.env.DB_USER || 'shaababna_db_user',
     password: process.env.DB_PASSWORD || 'vqvaeTyJS1qD1NVwurk8knW1GnUoRCna',
-    max: 10, // تقليل الحد الأقصى لعدد الاتصالات
-    min: 2, // الحد الأدنى لعدد الاتصالات
-    idleTimeoutMillis: 60000, // زيادة وقت الانتظار قبل إغلاق الاتصال
-    connectionTimeoutMillis: 10000, // زيادة وقت الانتظار للاتصال
+    max: 20, // زيادة الحد الأقصى لعدد الاتصالات
+    min: 5, // زيادة الحد الأدنى لعدد الاتصالات
+    idleTimeoutMillis: 300000, // 5 دقائق - زيادة وقت الانتظار قبل إغلاق الاتصال
+    connectionTimeoutMillis: 60000, // دقيقة واحدة - زيادة وقت الانتظار للاتصال
     ssl: {
         rejectUnauthorized: false,
         require: true
     },
     // إعدادات إضافية لتحسين الاستقرار
     keepAlive: true,
-    keepAliveInitialDelayMillis: 10000
+    keepAliveInitialDelayMillis: 30000, // 30 ثانية
+    // إعدادات إضافية لتحسين الاستقرار
+    statement_timeout: 300000, // 5 دقائق للاستعلامات
+    query_timeout: 300000, // 5 دقائق للاستعلامات
+    // إعدادات إضافية للاستقرار
+    application_name: 'shababna-platform',
+    // إعدادات إضافية للاتصال
+    tcp_keepalives_idle: 300, // 5 دقائق
+    tcp_keepalives_interval: 60, // دقيقة واحدة
+    tcp_keepalives_count: 3
 });
 
 // دالة لاختبار الاتصال

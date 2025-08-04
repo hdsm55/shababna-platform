@@ -66,6 +66,15 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
 
+  // Add CORS headers for better compatibility
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  // Set timeout for requests (5 minutes)
+  req.setTimeout(300000); // 5 minutes
+  res.setTimeout(300000); // 5 minutes
+
   next();
 });
 // CORS configuration
@@ -130,6 +139,27 @@ app.use('/api/join-requests', formsRoutes);
 app.use('/api/program-registrations', formsRoutes);
 app.use('/api/event-registrations', formsRoutes);
 
+// Timeout handling middleware
+app.use((req, res, next) => {
+  // Set timeout for all requests
+  const timeout = setTimeout(() => {
+    if (!res.headersSent) {
+      console.log('⚠️ Request timeout for:', req.path);
+      res.status(408).json({
+        success: false,
+        message: 'طلب مهلة زمنية - يرجى المحاولة مرة أخرى'
+      });
+    }
+  }, 300000); // 5 minutes
+
+  // Clear timeout when response is sent
+  res.on('finish', () => {
+    clearTimeout(timeout);
+  });
+
+  next();
+});
+
 // Error handling middleware
 app.use(errorHandler);
 
@@ -158,26 +188,39 @@ app.get('*', async (req, res) => {
     });
   }
 
+  // Skip static assets that should be served directly
+  if (req.path.startsWith('/assets/') ||
+    req.path.startsWith('/images/') ||
+    req.path.startsWith('/uploads/') ||
+    req.path.includes('.')) {
+    return res.status(404).json({
+      success: false,
+      message: 'Static asset not found',
+      path: req.path
+    });
+  }
+
   // Serve React app for all other routes (SPA fallback)
   const indexPath = path.join(process.cwd(), 'client', 'dist', 'index.html');
 
   // Check if the file exists
   if (existsSync(indexPath)) {
-    console.log('📄 Serving React app for path:', req.path);
+    console.log('📄 Serving React app for SPA route:', req.path);
 
-    // Set proper headers for SPA
+    // Set proper headers for SPA routing
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
 
+    // Send the React app
     res.sendFile(indexPath, (err) => {
       if (err) {
         console.error('❌ Error serving React app:', err);
-        res.status(500).json({
-          success: false,
-          message: 'Error serving React app',
-          path: req.path
-        });
+        // Don't send JSON error here, just log it
+        console.error('Failed to serve:', req.path);
+      } else {
+        console.log('✅ Successfully served React app for:', req.path);
       }
     });
   } else {
@@ -192,13 +235,43 @@ app.get('*', async (req, res) => {
       console.log('❌ Error reading directory:', error.message);
     }
 
-    res.status(404).json({
-      success: false,
-      message: 'React app not built or not found. Please check the build process.',
-      path: req.path,
-      expectedPath: indexPath,
-      currentDir: process.cwd()
-    });
+    // Send a simple HTML response instead of JSON
+    res.status(200).send(`
+      <!DOCTYPE html>
+      <html lang="ar" dir="rtl">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>شبابنا - Shababna</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              text-align: center;
+              padding: 50px;
+              background: #f5f5f5;
+            }
+            .container {
+              max-width: 600px;
+              margin: 0 auto;
+              background: white;
+              padding: 30px;
+              border-radius: 10px;
+              box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            .error { color: #e74c3c; }
+            .info { color: #3498db; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>شبابنا - Shababna</h1>
+            <p class="error">عذراً، التطبيق غير متاح حالياً</p>
+            <p class="info">يرجى المحاولة مرة أخرى أو التواصل مع الدعم الفني</p>
+            <p>Path: ${req.path}</p>
+          </div>
+        </body>
+      </html>
+    `);
   }
 });
 

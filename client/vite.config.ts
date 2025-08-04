@@ -38,6 +38,8 @@ export default defineConfig({
     // Ensure proper SPA routing
     outDir: 'dist',
     assetsDir: 'assets',
+    // Add source maps for better debugging
+    sourcemap: true,
   },
   base: '/',
   // Add preview configuration for SPA routing
