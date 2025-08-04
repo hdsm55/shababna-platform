@@ -188,6 +188,7 @@ app.get('/api/health', (req, res) => {
 
 // Serve static files from the React app (must be after API routes)
 app.use(express.static(path.join(process.cwd(), 'client', 'dist')));
+app.use(express.static(path.join(process.cwd(), 'dist')));
 
 // Handle React routing, return all requests to React app
 // This must be the LAST route handler
@@ -215,49 +216,41 @@ app.get('*', async (req, res) => {
 
   // Serve React app for all other routes (SPA fallback)
   const indexPath = path.join(process.cwd(), 'client', 'dist', 'index.html');
+  const indexPathAlt = path.join(process.cwd(), 'dist', 'index.html');
 
-  // Check if the file exists
+  console.log('🔍 Checking for React app at:', req.path);
+  console.log('📁 Looking for index.html at:', indexPath);
+
+  // Check if the file exists in multiple possible locations
+  let htmlContent = null;
+  let foundPath = null;
+
   if (existsSync(indexPath)) {
-    console.log('📄 Serving React app for SPA route:', req.path);
-
-    // Set proper headers for SPA routing
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-
-    // Send the React app with error handling
-    res.sendFile(indexPath, (err) => {
-      if (err) {
-        console.error('❌ Error serving React app:', err);
-        console.error('Failed to serve:', req.path);
-
-        // Send a proper error response instead of leaving it hanging
-        if (!res.headersSent) {
-          res.status(500).json({
-            success: false,
-            message: 'Error serving React app',
-            path: req.path
-          });
-        }
-      } else {
-        console.log('✅ Successfully served React app for:', req.path);
-      }
-    });
+    foundPath = indexPath;
+    console.log('✅ Found React app at:', indexPath);
+  } else if (existsSync(indexPathAlt)) {
+    foundPath = indexPathAlt;
+    console.log('✅ Found React app at:', indexPathAlt);
   } else {
-    // Fallback for development or production
     console.log('⚠️ React app not found at:', indexPath);
+    console.log('⚠️ Also checked:', indexPathAlt);
     console.log('📁 Current directory:', process.cwd());
 
     try {
       const files = readdirSync(process.cwd());
       console.log('📁 Available files:', files);
+
+      // Check if client directory exists
+      if (existsSync(path.join(process.cwd(), 'client'))) {
+        const clientFiles = readdirSync(path.join(process.cwd(), 'client'));
+        console.log('📁 Client directory files:', clientFiles);
+      }
     } catch (error) {
       console.log('❌ Error reading directory:', error.message);
     }
 
-    // Send a simple HTML response instead of JSON
-    res.status(200).send(`
+    // Send a simple HTML response with React app content
+    htmlContent = `
       <!DOCTYPE html>
       <html lang="ar" dir="rtl">
         <head>
@@ -281,18 +274,55 @@ app.get('*', async (req, res) => {
             }
             .error { color: #e74c3c; }
             .info { color: #3498db; }
+            .loading { color: #f39c12; }
           </style>
         </head>
         <body>
           <div class="container">
             <h1>شبابنا - Shababna</h1>
-            <p class="error">عذراً، التطبيق غير متاح حالياً</p>
-            <p class="info">يرجى المحاولة مرة أخرى أو التواصل مع الدعم الفني</p>
+            <p class="loading">جاري تحميل التطبيق...</p>
+            <p class="info">يرجى الانتظار قليلاً</p>
             <p>Path: ${req.path}</p>
+            <script>
+              // Redirect to home page after 3 seconds
+              setTimeout(() => {
+                window.location.href = '/';
+              }, 3000);
+            </script>
           </div>
         </body>
       </html>
-    `);
+    `;
+  }
+
+  // Set proper headers for SPA routing
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+
+  if (foundPath) {
+    // Send the React app with error handling
+    res.sendFile(foundPath, (err) => {
+      if (err) {
+        console.error('❌ Error serving React app:', err);
+        console.error('Failed to serve:', req.path);
+
+        // Send a proper error response instead of leaving it hanging
+        if (!res.headersSent) {
+          res.status(500).json({
+            success: false,
+            message: 'Error serving React app',
+            path: req.path
+          });
+        }
+      } else {
+        console.log('✅ Successfully served React app for:', req.path);
+      }
+    });
+  } else {
+    // Send the fallback HTML
+    res.status(200).send(htmlContent);
   }
 });
 
