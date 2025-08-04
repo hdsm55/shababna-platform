@@ -134,6 +134,7 @@ export const supportProgram = async (req, res) => {
         // التحقق من البيانات المطلوبة
         if (!supporter_name || !supporter_email) {
             console.log('❌ بيانات غير مكتملة:', { supporter_name, supporter_email });
+            res.setHeader('Content-Type', 'application/json');
             return res.status(400).json({
                 success: false,
                 message: 'الاسم والبريد الإلكتروني مطلوبان'
@@ -145,6 +146,7 @@ export const supportProgram = async (req, res) => {
         const programCheck = await query('SELECT id FROM programs WHERE id = $1', [id]);
         if (programCheck.rows.length === 0) {
             console.log('❌ البرنامج غير موجود:', id);
+            res.setHeader('Content-Type', 'application/json');
             return res.status(404).json({
                 success: false,
                 message: 'البرنامج غير موجود'
@@ -164,7 +166,7 @@ export const supportProgram = async (req, res) => {
 
         // تأكد من إرسال JSON صحيح
         res.setHeader('Content-Type', 'application/json');
-        return res.status(200).json({
+        res.status(200).json({
             success: true,
             data: result.rows[0],
             message: 'تم تسجيل الدعم بنجاح'
@@ -177,36 +179,40 @@ export const supportProgram = async (req, res) => {
 
         // معالجة خاصة لأخطاء قاعدة البيانات
         if (error.message.includes('Connection terminated') || error.message.includes('timeout')) {
-            return res.status(503).json({
+            res.status(503).json({
                 success: false,
                 message: 'خطأ في الاتصال بقاعدة البيانات، يرجى المحاولة مرة أخرى'
             });
+            return;
         }
 
         // معالجة أخطاء قاعدة البيانات الأخرى
         if (error.code === '23505') { // unique constraint violation
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: 'تم التسجيل مسبقاً بهذا البريد الإلكتروني'
             });
+            return;
         }
 
         if (error.code === '23503') { // foreign key constraint violation
-            return res.status(400).json({
+            res.status(400).json({
                 success: false,
                 message: 'البرنامج غير موجود'
             });
+            return;
         }
 
         // معالجة أخطاء أخرى
         if (error.message && error.message.includes('pool')) {
-            return res.status(503).json({
+            res.status(503).json({
                 success: false,
                 message: 'خطأ في الاتصال بقاعدة البيانات، يرجى المحاولة مرة أخرى'
             });
+            return;
         }
 
-        return res.status(500).json({
+        res.status(500).json({
             success: false,
             message: 'حدث خطأ أثناء تسجيل الدعم'
         });

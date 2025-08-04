@@ -110,15 +110,39 @@ const ProgramDetail: React.FC = () => {
 
       console.log('📡 استجابة الخادم:', response.status, response.statusText);
 
+      // التحقق من وجود محتوى في الاستجابة
+      const responseText = await response.text();
+      console.log('📄 محتوى الاستجابة:', responseText);
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || `فشل في التبرع (${response.status})`
-        );
+        let errorMessage = `فشل في التبرع (${response.status})`;
+
+        if (responseText) {
+          try {
+            const errorData = JSON.parse(responseText);
+            errorMessage = errorData.message || errorMessage;
+          } catch (e) {
+            console.log('❌ فشل في تحليل JSON للخطأ:', e);
+          }
+        }
+
+        throw new Error(errorMessage);
       }
 
-      const result = await response.json();
-      console.log('✅ نتيجة التبرع:', result);
+      // تحليل JSON فقط إذا كان هناك محتوى
+      let result;
+      if (responseText) {
+        try {
+          result = JSON.parse(responseText);
+          console.log('✅ نتيجة التبرع:', result);
+        } catch (e) {
+          console.error('❌ فشل في تحليل JSON:', e);
+          throw new Error('استجابة غير صحيحة من الخادم');
+        }
+      } else {
+        console.log('⚠️ استجابة فارغة من الخادم');
+        result = { success: false, message: 'استجابة فارغة من الخادم' };
+      }
 
       if (result.success) {
         setDonationStatus('success');
