@@ -40,18 +40,12 @@ export const testConnection = async () => {
 
 // دالة لتنفيذ الاستعلامات
 export const query = async (text, params = []) => {
-    let client;
     try {
-        client = await pool.connect();
-        const result = await client.query(text, params);
+        const result = await pool.query(text, params);
         return result;
     } catch (error) {
         console.error('❌ خطأ في تنفيذ الاستعلام:', error);
         throw error;
-    } finally {
-        if (client) {
-            client.release();
-        }
     }
 };
 

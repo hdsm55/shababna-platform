@@ -129,8 +129,11 @@ export const supportProgram = async (req, res) => {
         const { id } = req.params; // program_id
         const { supporter_name, supporter_email, supporter_phone, support_type, message, amount } = req.body;
 
+        console.log('🚀 استلام طلب التبرع:', { id, supporter_name, supporter_email, amount });
+
         // التحقق من البيانات المطلوبة
         if (!supporter_name || !supporter_email) {
+            console.log('❌ بيانات غير مكتملة:', { supporter_name, supporter_email });
             return res.status(400).json({
                 success: false,
                 message: 'الاسم والبريد الإلكتروني مطلوبان'
@@ -138,13 +141,17 @@ export const supportProgram = async (req, res) => {
         }
 
         // التحقق من وجود البرنامج
+        console.log('🔍 التحقق من وجود البرنامج:', id);
         const programCheck = await query('SELECT id FROM programs WHERE id = $1', [id]);
         if (programCheck.rows.length === 0) {
+            console.log('❌ البرنامج غير موجود:', id);
             return res.status(404).json({
                 success: false,
                 message: 'البرنامج غير موجود'
             });
         }
+
+        console.log('✅ البرنامج موجود، إدراج البيانات...');
 
         // إدراج البيانات
         const result = await query(
@@ -168,6 +175,21 @@ export const supportProgram = async (req, res) => {
             return res.status(503).json({
                 success: false,
                 message: 'خطأ في الاتصال بقاعدة البيانات، يرجى المحاولة مرة أخرى'
+            });
+        }
+
+        // معالجة أخطاء قاعدة البيانات الأخرى
+        if (error.code === '23505') { // unique constraint violation
+            return res.status(400).json({
+                success: false,
+                message: 'تم التسجيل مسبقاً بهذا البريد الإلكتروني'
+            });
+        }
+
+        if (error.code === '23503') { // foreign key constraint violation
+            return res.status(400).json({
+                success: false,
+                message: 'البرنامج غير موجود'
             });
         }
 

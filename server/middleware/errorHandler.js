@@ -15,6 +15,30 @@ export default function errorHandler(err, req, res, next) {
         });
     }
 
+    // معالجة أخطاء JSON parsing
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+        return res.status(400).json({
+            success: false,
+            message: 'بيانات غير صحيحة',
+            error: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
+    }
+
+    // معالجة أخطاء قاعدة البيانات الأخرى
+    if (err.code === '23505') { // unique constraint violation
+        return res.status(400).json({
+            success: false,
+            message: 'البيانات موجودة مسبقاً'
+        });
+    }
+
+    if (err.code === '23503') { // foreign key constraint violation
+        return res.status(400).json({
+            success: false,
+            message: 'البيانات المرتبطة غير موجودة'
+        });
+    }
+
     res.status(err.status || 500).json({
         success: false,
         message: err.message || 'حدث خطأ غير متوقع',
