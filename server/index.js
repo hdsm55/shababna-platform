@@ -77,6 +77,19 @@ app.use((req, res, next) => {
 
   next();
 });
+
+// JSON parsing error handling middleware
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    console.error('❌ JSON parsing error:', err.message);
+    return res.status(400).json({
+      success: false,
+      message: 'بيانات غير صحيحة - يرجى التحقق من البيانات المرسلة',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+  next(err);
+});
 // CORS configuration
 const corsOptions = {
   origin: function (origin, callback) {
@@ -213,12 +226,20 @@ app.get('*', async (req, res) => {
     res.setHeader('Expires', '0');
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
 
-    // Send the React app
+    // Send the React app with error handling
     res.sendFile(indexPath, (err) => {
       if (err) {
         console.error('❌ Error serving React app:', err);
-        // Don't send JSON error here, just log it
         console.error('Failed to serve:', req.path);
+
+        // Send a proper error response instead of leaving it hanging
+        if (!res.headersSent) {
+          res.status(500).json({
+            success: false,
+            message: 'Error serving React app',
+            path: req.path
+          });
+        }
       } else {
         console.log('✅ Successfully served React app for:', req.path);
       }

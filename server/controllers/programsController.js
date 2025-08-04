@@ -162,13 +162,18 @@ export const supportProgram = async (req, res) => {
 
         console.log('✅ تم تسجيل الدعم بنجاح:', result.rows[0]);
 
-        return res.json({
+        // تأكد من إرسال JSON صحيح
+        res.setHeader('Content-Type', 'application/json');
+        return res.status(200).json({
             success: true,
             data: result.rows[0],
             message: 'تم تسجيل الدعم بنجاح'
         });
     } catch (error) {
         console.error('❌ Support program error:', error);
+
+        // تأكد من إرسال JSON صحيح حتى في حالة الخطأ
+        res.setHeader('Content-Type', 'application/json');
 
         // معالجة خاصة لأخطاء قاعدة البيانات
         if (error.message.includes('Connection terminated') || error.message.includes('timeout')) {
@@ -190,6 +195,14 @@ export const supportProgram = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: 'البرنامج غير موجود'
+            });
+        }
+
+        // معالجة أخطاء أخرى
+        if (error.message && error.message.includes('pool')) {
+            return res.status(503).json({
+                success: false,
+                message: 'خطأ في الاتصال بقاعدة البيانات، يرجى المحاولة مرة أخرى'
             });
         }
 
