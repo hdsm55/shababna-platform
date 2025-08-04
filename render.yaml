@@ -1,10 +1,9 @@
 services:
-  # التطبيق الكامل (خادم + واجهة)
   - type: web
-    name: shababna-platform
+    name: shababna-backend
     env: node
     plan: free
-    buildCommand: npm run build:full
+    buildCommand: npm install
     startCommand: npm run prod:server
     envVars:
       - key: NODE_ENV
@@ -23,14 +22,22 @@ services:
         value: vqvaeTyJS1qD1NVwurk8knW1GnUoRCna
       - key: JWT_SECRET
         generateValue: true
-      - key: JWT_EXPIRES_IN
-        value: 7d
       - key: CLIENT_URL
-        value: https://shababna-platform-1.onrender.com
+        value: https://shababna-platform.onrender.com
       - key: FRONTEND_URL
-        value: https://shababna-platform-1.onrender.com
+        value: https://shababna-platform.onrender.com
+    healthCheckPath: /api/health
+    autoDeploy: true
+
+  - type: web
+    name: shababna-frontend
+    env: static
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: client/dist
+    envVars:
       - key: VITE_API_URL
-        value: https://shababna-platform-1.onrender.com/api
+        value: https://shababna-backend.onrender.com/api
+    autoDeploy: true
 
 databases:
   # قاعدة البيانات (إذا لم تكن موجودة)

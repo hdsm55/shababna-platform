@@ -35,6 +35,14 @@ export default defineConfig({
         manualChunks: undefined,
       },
     },
+    // Ensure proper SPA routing
+    outDir: 'dist',
+    assetsDir: 'assets',
   },
   base: '/',
+  // Add preview configuration for SPA routing
+  preview: {
+    port: 5173,
+    host: true,
+  },
 })

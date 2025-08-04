@@ -11,13 +11,17 @@ const pool = new Pool({
     database: process.env.DB_NAME || 'shaababna_db',
     user: process.env.DB_USER || 'shaababna_db_user',
     password: process.env.DB_PASSWORD || 'vqvaeTyJS1qD1NVwurk8knW1GnUoRCna',
-    max: 20, // الحد الأقصى لعدد الاتصالات
-    idleTimeoutMillis: 30000, // وقت الانتظار قبل إغلاق الاتصال
-    connectionTimeoutMillis: 2000, // وقت الانتظار للاتصال
+    max: 10, // تقليل الحد الأقصى لعدد الاتصالات
+    min: 2, // الحد الأدنى لعدد الاتصالات
+    idleTimeoutMillis: 60000, // زيادة وقت الانتظار قبل إغلاق الاتصال
+    connectionTimeoutMillis: 10000, // زيادة وقت الانتظار للاتصال
     ssl: {
         rejectUnauthorized: false,
         require: true
-    }
+    },
+    // إعدادات إضافية لتحسين الاستقرار
+    keepAlive: true,
+    keepAliveInitialDelayMillis: 10000
 });
 
 // دالة لاختبار الاتصال
@@ -36,12 +40,18 @@ export const testConnection = async () => {
 
 // دالة لتنفيذ الاستعلامات
 export const query = async (text, params = []) => {
+    let client;
     try {
-        const result = await pool.query(text, params);
+        client = await pool.connect();
+        const result = await client.query(text, params);
         return result;
     } catch (error) {
         console.error('❌ خطأ في تنفيذ الاستعلام:', error);
         throw error;
+    } finally {
+        if (client) {
+            client.release();
+        }
     }
 };
 

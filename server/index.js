@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import { existsSync, readdirSync } from 'fs';
 
 // Load environment variables first
 dotenv.config();
@@ -16,6 +17,7 @@ import bodyParser from 'body-parser';
 
 // Import database configuration
 import './config/database.js';
+import { testConnection } from './config/database.js';
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -54,9 +56,16 @@ app.use(helmet({
 
 // Add additional headers for better SPA support
 app.use((req, res, next) => {
+  // Set headers for SPA routing
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
+
+  // Add security headers
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+
   next();
 });
 // CORS configuration
@@ -139,7 +148,7 @@ app.use(express.static(path.join(process.cwd(), 'client', 'dist')));
 
 // Handle React routing, return all requests to React app
 // This must be the LAST route handler
-app.get('*', (req, res) => {
+app.get('*', async (req, res) => {
   // Skip API routes
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({
@@ -149,17 +158,39 @@ app.get('*', (req, res) => {
     });
   }
 
-  // Serve React app for all other routes
+  // Serve React app for all other routes (SPA fallback)
   const indexPath = path.join(process.cwd(), 'client', 'dist', 'index.html');
 
   // Check if the file exists
-  if (require('fs').existsSync(indexPath)) {
-    res.sendFile(indexPath);
+  if (existsSync(indexPath)) {
+    console.log('📄 Serving React app for path:', req.path);
+
+    // Set proper headers for SPA
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        console.error('❌ Error serving React app:', err);
+        res.status(500).json({
+          success: false,
+          message: 'Error serving React app',
+          path: req.path
+        });
+      }
+    });
   } else {
     // Fallback for development or production
     console.log('⚠️ React app not found at:', indexPath);
     console.log('📁 Current directory:', process.cwd());
-    console.log('📁 Available files:', require('fs').readdirSync(process.cwd()));
+
+    try {
+      const files = readdirSync(process.cwd());
+      console.log('📁 Available files:', files);
+    } catch (error) {
+      console.log('❌ Error reading directory:', error.message);
+    }
 
     res.status(404).json({
       success: false,
@@ -171,8 +202,21 @@ app.get('*', (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📱 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'http://localhost:5173'}`);
+
+  // اختبار الاتصال بقاعدة البيانات
+  try {
+    const dbConnected = await testConnection();
+    if (dbConnected) {
+      console.log('✅ Database connection successful');
+    } else {
+      console.log('⚠️ Database connection failed, but server is running');
+    }
+  } catch (error) {
+    console.error('⚠️ Database connection test failed:', error.message);
+    console.log('⚠️ Server is running without database connection');
+  }
 });

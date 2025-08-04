@@ -33,6 +33,12 @@ export const getProgramById = async (req, res) => {
         return successResponse(res, result.rows[0], 'تم جلب البرنامج بنجاح');
     } catch (error) {
         console.error('Get program error:', error);
+
+        // معالجة خاصة لأخطاء الاتصال
+        if (error.message.includes('Connection terminated') || error.message.includes('timeout')) {
+            return errorResponse(res, 'خطأ في الاتصال بقاعدة البيانات، يرجى المحاولة مرة أخرى', 503);
+        }
+
         return errorResponse(res, 'خطأ في جلب البرنامج', 500, error);
     }
 };
@@ -122,18 +128,53 @@ export const supportProgram = async (req, res) => {
     try {
         const { id } = req.params; // program_id
         const { supporter_name, supporter_email, supporter_phone, support_type, message, amount } = req.body;
+
+        // التحقق من البيانات المطلوبة
         if (!supporter_name || !supporter_email) {
-            return res.status(400).json({ success: false, message: 'الاسم والبريد الإلكتروني مطلوبان' });
+            return res.status(400).json({
+                success: false,
+                message: 'الاسم والبريد الإلكتروني مطلوبان'
+            });
         }
+
+        // التحقق من وجود البرنامج
+        const programCheck = await query('SELECT id FROM programs WHERE id = $1', [id]);
+        if (programCheck.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'البرنامج غير موجود'
+            });
+        }
+
+        // إدراج البيانات
         const result = await query(
             `INSERT INTO program_supporters (program_id, supporter_name, supporter_email, supporter_phone, support_type, message, amount, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW()) RETURNING *`,
+             VALUES ($1, $2, $3, $4, $5, $6, $7, NOW()) RETURNING *`,
             [id, supporter_name, supporter_email, supporter_phone || null, support_type || 'donation', message || null, amount || null]
         );
-        return res.json({ success: true, data: result.rows[0], message: 'تم تسجيل الدعم بنجاح' });
+
+        console.log('✅ تم تسجيل الدعم بنجاح:', result.rows[0]);
+
+        return res.json({
+            success: true,
+            data: result.rows[0],
+            message: 'تم تسجيل الدعم بنجاح'
+        });
     } catch (error) {
-        console.error('Support program error:', error);
-        return res.status(500).json({ success: false, message: 'حدث خطأ أثناء تسجيل الدعم' });
+        console.error('❌ Support program error:', error);
+
+        // معالجة خاصة لأخطاء قاعدة البيانات
+        if (error.message.includes('Connection terminated') || error.message.includes('timeout')) {
+            return res.status(503).json({
+                success: false,
+                message: 'خطأ في الاتصال بقاعدة البيانات، يرجى المحاولة مرة أخرى'
+            });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: 'حدث خطأ أثناء تسجيل الدعم'
+        });
     }
 };
 

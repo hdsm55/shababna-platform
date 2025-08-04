@@ -7,7 +7,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "dev:server": "nodemon index.js",
-    "prod:server": "node index.js",
+    "prod:server": "node --max-old-space-size=512 index.js",
     "build": "echo 'No build step required'",
     "test": "echo 'No tests specified'"
   },

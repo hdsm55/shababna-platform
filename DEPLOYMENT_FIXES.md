@@ -1,87 +1,93 @@
-# تصحيحات النشر على Render.com
+# تقرير إصلاحات النشر - Shababna Platform
 
-## المشاكل المحددة والحلول
+## المشاكل التي تم حلها
 
-### 1. مشكلة بناء الخادم الخلفي
+### 1. خطأ `require is not defined`
 
-**المشكلة:** `cd: server: No such file or directory`
-
-**السبب:** أوامر البناء في `render.yaml` تحتوي على `cd server &&` ولكن الخدمة تعمل من مجلد الجذر.
-
-**الحل:** تم تحديث `render.yaml`:
-
-```yaml
-buildCommand: npm install
-startCommand: npm run prod:server
-```
-
-### 2. مشكلة nodemon غير موجود
-
-**المشكلة:** `sh: 1: nodemon: not found`
-
-**السبب:** `nodemon` موجود في `devDependencies` ولا يتم تثبيته في بيئة الإنتاج.
-
+**المشكلة:** استخدام `require` في ES modules
 **الحل:**
 
-1. نقل `nodemon` إلى `dependencies` في `server/package.json`
-2. إضافة script `prod:server` يستخدم `node` بدلاً من `nodemon`
-3. تحديث `startCommand` في `render.yaml` لاستخدام `npm run prod:server`
+- تحويل `require('fs')` إلى `import('fs')`
+- إضافة `async` للدالة التي تستخدم `await import`
 
-### 3. مشكلة أخطاء TypeScript في الواجهة الأمامية
+### 2. خطأ الاتصال بقاعدة البيانات
 
-**المشكلة:** أخطاء TypeScript متعددة تمنع البناء
+**المشكلة:** timeout في الاتصال بقاعدة البيانات
+**الحل:**
 
-**الحلول المطبقة:**
+- تحسين إعدادات connection pool
+- زيادة timeouts
+- إضافة معالجة أفضل للأخطاء
 
-1. تحديث `client/tsconfig.json` لتكون أكثر تساهلاً
-2. إنشاء `client/tsconfig.app.json` للبناء
-3. تحديث `client/package.json` لتجنب فحص TypeScript أثناء البناء
-4. تحديث `client/vite.config.ts` لتجاهل بعض الأخطاء
+## التحسينات المطبقة
 
-## الإجراءات المطلوبة في Render.com
+### إعدادات قاعدة البيانات المحسنة
 
-### للخادم الخلفي (shababna-backend):
+```javascript
+const pool = new Pool({
+  max: 10, // تقليل الحد الأقصى
+  min: 2, // إضافة حد أدنى
+  idleTimeoutMillis: 60000, // زيادة وقت الانتظار
+  connectionTimeoutMillis: 10000, // زيادة وقت الاتصال
+  keepAlive: true,
+  keepAliveInitialDelayMillis: 10000,
+});
+```
 
-1. اذهب إلى Render Dashboard
-2. افتح الخدمة `shababna-backend`
-3. انقر على "Settings"
-4. قم بتحديث:
-   - **Build Command:** `npm install`
-   - **Start Command:** `npm run prod:server`
-5. أعد نشر الخدمة
+### معالجة أفضل للأخطاء
 
-### للواجهة الأمامية (shababna-frontend):
+- إضافة middleware لمعالجة أخطاء قاعدة البيانات
+- تحسين error handling في controllers
+- إضافة رسائل خطأ واضحة للمستخدم
 
-1. اذهب إلى Render Dashboard
-2. افتح الخدمة `shababna-frontend`
-3. انقر على "Settings"
-4. تأكد من:
-   - **Build Command:** `cd client && npm install && npm run build`
-   - **Static Publish Path:** `client/dist`
-5. أعد نشر الخدمة
+### تحسينات الأداء
 
-## متغيرات البيئة المطلوبة
+- تقليل عدد الاتصالات المتزامنة
+- إضافة اختبار الاتصال عند بدء التشغيل
+- تحسين إعدادات الذاكرة
 
-### للخادم الخلفي:
+## الملفات المحدثة
 
-- `NODE_ENV=production`
-- `PORT=10000`
-- `DB_HOST=dpg-d26hc33uibrs739skhdg-a.frankfurt-postgres.render.com`
-- `DB_PORT=5432`
-- `DB_NAME=shaababna_db`
-- `DB_USER=shaababna_db_user`
-- `DB_PASSWORD=vqvaeTyJS1qD1NVwurk8knW1GnUoRCna`
-- `JWT_SECRET` (يتم توليده تلقائياً)
-- `JWT_EXPIRES_IN=7d`
-- `CLIENT_URL=https://shababna-platform-1.onrender.com`
-- `FRONTEND_URL=https://shababna-platform-1.onrender.com`
+1. `server/index.js` - إصلاح ES modules
+2. `server/config/database.js` - تحسين إعدادات الاتصال
+3. `server/controllers/programsController.js` - معالجة أفضل للأخطاء
+4. `server/middleware/errorHandler.js` - إضافة معالجة أخطاء قاعدة البيانات
+5. `server/package.json` - تحسين إعدادات التشغيل
+6. `server/env.production` - إعدادات محسنة للإنتاج
 
-### للواجهة الأمامية:
+## خطوات النشر المحدثة
 
-- `VITE_API_URL=https://shababna-backend.onrender.com/api`
+1. **تأكد من إعدادات البيئة:**
 
-## ملاحظات مهمة
+   ```bash
+   # في Render.com
+   NODE_ENV=production
+   PORT=10000
+   ```
 
-- تأكد من أن قاعدة البيانات متصلة وصحيحة
-- تأكد من أن CORS مُعد بشكل صحيح
-- تأكد من أن جميع الخدمات تعمل على المنافذ الصحيحة
+2. **تأكد من إعدادات قاعدة البيانات:**
+
+   - استخدام إعدادات connection pool المحسنة
+   - التأكد من صحة بيانات الاتصال
+
+3. **مراقبة السجلات:**
+   - مراقبة أخطاء الاتصال
+   - مراقبة أداء قاعدة البيانات
+
+## النتائج المتوقعة
+
+- ✅ إصلاح خطأ `require is not defined`
+- ✅ تحسين استقرار الاتصال بقاعدة البيانات
+- ✅ تقليل أخطاء timeout
+- ✅ تحسين تجربة المستخدم عند حدوث أخطاء
+
+## المراقبة المستمرة
+
+1. **مراقبة السجلات في Render.com**
+2. **اختبار الاتصال بقاعدة البيانات**
+3. **مراقبة أداء التطبيق**
+4. **تحديث الإعدادات حسب الحاجة**
+
+---
+
+_تم إنشاء هذا التقرير في: ${new Date().toLocaleString('ar-SA')}_

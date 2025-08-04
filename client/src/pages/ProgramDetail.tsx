@@ -83,8 +83,15 @@ const ProgramDetail: React.FC = () => {
   const handleDonation = async (e: React.FormEvent) => {
     e.preventDefault();
     setDonationStatus('loading');
+    setDonationMessage('');
 
     try {
+      console.log('🚀 إرسال طلب التبرع:', {
+        supporter_name: `${donationForm.firstName} ${donationForm.lastName}`,
+        supporter_email: donationForm.email,
+        amount: donationForm.amount,
+      });
+
       // إرسال البيانات الفعلية للـ API
       const response = await fetch(`/api/programs/${id}/support`, {
         method: 'POST',
@@ -101,11 +108,17 @@ const ProgramDetail: React.FC = () => {
         }),
       });
 
+      console.log('📡 استجابة الخادم:', response.status, response.statusText);
+
       if (!response.ok) {
-        throw new Error('فشل في التبرع');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `فشل في التبرع (${response.status})`
+        );
       }
 
       const result = await response.json();
+      console.log('✅ نتيجة التبرع:', result);
 
       if (result.success) {
         setDonationStatus('success');
@@ -124,9 +137,13 @@ const ProgramDetail: React.FC = () => {
         throw new Error(result.message || 'حدث خطأ أثناء التبرع');
       }
     } catch (error) {
-      console.error('Donation error:', error);
+      console.error('❌ Donation error:', error);
       setDonationStatus('error');
-      setDonationMessage('حدث خطأ أثناء التبرع. يرجى المحاولة مرة أخرى.');
+      setDonationMessage(
+        error instanceof Error
+          ? error.message
+          : 'حدث خطأ أثناء التبرع. يرجى المحاولة مرة أخرى.'
+      );
     }
   };
 
