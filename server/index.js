@@ -90,6 +90,31 @@ app.use((err, req, res, next) => {
   }
   next(err);
 });
+
+// إضافة middleware لمعالجة JSON بشكل أفضل
+app.use((req, res, next) => {
+  if (req.method === 'POST' && req.headers['content-type']?.includes('application/json')) {
+    let data = '';
+    req.on('data', chunk => {
+      data += chunk;
+    });
+    req.on('end', () => {
+      try {
+        req.body = JSON.parse(data);
+        next();
+      } catch (error) {
+        console.error('❌ JSON parsing error in middleware:', error);
+        res.status(400).json({
+          success: false,
+          message: 'بيانات JSON غير صحيحة',
+          error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+      }
+    });
+  } else {
+    next();
+  }
+});
 // CORS configuration
 const corsOptions = {
   origin: function (origin, callback) {

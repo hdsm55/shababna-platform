@@ -13,8 +13,8 @@ const pool = new Pool({
     password: process.env.DB_PASSWORD || 'vqvaeTyJS1qD1NVwurk8knW1GnUoRCna',
     max: 20, // زيادة الحد الأقصى لعدد الاتصالات
     min: 5, // زيادة الحد الأدنى لعدد الاتصالات
-    idleTimeoutMillis: 300000, // 5 دقائق - زيادة وقت الانتظار قبل إغلاق الاتصال
-    connectionTimeoutMillis: 60000, // دقيقة واحدة - زيادة وقت الانتظار للاتصال
+    idleTimeoutMillis: 30000000, // 5 دقائق - زيادة وقت الانتظار قبل إغلاق الاتصال
+    connectionTimeoutMillis: 6000000, // دقيقة واحدة - زيادة وقت الانتظار للاتصال
     ssl: {
         rejectUnauthorized: false,
         require: true

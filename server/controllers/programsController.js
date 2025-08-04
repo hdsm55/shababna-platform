@@ -129,7 +129,18 @@ export const supportProgram = async (req, res) => {
         const { id } = req.params; // program_id
         const { supporter_name, supporter_email, supporter_phone, support_type, message, amount } = req.body;
 
-        console.log('🚀 استلام طلب التبرع:', { id, supporter_name, supporter_email, amount });
+        console.log('🚀 استلام طلب التبرع:', {
+            id,
+            supporter_name,
+            supporter_email,
+            supporter_phone,
+            support_type,
+            message,
+            amount
+        });
+
+        console.log('📄 Request body:', req.body);
+        console.log('📄 Request headers:', req.headers);
 
         // التحقق من البيانات المطلوبة
         if (!supporter_name || !supporter_email) {
