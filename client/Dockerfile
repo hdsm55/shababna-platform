@@ -3,29 +3,33 @@ FROM node:18-alpine as build
 
 WORKDIR /app
 
-# نسخ ملفات التبعيات
+# Copy package files
 COPY package*.json ./
 
-# تثبيت التبعيات
-RUN npm ci
+# Install dependencies
+RUN npm ci --only=production
 
-# نسخ الكود
+# Copy source code
 COPY . .
 
-# Build التطبيق
+# Build the app
 RUN npm run build
 
 # Production stage
 FROM nginx:alpine
 
-# نسخ ملفات الـ build
+# Copy built app
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# نسخ إعدادات Nginx
+# Copy nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# فتح المنفذ
+# Copy static files configuration
+COPY public/_redirects /usr/share/nginx/html/_redirects
+COPY public/_headers /usr/share/nginx/html/_headers
+
+# Expose port
 EXPOSE 80
 
-# تشغيل Nginx
+# Start nginx
 CMD ["nginx", "-g", "daemon off;"]

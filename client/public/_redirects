@@ -1,49 +1,29 @@
-# Handle client-side routing for SPA (Render.com)
+# SPA Routing - Redirect all routes to index.html
 /*    /index.html   200
 
-# API routes
-/api/*  /api/:splat  200
+# API routes - proxy to backend
+/api/*  https://shababna-backend.onrender.com/api/:splat  200
 
 # Static assets
 /assets/*  /assets/:splat  200
 /images/*  /images/:splat  200
-/uploads/*  /uploads/:splat  200
+*.js  /:splat  200
+*.css  /:splat  200
+*.png  /:splat  200
+*.jpg  /:splat  200
+*.jpeg  /:splat  200
+*.gif  /:splat  200
+*.svg  /:splat  200
+*.ico  /:splat  200
+*.woff  /:splat  200
+*.woff2  /:splat  200
+*.ttf  /:splat  200
+*.eot  /:splat  200
 
-# Specific routes for better handling
-/programs/*  /index.html  200
-/events/*  /index.html  200
-/blogs/*  /index.html  200
-/dashboard/*  /index.html  200
-/auth/*  /index.html  200
-/contact  /index.html  200
-/donations  /index.html  200
-/join-us  /index.html  200
-/volunteers  /index.html  200
-
-# Additional routes to prevent "Not Found"
-/programs  /index.html  200
-/events  /index.html  200
-/blogs  /index.html  200
-/dashboard  /index.html  200
-/auth  /index.html  200
-/contact  /index.html  200
-/donations  /index.html  200
-/join-us  /index.html  200
-/volunteers  /index.html  200
-
-# Handle all sub-pages
-/*/*  /index.html  200
-
-# Additional fallback routes
-/*.js  /index.html  200
-/*.css  /index.html  200
-/*.png  /index.html  200
-/*.jpg  /index.html  200
-/*.jpeg  /index.html  200
-/*.gif  /index.html  200
-/*.svg  /index.html  200
-/*.ico  /index.html  200
-/*.woff  /index.html  200
-/*.woff2  /index.html  200
-/*.ttf  /index.html  200
-/*.eot  /index.html  200
+# Security headers
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: no-referrer-when-downgrade
+  Cache-Control: no-cache, no-store, must-revalidate

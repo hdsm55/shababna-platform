@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
 import { Suspense, lazy } from 'react';
 import ErrorBoundary from './components/common/ErrorBoundary';
+import BackendIdleHandler from './components/common/BackendIdleHandler';
 import { ToastProvider } from './components/common/Toast';
 import { ThemeProvider } from './components/ThemeProvider';
 import Layout from './components/layout/Layout';
@@ -51,9 +52,24 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 10 * 60 * 1000, // 10 minutes - increased for better caching
-      retry: 1,
+      retry: (failureCount, error: any) => {
+        // Retry up to 3 times for network errors or 5xx errors
+        if (failureCount < 3) {
+          if (error?.response?.status >= 500) return true;
+          if (error?.code === 'ECONNABORTED') return true;
+          if (error?.message?.includes('timeout')) return true;
+        }
+        return false;
+      },
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
       refetchOnMount: false, // Don't refetch on mount if data is fresh
       gcTime: 15 * 60 * 1000, // 15 minutes garbage collection time
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
+    },
+    mutations: {
+      retry: 1,
+      retryDelay: 1000,
     },
   },
 });
@@ -65,111 +81,241 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <ThemeProvider>
             <ToastProvider>
-              <BrowserRouter
-                future={{
-                  v7_startTransition: true,
-                  v7_relativeSplatPath: true,
-                }}
-              >
-                <Routes>
-                  {/* Public Routes داخل Layout */}
-                  <Route element={<Layout />}>
+              <BackendIdleHandler>
+                <BrowserRouter
+                  future={{
+                    v7_startTransition: true,
+                    v7_relativeSplatPath: true,
+                  }}
+                >
+                  <Routes>
+                    {/* Public Routes داخل Layout */}
+                    <Route element={<Layout />}>
+                      <Route
+                        path="/"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <Home />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/events"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <Events />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/events/:id"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <EventDetail />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/events/:id/register"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <EventRegistration />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/programs"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <Programs />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/programs/:id"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <ProgramDetail />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/blogs"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <Blogs />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/blogs/:id"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <BlogDetail />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/contact"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <Contact />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/donations"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <Donations />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/join-us"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <JoinUs />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="/volunteers"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <Volunteers />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="*"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <NotFound />
+                          </Suspense>
+                        }
+                      />
+                    </Route>
+
+                    {/* Auth Routes */}
                     <Route
-                      path="/"
+                      path="/login"
                       element={
                         <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <Home />
+                          <Login />
                         </Suspense>
                       }
                     />
                     <Route
-                      path="/events"
+                      path="/register"
                       element={
                         <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <Events />
+                          <Register />
                         </Suspense>
                       }
                     />
                     <Route
-                      path="/events/:id"
+                      path="/create-admin"
                       element={
                         <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <EventDetail />
+                          <CreateAdmin />
                         </Suspense>
                       }
                     />
-                    <Route
-                      path="/events/:id/register"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <EventRegistration />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/programs"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <Programs />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/programs/:id"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <ProgramDetail />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/blogs"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <Blogs />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/blogs/:id"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <BlogDetail />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/contact"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <Contact />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/donations"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <Donations />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/join-us"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <JoinUs />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/volunteers"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <Volunteers />
-                        </Suspense>
-                      }
-                    />
+
+                    {/* Dashboard Routes - منفصلة عن Layout العام */}
+                    <Route path="/dashboard" element={<DashboardLayout />}>
+                      <Route
+                        index
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <Dashboard />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="events"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <DashboardEvents />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="programs"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <DashboardPrograms />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="blogs"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <DashboardBlogs />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="users"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <DashboardUsers />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="registrants"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <DashboardRegistrants />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="contact-forms"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <DashboardContactForms />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="analytics"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <DashboardAnalytics />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="activities"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <DashboardActivities />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="reports"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <DashboardReports />
+                          </Suspense>
+                        }
+                      />
+                      <Route
+                        path="settings"
+                        element={
+                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                            <DashboardSettings />
+                          </Suspense>
+                        }
+                      />
+                    </Route>
+
+                    {/* Catch-all route for 404 */}
                     <Route
                       path="*"
                       element={
@@ -178,137 +324,9 @@ function App() {
                         </Suspense>
                       }
                     />
-                  </Route>
-
-                  {/* Auth Routes */}
-                  <Route
-                    path="/login"
-                    element={
-                      <Suspense fallback={<LoadingSpinner size="lg" />}>
-                        <Login />
-                      </Suspense>
-                    }
-                  />
-                  <Route
-                    path="/register"
-                    element={
-                      <Suspense fallback={<LoadingSpinner size="lg" />}>
-                        <Register />
-                      </Suspense>
-                    }
-                  />
-                  <Route
-                    path="/create-admin"
-                    element={
-                      <Suspense fallback={<LoadingSpinner size="lg" />}>
-                        <CreateAdmin />
-                      </Suspense>
-                    }
-                  />
-
-                  {/* Dashboard Routes - منفصلة عن Layout العام */}
-                  <Route path="/dashboard" element={<DashboardLayout />}>
-                    <Route
-                      index
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <Dashboard />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="events"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <DashboardEvents />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="programs"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <DashboardPrograms />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="blogs"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <DashboardBlogs />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="users"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <DashboardUsers />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="registrants"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <DashboardRegistrants />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="contact-forms"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <DashboardContactForms />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="analytics"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <DashboardAnalytics />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="activities"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <DashboardActivities />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="reports"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <DashboardReports />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="settings"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <DashboardSettings />
-                        </Suspense>
-                      }
-                    />
-                  </Route>
-
-                  {/* Catch-all route for 404 */}
-                  <Route
-                    path="*"
-                    element={
-                      <Suspense fallback={<LoadingSpinner size="lg" />}>
-                        <NotFound />
-                      </Suspense>
-                    }
-                  />
-                </Routes>
-              </BrowserRouter>
+                  </Routes>
+                </BrowserRouter>
+              </BackendIdleHandler>
             </ToastProvider>
           </ThemeProvider>
         </QueryClientProvider>

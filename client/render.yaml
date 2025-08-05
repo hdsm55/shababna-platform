@@ -2,8 +2,8 @@ services:
   - type: web
     name: shababna-frontend
     env: static
-    buildCommand: cd client && npm install && npm run build
-    staticPublishPath: ./client/dist
+    buildCommand: npm run build
+    staticPublishPath: ./dist
     routes:
       - type: rewrite
         source: /api/*

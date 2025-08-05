@@ -3,9 +3,9 @@ import { useAuthStore } from '../store/authStore';
 
 // Create axios instance with default config
 export const http = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api',
+  baseURL: import.meta.env.VITE_API_URL || 'https://shababna-backend.onrender.com/api',
   withCredentials: true,
-  timeout: 10000, // 10 seconds timeout
+  timeout: 3000000, // 30 seconds timeout for Render free plan
 });
 
 // إضافة Interceptor لإرسال التوكن تلقائياً
@@ -14,8 +14,10 @@ http.interceptors.request.use((config) => {
   const token = useAuthStore.getState().token;
 
   if (token) {
-    config.headers = config.headers || {};
-    config.headers['Authorization'] = `Bearer ${token}`;
+    if (!config.headers) {
+      config.headers = {};
+    }
+    config.headers.Authorization = `Bearer ${token}`;
     console.log('🔑 إرسال token:', token.substring(0, 20) + '...');
   } else {
     console.log('⚠️  لا يوجد token');
@@ -29,11 +31,23 @@ http.interceptors.response.use(
     return response;
   },
   (error) => {
+    // Handle backend idle time gracefully
+    if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+      console.log('⏰ Backend is waking up, please wait...');
+      // Don't redirect to login for timeout errors
+      return Promise.reject({
+        ...error,
+        isBackendIdle: true,
+        message: 'الخادم يستيقظ، يرجى الانتظار...'
+      });
+    }
+
     if (error.response?.status === 401) {
       // Token expired or invalid, redirect to login
       useAuthStore.getState().logout();
       window.location.href = '/login';
     }
+
     return Promise.reject(error);
   }
 );

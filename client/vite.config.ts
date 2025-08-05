@@ -33,6 +33,23 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: undefined,
+        // Ensure proper asset naming for Render
+        assetFileNames: (assetInfo) => {
+          const info = assetInfo.name.split('.')
+          const ext = info[info.length - 1]
+          if (/\.(css)$/.test(assetInfo.name)) {
+            return `assets/[name]-[hash].${ext}`
+          }
+          if (/\.(png|jpe?g|gif|svg|ico|webp)$/.test(assetInfo.name)) {
+            return `images/[name]-[hash].${ext}`
+          }
+          if (/\.(woff|woff2|eot|ttf|otf)$/.test(assetInfo.name)) {
+            return `fonts/[name]-[hash].${ext}`
+          }
+          return `assets/[name]-[hash].${ext}`
+        },
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
       },
     },
     // Ensure proper SPA routing

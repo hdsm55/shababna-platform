@@ -60,13 +60,60 @@ const ProgramDetail: React.FC = () => {
     data: programData,
     isLoading,
     error,
+    isError,
   } = useQuery({
     queryKey: ['program', id],
     queryFn: () => fetchProgramById(id!),
     enabled: !!id,
+    retry: (failureCount, error: any) => {
+      // Retry for backend idle time
+      if (failureCount < 3) {
+        if (error?.isBackendIdle) return true;
+        if (error?.response?.status >= 500) return true;
+        if (error?.code === 'ECONNABORTED') return true;
+      }
+      return false;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   const program = programData?.data || programData;
+  const isBackendIdle = (error as any)?.isBackendIdle;
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner
+          size="lg"
+          isBackendIdle={isBackendIdle}
+          text={
+            isBackendIdle
+              ? 'الخادم يستيقظ، يرجى الانتظار...'
+              : 'جاري تحميل تفاصيل البرنامج...'
+          }
+        />
+      </div>
+    );
+  }
+
+  // Show error state
+  if (isError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Alert type="error" title="خطأ في التحميل">
+            {isBackendIdle
+              ? 'الخادم يستيقظ، يرجى المحاولة مرة أخرى'
+              : 'حدث خطأ أثناء تحميل تفاصيل البرنامج'}
+          </Alert>
+          <Button onClick={() => window.location.reload()} className="mt-4">
+            إعادة المحاولة
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('ar-SA', {
@@ -93,20 +140,23 @@ const ProgramDetail: React.FC = () => {
       });
 
       // إرسال البيانات الفعلية للـ API
-      const response = await fetch(`/api/programs/${id}/support`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          supporter_name: `${donationForm.firstName} ${donationForm.lastName}`,
-          supporter_email: donationForm.email,
-          supporter_phone: donationForm.phone,
-          support_type: 'donation',
-          message: donationForm.message,
-          amount: donationForm.amount,
-        }),
-      });
+      const response = await fetch(
+        `https://shababna-backend.onrender.com/api/programs/${id}/support`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            supporter_name: `${donationForm.firstName} ${donationForm.lastName}`,
+            supporter_email: donationForm.email,
+            supporter_phone: donationForm.phone,
+            support_type: 'donation',
+            message: donationForm.message,
+            amount: donationForm.amount,
+          }),
+        }
+      );
 
       console.log('📡 استجابة الخادم:', response.status, response.statusText);
 
@@ -179,24 +229,6 @@ const ProgramDetail: React.FC = () => {
       [e.target.name]: e.target.value,
     });
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
-
-  if (error || !program) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Alert type="error">
-          {t('programDetail.error', 'حدث خطأ أثناء جلب تفاصيل البرنامج.')}
-        </Alert>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-neutral-50" dir={isRTL ? 'rtl' : 'ltr'}>
