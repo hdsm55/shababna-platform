@@ -5,7 +5,7 @@ import { getApiUrl } from '../config/environment';
 // Create axios instance with default config
 export const http = axios.create({
   baseURL: import.meta.env.VITE_API_URL || getApiUrl(),
-  withCredentials: true,
+  withCredentials: false, // Changed to false to fix CORS issue
   timeout: 45000, // 45 seconds timeout for Render free plan
 });
 

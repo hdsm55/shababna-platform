@@ -134,7 +134,9 @@ const corsOptions = {
       'https://shababna-frontend.onrender.com',
       'https://shababna-backend.onrender.com',
       'https://shababna-platform-1.onrender.com',
-      'https://shababna-platform.onrender.com'
+      'https://shababna-platform.onrender.com',
+      'https://shaababna.com',
+      'https://www.shaababna.com'
     ].filter(Boolean);
 
     if (allowedOrigins.indexOf(origin) !== -1) {
