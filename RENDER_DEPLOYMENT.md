@@ -3,16 +3,19 @@
 ## المشاكل التي تم حلها
 
 ### 1. مشكلة SPA Routing (404 للصفحات الفرعية)
+
 **السبب:** الخادم لا يعرف كيف يتعامل مع routes الفرعية
 **الحل:** إضافة rewrite rules في `render.yaml` و `static.json`
 
 ### 2. مشكلة Content Security Policy (CSP)
+
 **السبب:** CSP يمنع تنفيذ scripts
 **الحل:** إضافة `'wasm-unsafe-eval'` و تحديث URLs
 
 ## الملفات المحدثة
 
 ### 1. `render.yaml` (الملف الرئيسي)
+
 ```yaml
 services:
   - type: web
@@ -46,6 +49,7 @@ services:
 ```
 
 ### 2. `static.json` (بديل لـ render.yaml)
+
 ```json
 {
   "root": "dist",
@@ -71,6 +75,7 @@ services:
 ```
 
 ### 3. `public/_redirects` (للـ SPA routing)
+
 ```
 # SPA Routing - Redirect all routes to index.html
 /*    /index.html   200
@@ -93,6 +98,7 @@ services:
 ```
 
 ### 4. `public/_headers` (للـ headers)
+
 ```
 # SPA Routing Headers
 /*
@@ -114,13 +120,18 @@ services:
 ```
 
 ### 5. `index.html` (CSP محدث)
+
 ```html
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://localhost:5000 http://127.0.0.1:5000 https://shababna-platform.onrender.com https://*.onrender.com https://*.render.com; object-src 'none'; base-uri 'self'; form-action 'self';" />
+<meta
+  http-equiv="Content-Security-Policy"
+  content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://localhost:5000 http://127.0.0.1:5000 https://shababna-platform.onrender.com https://*.onrender.com https://*.render.com; object-src 'none'; base-uri 'self'; form-action 'self';"
+/>
 ```
 
 ## خطوات النشر
 
 ### 1. نشر Backend أولاً
+
 ```bash
 cd server
 git add .
@@ -129,6 +140,7 @@ git push origin main
 ```
 
 ### 2. نشر Frontend
+
 ```bash
 cd client
 npm run build
