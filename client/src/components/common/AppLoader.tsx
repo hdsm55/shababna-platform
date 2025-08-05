@@ -11,9 +11,20 @@ const AppLoader: React.FC<AppLoaderProps> = ({ children }) => {
   const [loadingProgress, setLoadingProgress] = useState(0);
 
   useEffect(() => {
+    // التحقق من أن هذا هو التحميل الأولي للتطبيق
+    const isInitialLoad = !sessionStorage.getItem('appInitialized');
+
+    if (!isInitialLoad) {
+      // إذا لم يكن هذا التحميل الأولي، لا تظهر شاشة التحميل
+      setIsLoading(false);
+      return;
+    }
+
     // تأخير قصير لضمان تحميل جميع المكونات
     const timer = setTimeout(() => {
       setIsLoading(false);
+      // وضع علامة أن التطبيق تم تهيئته
+      sessionStorage.setItem('appInitialized', 'true');
     }, 1000);
 
     // محاكاة التقدم

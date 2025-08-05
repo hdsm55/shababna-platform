@@ -237,8 +237,8 @@ const Home: React.FC = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1,
+        staggerChildren: 0.1,
+        delayChildren: 0.05,
       },
     },
   };
@@ -249,8 +249,8 @@ const Home: React.FC = () => {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.6,
-        ease: 'easeOut',
+        duration: 0.3,
+        ease: [0.4, 0, 0.2, 1],
       },
     },
   };
@@ -261,8 +261,8 @@ const Home: React.FC = () => {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.8,
-        ease: 'easeOut',
+        duration: 0.4,
+        ease: [0.4, 0, 0.2, 1],
       },
     },
   };
@@ -297,7 +297,7 @@ const Home: React.FC = () => {
               rotate: [0, 360],
             }}
             transition={{
-              duration: 60,
+              duration: 30,
               repeat: Infinity,
               ease: 'linear',
             }}
@@ -308,7 +308,7 @@ const Home: React.FC = () => {
               rotate: [360, 0],
             }}
             transition={{
-              duration: 80,
+              duration: 40,
               repeat: Infinity,
               ease: 'linear',
             }}
@@ -322,7 +322,7 @@ const Home: React.FC = () => {
             y: [-10, 10, -10],
           }}
           transition={{
-            duration: 4,
+            duration: 2,
             repeat: Infinity,
             ease: 'easeInOut',
           }}
@@ -333,7 +333,7 @@ const Home: React.FC = () => {
             y: [10, -10, 10],
           }}
           transition={{
-            duration: 6,
+            duration: 3,
             repeat: Infinity,
             ease: 'easeInOut',
           }}

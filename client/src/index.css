@@ -6,6 +6,12 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* تحسين الأداء للتمرير */
+    scroll-padding-top: 80px;
+    /* تسريع التمرير */
+    -webkit-overflow-scrolling: touch;
+    /* تحسين الأداء */
+    will-change: scroll-position;
   }
 
   body {
@@ -16,6 +22,12 @@
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* تحسين الأداء */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    /* تسريع الحركة */
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* Arabic text styling */
@@ -23,9 +35,31 @@
     font-family: 'Tajawal', 'Noto Sans Arabic', system-ui, sans-serif;
   }
 
-  /* Smooth scrolling for anchor links */
+  /* تحسينات الأداء للتمرير */
   html {
     scroll-padding-top: 80px;
+    /* تسريع التمرير */
+    -webkit-overflow-scrolling: touch;
+    /* تحسين الأداء */
+    will-change: scroll-position;
+  }
+
+  /* تحسين أداء العناصر المتحركة */
+  * {
+    /* تسريع الحركة */
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    /* تحسين الأداء */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  /* تحسين أداء الصور */
+  img {
+    /* تسريع تحميل الصور */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    /* تحسين الأداء */
+    transform: translateZ(0);
   }
 
   /* Custom scrollbar */
@@ -67,44 +101,64 @@
 @layer components {
   /* Modern button styles */
   .btn {
-    @apply inline-flex items-center justify-center font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group;
+    @apply inline-flex items-center justify-center font-medium rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group;
+    /* تسريع الحركة */
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    /* تحسين الأداء */
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   .btn-primary {
     @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 shadow-sm hover:shadow-md active:bg-primary-800 hover:-translate-y-0.5 hover:shadow-lg;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .btn-secondary {
     @apply bg-secondary-600 text-white hover:bg-secondary-700 focus:ring-secondary-500 shadow-sm hover:shadow-md active:bg-secondary-800 hover:-translate-y-0.5 hover:shadow-lg;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .btn-outline {
     @apply border-2 border-primary-600 text-primary-600 hover:bg-primary-50 focus:ring-primary-500 bg-white shadow-sm hover:shadow-md active:bg-primary-100 hover:-translate-y-0.5 hover:shadow-lg;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .btn-ghost {
     @apply text-secondary-600 hover:bg-secondary-50 focus:ring-secondary-500 active:bg-secondary-100 hover:-translate-y-0.5;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .btn-gradient {
     @apply bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 focus:ring-primary-500 shadow-sm hover:shadow-md active:from-primary-800 active:to-primary-900 hover:-translate-y-0.5 hover:shadow-lg;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* Modern card styles */
   .card {
-    @apply bg-white rounded-xl border border-neutral-200 shadow-card hover:shadow-card-hover transition-all duration-300 backdrop-blur-sm;
+    @apply bg-white rounded-xl border border-neutral-200 shadow-card hover:shadow-card-hover backdrop-blur-sm;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   .card-elevated {
-    @apply bg-white rounded-xl border border-neutral-200 shadow-md hover:shadow-lg transition-all duration-300 backdrop-blur-sm;
+    @apply bg-white rounded-xl border border-neutral-200 shadow-md hover:shadow-lg backdrop-blur-sm;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   .card-glass {
     @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-lg;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .card-gradient {
-    @apply bg-gradient-to-br from-white to-neutral-50 rounded-xl border border-neutral-200 shadow-card hover:shadow-card-hover transition-all duration-300;
+    @apply bg-gradient-to-br from-white to-neutral-50 rounded-xl border border-neutral-200 shadow-card hover:shadow-card-hover;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   /* Modern input styles */
@@ -157,19 +211,29 @@
 
   /* Modern hover effects */
   .hover-lift {
-    @apply transition-all duration-300 hover:-translate-y-2 hover:shadow-lg;
+    @apply hover:-translate-y-2 hover:shadow-lg;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   .hover-glow {
-    @apply transition-all duration-300 hover:shadow-glow;
+    @apply hover:shadow-glow;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .hover-scale {
-    @apply transition-transform duration-300 hover:scale-105;
+    @apply hover:scale-105;
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   .hover-lift-sm {
-    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-md;
+    @apply hover:-translate-y-1 hover:shadow-md;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateZ(0);
+    will-change: transform;
   }
 
   /* Modern badge styles */
@@ -307,19 +371,23 @@
 
   /* Animation utilities */
   .animate-float {
-    animation: float 3s ease-in-out infinite;
+    animation: float 2s ease-in-out infinite;
+    will-change: transform;
   }
 
   .animate-pulse-slow {
-    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    will-change: opacity;
   }
 
   .animate-shimmer {
-    animation: shimmer 2s linear infinite;
+    animation: shimmer 1.5s linear infinite;
+    will-change: transform;
   }
 
   .animate-gradient {
-    animation: gradient 3s ease infinite;
+    animation: gradient 2s ease infinite;
+    will-change: background-position;
   }
 
   /* Responsive spacing */
@@ -602,6 +670,42 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* تحسينات الأداء الإضافية */
+@layer utilities {
+  /* تسريع جميع الحركات */
+  .fast-transition {
+    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  /* تحسين أداء التمرير */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* تحسين أداء العناصر المتحركة */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    will-change: transform;
+  }
+
+  /* تسريع الـ hover effects */
+  .fast-hover {
+    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  /* تحسين أداء الصور */
+  .optimized-image {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    transform: translateZ(0);
+  }
 }
 
 /* Print styles */
