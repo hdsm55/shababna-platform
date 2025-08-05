@@ -467,8 +467,12 @@ const EventRegistration: React.FC = () => {
                             )}
                       </Alert>
                     ) : (
-                      <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <form
+                        onSubmit={handleSubmit}
+                        className="space-y-3 sm:space-y-4"
+                      >
+                        {/* Name Fields - Stack on Mobile */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                           <Input
                             label={t(
                               'events.registration.firstName',
@@ -479,6 +483,7 @@ const EventRegistration: React.FC = () => {
                               handleInputChange('firstName', e.target.value)
                             }
                             required
+                            className="text-sm sm:text-base"
                           />
                           <Input
                             label={t(
@@ -490,6 +495,7 @@ const EventRegistration: React.FC = () => {
                               handleInputChange('lastName', e.target.value)
                             }
                             required
+                            className="text-sm sm:text-base"
                           />
                         </div>
 
@@ -504,6 +510,7 @@ const EventRegistration: React.FC = () => {
                             handleInputChange('email', e.target.value)
                           }
                           required
+                          className="text-sm sm:text-base"
                         />
 
                         <Input
@@ -514,6 +521,7 @@ const EventRegistration: React.FC = () => {
                             handleInputChange('phone', e.target.value)
                           }
                           required
+                          className="text-sm sm:text-base"
                         />
 
                         <div>
@@ -525,8 +533,8 @@ const EventRegistration: React.FC = () => {
                             onChange={(e) =>
                               handleInputChange('message', e.target.value)
                             }
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                            rows={3}
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm sm:text-base"
+                            rows={2}
                             placeholder="أضف رسالة أو ملاحظات..."
                           />
                         </div>
@@ -534,7 +542,7 @@ const EventRegistration: React.FC = () => {
                         <Button
                           type="submit"
                           variant="primary"
-                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3"
+                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-2 sm:py-3 text-sm sm:text-base"
                           disabled={isSubmitting}
                         >
                           {isSubmitting ? (

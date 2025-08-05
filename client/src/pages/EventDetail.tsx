@@ -523,47 +523,52 @@ const EventDetail: React.FC = () => {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl"
+              className="bg-white rounded-2xl p-4 sm:p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto"
             >
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-gray-900">
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
                   {t('eventDetail.register', 'تسجيل في الفعالية')}
                 </h3>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setShowRegistration(false)}
-                  className="rounded-full w-8 h-8 p-0"
+                  className="rounded-full w-8 h-8 p-0 flex-shrink-0"
                 >
                   ×
                 </Button>
               </div>
 
-              {/* Event Summary */}
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg mb-6 border border-blue-200">
-                <h4 className="font-semibold text-gray-900 mb-2">
+              {/* Event Summary - Compact for Mobile */}
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 border border-blue-200">
+                <h4 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">
                   {event.title}
                 </h4>
-                <div className="flex items-center gap-4 text-sm text-gray-600">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
                   <div className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4 text-blue-500" />
+                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
                     <span>{formatDate(event.start_date)}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4 text-red-500" />
-                    <span>{event.location}</span>
+                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
+                    <span className="truncate">{event.location}</span>
                   </div>
                 </div>
               </div>
 
-              <form onSubmit={handleRegistration} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <form
+                onSubmit={handleRegistration}
+                className="space-y-3 sm:space-y-4"
+              >
+                {/* Name Fields - Stack on Mobile */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <Input
                     name="firstName"
                     placeholder={t('eventDetail.firstName', 'الاسم الأول')}
                     value={registrationForm.firstName}
                     onChange={handleInputChange}
                     required
+                    className="text-sm sm:text-base"
                   />
                   <Input
                     name="lastName"
@@ -571,6 +576,7 @@ const EventDetail: React.FC = () => {
                     value={registrationForm.lastName}
                     onChange={handleInputChange}
                     required
+                    className="text-sm sm:text-base"
                   />
                 </div>
 
@@ -581,6 +587,7 @@ const EventDetail: React.FC = () => {
                   value={registrationForm.email}
                   onChange={handleInputChange}
                   required
+                  className="text-sm sm:text-base"
                 />
 
                 <Input
@@ -589,6 +596,7 @@ const EventDetail: React.FC = () => {
                   value={registrationForm.phone}
                   onChange={handleInputChange}
                   required
+                  className="text-sm sm:text-base"
                 />
 
                 <textarea
@@ -596,23 +604,24 @@ const EventDetail: React.FC = () => {
                   placeholder={t('eventDetail.message', 'رسالة (اختياري)')}
                   value={registrationForm.message}
                   onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                  rows={3}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm sm:text-base"
+                  rows={2}
                 />
 
-                <div className="flex gap-3">
+                {/* Buttons - Stack on Mobile */}
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setShowRegistration(false)}
-                    className="flex-1"
+                    className="flex-1 text-sm sm:text-base py-2 sm:py-3"
                   >
                     {t('eventDetail.cancel', 'إلغاء')}
                   </Button>
                   <Button
                     type="submit"
                     disabled={registrationStatus === 'loading'}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-sm sm:text-base py-2 sm:py-3"
                   >
                     {registrationStatus === 'loading' ? (
                       <LoadingSpinner size="sm" />

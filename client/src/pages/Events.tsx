@@ -644,9 +644,13 @@ const Events: React.FC = () => {
               </div>
             </div>
 
-            {/* Registration Form */}
-            <form onSubmit={handleRegistrationSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Registration Form - Mobile Optimized */}
+            <form
+              onSubmit={handleRegistrationSubmit}
+              className="space-y-3 sm:space-y-4"
+            >
+              {/* Name Fields - Stack on Mobile */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <Input
                   label={t('events.registration.firstName', 'الاسم الأول')}
                   value={registrationForm.firstName}
@@ -654,6 +658,7 @@ const Events: React.FC = () => {
                     handleInputChange('firstName', e.target.value)
                   }
                   required
+                  className="text-sm sm:text-base"
                 />
                 <Input
                   label={t('events.registration.lastName', 'اسم العائلة')}
@@ -662,6 +667,7 @@ const Events: React.FC = () => {
                     handleInputChange('lastName', e.target.value)
                   }
                   required
+                  className="text-sm sm:text-base"
                 />
               </div>
 
@@ -671,6 +677,7 @@ const Events: React.FC = () => {
                 value={registrationForm.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
                 required
+                className="text-sm sm:text-base"
               />
 
               <Input
@@ -679,10 +686,16 @@ const Events: React.FC = () => {
                 value={registrationForm.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
                 required
+                className="text-sm sm:text-base"
               />
 
-              <div className="flex gap-3">
-                <Button type="submit" variant="primary" className="flex-1">
+              {/* Buttons - Stack on Mobile */}
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  className="flex-1 text-sm sm:text-base py-2 sm:py-3"
+                >
                   {t('events.registration.submit', 'تأكيد التسجيل')}
                 </Button>
                 <Button
@@ -698,6 +711,7 @@ const Events: React.FC = () => {
                       phone: '',
                     });
                   }}
+                  className="text-sm sm:text-base py-2 sm:py-3"
                 >
                   {t('common.cancel', 'إلغاء')}
                 </Button>
