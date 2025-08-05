@@ -9,6 +9,8 @@ import { ThemeProvider } from './components/ThemeProvider';
 import Layout from './components/layout/Layout';
 import DashboardLayout from './layouts/DashboardLayout';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import PageLoader from './components/common/PageLoader';
+import AppLoader from './components/common/AppLoader';
 
 // Lazy load pages for better performance
 const Home = lazy(() => import('./pages/Home'));
@@ -76,257 +78,371 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <ErrorBoundary>
-      <HelmetProvider>
-        <QueryClientProvider client={queryClient}>
-          <ThemeProvider>
-            <ToastProvider>
-              <BackendIdleHandler>
-                <HashRouter>
-                  <Routes>
-                    {/* Public Routes داخل Layout */}
-                    <Route element={<Layout />}>
+    <AppLoader>
+      <ErrorBoundary>
+        <HelmetProvider>
+          <QueryClientProvider client={queryClient}>
+            <ThemeProvider>
+              <ToastProvider>
+                <BackendIdleHandler>
+                  <HashRouter>
+                    <Routes>
+                      {/* Public Routes داخل Layout */}
+                      <Route element={<Layout />}>
+                        <Route
+                          path="/"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل الصفحة الرئيسية..." />
+                              }
+                            >
+                              <Home />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="/events"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل الفعاليات..." />
+                              }
+                            >
+                              <Events />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="/events/:id"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل تفاصيل الفعالية..." />
+                              }
+                            >
+                              <EventDetail />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="/events/:id/register"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل صفحة التسجيل..." />
+                              }
+                            >
+                              <EventRegistration />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="/programs"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل البرامج..." />
+                              }
+                            >
+                              <Programs />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="/programs/:id"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل تفاصيل البرنامج..." />
+                              }
+                            >
+                              <ProgramDetail />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="/blogs"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل المدونة..." />
+                              }
+                            >
+                              <Blogs />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="/blogs/:id"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل المقال..." />
+                              }
+                            >
+                              <BlogDetail />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="/contact"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل صفحة التواصل..." />
+                              }
+                            >
+                              <Contact />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="/donations"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل صفحة التبرعات..." />
+                              }
+                            >
+                              <Donations />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="/join-us"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل صفحة الانضمام..." />
+                              }
+                            >
+                              <JoinUs />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="/volunteers"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل صفحة المتطوعين..." />
+                              }
+                            >
+                              <Volunteers />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="*"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل الصفحة..." />
+                              }
+                            >
+                              <NotFound />
+                            </Suspense>
+                          }
+                        />
+                      </Route>
+
+                      {/* Auth Routes */}
                       <Route
-                        path="/"
+                        path="/login"
                         element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <Home />
+                          <Suspense
+                            fallback={
+                              <PageLoader message="جاري تحميل صفحة تسجيل الدخول..." />
+                            }
+                          >
+                            <Login />
                           </Suspense>
                         }
                       />
                       <Route
-                        path="/events"
+                        path="/register"
                         element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <Events />
+                          <Suspense
+                            fallback={
+                              <PageLoader message="جاري تحميل صفحة التسجيل..." />
+                            }
+                          >
+                            <Register />
                           </Suspense>
                         }
                       />
                       <Route
-                        path="/events/:id"
+                        path="/create-admin"
                         element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <EventDetail />
+                          <Suspense
+                            fallback={
+                              <PageLoader message="جاري تحميل صفحة إنشاء المدير..." />
+                            }
+                          >
+                            <CreateAdmin />
                           </Suspense>
                         }
                       />
-                      <Route
-                        path="/events/:id/register"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <EventRegistration />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="/programs"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <Programs />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="/programs/:id"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <ProgramDetail />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="/blogs"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <Blogs />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="/blogs/:id"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <BlogDetail />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="/contact"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <Contact />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="/donations"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <Donations />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="/join-us"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <JoinUs />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="/volunteers"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <Volunteers />
-                          </Suspense>
-                        }
-                      />
+
+                      {/* Dashboard Routes - منفصلة عن Layout العام */}
+                      <Route path="/dashboard" element={<DashboardLayout />}>
+                        <Route
+                          index
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل لوحة التحكم..." />
+                              }
+                            >
+                              <Dashboard />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="events"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل إدارة الفعاليات..." />
+                              }
+                            >
+                              <DashboardEvents />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="programs"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل إدارة البرامج..." />
+                              }
+                            >
+                              <DashboardPrograms />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="blogs"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل إدارة المدونة..." />
+                              }
+                            >
+                              <DashboardBlogs />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="users"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل إدارة المستخدمين..." />
+                              }
+                            >
+                              <DashboardUsers />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="registrants"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل قائمة المسجلين..." />
+                              }
+                            >
+                              <DashboardRegistrants />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="contact-forms"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل رسائل التواصل..." />
+                              }
+                            >
+                              <DashboardContactForms />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="analytics"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل التحليلات..." />
+                              }
+                            >
+                              <DashboardAnalytics />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="activities"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل النشاطات..." />
+                              }
+                            >
+                              <DashboardActivities />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="reports"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل التقارير..." />
+                              }
+                            >
+                              <DashboardReports />
+                            </Suspense>
+                          }
+                        />
+                        <Route
+                          path="settings"
+                          element={
+                            <Suspense
+                              fallback={
+                                <PageLoader message="جاري تحميل الإعدادات..." />
+                              }
+                            >
+                              <DashboardSettings />
+                            </Suspense>
+                          }
+                        />
+                      </Route>
+
+                      {/* Catch-all route for 404 */}
                       <Route
                         path="*"
                         element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
+                          <Suspense
+                            fallback={
+                              <PageLoader message="جاري تحميل الصفحة..." />
+                            }
+                          >
                             <NotFound />
                           </Suspense>
                         }
                       />
-                    </Route>
-
-                    {/* Auth Routes */}
-                    <Route
-                      path="/login"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <Login />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/register"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <Register />
-                        </Suspense>
-                      }
-                    />
-                    <Route
-                      path="/create-admin"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <CreateAdmin />
-                        </Suspense>
-                      }
-                    />
-
-                    {/* Dashboard Routes - منفصلة عن Layout العام */}
-                    <Route path="/dashboard" element={<DashboardLayout />}>
-                      <Route
-                        index
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <Dashboard />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="events"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <DashboardEvents />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="programs"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <DashboardPrograms />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="blogs"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <DashboardBlogs />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="users"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <DashboardUsers />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="registrants"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <DashboardRegistrants />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="contact-forms"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <DashboardContactForms />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="analytics"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <DashboardAnalytics />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="activities"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <DashboardActivities />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="reports"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <DashboardReports />
-                          </Suspense>
-                        }
-                      />
-                      <Route
-                        path="settings"
-                        element={
-                          <Suspense fallback={<LoadingSpinner size="lg" />}>
-                            <DashboardSettings />
-                          </Suspense>
-                        }
-                      />
-                    </Route>
-
-                    {/* Catch-all route for 404 */}
-                    <Route
-                      path="*"
-                      element={
-                        <Suspense fallback={<LoadingSpinner size="lg" />}>
-                          <NotFound />
-                        </Suspense>
-                      }
-                    />
-                  </Routes>
-                </HashRouter>
-              </BackendIdleHandler>
-            </ToastProvider>
-          </ThemeProvider>
-        </QueryClientProvider>
-      </HelmetProvider>
-    </ErrorBoundary>
+                    </Routes>
+                  </HashRouter>
+                </BackendIdleHandler>
+              </ToastProvider>
+            </ThemeProvider>
+          </QueryClientProvider>
+        </HelmetProvider>
+      </ErrorBoundary>
+    </AppLoader>
   );
 }
 

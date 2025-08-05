@@ -14,7 +14,7 @@ import {
 import { Input } from '../components/ui/Input/Input';
 import Alert from '../components/common/Alert';
 import { Modal } from '../components/ui/Modal/Modal';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+
 import { fetchEvents } from '../services/eventsApi';
 import { fetchPrograms } from '../services/programsApi';
 import { Program } from '../types';
@@ -686,11 +686,7 @@ const Home: React.FC = () => {
             </p>
           </motion.div>
 
-          {eventsLoading ? (
-            <div className="flex justify-center">
-              <LoadingSpinner />
-            </div>
-          ) : latestEvents.length === 0 ? (
+          {latestEvents.length === 0 ? (
             <Alert type="info">
               {t('home.noEvents', 'لا توجد فعاليات حالياً')}
             </Alert>
@@ -789,11 +785,7 @@ const Home: React.FC = () => {
             </p>
           </motion.div>
 
-          {programsLoading ? (
-            <div className="flex justify-center">
-              <LoadingSpinner />
-            </div>
-          ) : latestPrograms.length === 0 ? (
+          {latestPrograms.length === 0 ? (
             <Alert type="info">
               {t('home.noPrograms', 'لا توجد برامج حالياً')}
             </Alert>
@@ -881,103 +873,6 @@ const Home: React.FC = () => {
               ))}
             </motion.div>
           )}
-        </div>
-      </motion.section>
-
-      {/* Newsletter Section - Enhanced */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.2 }}
-        transition={{ duration: 0.8 }}
-        className="py-20 bg-gradient-to-br from-primary-50 via-accent-50 to-white relative overflow-hidden"
-      >
-        {/* Background decoration */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-primary-200/20 to-transparent rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-br from-accent-200/20 to-transparent rounded-full blur-3xl"></div>
-        </div>
-
-        <div className="container mx-auto px-4 max-w-2xl relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-8"
-          >
-            <h2
-              className="text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary-700 to-accent-700 mb-3"
-              tabIndex={0}
-            >
-              {t('home.newsletter.title', 'اشترك في النشرة البريدية')}
-            </h2>
-            <p className="text-sm text-neutral-700">
-              {t(
-                'home.newsletter.subtitle',
-                'احصل على آخر الأخبار والفعاليات مباشرة في بريدك الإلكتروني'
-              )}
-            </p>
-          </motion.div>
-
-          <motion.form
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            onSubmit={handleNewsletter}
-            className="flex flex-col md:flex-row gap-4 items-center"
-            aria-label={t('home.newsletter.formAria', 'نموذج النشرة البريدية')}
-          >
-            <Input
-              type="email"
-              placeholder={t(
-                'home.newsletter.placeholder',
-                'أدخل بريدك الإلكتروني'
-              )}
-              value={newsletterEmail}
-              onChange={(e) => setNewsletterEmail(e.target.value)}
-              required
-              fullWidth
-              className="flex-1"
-              aria-label={t(
-                'home.newsletter.placeholder',
-                'أدخل بريدك الإلكتروني'
-              )}
-            />
-            <Button
-              type="submit"
-              size="md"
-              variant="accent"
-              disabled={newsletterStatus === 'loading'}
-              aria-busy={newsletterStatus === 'loading'}
-              className="w-full md:w-auto px-6 font-bold shadow-lg hover:shadow-accent-200 transition-all duration-300"
-            >
-              {newsletterStatus === 'loading'
-                ? t('home.newsletter.loading', 'جاري الإرسال...')
-                : t('home.newsletter.cta', 'اشترك')}
-            </Button>
-          </motion.form>
-
-          <AnimatePresence>
-            {newsletterStatus !== 'idle' && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="mt-6"
-              >
-                <Alert
-                  type={newsletterStatus === 'success' ? 'success' : 'error'}
-                  className="text-center"
-                  aria-live="polite"
-                >
-                  {newsletterMsg}
-                </Alert>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </motion.section>
 

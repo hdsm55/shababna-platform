@@ -107,6 +107,72 @@ const ContactForms: React.FC = () => {
     }
   };
 
+  const handleExportData = () => {
+    if (!contactFormsData?.data?.forms) {
+      setModalMsg('❌ لا توجد بيانات للتصدير');
+      return;
+    }
+
+    try {
+      // تحضير البيانات للتصدير
+      const exportData = contactFormsData.data.forms.map((form: any) => ({
+        name: form.name,
+        email: form.email,
+        subject: form.subject,
+        message: form.message,
+        status: form.is_read ? 'مقروءة' : 'غير مقروءة',
+        date: new Date(form.created_at).toLocaleDateString('ar-SA'),
+      }));
+
+      // تحويل البيانات إلى CSV
+      const headers = [
+        'الاسم',
+        'البريد الإلكتروني',
+        'الموضوع',
+        'الرسالة',
+        'الحالة',
+        'التاريخ',
+      ];
+      const csvContent = [
+        headers.join(','),
+        ...exportData.map((row: any) =>
+          [
+            `"${row.name}"`,
+            `"${row.email}"`,
+            `"${row.subject}"`,
+            `"${row.message}"`,
+            `"${row.status}"`,
+            `"${row.date}"`,
+          ].join(',')
+        ),
+      ].join('\n');
+
+      // إنشاء ملف CSV وتنزيله
+      const blob = new Blob(['\uFEFF' + csvContent], {
+        type: 'text/csv;charset=utf-8;',
+      });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute(
+        'download',
+        `رسائل_التواصل_${new Date().toLocaleDateString('ar-SA')}.csv`
+      );
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setModalMsg(
+        `✅ تم تصدير ${
+          exportData.length
+        } رسالة بنجاح!\n\n📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}`
+      );
+    } catch (error) {
+      setModalMsg('❌ حدث خطأ أثناء تصدير البيانات');
+    }
+  };
+
   const filteredForms =
     contactFormsData?.data?.forms?.filter(
       (form: any) =>
@@ -189,7 +255,7 @@ const ContactForms: React.FC = () => {
                 size="sm"
                 icon={Download}
                 onClick={() => {
-                  // TODO: Implement export functionality
+                  handleExportData();
                 }}
               >
                 {t('dashboard.contactForms.export', 'تصدير')}

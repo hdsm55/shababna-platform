@@ -420,18 +420,46 @@ const EventDetail: React.FC = () => {
                     {t('eventDetail.contactInfo', 'معلومات التواصل')}
                   </h3>
                   <div className="space-y-2 text-sm text-gray-600">
-                    <div className="flex items-center p-2 hover:bg-gray-50 rounded">
+                    <a
+                      href="tel:+905050505645"
+                      className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors duration-200"
+                    >
                       <Phone className="w-4 h-4 mr-2 text-green-500" />
-                      <span>+905050505645</span>
-                    </div>
-                    <div className="flex items-center p-2 hover:bg-gray-50 rounded">
+                      <span className="text-blue-600 hover:text-blue-800">
+                        +905050505645
+                      </span>
+                    </a>
+                    <a
+                      href="mailto:info@shaababna.com"
+                      className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors duration-200"
+                    >
                       <Mail className="w-4 h-4 mr-2 text-blue-500" />
-                      <span>info@shaababna.com</span>
-                    </div>
-                    <div className="flex items-center p-2 hover:bg-gray-50 rounded">
+                      <span className="text-blue-600 hover:text-blue-800">
+                        info@shaababna.com
+                      </span>
+                    </a>
+                    <a
+                      href="https://maps.app.goo.gl/yz4Nc1RmLt6CuTh47"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors duration-200"
+                    >
+                      <MapPin className="w-4 h-4 mr-2 text-red-500" />
+                      <span className="text-blue-600 hover:text-blue-800">
+                        موقعنا على الخريطة
+                      </span>
+                    </a>
+                    <a
+                      href="https://shaababna.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors duration-200"
+                    >
                       <Globe className="w-4 h-4 mr-2 text-purple-500" />
-                      <span>www.shababna.com</span>
-                    </div>
+                      <span className="text-blue-600 hover:text-blue-800">
+                        www.shaababna.com
+                      </span>
+                    </a>
                   </div>
                 </div>
               </Card>
