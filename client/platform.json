@@ -1,37 +1,30 @@
 {
-  "routes": [
-    {
-      "route": "/*",
-      "serve": "/index.html",
-      "statusCode": 200
+  "name": "shababna-frontend",
+  "type": "static",
+  "build": {
+    "flavor": "nodejs",
+    "dependencies": {
+      "nodejs": "18"
     }
-  ],
-  "headers": {
-    "/*": {
-      "X-Frame-Options": "DENY",
-      "X-Content-Type-Options": "no-sniff",
-      "X-XSS-Protection": "1; mode=block",
-      "Referrer-Policy": "no-referrer-when-downgrade"
+  },
+  "deploy": {
+    "static": {
+      "document_root": "dist",
+      "index_document": "index.html",
+      "error_document": "index.html"
+    }
+  },
+  "routes": {
+    "/": {
+      "type": "upstream",
+      "upstream": "app:http"
     },
     "/api/*": {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization"
-    },
-    "*.js": {
-      "Cache-Control": "public, max-age=31536000, immutable"
-    },
-    "*.css": {
-      "Cache-Control": "public, max-age=31536000, immutable"
-    },
-    "*.png": {
-      "Cache-Control": "public, max-age=31536000, immutable"
-    },
-    "*.jpg": {
-      "Cache-Control": "public, max-age=31536000, immutable"
-    },
-    "*.svg": {
-      "Cache-Control": "public, max-age=31536000, immutable"
+      "type": "redirect",
+      "to": "https://shababna-backend.onrender.com/api/$1"
     }
+  },
+  "variables": {
+    "NODE_ENV": "production"
   }
 }

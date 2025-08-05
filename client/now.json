@@ -3,13 +3,17 @@
   "builds": [
     {
       "src": "package.json",
-      "use": "@now/static-build",
+      "use": "@vercel/static-build",
       "config": {
         "distDir": "dist"
       }
     }
   ],
   "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "https://shababna-backend.onrender.com/api/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "/index.html"
@@ -25,7 +29,7 @@
         },
         {
           "key": "X-Content-Type-Options",
-          "value": "no-sniff"
+          "value": "nosniff"
         },
         {
           "key": "X-XSS-Protection",
@@ -34,28 +38,15 @@
         {
           "key": "Referrer-Policy",
           "value": "no-referrer-when-downgrade"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
         }
       ]
     },
     {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, PUT, DELETE, OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization"
-        }
-      ]
-    },
-    {
-      "source": "/(.*).js",
+      "source": "/assets/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -64,16 +55,7 @@
       ]
     },
     {
-      "source": "/(.*).css",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/(.*).(png|jpg|jpeg|gif|svg|ico)",
+      "source": "/(.*\\.(js|css|png|jpg|svg|ico|woff|woff2|ttf|eot))",
       "headers": [
         {
           "key": "Cache-Control",

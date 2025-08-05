@@ -3,300 +3,323 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اختبار جميع APIs</title>
+    <title>API Test - Shababna</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             margin: 0;
             padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            color: white;
         }
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
         h1 {
             text-align: center;
-            color: #333;
             margin-bottom: 30px;
+            color: #fff;
+            font-size: 2.5em;
         }
-        .test-section {
-            margin: 20px 0;
-            padding: 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            background: #f9f9f9;
-        }
-        .test-grid {
+        .api-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
-            margin-top: 20px;
+            margin-bottom: 30px;
         }
-        button {
-            background: #4CAF50;
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            margin: 10px 5px;
+        .api-card {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
         }
-        button:hover {
-            background: #45a049;
+        .api-card:hover {
+            transform: translateY(-5px);
         }
-        .result {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            white-space: pre-wrap;
+        .api-name {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #4ade80;
+        }
+        .api-url {
             font-family: monospace;
-            font-size: 14px;
-            max-height: 300px;
+            font-size: 0.9em;
+            color: #fbbf24;
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+        .api-status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .status-success {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+        }
+        .status-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        .status-loading {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+        .test-button {
+            background: #4ade80;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+        .test-button:hover {
+            background: #22c55e;
+        }
+        .test-button:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+        .response {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.8em;
+            max-height: 100px;
             overflow-y: auto;
         }
-        .success {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
+        .summary {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
         }
-        .error {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-        }
-        .loading {
-            background: #d1ecf1;
-            border: 1px solid #bee5eb;
-            color: #0c5460;
-        }
-        .warning {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
+        .summary h3 {
+            margin-top: 0;
+            color: #4ade80;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔍 اختبار جميع APIs</h1>
+        <h1>🔌 API Test Dashboard</h1>
 
-        <div class="test-section">
-            <h3>اختبار إحصائيات الداشبورد</h3>
-            <button onclick="testDashboardStats()">جلب إحصائيات الداشبورد</button>
-            <div id="dashboard-stats-result" class="result" style="display: none;"></div>
+        <div class="api-grid" id="apiGrid">
+            <!-- API cards will be generated here -->
         </div>
 
-        <div class="test-section">
-            <h3>اختبار الفعاليات</h3>
-            <button onclick="testEvents()">جلب الفعاليات</button>
-            <div id="events-result" class="result" style="display: none;"></div>
-        </div>
-
-        <div class="test-section">
-            <h3>اختبار البرامج</h3>
-            <button onclick="testPrograms()">جلب البرامج</button>
-            <div id="programs-result" class="result" style="display: none;"></div>
-        </div>
-
-        <div class="test-section">
-            <h3>اختبار رسائل التواصل</h3>
-            <button onclick="testContactForms()">جلب رسائل التواصل</button>
-            <div id="contact-forms-result" class="result" style="display: none;"></div>
-        </div>
-
-        <div class="test-section">
-            <h3>اختبار شامل</h3>
-            <button onclick="runAllTests()">تشغيل جميع الاختبارات</button>
-            <div id="all-tests-result" class="result" style="display: none;"></div>
+        <div class="summary">
+            <h3>📊 Test Summary</h3>
+            <div id="summaryContent">
+                <p>Click "Test All APIs" to start testing...</p>
+            </div>
+            <button class="test-button" onclick="testAllAPIs()">Test All APIs</button>
         </div>
     </div>
 
     <script>
-        const API_BASE = 'http://localhost:5000/api';
+        const APIs = [
+            {
+                name: 'Auth - Login',
+                url: 'https://shababna-backend.onrender.com/api/auth/login',
+                method: 'POST',
+                testData: { email: 'test@example.com', password: 'test123' }
+            },
+            {
+                name: 'Auth - Register',
+                url: 'https://shababna-backend.onrender.com/api/auth/register',
+                method: 'POST',
+                testData: {
+                    email: 'test@example.com',
+                    password: 'test123',
+                    first_name: 'Test',
+                    last_name: 'User'
+                }
+            },
+            {
+                name: 'Events - List',
+                url: 'https://shababna-backend.onrender.com/api/events',
+                method: 'GET'
+            },
+            {
+                name: 'Events - Single',
+                url: 'https://shababna-backend.onrender.com/api/events/1',
+                method: 'GET'
+            },
+            {
+                name: 'Programs - List',
+                url: 'https://shababna-backend.onrender.com/api/programs',
+                method: 'GET'
+            },
+            {
+                name: 'Programs - Single',
+                url: 'https://shababna-backend.onrender.com/api/programs/1',
+                method: 'GET'
+            },
+            {
+                name: 'Blogs - List',
+                url: 'https://shababna-backend.onrender.com/api/blogs',
+                method: 'GET'
+            },
+            {
+                name: 'Blogs - Single',
+                url: 'https://shababna-backend.onrender.com/api/blogs/1',
+                method: 'GET'
+            },
+            {
+                name: 'Users - List',
+                url: 'https://shababna-backend.onrender.com/api/users',
+                method: 'GET'
+            },
+            {
+                name: 'Contact Forms',
+                url: 'https://shababna-backend.onrender.com/api/forms',
+                method: 'GET'
+            },
+            {
+                name: 'Dashboard - Analytics',
+                url: 'https://shababna-backend.onrender.com/api/dashboard/analytics',
+                method: 'GET'
+            },
+            {
+                name: 'Health Check',
+                url: 'https://shababna-backend.onrender.com/api/health',
+                method: 'GET'
+            }
+        ];
 
-        async function makeRequest(endpoint, options = {}) {
+        function createAPICard(api, index) {
+            return `
+                <div class="api-card">
+                    <div class="api-name">${api.name}</div>
+                    <div class="api-url">${api.method} ${api.url}</div>
+                    <div class="api-status status-loading" id="status-${index}">⏳ Waiting...</div>
+                    <button class="test-button" onclick="testAPI(${index})">Test API</button>
+                    <div class="response" id="response-${index}" style="display: none;"></div>
+                </div>
+            `;
+        }
+
+        function renderAPIs() {
+            const grid = document.getElementById('apiGrid');
+            grid.innerHTML = APIs.map((api, index) => createAPICard(api, index)).join('');
+        }
+
+        async function testAPI(index) {
+            const api = APIs[index];
+            const statusElement = document.getElementById(`status-${index}`);
+            const responseElement = document.getElementById(`response-${index}`);
+            const button = statusElement.nextElementSibling;
+
+            statusElement.className = 'api-status status-loading';
+            statusElement.textContent = '⏳ Testing...';
+            button.disabled = true;
+
             try {
-                const response = await fetch(`${API_BASE}${endpoint}`, {
+                const options = {
+                    method: api.method,
                     headers: {
-                        'Authorization': 'Bearer test-token',
                         'Content-Type': 'application/json',
-                        ...options.headers
-                    },
-                    ...options
-                });
+                    }
+                };
 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                if (api.testData) {
+                    options.body = JSON.stringify(api.testData);
                 }
 
-                return await response.json();
+                const response = await fetch(api.url, options);
+                const data = await response.json();
+
+                statusElement.className = 'api-status status-success';
+                statusElement.textContent = `✅ ${response.status} ${response.statusText}`;
+
+                responseElement.style.display = 'block';
+                responseElement.textContent = JSON.stringify(data, null, 2);
+
             } catch (error) {
-                throw error;
+                statusElement.className = 'api-status status-error';
+                statusElement.textContent = `❌ Error: ${error.message}`;
+
+                responseElement.style.display = 'block';
+                responseElement.textContent = `Error: ${error.message}`;
             }
+
+            button.disabled = false;
         }
 
-        async function testDashboardStats() {
-            const resultDiv = document.getElementById('dashboard-stats-result');
-            resultDiv.style.display = 'block';
-            resultDiv.className = 'result loading';
-            resultDiv.textContent = 'جاري جلب إحصائيات الداشبورد...';
+        async function testAllAPIs() {
+            const summaryElement = document.getElementById('summaryContent');
+            summaryElement.innerHTML = '<p>🔄 Testing all APIs...</p>';
 
-            try {
-                console.log('🔍 اختبار إحصائيات الداشبورد...');
-                const data = await makeRequest('/dashboard/stats');
-                console.log('📊 استجابة إحصائيات الداشبورد:', data);
+            let successCount = 0;
+            let errorCount = 0;
 
-                if (data.success) {
-                    resultDiv.className = 'result success';
-                    resultDiv.textContent = `✅ نجح اختبار إحصائيات الداشبورد!\n\n📊 البيانات:\n${JSON.stringify(data.data, null, 2)}`;
-                } else {
-                    resultDiv.className = 'result error';
-                    resultDiv.textContent = `❌ فشل الاختبار: ${data.message}`;
+            for (let i = 0; i < APIs.length; i++) {
+                const api = APIs[i];
+                const statusElement = document.getElementById(`status-${i}`);
+                const responseElement = document.getElementById(`response-${i}`);
+
+                statusElement.className = 'api-status status-loading';
+                statusElement.textContent = '⏳ Testing...';
+
+                try {
+                    const options = {
+                        method: api.method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    };
+
+                    if (api.testData) {
+                        options.body = JSON.stringify(api.testData);
+                    }
+
+                    const response = await fetch(api.url, options);
+
+                    if (response.ok) {
+                        statusElement.className = 'api-status status-success';
+                        statusElement.textContent = `✅ ${response.status}`;
+                        successCount++;
+                    } else {
+                        statusElement.className = 'api-status status-error';
+                        statusElement.textContent = `❌ ${response.status}`;
+                        errorCount++;
+                    }
+
+                } catch (error) {
+                    statusElement.className = 'api-status status-error';
+                    statusElement.textContent = `❌ Error`;
+                    errorCount++;
                 }
-            } catch (error) {
-                console.error('❌ خطأ في اختبار إحصائيات الداشبورد:', error);
-                resultDiv.className = 'result error';
-                resultDiv.textContent = `❌ خطأ في الاتصال: ${error.message}`;
+
+                // Add delay between requests
+                await new Promise(resolve => setTimeout(resolve, 500));
             }
+
+            summaryElement.innerHTML = `
+                <p>✅ Successful: ${successCount}</p>
+                <p>❌ Failed: ${errorCount}</p>
+                <p>📊 Total: ${APIs.length}</p>
+                <p>🎯 Success Rate: ${Math.round((successCount / APIs.length) * 100)}%</p>
+            `;
         }
 
-        async function testEvents() {
-            const resultDiv = document.getElementById('events-result');
-            resultDiv.style.display = 'block';
-            resultDiv.className = 'result loading';
-            resultDiv.textContent = 'جاري جلب الفعاليات...';
-
-            try {
-                console.log('🔍 اختبار الفعاليات...');
-                const data = await makeRequest('/events');
-                console.log('📊 استجابة الفعاليات:', data);
-
-                if (data.success) {
-                    const events = data.data?.events || data.data || [];
-                    resultDiv.className = 'result success';
-                    resultDiv.textContent = `✅ نجح اختبار الفعاليات!\n\n📊 عدد الفعاليات: ${events.length}\n\n📋 الفعاليات:\n${events.map((event, index) =>
-                        `${index + 1}. ${event.title} - ${event.status}`
-                    ).join('\n') || 'لا توجد فعاليات'}`;
-                } else {
-                    resultDiv.className = 'result error';
-                    resultDiv.textContent = `❌ فشل الاختبار: ${data.message}`;
-                }
-            } catch (error) {
-                console.error('❌ خطأ في اختبار الفعاليات:', error);
-                resultDiv.className = 'result error';
-                resultDiv.textContent = `❌ خطأ في الاتصال: ${error.message}`;
-            }
-        }
-
-        async function testPrograms() {
-            const resultDiv = document.getElementById('programs-result');
-            resultDiv.style.display = 'block';
-            resultDiv.className = 'result loading';
-            resultDiv.textContent = 'جاري جلب البرامج...';
-
-            try {
-                console.log('🔍 اختبار البرامج...');
-                const data = await makeRequest('/programs');
-                console.log('📊 استجابة البرامج:', data);
-
-                if (data.success) {
-                    const programs = data.data?.programs || data.data || [];
-                    resultDiv.className = 'result success';
-                    resultDiv.textContent = `✅ نجح اختبار البرامج!\n\n📊 عدد البرامج: ${programs.length}\n\n📋 البرامج:\n${programs.map((program, index) =>
-                        `${index + 1}. ${program.title} - ${program.status}`
-                    ).join('\n') || 'لا توجد برامج'}`;
-                } else {
-                    resultDiv.className = 'result error';
-                    resultDiv.textContent = `❌ فشل الاختبار: ${data.message}`;
-                }
-            } catch (error) {
-                console.error('❌ خطأ في اختبار البرامج:', error);
-                resultDiv.className = 'result error';
-                resultDiv.textContent = `❌ خطأ في الاتصال: ${error.message}`;
-            }
-        }
-
-        async function testContactForms() {
-            const resultDiv = document.getElementById('contact-forms-result');
-            resultDiv.style.display = 'block';
-            resultDiv.className = 'result loading';
-            resultDiv.textContent = 'جاري جلب رسائل التواصل...';
-
-            try {
-                console.log('🔍 اختبار رسائل التواصل...');
-                const data = await makeRequest('/forms/contact-forms');
-                console.log('📊 استجابة رسائل التواصل:', data);
-
-                if (data.success) {
-                    const forms = data.data?.forms || data.data || [];
-                    resultDiv.className = 'result success';
-                    resultDiv.textContent = `✅ نجح اختبار رسائل التواصل!\n\n📊 عدد الرسائل: ${forms.length}\n\n📋 الرسائل:\n${forms.map((form, index) =>
-                        `${index + 1}. ${form.name} (${form.email}) - ${form.subject}`
-                    ).join('\n') || 'لا توجد رسائل'}`;
-                } else {
-                    resultDiv.className = 'result error';
-                    resultDiv.textContent = `❌ فشل الاختبار: ${data.message}`;
-                }
-            } catch (error) {
-                console.error('❌ خطأ في اختبار رسائل التواصل:', error);
-                resultDiv.className = 'result error';
-                resultDiv.textContent = `❌ خطأ في الاتصال: ${error.message}`;
-            }
-        }
-
-        async function runAllTests() {
-            const resultDiv = document.getElementById('all-tests-result');
-            resultDiv.style.display = 'block';
-            resultDiv.className = 'result loading';
-            resultDiv.textContent = 'جاري تشغيل جميع الاختبارات...\n\n';
-
-            const results = [];
-
-            // اختبار إحصائيات الداشبورد
-            try {
-                const statsData = await makeRequest('/dashboard/stats');
-                results.push(`✅ إحصائيات الداشبورد: نجح`);
-            } catch (error) {
-                results.push(`❌ إحصائيات الداشبورد: فشل - ${error.message}`);
-            }
-
-            // اختبار الفعاليات
-            try {
-                const eventsData = await makeRequest('/events');
-                const eventsCount = eventsData.data?.events?.length || eventsData.data?.length || 0;
-                results.push(`✅ الفعاليات: نجح (${eventsCount} فعالية)`);
-            } catch (error) {
-                results.push(`❌ الفعاليات: فشل - ${error.message}`);
-            }
-
-            // اختبار البرامج
-            try {
-                const programsData = await makeRequest('/programs');
-                const programsCount = programsData.data?.programs?.length || programsData.data?.length || 0;
-                results.push(`✅ البرامج: نجح (${programsCount} برنامج)`);
-            } catch (error) {
-                results.push(`❌ البرامج: فشل - ${error.message}`);
-            }
-
-            // اختبار رسائل التواصل
-            try {
-                const formsData = await makeRequest('/forms/contact-forms');
-                const formsCount = formsData.data?.forms?.length || formsData.data?.length || 0;
-                results.push(`✅ رسائل التواصل: نجح (${formsCount} رسالة)`);
-            } catch (error) {
-                results.push(`❌ رسائل التواصل: فشل - ${error.message}`);
-            }
-
-            resultDiv.className = 'result success';
-            resultDiv.textContent = `📊 نتائج جميع الاختبارات:\n\n${results.join('\n')}`;
-        }
+        // Initialize the page
+        renderAPIs();
     </script>
 </body>
 </html>

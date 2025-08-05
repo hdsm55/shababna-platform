@@ -78,7 +78,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// JSON parsing error handling middleware
+// معالجة أخطاء JSON parsing
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
     console.error('❌ JSON parsing error:', err.message);
@@ -88,33 +88,36 @@ app.use((err, req, res, next) => {
       error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
+
+  // معالجة أخطاء stream
+  if (err.type === 'stream.not.readable') {
+    console.error('❌ Stream error:', err.message);
+    return res.status(400).json({
+      success: false,
+      message: 'خطأ في معالجة البيانات - يرجى المحاولة مرة أخرى',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+
   next(err);
 });
 
-// إضافة middleware لمعالجة JSON بشكل أفضل
-app.use((req, res, next) => {
-  if (req.method === 'POST' && req.headers['content-type']?.includes('application/json')) {
-    let data = '';
-    req.on('data', chunk => {
-      data += chunk;
-    });
-    req.on('end', () => {
-      try {
-        req.body = JSON.parse(data);
-        next();
-      } catch (error) {
-        console.error('❌ JSON parsing error in middleware:', error);
-        res.status(400).json({
-          success: false,
-          message: 'بيانات JSON غير صحيحة',
-          error: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
-      }
-    });
-  } else {
-    next();
+// إعدادات body-parser محسنة
+app.use(bodyParser.json({
+  limit: '10mb',
+  verify: (req, res, buf) => {
+    try {
+      JSON.parse(buf);
+    } catch (e) {
+      throw new Error('Invalid JSON');
+    }
   }
-});
+}));
+
+app.use(bodyParser.urlencoded({
+  extended: true,
+  limit: '10mb'
+}));
 // CORS configuration
 const corsOptions = {
   origin: function (origin, callback) {
@@ -150,9 +153,6 @@ app.use(cors(corsOptions));
 
 // Handle preflight requests
 app.options('*', cors(corsOptions));
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 // جعل مجلد uploads متاحاً للقراءة عبر HTTP
 app.use('/uploads', express.static(path.join(process.cwd(), 'server', 'uploads')));

@@ -3,47 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اختبار رسائل التواصل</title>
+    <title>Contact Forms Test - Shababna</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             margin: 0;
             padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            color: white;
         }
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
         h1 {
             text-align: center;
-            color: #333;
             margin-bottom: 30px;
+            color: #fff;
+            font-size: 2.5em;
         }
         .test-section {
-            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.2);
             padding: 20px;
-            border: 2px solid #e0e0e0;
             border-radius: 10px;
-            background: #f9f9f9;
+            margin-bottom: 20px;
         }
-        button {
-            background: #4CAF50;
+        .test-button {
+            background: #4ade80;
             color: white;
-            padding: 12px 24px;
             border: none;
+            padding: 12px 24px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
+            font-weight: bold;
             margin: 10px 5px;
+            transition: background 0.3s ease;
         }
-        button:hover {
-            background: #45a049;
+        .test-button:hover {
+            background: #22c55e;
+        }
+        .test-button:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
         }
         .result {
             margin-top: 20px;
@@ -52,109 +60,352 @@
             white-space: pre-wrap;
             font-family: monospace;
             font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
         }
         .success {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
+            background: rgba(74, 222, 128, 0.2);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            color: #4ade80;
         }
         .error {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
         }
         .loading {
-            background: #d1ecf1;
-            border: 1px solid #bee5eb;
-            color: #0c5460;
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            color: #fbbf24;
+        }
+        .forms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .form-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .form-name {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #4ade80;
+        }
+        .form-email {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+        }
+        .form-subject {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        .form-message {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        .form-meta {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .form-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status-new {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+        .status-read {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+        .status-replied {
+            background: rgba(168, 85, 247, 0.2);
+            color: #a855f7;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔍 اختبار رسائل التواصل</h1>
+        <h1>📧 Contact Forms Test Dashboard</h1>
 
         <div class="test-section">
-            <h3>اختبار API رسائل التواصل</h3>
-            <button onclick="testContactForms()">جلب رسائل التواصل</button>
-            <div id="contact-forms-result" class="result" style="display: none;"></div>
+            <h3>🔍 اختبار APIs الخاصة بنماذج التواصل</h3>
+            <button class="test-button" onclick="testContactFormsList()">اختبار قائمة النماذج</button>
+            <button class="test-button" onclick="testContactFormDetail()">اختبار تفاصيل نموذج</button>
+            <button class="test-button" onclick="testSubmitContactForm()">اختبار إرسال نموذج</button>
+            <button class="test-button" onclick="testUpdateFormStatus()">اختبار تحديث حالة النموذج</button>
+            <button class="test-button" onclick="testDeleteForm()">اختبار حذف نموذج</button>
+            <button class="test-button" onclick="runAllFormTests()">تشغيل جميع الاختبارات</button>
         </div>
 
         <div class="test-section">
-            <h3>إحصائيات سريعة</h3>
-            <button onclick="showStats()">عرض الإحصائيات</button>
-            <div id="stats-result" class="result" style="display: none;"></div>
+            <h3>📊 نتائج الاختبارات</h3>
+            <div id="test-results" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📧 عرض نماذج التواصل</h3>
+            <div id="forms-display" class="forms-grid"></div>
         </div>
     </div>
 
     <script>
-        async function testContactForms() {
-            const resultDiv = document.getElementById('contact-forms-result');
-            resultDiv.style.display = 'block';
-            resultDiv.className = 'result loading';
-            resultDiv.textContent = 'جاري جلب البيانات...';
+        const API_BASE = 'https://shababna-backend.onrender.com/api';
 
+        async function makeRequest(endpoint, options = {}) {
             try {
-                console.log('🔍 اختبار API رسائل التواصل...');
-                const response = await fetch('http://localhost:5000/api/forms/contact-forms', {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
                     headers: {
-                        'Authorization': 'Bearer test-token',
-                        'Content-Type': 'application/json'
-                    }
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
                 });
 
-                const data = await response.json();
-                console.log('📊 استجابة API:', data);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        function showResult(message, type = 'success') {
+            const resultDiv = document.getElementById('test-results');
+            resultDiv.style.display = 'block';
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+        }
+
+        function getStatusClass(status) {
+            switch (status) {
+                case 'new': return 'status-new';
+                case 'read': return 'status-read';
+                case 'replied': return 'status-replied';
+                default: return 'status-new';
+            }
+        }
+
+        function getStatusText(status) {
+            switch (status) {
+                case 'new': return 'جديد';
+                case 'read': return 'مقروء';
+                case 'replied': return 'تم الرد';
+                default: return 'جديد';
+            }
+        }
+
+        async function testContactFormsList() {
+            showResult('⏳ جاري اختبار قائمة نماذج التواصل...', 'loading');
+
+            try {
+                console.log('🔍 اختبار قائمة نماذج التواصل...');
+                const data = await makeRequest('/forms/contact-forms');
+                console.log('📊 استجابة نماذج التواصل:', data);
 
                 if (data.success) {
-                    resultDiv.className = 'result success';
-                    resultDiv.textContent = `✅ نجح الاختبار!\n\n📊 عدد الرسائل: ${data.data?.forms?.length || 0}\n\n📋 الرسائل:\n${data.data?.forms?.map((form, index) =>
-                        `${index + 1}. ${form.name} (${form.email})\n   الموضوع: ${form.subject}\n   التاريخ: ${new Date(form.created_at).toLocaleDateString('ar-SA')}\n   مقروءة: ${form.is_read ? 'نعم' : 'لا'}`
-                    ).join('\n\n') || 'لا توجد رسائل'}`;
+                    const forms = data.data?.forms || data.data || [];
+                    showResult(`✅ نجح اختبار قائمة نماذج التواصل!\n\n📊 عدد النماذج: ${forms.length}\n\n📋 النماذج:\n${forms.map((form, index) =>
+                        `${index + 1}. ${form.name} (${form.email}) - ${form.subject}`
+                    ).join('\n') || 'لا توجد نماذج'}`);
+
+                    displayForms(forms);
                 } else {
-                    resultDiv.className = 'result error';
-                    resultDiv.textContent = `❌ فشل الاختبار: ${data.message}`;
+                    showResult(`❌ فشل الاختبار: ${data.message}`, 'error');
                 }
             } catch (error) {
-                console.error('❌ خطأ في الاختبار:', error);
-                resultDiv.className = 'result error';
-                resultDiv.textContent = `❌ خطأ في الاتصال: ${error.message}`;
+                console.error('❌ خطأ في اختبار نماذج التواصل:', error);
+                showResult(`❌ خطأ في الاتصال: ${error.message}`, 'error');
             }
         }
 
-        async function showStats() {
-            const resultDiv = document.getElementById('stats-result');
-            resultDiv.style.display = 'block';
-            resultDiv.className = 'result loading';
-            resultDiv.textContent = 'جاري حساب الإحصائيات...';
+        async function testContactFormDetail() {
+            showResult('⏳ جاري اختبار تفاصيل نموذج التواصل...', 'loading');
 
             try {
-                const response = await fetch('http://localhost:5000/api/forms/contact-forms', {
-                    headers: {
-                        'Authorization': 'Bearer test-token',
-                        'Content-Type': 'application/json'
-                    }
-                });
+                console.log('🔍 اختبار تفاصيل نموذج التواصل...');
+                const data = await makeRequest('/forms/contact-forms/1');
+                console.log('📊 استجابة تفاصيل النموذج:', data);
 
-                const data = await response.json();
-
-                if (data.success && data.data?.forms) {
-                    const forms = data.data.forms;
-                    const total = forms.length;
-                    const read = forms.filter(f => f.is_read).length;
-                    const unread = total - read;
-
-                    resultDiv.className = 'result success';
-                    resultDiv.textContent = `📊 إحصائيات رسائل التواصل:\n\n📧 إجمالي الرسائل: ${total}\n✅ الرسائل المقروءة: ${read}\n❌ الرسائل غير المقروءة: ${unread}\n📈 نسبة القراءة: ${total > 0 ? Math.round((read / total) * 100) : 0}%`;
+                if (data.success) {
+                    const form = data.data?.form || data.data;
+                    showResult(`✅ نجح اختبار تفاصيل نموذج التواصل!\n\n📝 النموذج:\n${JSON.stringify(form, null, 2)}`);
                 } else {
-                    resultDiv.className = 'result error';
-                    resultDiv.textContent = '❌ فشل في جلب الإحصائيات';
+                    showResult(`❌ فشل الاختبار: ${data.message}`, 'error');
                 }
             } catch (error) {
-                resultDiv.className = 'result error';
-                resultDiv.textContent = `❌ خطأ في الاتصال: ${error.message}`;
+                console.error('❌ خطأ في اختبار تفاصيل النموذج:', error);
+                showResult(`❌ خطأ في الاتصال: ${error.message}`, 'error');
             }
         }
+
+        async function testSubmitContactForm() {
+            showResult('⏳ جاري اختبار إرسال نموذج التواصل...', 'loading');
+
+            try {
+                console.log('🔍 اختبار إرسال نموذج التواصل...');
+                const formData = {
+                    name: 'مستخدم اختبار',
+                    email: 'test@example.com',
+                    subject: 'رسالة اختبار',
+                    message: 'هذه رسالة اختبار لنموذج التواصل',
+                    phone: '+966501234567'
+                };
+
+                const data = await makeRequest('/forms/contact', {
+                    method: 'POST',
+                    body: JSON.stringify(formData)
+                });
+
+                console.log('📊 استجابة إرسال النموذج:', data);
+
+                if (data.success) {
+                    showResult(`✅ نجح اختبار إرسال نموذج التواصل!\n\n📝 النموذج المرسل:\n${JSON.stringify(data.data, null, 2)}`);
+                } else {
+                    showResult(`❌ فشل الاختبار: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('❌ خطأ في اختبار إرسال النموذج:', error);
+                showResult(`❌ خطأ في الاتصال: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUpdateFormStatus() {
+            showResult('⏳ جاري اختبار تحديث حالة النموذج...', 'loading');
+
+            try {
+                console.log('🔍 اختبار تحديث حالة النموذج...');
+                const updateData = {
+                    status: 'read',
+                    admin_notes: 'تم قراءة الرسالة والرد عليها'
+                };
+
+                const data = await makeRequest('/forms/contact-forms/1', {
+                    method: 'PUT',
+                    body: JSON.stringify(updateData)
+                });
+
+                console.log('📊 استجابة تحديث النموذج:', data);
+
+                if (data.success) {
+                    showResult(`✅ نجح اختبار تحديث حالة النموذج!\n\n📝 النموذج المحدث:\n${JSON.stringify(data.data, null, 2)}`);
+                } else {
+                    showResult(`❌ فشل الاختبار: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('❌ خطأ في اختبار تحديث النموذج:', error);
+                showResult(`❌ خطأ في الاتصال: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDeleteForm() {
+            showResult('⏳ جاري اختبار حذف نموذج التواصل...', 'loading');
+
+            try {
+                console.log('🔍 اختبار حذف نموذج التواصل...');
+                const data = await makeRequest('/forms/contact-forms/999', {
+                    method: 'DELETE'
+                });
+
+                console.log('📊 استجابة حذف النموذج:', data);
+
+                if (data.success) {
+                    showResult(`✅ نجح اختبار حذف نموذج التواصل!\n\n📝 النتيجة:\n${JSON.stringify(data, null, 2)}`);
+                } else {
+                    showResult(`❌ فشل الاختبار: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('❌ خطأ في اختبار حذف النموذج:', error);
+                showResult(`❌ خطأ في الاتصال: ${error.message}`, 'error');
+            }
+        }
+
+        async function runAllFormTests() {
+            showResult('⏳ جاري تشغيل جميع اختبارات نماذج التواصل...\n\n', 'loading');
+
+            const results = [];
+
+            // اختبار قائمة النماذج
+            try {
+                const formsData = await makeRequest('/forms/contact-forms');
+                const formsCount = formsData.data?.forms?.length || formsData.data?.length || 0;
+                results.push(`✅ قائمة النماذج: نجح (${formsCount} نموذج)`);
+            } catch (error) {
+                results.push(`❌ قائمة النماذج: فشل - ${error.message}`);
+            }
+
+            // اختبار تفاصيل النموذج
+            try {
+                const formDetailData = await makeRequest('/forms/contact-forms/1');
+                results.push(`✅ تفاصيل النموذج: نجح`);
+            } catch (error) {
+                results.push(`❌ تفاصيل النموذج: فشل - ${error.message}`);
+            }
+
+            // اختبار إرسال النموذج
+            try {
+                const submitData = await makeRequest('/forms/contact', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name: 'مستخدم اختبار شامل',
+                        email: 'test@example.com',
+                        subject: 'رسالة اختبار شامل',
+                        message: 'هذه رسالة اختبار شاملة لنموذج التواصل',
+                        phone: '+966501234567'
+                    })
+                });
+                results.push(`✅ إرسال النموذج: نجح`);
+            } catch (error) {
+                results.push(`❌ إرسال النموذج: فشل - ${error.message}`);
+            }
+
+            showResult(`📊 نتائج جميع اختبارات نماذج التواصل:\n\n${results.join('\n')}`, 'success');
+        }
+
+        function displayForms(forms) {
+            const displayDiv = document.getElementById('forms-display');
+
+            if (!forms || forms.length === 0) {
+                displayDiv.innerHTML = '<p>لا توجد نماذج لعرضها</p>';
+                return;
+            }
+
+            displayDiv.innerHTML = forms.map(form => `
+                <div class="form-card">
+                    <div class="form-name">
+                        ${form.name || 'بدون اسم'}
+                        <span class="form-status ${getStatusClass(form.status)}">${getStatusText(form.status)}</span>
+                    </div>
+                    <div class="form-email">📧 ${form.email || 'غير محدد'}</div>
+                    <div class="form-subject">📝 ${form.subject || 'بدون موضوع'}</div>
+                    <div class="form-message">💬 ${form.message?.substring(0, 100) || 'لا يوجد رسالة'}...</div>
+                    <div class="form-meta">
+                        📅 ${form.created_at ? new Date(form.created_at).toLocaleDateString('ar-SA') : 'غير محدد'} |
+                        📞 ${form.phone || 'غير محدد'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // اختبار تلقائي عند تحميل الصفحة
+        window.addEventListener('load', () => {
+            console.log('🚀 بدء اختبار نماذج التواصل...');
+            testContactFormsList();
+        });
     </script>
 </body>
 </html>

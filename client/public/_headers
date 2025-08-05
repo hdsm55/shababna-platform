@@ -1,45 +1,39 @@
-# Security headers for all pages
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   X-XSS-Protection: 1; mode=block
   Referrer-Policy: no-referrer-when-downgrade
   Cache-Control: no-cache, no-store, must-revalidate
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://localhost:5000 http://127.0.0.1:5000 https://shababna-backend.onrender.com https://*.onrender.com; object-src 'none'; base-uri 'self'; form-action 'self';
 
-# Cache static assets
-/*.js
+/assets/*
   Cache-Control: public, max-age=31536000, immutable
 
-/*.css
+*.js
   Cache-Control: public, max-age=31536000, immutable
 
-/*.png
+*.css
   Cache-Control: public, max-age=31536000, immutable
 
-/*.jpg
+*.png
   Cache-Control: public, max-age=31536000, immutable
 
-/*.svg
+*.jpg
   Cache-Control: public, max-age=31536000, immutable
 
-/*.ico
+*.svg
   Cache-Control: public, max-age=31536000, immutable
 
-/*.woff
+*.ico
   Cache-Control: public, max-age=31536000, immutable
 
-/*.woff2
+*.woff
   Cache-Control: public, max-age=31536000, immutable
 
-/*.ttf
+*.woff2
   Cache-Control: public, max-age=31536000, immutable
 
-/*.eot
+*.ttf
   Cache-Control: public, max-age=31536000, immutable
 
-# API routes
-/api/*
-  Access-Control-Allow-Origin: *
-  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Authorization
+*.eot
+  Cache-Control: public, max-age=31536000, immutable

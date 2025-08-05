@@ -1,0 +1,82 @@
+#!/usr/bin/env node
+
+import fetch from 'node-fetch';
+
+console.log('🚀 اختبار سريع للـ Frontend...\n');
+
+const quickTests = [
+    {
+        name: 'SPA Routing - Home',
+        url: 'http://localhost:5173',
+        type: 'routing'
+    },
+    {
+        name: 'SPA Routing - Programs',
+        url: 'http://localhost:5173/programs',
+        type: 'routing'
+    },
+    {
+        name: 'SPA Routing - Events',
+        url: 'http://localhost:5173/events',
+        type: 'routing'
+    },
+    {
+        name: 'API Health Check',
+        url: 'https://shababna-backend.onrender.com/api/health',
+        type: 'api'
+    },
+    {
+        name: 'API Events',
+        url: 'https://shababna-backend.onrender.com/api/events',
+        type: 'api'
+    },
+    {
+        name: 'API Programs',
+        url: 'https://shababna-backend.onrender.com/api/programs',
+        type: 'api'
+    }
+];
+
+async function quickTest() {
+    let success = 0;
+    let failed = 0;
+
+    for (const test of quickTests) {
+        try {
+            const startTime = Date.now();
+            const response = await fetch(test.url, {
+                method: 'GET',
+                timeout: test.type === 'api' ? 15000 : 10000
+            });
+            const endTime = Date.now();
+            const responseTime = endTime - startTime;
+
+            if (response.ok) {
+                console.log(`✅ ${test.name} (${responseTime}ms)`);
+                success++;
+            } else {
+                console.log(`❌ ${test.name} (Status: ${response.status})`);
+                failed++;
+            }
+        } catch (error) {
+            console.log(`❌ ${test.name} (Error: ${error.message})`);
+            failed++;
+        }
+
+        // Small delay
+        await new Promise(resolve => setTimeout(resolve, 200));
+    }
+
+    console.log('\n📊 النتائج:');
+    console.log(`✅ نجح: ${success}`);
+    console.log(`❌ فشل: ${failed}`);
+    console.log(`📈 نسبة النجاح: ${Math.round((success / (success + failed)) * 100)}%`);
+
+    if (success === quickTests.length) {
+        console.log('\n🎉 جميع الاختبارات نجحت!');
+    } else {
+        console.log('\n⚠️  بعض الاختبارات فشلت.');
+    }
+}
+
+quickTest().catch(console.error);

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اختبار المدونات</title>
+    <title>Blogs Test - Shababna</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -11,127 +11,351 @@
             padding: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            color: white;
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
         h1 {
             text-align: center;
-            color: #333;
             margin-bottom: 30px;
+            color: #fff;
+            font-size: 2.5em;
         }
-        .blog-detail {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .blog-title {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #333;
+        .test-section {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
             margin-bottom: 20px;
-            line-height: 1.2;
         }
-        .blog-meta {
-            display: flex;
-            gap: 15px;
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        .blog-content {
-            line-height: 1.8;
-            color: #333;
+        .test-button {
+            background: #4ade80;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
             font-size: 16px;
+            font-weight: bold;
+            margin: 10px 5px;
+            transition: background 0.3s ease;
         }
-        .loading {
-            text-align: center;
-            padding: 50px;
-            font-size: 18px;
-            color: #666;
+        .test-button:hover {
+            background: #22c55e;
+        }
+        .test-button:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            background: rgba(74, 222, 128, 0.2);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            color: #4ade80;
         }
         .error {
-            text-align: center;
-            padding: 50px;
-            color: #d32f2f;
-            background: #ffebee;
-            border-radius: 10px;
-            margin: 20px 0;
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
         }
-        .back-button {
-            display: inline-block;
-            padding: 12px 24px;
-            background: #667eea;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
+        .loading {
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            color: #fbbf24;
+        }
+        .blogs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
             margin-top: 20px;
-            transition: background 0.3s;
         }
-        .back-button:hover {
-            background: #5a6fd8;
+        .blog-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .blog-title {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #4ade80;
+        }
+        .blog-excerpt {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+        }
+        .blog-meta {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.6);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔍 اختبار تفاصيل المدونة</h1>
+        <h1>📝 Blogs Test Dashboard</h1>
 
-        <div id="loading" class="loading">جاري تحميل المدونة...</div>
-        <div id="error" class="error" style="display: none;">حدث خطأ في تحميل المدونة</div>
-        <div id="blog-content" class="blog-detail" style="display: none;"></div>
+        <div class="test-section">
+            <h3>🔍 اختبار APIs الخاصة بالمدونات</h3>
+            <button class="test-button" onclick="testBlogsList()">اختبار قائمة المدونات</button>
+            <button class="test-button" onclick="testBlogDetail()">اختبار تفاصيل مدونة</button>
+            <button class="test-button" onclick="testCreateBlog()">اختبار إنشاء مدونة</button>
+            <button class="test-button" onclick="testUpdateBlog()">اختبار تحديث مدونة</button>
+            <button class="test-button" onclick="testDeleteBlog()">اختبار حذف مدونة</button>
+            <button class="test-button" onclick="runAllBlogTests()">تشغيل جميع الاختبارات</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 نتائج الاختبارات</h3>
+            <div id="test-results" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📝 عرض المدونات</h3>
+            <div id="blogs-display" class="blogs-grid"></div>
+        </div>
     </div>
 
     <script>
-        async function fetchBlog() {
+        const API_BASE = 'https://shababna-backend.onrender.com/api';
+
+        async function makeRequest(endpoint, options = {}) {
             try {
-                console.log('🔍 جاري جلب المدونة...');
-                const blogId = 5; // المدونة رقم 5
-                const response = await fetch(`http://localhost:5000/api/blogs/${blogId}`);
-                const data = await response.json();
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
 
-                console.log('📊 استجابة API المدونة:', data);
-
-                if (data.success && data.data) {
-                    displayBlog(data.data);
-                } else {
-                    throw new Error('بيانات غير صحيحة من الخادم');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
+
+                return await response.json();
             } catch (error) {
-                console.error('❌ خطأ في جلب المدونة:', error);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error').style.display = 'block';
-                document.getElementById('error').textContent = `خطأ في تحميل المدونة: ${error.message}`;
+                throw error;
             }
         }
 
-        function displayBlog(blog) {
-            const container = document.getElementById('blog-content');
-            const loading = document.getElementById('loading');
-
-            loading.style.display = 'none';
-            container.style.display = 'block';
-
-            container.innerHTML = `
-                <h1 class="blog-title">${blog.title}</h1>
-                <div class="blog-meta">
-                    <span>بواسطة: ${blog.author || 'فريق شبابنا'}</span>
-                    <span>•</span>
-                    <span>${new Date(blog.created_at).toLocaleDateString('ar-SA')}</span>
-                </div>
-                <div class="blog-content">
-                    ${blog.content}
-                </div>
-                <a href="/blogs" class="back-button">العودة للمدونة</a>
-            `;
+        function showResult(message, type = 'success') {
+            const resultDiv = document.getElementById('test-results');
+            resultDiv.style.display = 'block';
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
         }
 
-        // بدء التحميل
-        fetchBlog();
+        async function testBlogsList() {
+            showResult('⏳ جاري اختبار قائمة المدونات...', 'loading');
+
+            try {
+                console.log('🔍 اختبار قائمة المدونات...');
+                const data = await makeRequest('/blogs');
+                console.log('📊 استجابة المدونات:', data);
+
+                if (data.success) {
+                    const blogs = data.data?.blogs || data.data || [];
+                    showResult(`✅ نجح اختبار قائمة المدونات!\n\n📊 عدد المدونات: ${blogs.length}\n\n📋 المدونات:\n${blogs.map((blog, index) =>
+                        `${index + 1}. ${blog.title} - ${blog.status || 'نشط'}`
+                    ).join('\n') || 'لا توجد مدونات'}`);
+
+                    displayBlogs(blogs);
+                } else {
+                    showResult(`❌ فشل الاختبار: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('❌ خطأ في اختبار المدونات:', error);
+                showResult(`❌ خطأ في الاتصال: ${error.message}`, 'error');
+            }
+        }
+
+        async function testBlogDetail() {
+            showResult('⏳ جاري اختبار تفاصيل المدونة...', 'loading');
+
+            try {
+                console.log('🔍 اختبار تفاصيل المدونة...');
+                const data = await makeRequest('/blogs/1');
+                console.log('📊 استجابة تفاصيل المدونة:', data);
+
+                if (data.success) {
+                    const blog = data.data?.blog || data.data;
+                    showResult(`✅ نجح اختبار تفاصيل المدونة!\n\n📝 المدونة:\n${JSON.stringify(blog, null, 2)}`);
+                } else {
+                    showResult(`❌ فشل الاختبار: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('❌ خطأ في اختبار تفاصيل المدونة:', error);
+                showResult(`❌ خطأ في الاتصال: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateBlog() {
+            showResult('⏳ جاري اختبار إنشاء مدونة...', 'loading');
+
+            try {
+                console.log('🔍 اختبار إنشاء مدونة...');
+                const blogData = {
+                    title: 'مدونة اختبار',
+                    content: 'محتوى المدونة للاختبار',
+                    excerpt: 'ملخص المدونة للاختبار',
+                    author: 'نظام الاختبار',
+                    tags: ['اختبار', 'مدونة'],
+                    status: 'draft'
+                };
+
+                const data = await makeRequest('/blogs', {
+                    method: 'POST',
+                    body: JSON.stringify(blogData)
+                });
+
+                console.log('📊 استجابة إنشاء المدونة:', data);
+
+                if (data.success) {
+                    showResult(`✅ نجح اختبار إنشاء المدونة!\n\n📝 المدونة المنشأة:\n${JSON.stringify(data.data, null, 2)}`);
+                } else {
+                    showResult(`❌ فشل الاختبار: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('❌ خطأ في اختبار إنشاء المدونة:', error);
+                showResult(`❌ خطأ في الاتصال: ${error.message}`, 'error');
+            }
+        }
+
+        async function testUpdateBlog() {
+            showResult('⏳ جاري اختبار تحديث مدونة...', 'loading');
+
+            try {
+                console.log('🔍 اختبار تحديث مدونة...');
+                const updateData = {
+                    title: 'مدونة محدثة',
+                    content: 'محتوى محدث للمدونة',
+                    status: 'published'
+                };
+
+                const data = await makeRequest('/blogs/1', {
+                    method: 'PUT',
+                    body: JSON.stringify(updateData)
+                });
+
+                console.log('📊 استجابة تحديث المدونة:', data);
+
+                if (data.success) {
+                    showResult(`✅ نجح اختبار تحديث المدونة!\n\n📝 المدونة المحدثة:\n${JSON.stringify(data.data, null, 2)}`);
+                } else {
+                    showResult(`❌ فشل الاختبار: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('❌ خطأ في اختبار تحديث المدونة:', error);
+                showResult(`❌ خطأ في الاتصال: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDeleteBlog() {
+            showResult('⏳ جاري اختبار حذف مدونة...', 'loading');
+
+            try {
+                console.log('🔍 اختبار حذف مدونة...');
+                const data = await makeRequest('/blogs/999', {
+                    method: 'DELETE'
+                });
+
+                console.log('📊 استجابة حذف المدونة:', data);
+
+                if (data.success) {
+                    showResult(`✅ نجح اختبار حذف المدونة!\n\n📝 النتيجة:\n${JSON.stringify(data, null, 2)}`);
+                } else {
+                    showResult(`❌ فشل الاختبار: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                console.error('❌ خطأ في اختبار حذف المدونة:', error);
+                showResult(`❌ خطأ في الاتصال: ${error.message}`, 'error');
+            }
+        }
+
+        async function runAllBlogTests() {
+            showResult('⏳ جاري تشغيل جميع اختبارات المدونات...\n\n', 'loading');
+
+            const results = [];
+
+            // اختبار قائمة المدونات
+            try {
+                const blogsData = await makeRequest('/blogs');
+                const blogsCount = blogsData.data?.blogs?.length || blogsData.data?.length || 0;
+                results.push(`✅ قائمة المدونات: نجح (${blogsCount} مدونة)`);
+            } catch (error) {
+                results.push(`❌ قائمة المدونات: فشل - ${error.message}`);
+            }
+
+            // اختبار تفاصيل المدونة
+            try {
+                const blogDetailData = await makeRequest('/blogs/1');
+                results.push(`✅ تفاصيل المدونة: نجح`);
+            } catch (error) {
+                results.push(`❌ تفاصيل المدونة: فشل - ${error.message}`);
+            }
+
+            // اختبار إنشاء المدونة
+            try {
+                const createData = await makeRequest('/blogs', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        title: 'مدونة اختبار شاملة',
+                        content: 'محتوى للاختبار الشامل',
+                        excerpt: 'ملخص للاختبار',
+                        author: 'نظام الاختبار',
+                        status: 'draft'
+                    })
+                });
+                results.push(`✅ إنشاء المدونة: نجح`);
+            } catch (error) {
+                results.push(`❌ إنشاء المدونة: فشل - ${error.message}`);
+            }
+
+            showResult(`📊 نتائج جميع اختبارات المدونات:\n\n${results.join('\n')}`, 'success');
+        }
+
+        function displayBlogs(blogs) {
+            const displayDiv = document.getElementById('blogs-display');
+
+            if (!blogs || blogs.length === 0) {
+                displayDiv.innerHTML = '<p>لا توجد مدونات لعرضها</p>';
+                return;
+            }
+
+            displayDiv.innerHTML = blogs.map(blog => `
+                <div class="blog-card">
+                    <div class="blog-title">${blog.title || 'بدون عنوان'}</div>
+                    <div class="blog-excerpt">${blog.excerpt || blog.content?.substring(0, 100) || 'لا يوجد ملخص'}...</div>
+                    <div class="blog-meta">
+                        المؤلف: ${blog.author || 'غير محدد'} |
+                        الحالة: ${blog.status || 'غير محدد'} |
+                        التاريخ: ${blog.created_at ? new Date(blog.created_at).toLocaleDateString('ar-SA') : 'غير محدد'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // اختبار تلقائي عند تحميل الصفحة
+        window.addEventListener('load', () => {
+            console.log('🚀 بدء اختبار المدونات...');
+            testBlogsList();
+        });
     </script>
 </body>
 </html>

@@ -12,13 +12,20 @@ const BackendIdleHandler: React.FC<BackendIdleHandlerProps> = ({
 }) => {
   const [isBackendIdle, setIsBackendIdle] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const [lastError, setLastError] = useState<string>('');
   const queryClient = useQueryClient();
 
   useEffect(() => {
     const handleBackendIdle = (error: any) => {
-      if (error?.isBackendIdle) {
+      if (
+        error?.isBackendIdle ||
+        error?.code === 'ECONNABORTED' ||
+        error?.message?.includes('timeout') ||
+        (!error.response && error.message?.includes('Network Error'))
+      ) {
         setIsBackendIdle(true);
         setRetryCount((prev) => prev + 1);
+        setLastError(error?.message || 'الخادم يستيقظ، يرجى الانتظار...');
       }
     };
 
@@ -37,22 +44,37 @@ const BackendIdleHandler: React.FC<BackendIdleHandlerProps> = ({
   const handleRetry = () => {
     setIsBackendIdle(false);
     setRetryCount(0);
+    setLastError('');
     queryClient.invalidateQueries();
   };
+
+  const handleAutoRetry = () => {
+    // Auto retry after 5 seconds
+    setTimeout(() => {
+      if (isBackendIdle) {
+        handleRetry();
+      }
+    }, 5000);
+  };
+
+  useEffect(() => {
+    if (isBackendIdle && retryCount === 1) {
+      handleAutoRetry();
+    }
+  }, [isBackendIdle, retryCount]);
 
   if (isBackendIdle) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-neutral-50">
         <div className="text-center max-w-md mx-auto p-6">
-          <LoadingSpinner
-            size="lg"
-            isBackendIdle={true}
-            text="الخادم يستيقظ، يرجى الانتظار..."
-          />
+          <LoadingSpinner size="lg" isBackendIdle={true} text={lastError} />
 
           <Alert type="info" title="الخادم المجاني يستيقظ" className="mt-6">
             الخادم المجاني على Render يستيقظ من النوم بعد فترة من عدم النشاط.
             هذا طبيعي ويستغرق بضع ثوانٍ.
+            {retryCount > 1 && (
+              <div className="mt-2 text-sm">المحاولة: {retryCount}</div>
+            )}
           </Alert>
 
           {retryCount > 2 && (

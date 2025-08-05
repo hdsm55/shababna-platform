@@ -10,6 +10,7 @@ import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { fetchProgramById } from '../services/programsApi';
 import { motion } from 'framer-motion';
+import { getApiUrl } from '../config/environment';
 import {
   Calendar,
   MapPin,
@@ -140,23 +141,21 @@ const ProgramDetail: React.FC = () => {
       });
 
       // إرسال البيانات الفعلية للـ API
-      const response = await fetch(
-        `https://shababna-backend.onrender.com/api/programs/${id}/support`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            supporter_name: `${donationForm.firstName} ${donationForm.lastName}`,
-            supporter_email: donationForm.email,
-            supporter_phone: donationForm.phone,
-            support_type: 'donation',
-            message: donationForm.message,
-            amount: donationForm.amount,
-          }),
-        }
-      );
+
+      const response = await fetch(`${getApiUrl()}/programs/${id}/support`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          supporter_name: `${donationForm.firstName} ${donationForm.lastName}`,
+          supporter_email: donationForm.email,
+          supporter_phone: donationForm.phone,
+          support_type: 'donation',
+          message: donationForm.message,
+          amount: donationForm.amount,
+        }),
+      });
 
       console.log('📡 استجابة الخادم:', response.status, response.statusText);
 
