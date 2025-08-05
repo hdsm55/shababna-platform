@@ -31,6 +31,7 @@ import {
   Award,
   Target,
   Zap,
+  Mail,
 } from 'lucide-react';
 import { useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
@@ -269,7 +270,7 @@ const Home: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen bg-gradient-to-br from-white via-primary-50/30 to-accent-50/30"
+      className="bg-gradient-to-br from-white via-primary-50/30 to-accent-50/30"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <SEO
@@ -287,8 +288,19 @@ const Home: React.FC = () => {
         dir={isRTL ? 'rtl' : 'ltr'}
         aria-label={t('home.hero.aria', 'قسم البطل - مقدمة المنصة')}
       >
-        {/* Enhanced Background with multiple layers */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-accent-50"></div>
+        {/* Background Image with Fallback */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url('/images/hero-bg.jpg')`,
+          }}
+        >
+          {/* Fallback gradient if image fails to load */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-accent-50"></div>
+        </div>
+
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/20"></div>
 
         {/* Animated geometric patterns */}
         <div className="absolute inset-0 pointer-events-none select-none opacity-10">
@@ -706,10 +718,24 @@ const Home: React.FC = () => {
                 >
                   <Card
                     variant="default"
-                    className="h-full group hover:scale-105 transition-all duration-500"
+                    className="h-full group hover:scale-105 transition-all duration-500 overflow-hidden"
                     interactive
                     glow
                   >
+                    {/* Event Image */}
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={event.image_url || '/images/event-placeholder.svg'}
+                        alt={event.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.src = '/images/event-placeholder.svg';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    </div>
+
                     <CardHeader>
                       <CardTitle className="text-base font-bold text-primary-800 mb-2 group-hover:text-primary-700 transition-colors">
                         {event.title}
@@ -805,10 +831,27 @@ const Home: React.FC = () => {
                 >
                   <Card
                     variant="default"
-                    className="h-full group hover:scale-105 transition-all duration-500"
+                    className="h-full group hover:scale-105 transition-all duration-500 overflow-hidden"
                     interactive
                     glow
                   >
+                    {/* Program Image */}
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={
+                          program.image_url || '/images/program-placeholder.svg'
+                        }
+                        alt={program.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.src =
+                            '/images/program-placeholder.svg';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    </div>
+
                     <CardHeader>
                       <CardTitle className="text-base font-bold text-primary-800 mb-2 group-hover:text-primary-700 transition-colors">
                         {program.title}
@@ -873,6 +916,128 @@ const Home: React.FC = () => {
               ))}
             </motion.div>
           )}
+        </div>
+      </motion.section>
+
+      {/* Newsletter Section - قسم النشرة البريدية */}
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.3 }}
+        className="py-20 bg-gradient-to-br from-primary-50 via-white to-accent-50 relative overflow-hidden"
+      >
+        {/* Background decoration */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-primary-200/20 to-transparent rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-br from-accent-200/20 to-transparent rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="mb-8"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary-700 to-accent-700 mb-4">
+                {t('home.newsletter.title', 'تابع جديدنا')}
+              </h2>
+              <p className="text-lg text-neutral-700 max-w-2xl mx-auto">
+                {t(
+                  'home.newsletter.subtitle',
+                  'كن أول من يعرف عن فعالياتنا وبرامجنا الجديدة. مجتمعنا ينتظرك!'
+                )}
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
+              className="max-w-md mx-auto"
+            >
+              <form onSubmit={handleNewsletter} className="space-y-4">
+                <div className="relative">
+                  <Input
+                    type="email"
+                    placeholder={t(
+                      'home.newsletter.placeholder',
+                      'بريدك الإلكتروني'
+                    )}
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                    required
+                    className="w-full bg-white border-2 border-neutral-200 rounded-xl px-6 py-4 text-base focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all duration-300 hover:border-neutral-300"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="lg"
+                  disabled={newsletterStatus === 'loading'}
+                  className="w-full px-8 py-4 text-base font-bold shadow-xl hover:shadow-primary-500/25 transition-all duration-300"
+                >
+                  {newsletterStatus === 'loading' ? (
+                    <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>
+                        {t('home.newsletter.loading', 'جاري الإرسال...')}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
+                      <Mail className="w-5 h-5" />
+                      <span>{t('buttons.subscribe', 'اشترك')}</span>
+                    </div>
+                  )}
+                </Button>
+              </form>
+
+              {/* Status Messages */}
+              <AnimatePresence>
+                {newsletterStatus === 'success' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-4 p-4 bg-green-500/10 border border-green-500/20 rounded-xl"
+                  >
+                    <p className="text-green-700 text-sm font-medium">
+                      {t('home.newsletter.success', 'تم الاشتراك بنجاح!')}
+                    </p>
+                  </motion.div>
+                )}
+                {newsletterStatus === 'error' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl"
+                  >
+                    <p className="text-red-700 text-sm font-medium">
+                      {newsletterMsg ||
+                        t(
+                          'home.newsletter.error',
+                          'حدث خطأ، يرجى المحاولة مرة أخرى'
+                        )}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Privacy Notice */}
+              <p className="text-neutral-500 text-sm mt-6">
+                {t(
+                  'home.newsletter.privacy',
+                  'نحترم خصوصيتك. يمكنك إلغاء الاشتراك في أي وقت.'
+                )}
+              </p>
+            </motion.div>
+          </div>
         </div>
       </motion.section>
 

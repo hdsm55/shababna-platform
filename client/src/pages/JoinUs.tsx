@@ -77,7 +77,7 @@ const JoinUs: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="bg-neutral-50" dir={isRTL ? 'rtl' : 'ltr'}>
       <SEO
         title={t('joinUs.title')}
         description={t('joinUs.subtitle')}

@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+اimport fetch from 'node-fetch';
 
 async function testNewsletter() {
     try {

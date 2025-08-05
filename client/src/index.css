@@ -708,6 +708,114 @@
   }
 }
 
+/* Performance Optimizations - Fast Animations */
+@layer utilities {
+  /* GPU Acceleration */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    will-change: transform;
+  }
+
+  /* Fast Transitions */
+  .transition-fast {
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .transition-medium {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Optimized Hover Effects */
+  .hover-lift {
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px) translateZ(0);
+  }
+
+  /* Fast Scale Transitions */
+  .scale-fast {
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  .scale-fast:hover {
+    transform: scale(1.05) translateZ(0);
+  }
+
+  /* Optimized Scroll */
+  .scroll-smooth {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    will-change: scroll-position;
+  }
+
+  /* Fast Fade Animations */
+  .fade-fast {
+    transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity;
+  }
+
+  /* Optimized Image Loading */
+  .image-optimized {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    will-change: transform;
+  }
+}
+
+/* Override slow transitions */
+.transition-all.duration-500 {
+  transition-duration: 0.2s !important;
+}
+
+.transition-all.duration-300 {
+  transition-duration: 0.15s !important;
+}
+
+.transition-transform.duration-500 {
+  transition-duration: 0.2s !important;
+}
+
+.transition-transform.duration-300 {
+  transition-duration: 0.15s !important;
+}
+
+/* Optimize framer-motion animations */
+[data-framer-motion] {
+  will-change: transform, opacity;
+}
+
+/* Fast loading states */
+.loading-fast {
+  animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Optimized button interactions */
+button, a {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(0);
+  will-change: transform, background-color, color;
+}
+
+/* Fast card animations */
+.card-fast {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(0);
+  will-change: transform, box-shadow;
+}
+
+.card-fast:hover {
+  transform: translateY(-2px) translateZ(0);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
 /* Print styles */
 @media print {
   .blog-content {

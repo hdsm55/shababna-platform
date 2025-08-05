@@ -29,7 +29,11 @@ CREATE TABLE IF NOT EXISTS programs (
     description TEXT,
     start_date DATE,
     end_date DATE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    image_url VARCHAR(500),
+    category VARCHAR(100),
+    status VARCHAR(50) DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- === 3. جدول الفعاليات ===

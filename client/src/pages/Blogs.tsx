@@ -29,10 +29,7 @@ const Blogs: React.FC = () => {
   const isRTL = i18n.dir() === 'rtl';
 
   return (
-    <section
-      className="py-12 min-h-screen bg-neutral-50"
-      dir={isRTL ? 'rtl' : 'ltr'}
-    >
+    <section className="py-12 bg-neutral-50" dir={isRTL ? 'rtl' : 'ltr'}>
       <SEO
         title={t('blogs.title', 'المدونة')}
         description={t('blogs.subtitle', 'أحدث المقالات والتدوينات من شبابنا')}

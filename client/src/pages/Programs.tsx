@@ -118,7 +118,7 @@ const Programs: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div dir={isRTL ? 'rtl' : 'ltr'}>
       <SEO
         title={t('programs.seo.title', 'البرامج - منصة شبابنا العالمية')}
         description={t(

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -21,6 +21,16 @@ const Footer: React.FC = () => {
     'idle' | 'loading' | 'success' | 'error'
   >('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // تأخير ظهور الفوتر لضمان عدم ظهوره مبكراً
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 2000); // 2 ثانية بعد تحميل الصفحة
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,11 +99,21 @@ const Footer: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // إخفاء الفوتر إذا لم يكن مرئياً بعد
+  if (!isVisible) {
+    return null;
+  }
+
   return (
-    <footer className="bg-neutral-900 text-white relative">
-      {/* Background Pattern */}
+    <motion.footer
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: 'easeOut' }}
+      className="bg-neutral-900 text-white relative z-10"
+    >
+      {/* Background Pattern - مبسط */}
       <div
-        className="absolute inset-0 opacity-20"
+        className="absolute inset-0 opacity-10"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         }}
@@ -119,18 +139,16 @@ const Footer: React.FC = () => {
             </p>
             <div className="flex space-x-4 rtl:space-x-reverse">
               {socialLinks.map((social, index) => (
-                <motion.a
+                <a
                   key={index}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`text-neutral-400 ${social.color} transition-all duration-300 p-2 rounded-lg hover:bg-neutral-800 hover:scale-110`}
+                  className={`text-neutral-400 ${social.color} transition-all duration-300 p-2 rounded-lg hover:bg-neutral-800`}
                   aria-label={social.label}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
                 >
                   <social.icon className="w-5 h-5" />
-                </motion.a>
+                </a>
               ))}
             </div>
           </div>
@@ -145,7 +163,7 @@ const Footer: React.FC = () => {
                 <li key={link.key}>
                   <Link
                     to={link.path}
-                    className="text-neutral-300 hover:text-primary-400 transition-all duration-300 text-sm font-medium hover:translate-x-1 rtl:hover:-translate-x-1 inline-block"
+                    className="text-neutral-300 hover:text-primary-400 transition-all duration-300 text-sm font-medium inline-block"
                   >
                     {t(`nav.${link.key}`)}
                   </Link>
@@ -229,7 +247,7 @@ const Footer: React.FC = () => {
               <button
                 type="submit"
                 disabled={newsletterStatus === 'loading'}
-                className="w-full bg-primary-600 text-white px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary-700 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 rtl:space-x-reverse"
+                className="w-full bg-primary-600 text-white px-4 py-3 rounded-lg text-sm font-medium hover:bg-primary-700 transition-all duration-300 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 rtl:space-x-reverse"
               >
                 {newsletterStatus === 'loading' ? (
                   <>
@@ -249,22 +267,14 @@ const Footer: React.FC = () => {
 
             {/* Status Messages */}
             {newsletterStatus === 'success' && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-3 bg-green-500/20 border border-green-500/30 rounded-lg"
-              >
+              <div className="p-3 bg-green-500/20 border border-green-500/30 rounded-lg">
                 <p className="text-green-400 text-sm text-center">
                   {t('home.newsletter.success', 'تم الاشتراك بنجاح!')}
                 </p>
-              </motion.div>
+              </div>
             )}
             {newsletterStatus === 'error' && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-3 bg-red-500/20 border border-red-500/30 rounded-lg"
-              >
+              <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
                 <p className="text-red-400 text-sm text-center">
                   {errorMessage ||
                     t(
@@ -272,7 +282,7 @@ const Footer: React.FC = () => {
                       'حدث خطأ، يرجى المحاولة مرة أخرى'
                     )}
                 </p>
-              </motion.div>
+              </div>
             )}
 
             {/* Privacy Notice */}
@@ -308,16 +318,14 @@ const Footer: React.FC = () => {
         </div>
       </div>
 
-      {/* Scroll to top button */}
-      <motion.button
+      {/* Scroll to top button - مبسط */}
+      <button
         onClick={scrollToTop}
         className="fixed bottom-6 right-6 w-12 h-12 bg-primary-600 text-white rounded-full shadow-lg hover:bg-primary-700 transition-all duration-300 z-50 flex items-center justify-center hover:shadow-xl"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
       >
         <ArrowUp className="w-5 h-5" />
-      </motion.button>
-    </footer>
+      </button>
+    </motion.footer>
   );
 };
 

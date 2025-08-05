@@ -22,7 +22,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       }`}
     >
       <Header />
-      <main className="flex-1">{children || <Outlet />}</main>
+      <main className="flex-1 flex flex-col">
+        <div className="flex-1">{children || <Outlet />}</div>
+      </main>
       <Footer />
     </div>
   );

@@ -53,21 +53,24 @@ const DashboardSettings = lazy(() => import('./pages/dashboard/Settings'));
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 10 * 60 * 1000, // 10 minutes - increased for better caching
+      staleTime: 15 * 60 * 1000, // 15 minutes - increased for better caching
       retry: (failureCount, error: any) => {
-        // Retry up to 3 times for network errors or 5xx errors
-        if (failureCount < 3) {
+        // Retry up to 2 times for network errors or 5xx errors
+        if (failureCount < 2) {
           if (error?.response?.status >= 500) return true;
           if (error?.code === 'ECONNABORTED') return true;
           if (error?.message?.includes('timeout')) return true;
         }
         return false;
       },
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 15000),
       refetchOnMount: false, // Don't refetch on mount if data is fresh
-      gcTime: 15 * 60 * 1000, // 15 minutes garbage collection time
+      gcTime: 20 * 60 * 1000, // 20 minutes garbage collection time
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
+      // تحسين الأداء
+      refetchInterval: false,
+      refetchIntervalInBackground: false,
     },
     mutations: {
       retry: 1,

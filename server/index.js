@@ -33,6 +33,7 @@ import blogsRoutes from './routes/blogs.js';
 import newsletterRoutes from './routes/newsletter.js';
 import paymentsRoutes from './routes/payments.js';
 import volunteersRoutes from './routes/volunteers.js';
+import uploadRoutes from './routes/upload.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -172,6 +173,7 @@ app.use('/api/blogs', blogsRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/volunteers', volunteersRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Additional routes for dashboard data
 app.use('/api/contact-forms', formsRoutes);

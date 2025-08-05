@@ -8,6 +8,7 @@ export default defineConfig({
   ],
   optimizeDeps: {
     exclude: ['lucide-react'],
+    include: ['react', 'react-dom', 'react-router-dom'],
   },
   define: {
     // Expose environment variables to the client
@@ -32,7 +33,13 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: undefined,
+        // تحسين تقسيم الباندل
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          ui: ['framer-motion', 'lucide-react'],
+          utils: ['@tanstack/react-query'],
+        },
         // Ensure proper asset naming for Render
         assetFileNames: (assetInfo) => {
           const info = assetInfo.name.split('.')
@@ -52,11 +59,13 @@ export default defineConfig({
         entryFileNames: 'assets/[name]-[hash].js',
       },
     },
-    // Ensure proper SPA routing
+    // تحسين إعدادات البناء
     outDir: 'dist',
     assetsDir: 'assets',
-    // Add source maps for better debugging
-    sourcemap: true,
+    // إزالة source maps للإنتاج
+    sourcemap: false,
+    // تحسين حجم الباندل
+    chunkSizeWarningLimit: 1000,
   },
   base: '/',
   // Add preview configuration for SPA routing

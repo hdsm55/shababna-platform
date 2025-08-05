@@ -221,7 +221,7 @@ const Events: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+    <div className="bg-gradient-to-br from-slate-50 via-white to-blue-50">
       <SEO
         title={t('events.pageTitle', 'الفعاليات - منصة شبابنا')}
         description={t(
