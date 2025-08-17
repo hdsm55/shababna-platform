@@ -1,108 +1,85 @@
-import React, { Suspense, lazy } from 'react';
-import { motion } from 'framer-motion';
-
-// Lazy load components for better performance
-const LazyComponent = lazy(() => import('./LazyImage'));
+import { useEffect, useCallback } from 'react';
 
 interface PerformanceOptimizerProps {
   children: React.ReactNode;
-  fallback?: React.ReactNode;
 }
 
 const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
   children,
-  fallback = (
-    <div className="flex items-center justify-center p-4">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-    </div>
-  ),
 }) => {
-  return (
-    <Suspense fallback={fallback}>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        {children}
-      </motion.div>
-    </Suspense>
-  );
+  // تحسين الأداء عند التمرير
+  const handleScroll = useCallback(() => {
+    // تحسين الأداء عند التمرير
+    requestAnimationFrame(() => {
+      // يمكن إضافة منطق إضافي هنا
+    });
+  }, []);
+
+  // تحسين الأداء عند تغيير الحجم
+  const handleResize = useCallback(() => {
+    // تحسين الأداء عند تغيير الحجم
+    requestAnimationFrame(() => {
+      // يمكن إضافة منطق إضافي هنا
+    });
+  }, []);
+
+  useEffect(() => {
+    // إضافة مستمعي الأحداث مع throttling
+    let scrollTimeout: number;
+    let resizeTimeout: number;
+
+    const throttledScroll = () => {
+      if (scrollTimeout) return;
+      scrollTimeout = window.setTimeout(() => {
+        handleScroll();
+        scrollTimeout = 0;
+      }, 16); // ~60fps
+    };
+
+    const throttledResize = () => {
+      if (resizeTimeout) return;
+      resizeTimeout = window.setTimeout(() => {
+        handleResize();
+        resizeTimeout = 0;
+      }, 100);
+    };
+
+    // إضافة مستمعي الأحداث
+    window.addEventListener('scroll', throttledScroll, { passive: true });
+    window.addEventListener('resize', throttledResize, { passive: true });
+
+    // تنظيف
+    return () => {
+      window.removeEventListener('scroll', throttledScroll);
+      window.removeEventListener('resize', throttledResize);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+    };
+  }, [handleScroll, handleResize]);
+
+  // تحسين الأداء للصور
+  useEffect(() => {
+    // تحسين تحميل الصور
+    const images = document.querySelectorAll('img[data-src]');
+    const imageObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const img = entry.target as HTMLImageElement;
+          img.src = img.dataset.src || '';
+          img.classList.remove('lazy');
+          imageObserver.unobserve(img);
+        }
+      });
+    });
+
+    images.forEach((img) => imageObserver.observe(img));
+
+    return () => {
+      imageObserver.disconnect();
+    };
+  }, []);
+
+  return <>{children}</>;
 };
 
-// Image optimization component
-interface OptimizedImageProps {
-  src: string;
-  alt: string;
-  className?: string;
-  width?: number;
-  height?: number;
-  quality?: number;
-}
-
-const OptimizedImage: React.FC<OptimizedImageProps> = ({
-  src,
-  alt,
-  className = '',
-  width = 400,
-  height = 300,
-  quality = 80,
-}) => {
-  const [isLoaded, setIsLoaded] = React.useState(false);
-  const [hasError, setHasError] = React.useState(false);
-
-  const optimizedSrc = React.useMemo(() => {
-    // Add image optimization parameters
-    const url = new URL(src, window.location.origin);
-    url.searchParams.set('w', width.toString());
-    url.searchParams.set('h', height.toString());
-    url.searchParams.set('q', quality.toString());
-    return url.toString();
-  }, [src, width, height, quality]);
-
-  return (
-    <div className={`relative overflow-hidden ${className}`}>
-      {!isLoaded && !hasError && (
-        <div className="absolute inset-0 bg-neutral-100 animate-pulse" />
-      )}
-
-      <img
-        src={optimizedSrc}
-        alt={alt}
-        className={`w-full h-full object-cover transition-opacity duration-300 ${
-          isLoaded ? 'opacity-100' : 'opacity-0'
-        }`}
-        loading="lazy"
-        onLoad={() => setIsLoaded(true)}
-        onError={() => setHasError(true)}
-      />
-
-      {hasError && (
-        <div className="absolute inset-0 bg-error-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-error-500 text-base font-medium">
-              الصورة غير متوفرة
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Code splitting utility
-export const withCodeSplitting = <P extends object>(
-  Component: React.ComponentType<P>,
-  fallback?: React.ReactNode
-) => {
-  const LazyComponent = lazy(() => Promise.resolve({ default: Component }));
-
-  return (props: P) => (
-    <Suspense fallback={fallback}>
-      <LazyComponent {...props} />
-    </Suspense>
-  );
-};
-
-export { OptimizedImage };
 export default PerformanceOptimizer;

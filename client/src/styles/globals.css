@@ -1,0 +1,350 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== نظام الألوان المعتمد - منصة شبابنا ===== */
+
+/* الألوان الأساسية المعتمدة */
+@layer base {
+  :root {
+    /* YInMn Blue - اللون الأساسي */
+    --color-primary-50: #e6f0f8;
+    --color-primary-100: #cce1f1;
+    --color-primary-200: #99c3e3;
+    --color-primary-300: #66a5d5;
+    --color-primary-400: #3387c7;
+    --color-primary-500: #27548A;
+    --color-primary-600: #1f436e;
+    --color-primary-700: #173252;
+    --color-primary-800: #0f2136;
+    --color-primary-900: #003362;
+
+    /* Japanese Indigo - اللون الثانوي */
+    --color-secondary-50: #e8f0f4;
+    --color-secondary-100: #d1e1e9;
+    --color-secondary-200: #a3c3d3;
+    --color-secondary-300: #75a5bd;
+    --color-secondary-400: #4787a7;
+    --color-secondary-500: #183B4E;
+    --color-secondary-600: #132f3e;
+    --color-secondary-700: #0e232e;
+    --color-secondary-800: #0a171f;
+    --color-secondary-900: #050b0f;
+
+    /* Indian Yellow - اللون المميز */
+    --color-accent-50: #fef8f0;
+    --color-accent-100: #fdf1e1;
+    --color-accent-200: #fbe3c3;
+    --color-accent-300: #f9d5a5;
+    --color-accent-400: #f7c787;
+    --color-accent-500: #DDA853;
+    --color-accent-600: #b18642;
+    --color-accent-700: #856432;
+    --color-accent-800: #594221;
+    --color-accent-900: #2c2111;
+
+    /* Beige - اللون المحايد */
+    --color-neutral-50: #fefefd;
+    --color-neutral-100: #fdfdfb;
+    --color-neutral-200: #fbfbf7;
+    --color-neutral-300: #f9f9f3;
+    --color-neutral-400: #f7f7ef;
+    --color-neutral-500: #F3F3E0;
+    --color-neutral-600: #c2c2b3;
+    --color-neutral-700: #919186;
+    --color-neutral-800: #606159;
+    --color-neutral-900: #30302c;
+
+    /* Dark Midnight Blue - بديل للأسود */
+    --color-dark-50: #e6f0f8;
+    --color-dark-100: #cce1f1;
+    --color-dark-200: #99c3e3;
+    --color-dark-300: #66a5d5;
+    --color-dark-400: #3387c7;
+    --color-dark-500: #003362;
+    --color-dark-600: #002a52;
+    --color-dark-700: #002042;
+    --color-dark-800: #001631;
+    --color-dark-900: #000c21;
+  }
+}
+
+/* ===== مكونات CSS مخصصة ===== */
+
+@layer components {
+  /* الألوان المعتمدة */
+  .bg-brand-primary {
+    background-color: var(--color-primary-500);
+  }
+
+  .bg-brand-secondary {
+    background-color: var(--color-secondary-500);
+  }
+
+  .bg-brand-accent {
+    background-color: var(--color-accent-500);
+  }
+
+  .bg-brand-neutral {
+    background-color: var(--color-neutral-500);
+  }
+
+  .bg-brand-dark {
+    background-color: var(--color-dark-500);
+  }
+
+  .text-brand-primary {
+    color: var(--color-primary-500);
+  }
+
+  .text-brand-secondary {
+    color: var(--color-secondary-500);
+  }
+
+  .text-brand-accent {
+    color: var(--color-accent-500);
+  }
+
+  .text-brand-neutral {
+    color: var(--color-neutral-500);
+  }
+
+  .text-brand-dark {
+    color: var(--color-dark-500);
+  }
+
+  /* المتدرجات المعتمدة */
+  .bg-gradient-brand-primary {
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-900) 100%);
+  }
+
+  .bg-gradient-brand-secondary {
+    background: linear-gradient(135deg, var(--color-secondary-500) 0%, var(--color-secondary-900) 100%);
+  }
+
+  .bg-gradient-brand-accent {
+    background: linear-gradient(135deg, var(--color-accent-500) 0%, var(--color-accent-700) 100%);
+  }
+
+  .bg-gradient-brand-hero {
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-secondary-500) 50%, var(--color-primary-900) 100%);
+  }
+
+  .bg-gradient-brand-overlay {
+    background: linear-gradient(135deg, var(--color-dark-500) 0%, var(--color-secondary-500) 50%, var(--color-primary-500) 100%);
+  }
+
+  .bg-gradient-brand-light {
+    background: linear-gradient(135deg, var(--color-neutral-500) 0%, #ffffff 100%);
+  }
+
+  /* الظلال المحسنة */
+  .shadow-brand-sm {
+    box-shadow: 0 1px 2px 0 rgba(39, 84, 138, 0.05);
+  }
+
+  .shadow-brand-md {
+    box-shadow: 0 4px 6px -1px rgba(39, 84, 138, 0.1), 0 2px 4px -1px rgba(39, 84, 138, 0.06);
+  }
+
+  .shadow-brand-lg {
+    box-shadow: 0 10px 15px -3px rgba(39, 84, 138, 0.1), 0 4px 6px -2px rgba(39, 84, 138, 0.05);
+  }
+
+  .shadow-brand-xl {
+    box-shadow: 0 20px 25px -5px rgba(39, 84, 138, 0.1), 0 10px 10px -5px rgba(39, 84, 138, 0.04);
+  }
+
+  /* النص المتدرج */
+  .text-gradient-brand {
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-accent-500) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* الخلفيات المتحركة */
+  .bg-animated-gradient {
+    background: linear-gradient(-45deg, var(--color-primary-500), var(--color-secondary-500), var(--color-accent-500), var(--color-primary-700));
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+  }
+
+  @keyframes gradientShift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  /* تأثير العائم */
+  .floating-effect {
+    animation: floating 6s ease-in-out infinite;
+  }
+
+  @keyframes floating {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  /* تأثير الزجاج */
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* البطاقات المحسنة */
+  .card-enhanced {
+    @apply bg-white rounded-lg shadow-brand-md hover:shadow-brand-lg transition-all duration-300 transform hover:-translate-y-1;
+  }
+
+  .card-brand {
+    @apply bg-gradient-to-br from-white to-neutral-50 rounded-lg shadow-brand-md border border-neutral-200;
+  }
+
+  /* الأزرار المحسنة */
+  .btn-brand-primary {
+    @apply bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 shadow-brand-md hover:shadow-brand-lg transform hover:scale-105 transition-all duration-300;
+  }
+
+  .btn-brand-secondary {
+    @apply bg-gradient-to-r from-secondary-600 to-secondary-700 text-white hover:from-secondary-700 hover:to-secondary-800 shadow-brand-md hover:shadow-brand-lg transform hover:scale-105 transition-all duration-300;
+  }
+
+  .btn-brand-accent {
+    @apply bg-gradient-to-r from-accent-600 to-accent-700 text-white hover:from-accent-700 hover:to-accent-800 shadow-brand-md hover:shadow-brand-lg transform hover:scale-105 transition-all duration-300;
+  }
+
+  .btn-brand-outline {
+    @apply border-2 border-primary-600 text-primary-600 hover:bg-primary-50 hover:border-primary-700 transition-all duration-300;
+  }
+
+  /* الأقسام المحسنة */
+  .section-brand-primary {
+    @apply bg-gradient-to-br from-primary-50 via-white to-neutral-50;
+  }
+
+  .section-brand-secondary {
+    @apply bg-gradient-to-br from-secondary-50 via-white to-neutral-50;
+  }
+
+  .section-brand-dark {
+    @apply bg-gradient-to-br from-dark-500 via-dark-600 to-dark-700 text-white;
+  }
+
+  /* النصوص المحسنة */
+  .text-brand-heading {
+    @apply text-dark-500 font-bold;
+  }
+
+  .text-brand-body {
+    @apply text-dark-600 leading-relaxed;
+  }
+
+  .text-brand-muted {
+    @apply text-dark-400;
+  }
+}
+
+/* ===== تحسينات عامة ===== */
+
+@layer utilities {
+  /* تحسين التمرير */
+  .scrollbar-brand {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-primary-500) var(--color-neutral-200);
+  }
+
+  .scrollbar-brand::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-brand::-webkit-scrollbar-track {
+    background: var(--color-neutral-200);
+  }
+
+  .scrollbar-brand::-webkit-scrollbar-thumb {
+    background: var(--color-primary-500);
+    border-radius: 3px;
+  }
+
+  .scrollbar-brand::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-600);
+  }
+
+  /* تحسين التركيز */
+  .focus-brand {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+
+  /* تحسين الانتقالات */
+  .transition-brand {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  /* تحسين الظلال */
+  .shadow-brand-hover {
+    @apply shadow-brand-md hover:shadow-brand-lg transition-shadow duration-300;
+  }
+}
+
+/* ===== دعم RTL ===== */
+
+[dir="rtl"] {
+  .text-left {
+    text-align: right;
+  }
+
+  .text-right {
+    text-align: left;
+  }
+
+  .ml-auto {
+    margin-left: unset;
+    margin-right: auto;
+  }
+
+  .mr-auto {
+    margin-right: unset;
+    margin-left: auto;
+  }
+}
+
+/* ===== تحسينات الأداء ===== */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Tajawal', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  color: var(--color-dark-600);
+  background-color: #ffffff;
+}
+
+/* ===== تحسينات الطباعة ===== */
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-break {
+    page-break-before: always;
+  }
+}

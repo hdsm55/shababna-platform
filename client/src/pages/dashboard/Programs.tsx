@@ -290,12 +290,40 @@ const ProgramsDashboard: React.FC = () => {
     }
 
     try {
-      const programData = {
-        ...form,
-        goal_amount: parseFloat(form.goal_amount),
-        current_amount: selectedProgram?.current_amount || 0,
-        participants_count: selectedProgram?.participants_count || 0,
-      };
+      // إنشاء FormData إذا كانت هناك صورة
+      let programData: any;
+
+      if (image) {
+        // إذا كانت هناك صورة جديدة، استخدم FormData
+        const formData = new FormData();
+        formData.append('title', form.title);
+        formData.append('description', form.description);
+        formData.append('category', form.category);
+        formData.append('goal_amount', form.goal_amount);
+        formData.append('start_date', form.start_date);
+        formData.append('end_date', form.end_date);
+        formData.append(
+          'current_amount',
+          (selectedProgram?.current_amount || 0).toString()
+        );
+        formData.append(
+          'participants_count',
+          (selectedProgram?.participants_count || 0).toString()
+        );
+        formData.append('image', image);
+
+        programData = formData;
+        console.log('📸 إرسال البيانات مع الصورة:', formData);
+      } else {
+        // إذا لم تكن هناك صورة جديدة، استخدم JSON
+        programData = {
+          ...form,
+          goal_amount: parseFloat(form.goal_amount),
+          current_amount: selectedProgram?.current_amount || 0,
+          participants_count: selectedProgram?.participants_count || 0,
+        };
+        console.log('📄 إرسال البيانات بدون صورة:', programData);
+      }
 
       if (modalType === 'add') {
         await createProgram(programData);

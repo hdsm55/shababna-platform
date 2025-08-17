@@ -8,7 +8,9 @@ export default defineConfig({
   ],
   optimizeDeps: {
     exclude: ['lucide-react'],
-    include: ['react', 'react-dom', 'react-router-dom'],
+    include: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query', 'framer-motion'],
+    // تحسين التبعيات
+    force: false,
   },
   define: {
     // Expose environment variables to the client
@@ -16,7 +18,9 @@ export default defineConfig({
   },
   esbuild: {
     // Ignore TypeScript errors during build
-    logOverride: { 'this-is-undefined-in-esm': 'silent' }
+    logOverride: { 'this-is-undefined-in-esm': 'silent' },
+    // تحسين البناء
+    target: 'es2020',
   },
   server: {
     proxy: {
@@ -27,7 +31,22 @@ export default defineConfig({
       },
     },
     headers: {
-      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://localhost:5000 http://127.0.0.1:5000 https://shababna-platform.onrender.com https://*.onrender.com https://*.render.com; object-src 'none'; base-uri 'self'; form-action 'self';"
+      'Content-Security-Policy': [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src 'self' https://fonts.gstatic.com",
+        "img-src 'self' data: https: blob:",
+        "connect-src 'self' http://localhost:5000 http://127.0.0.1:5000 https://shababna-platform.onrender.com https://*.onrender.com https://*.render.com",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+        "frame-ancestors 'none'"
+      ].join('; ')
+    },
+    // تحسين سرعة التطوير
+    hmr: {
+      overlay: false, // إزالة overlay الأخطاء لتحسين الأداء
     },
   },
   build: {
@@ -39,6 +58,7 @@ export default defineConfig({
           router: ['react-router-dom'],
           ui: ['framer-motion', 'lucide-react'],
           utils: ['@tanstack/react-query'],
+          i18n: ['react-i18next', 'i18next'],
         },
         // Ensure proper asset naming for Render
         assetFileNames: (assetInfo) => {
@@ -66,6 +86,12 @@ export default defineConfig({
     sourcemap: false,
     // تحسين حجم الباندل
     chunkSizeWarningLimit: 1000,
+    // تحسين الأمان
+    minify: 'esbuild',
+    target: 'es2015',
+    // تحسين الأداء
+    reportCompressedSize: false, // تسريع البناء
+    emptyOutDir: true,
   },
   base: '/',
   // Add preview configuration for SPA routing

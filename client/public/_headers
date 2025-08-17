@@ -2,9 +2,10 @@
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
-  X-XSS-Protection: 1; mode=block
+  X-XSS-Protection: 1
   Referrer-Policy: no-referrer-when-downgrade
   Cache-Control: no-cache, no-store, must-revalidate
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://127.0.0.1:5000 https://api.shababnaglobal.org; frame-ancestors 'none';
 
 # Static Assets - Long cache
 /assets/*

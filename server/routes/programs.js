@@ -12,11 +12,18 @@ const router = express.Router();
 // إعداد multer لحفظ الصور في مجلد uploads
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(process.cwd(), 'server', 'uploads'));
+        const uploadDir = path.join(process.cwd(), 'server', 'public', 'uploads');
+        // إنشاء المجلد إذا لم يكن موجوداً
+        const fs = require('fs');
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + '-' + file.originalname);
+        const ext = require('path').extname(file.originalname);
+        cb(null, 'program-' + uniqueSuffix + ext);
     }
 });
 const upload = multer({ storage });
@@ -37,7 +44,7 @@ router.post('/:id/register', registerForProgram);
 router.post('/', authMiddleware, adminMiddleware, upload.single('image'), createProgram);
 
 // Update a program (admin only)
-router.put('/:id', authMiddleware, adminMiddleware, updateProgram);
+router.put('/:id', authMiddleware, adminMiddleware, upload.single('image'), updateProgram);
 
 // Delete a program (admin only)
 router.delete('/:id', authMiddleware, adminMiddleware, deleteProgram);

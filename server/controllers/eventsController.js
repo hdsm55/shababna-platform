@@ -67,7 +67,7 @@ export const getAllEvents = async (req, res) => {
         console.log('🔍 SQL Query:', sql);
         console.log('🔍 SQL Params:', params);
 
-        const countSql = `SELECT COUNT(DISTINCT e.id) as count FROM events e WHERE 1=1`;
+        let countSql = `SELECT COUNT(DISTINCT e.id) as count FROM events e WHERE 1=1`;
         const countParams = [];
         let countParamIndex = 1;
 
@@ -91,9 +91,9 @@ export const getAllEvents = async (req, res) => {
 
         const countResult = await getRow(countSql, countParams);
         const total = parseInt(countResult.count);
-        sql += ` ORDER BY e.start_date DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
-        params.push(parseInt(limit), offset);
-        const result = await getRows(sql, params);
+        const finalSql = sql + ` ORDER BY e.start_date DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+        const finalParams = [...params, parseInt(limit), offset];
+        const result = await getRows(finalSql, finalParams);
         const totalPages = Math.ceil(total / parseInt(limit));
 
         console.log('📊 Events Result:', {

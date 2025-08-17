@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { getCardClasses } from '../../common/DesignSystem';
 import { DESIGN_SYSTEM } from '../../common/DesignSystem';
-import { Button } from '../Button/Button';
+import { Button } from '../Button/ButtonSimple';
 
 interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
   open: boolean;
@@ -52,7 +52,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
       dir={direction}
     >
       {/* الخلفية */}
@@ -65,7 +65,7 @@ export const Modal: React.FC<ModalProps> = ({
       <div
         ref={modalRef}
         className={[
-          'relative w-full max-w-lg max-h-[90vh] overflow-hidden',
+          'relative w-full max-w-4xl max-h-[90vh] overflow-y-auto',
           getCardClasses('elevated'),
           'rounded-xl shadow-xl bg-white',
           `focus:outline-none focus:ring-2 focus:ring-[${DESIGN_SYSTEM.colors.primary}] focus:ring-offset-2`,

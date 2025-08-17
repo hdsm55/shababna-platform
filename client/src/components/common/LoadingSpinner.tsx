@@ -36,24 +36,22 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
           aria-label="Loading"
         />
         {text && (
-          <span className="text-textSecondary text-sm rtl:text-right">
-            {text}
-          </span>
+          <span className="text-gray-600 text-sm rtl:text-right">{text}</span>
         )}
       </div>
       {isBackendIdle && (
         <div className="text-center">
-          <p className="text-sm text-textSecondary mb-2">
+          <p className="text-sm text-gray-600 mb-2">
             الخادم المجاني يستيقظ من النوم
           </p>
           <div className="flex items-center justify-center gap-1">
-            <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
             <div
-              className="w-2 h-2 bg-primary rounded-full animate-pulse"
+              className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"
               style={{ animationDelay: '0.2s' }}
             ></div>
             <div
-              className="w-2 h-2 bg-primary rounded-full animate-pulse"
+              className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"
               style={{ animationDelay: '0.4s' }}
             ></div>
           </div>

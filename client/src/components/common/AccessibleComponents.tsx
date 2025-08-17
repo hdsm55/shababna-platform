@@ -2,15 +2,15 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
 import {
-  BUTTON_VARIANTS,
-  CARD_VARIANTS,
+  getButtonClasses,
+  getCardClasses,
   SECTION_VARIANTS,
 } from './DesignSystem';
 
 // Accessible Button Component
 interface AccessibleButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: keyof typeof BUTTON_VARIANTS;
+  variant?: 'primary' | 'secondary' | 'accent' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   icon?: React.ElementType;
   iconPosition?: 'left' | 'right';
@@ -35,15 +35,6 @@ export const AccessibleButton: React.FC<AccessibleButtonProps> = ({
   ariaDescribedBy,
   ...props
 }) => {
-  const baseStyles =
-    'inline-flex items-center justify-center font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed rounded-md';
-
-  const sizeStyles = {
-    sm: 'text-sm px-3 py-1.5',
-    md: 'text-base px-4 py-2',
-    lg: 'text-lg px-6 py-3',
-  };
-
   const content = (
     <>
       {loading ? (
@@ -65,9 +56,7 @@ export const AccessibleButton: React.FC<AccessibleButtonProps> = ({
     <motion.button
       type="button"
       className={clsx(
-        baseStyles,
-        BUTTON_VARIANTS[variant],
-        sizeStyles[size],
+        getButtonClasses(variant, size),
         fullWidth && 'w-full',
         className
       )}
@@ -86,7 +75,7 @@ export const AccessibleButton: React.FC<AccessibleButtonProps> = ({
 
 // Accessible Card Component
 interface AccessibleCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: keyof typeof CARD_VARIANTS;
+  variant?: 'default' | 'elevated' | 'outlined' | 'filled';
   children: React.ReactNode;
   interactive?: boolean;
   ariaLabel?: string;
@@ -100,21 +89,19 @@ export const AccessibleCard: React.FC<AccessibleCardProps> = ({
   className,
   ...props
 }) => {
-  const baseStyles = 'transition-all duration-200';
-  const interactiveStyles = interactive
-    ? 'hover:shadow-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2'
-    : '';
-
   return (
     <motion.div
       className={clsx(
-        baseStyles,
-        CARD_VARIANTS[variant],
-        interactiveStyles,
+        getCardClasses(variant),
+        interactive && 'cursor-pointer hover:shadow-lg',
         className
       )}
+      role={interactive ? 'button' : undefined}
+      tabIndex={interactive ? 0 : undefined}
       aria-label={ariaLabel}
-      whileHover={interactive ? { y: -2 } : {}}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
       {...props}
     >
       {children}
@@ -140,16 +127,12 @@ export const AccessibleSection: React.FC<AccessibleSectionProps> = ({
 }) => {
   return (
     <section
-      className={clsx(
-        SECTION_VARIANTS[variant],
-        'py-16 px-4 sm:px-6 lg:px-8',
-        className
-      )}
+      className={clsx(SECTION_VARIANTS[variant], className)}
       aria-label={ariaLabel}
       aria-describedby={ariaDescribedBy}
       {...props}
     >
-      <div className="max-w-7xl mx-auto">{children}</div>
+      {children}
     </section>
   );
 };
@@ -171,33 +154,27 @@ export const AccessibleLink: React.FC<AccessibleLinkProps> = ({
   className,
   ...props
 }) => {
-  const externalProps = external
+  const linkProps = external
     ? {
         target: '_blank',
         rel: 'noopener noreferrer',
-        'aria-describedby': 'external-link-description',
+        'aria-label': ariaLabel || `${children} (يفتح في نافذة جديدة)`,
       }
-    : {};
+    : { 'aria-label': ariaLabel };
 
   return (
-    <motion.a
+    <a
       href={href}
       className={clsx(
-        'text-primary-600 hover:text-primary-700 underline underline-offset-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2',
+        'text-primary-600 hover:text-primary-700 underline-offset-2 hover:underline transition-colors duration-200',
         className
       )}
-      aria-label={ariaLabel}
-      whileHover={{ scale: 1.02 }}
-      {...externalProps}
+      {...linkProps}
       {...props}
     >
       {children}
-      {external && (
-        <span id="external-link-description" className="sr-only">
-          (يفتح في نافذة جديدة)
-        </span>
-      )}
-    </motion.a>
+      {external && <span className="sr-only"> (يفتح في نافذة جديدة)</span>}
+    </a>
   );
 };
 
@@ -233,7 +210,7 @@ export const AccessibleImage: React.FC<AccessibleImageProps> = ({
       src={imgSrc}
       alt={alt}
       loading={loading}
-      className={clsx('w-full h-auto', className)}
+      className={clsx('max-w-full h-auto', className)}
       onError={handleError}
       {...props}
     />

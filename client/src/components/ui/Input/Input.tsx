@@ -1,192 +1,94 @@
-import React, { forwardRef } from 'react';
-import { motion } from 'framer-motion';
-import { tokens, microInteractions } from '../../../theme/tokens';
+import React from 'react';
+import { getInputClasses } from '../../common/DesignSystem';
 
-export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputProps {
+  type?: string;
+  placeholder?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  error?: boolean;
+  disabled?: boolean;
+  className?: string;
+  name?: string;
+  required?: boolean;
+  min?: string;
+  accept?: string;
   label?: string;
   helperText?: string;
-  error?: string;
-  success?: string;
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';
-  fullWidth?: boolean;
-  size?: 'sm' | 'md' | 'lg';
-  variant?: 'default' | 'outlined' | 'filled' | 'ghost';
-  state?: 'default' | 'error' | 'success' | 'warning' | 'info';
-  children?: React.ReactNode;
 }
 
-// Input states مع التحسينات الجديدة
-const inputStates = {
-  default:
-    'border-neutral-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200',
-  error:
-    'border-error-300 focus:border-error-500 focus:ring-2 focus:ring-error-200',
-  success:
-    'border-success-300 focus:border-success-500 focus:ring-2 focus:ring-success-200',
-  warning:
-    'border-warning-300 focus:border-warning-500 focus:ring-2 focus:ring-warning-200',
-  info: 'border-info-300 focus:border-info-500 focus:ring-2 focus:ring-info-200',
-};
+export const Input: React.FC<InputProps> = ({
+  type = 'text',
+  placeholder,
+  value,
+  onChange,
+  error = false,
+  disabled = false,
+  className = '',
+  name,
+  required = false,
+  min,
+  accept,
+  label,
+  helperText,
+  icon,
+  iconPosition = 'left',
+}) => {
+  return (
+    <div className="w-full">
+      {label && (
+        <label className="block text-sm font-medium text-neutral-700 mb-2">
+          {label}
+          {required && <span className="text-error-500 ml-1">*</span>}
+        </label>
+      )}
 
-// Input variants مع التحسينات الجديدة
-const inputVariants = {
-  default: 'bg-white border border-neutral-300',
-  outlined: 'bg-transparent border-2 border-neutral-300',
-  filled: 'bg-neutral-50 border border-neutral-300',
-  ghost: 'bg-transparent border-b-2 border-neutral-300 rounded-none',
-};
-
-// Input sizes مع التحسينات الجديدة
-const inputSizes = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2 text-base',
-  lg: 'px-5 py-3 text-lg',
-};
-
-// Text colors للـ states
-const textColors = {
-  default: 'text-neutral-900',
-  error: 'text-error-600',
-  success: 'text-success-600',
-  warning: 'text-warning-600',
-  info: 'text-info-600',
-};
-
-export const Input = forwardRef<HTMLInputElement, InputProps>(
-  (
-    {
-      label,
-      helperText,
-      error,
-      success,
-      icon,
-      iconPosition = 'left',
-      fullWidth = false,
-      size = 'md',
-      variant = 'default',
-      state = 'default',
-      className = '',
-      children,
-      ...props
-    },
-    ref
-  ) => {
-    // تحديد الـ state بناء على الـ props
-    const currentState = error ? 'error' : success ? 'success' : state;
-
-    // تجميع classes
-    const baseClasses =
-      'rounded-lg transition-all duration-200 focus:outline-none placeholder-neutral-400';
-
-    const variantClasses = inputVariants[variant];
-    const sizeClasses = inputSizes[size];
-    const stateClasses = inputStates[currentState];
-    const widthClasses = fullWidth ? 'w-full' : '';
-    const microClasses = microInteractions.inputFocus;
-
-    const inputClasses = [
-      baseClasses,
-      variantClasses,
-      sizeClasses,
-      stateClasses,
-      widthClasses,
-      microClasses,
-      className,
-    ]
-      .filter(Boolean)
-      .join(' ');
-
-    // Icon wrapper مع animation
-    const IconWrapper = ({
-      children,
-      position,
-    }: {
-      children: React.ReactNode;
-      position: 'left' | 'right';
-    }) => (
-      <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.2 }}
-        className={`absolute top-1/2 transform -translate-y-1/2 flex items-center justify-center w-5 h-5 text-neutral-400 ${
-          position === 'left' ? 'left-3' : 'right-3'
-        }`}
-      >
-        {children}
-      </motion.div>
-    );
-
-    // Helper text component
-    const HelperText = ({
-      text,
-      type,
-    }: {
-      text: string;
-      type: 'helper' | 'error' | 'success';
-    }) => {
-      const colorClasses = {
-        helper: 'text-neutral-500',
-        error: 'text-error-600',
-        success: 'text-success-600',
-      };
-
-      return (
-        <motion.p
-          initial={{ opacity: 0, y: -5 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`text-sm mt-1 ${colorClasses[type]}`}
-        >
-          {text}
-        </motion.p>
-      );
-    };
-
-    return (
-      <div className={`${fullWidth ? 'w-full' : ''}`}>
-        {label && (
-          <motion.label
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className={`block text-sm font-medium text-neutral-700 mb-2`}
-          >
-            {label}
-          </motion.label>
+      <div className="relative">
+        {icon && iconPosition === 'left' && (
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span className="text-neutral-400">{icon}</span>
+          </div>
         )}
 
-        <div className="relative">
-          {icon && iconPosition === 'left' && (
-            <IconWrapper position="left">{icon}</IconWrapper>
-          )}
+        <input
+          type={type}
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange}
+          name={name}
+          required={required}
+          min={min}
+          accept={accept}
+          className={`
+            ${getInputClasses(error, disabled)}
+            ${icon && iconPosition === 'left' ? 'pl-10' : ''}
+            ${icon && iconPosition === 'right' ? 'pr-10' : ''}
+            ${className}
+          `}
+          disabled={disabled}
+        />
 
-          <motion.input
-            ref={ref}
-            className={`${inputClasses} ${
-              icon && iconPosition === 'left' ? 'pl-10' : ''
-            } ${icon && iconPosition === 'right' ? 'pr-10' : ''}`}
-            whileFocus={{ scale: 1.01 }}
-            transition={{ duration: 0.2 }}
-            {...props}
-          />
-
-          {icon && iconPosition === 'right' && (
-            <IconWrapper position="right">{icon}</IconWrapper>
-          )}
-        </div>
-
-        {/* Helper texts */}
-        {helperText && <HelperText text={helperText} type="helper" />}
-        {error && <HelperText text={error} type="error" />}
-        {success && <HelperText text={success} type="success" />}
-
-        {children}
+        {icon && iconPosition === 'right' && (
+          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <span className="text-neutral-400">{icon}</span>
+          </div>
+        )}
       </div>
-    );
-  }
-);
 
-Input.displayName = 'Input';
+      {helperText && (
+        <p
+          className={`mt-1 text-sm ${
+            error ? 'text-error-600' : 'text-neutral-500'
+          }`}
+        >
+          {helperText}
+        </p>
+      )}
+    </div>
+  );
+};
 
 // إضافة Textarea component
 export const Textarea: React.FC<

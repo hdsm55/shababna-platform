@@ -365,7 +365,7 @@ const ProgramDetail: React.FC = () => {
                   </h3>
                   <div className="space-y-2 text-sm text-gray-600">
                     <a
-                      href="tel:+966501234567"
+                      href="tel:+905050505645"
                       className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors duration-200"
                     >
                       <Phone className="w-4 h-4 mr-2 text-green-500" />

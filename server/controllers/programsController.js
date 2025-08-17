@@ -2,21 +2,71 @@ import { validationResult } from 'express-validator';
 import { query } from '../config/database.js';
 import { successResponse, errorResponse } from '../utils/response.js';
 
-// Get all programs (public)
+// Get all programs (public) - محسن لدعم التصفية والتحديد
 export const getAllPrograms = async (req, res) => {
     try {
-        const result = await query(`
-      SELECT
-        id,
-        title,
-        description,
-        start_date,
-        end_date,
-        created_at
-        FROM programs
-        ORDER BY created_at DESC
-    `);
-        return successResponse(res, { programs: result.rows, total: result.rows.length }, 'تم جلب البرامج بنجاح');
+        const { page = 1, limit = 10, category, search } = req.query;
+        const offset = (page - 1) * limit;
+
+        // بناء الاستعلام الديناميكي
+        let whereClause = '';
+        const params = [];
+        let paramIndex = 1;
+
+        if (category) {
+            whereClause += ` WHERE category = $${paramIndex}`;
+            params.push(category);
+            paramIndex++;
+        }
+
+        if (search) {
+            const searchCondition = ` ${whereClause ? 'AND' : 'WHERE'} (title ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`;
+            whereClause += searchCondition;
+            params.push(`%${search}%`);
+            paramIndex++;
+        }
+
+        // استعلام العد
+        const countQuery = `SELECT COUNT(*) FROM programs${whereClause}`;
+        const countResult = await query(countQuery, params);
+        const total = parseInt(countResult.rows[0].count);
+
+        // استعلام البيانات
+        const dataQuery = `
+            SELECT
+                id,
+                title,
+                description,
+                start_date,
+                end_date,
+                category,
+                goal_amount,
+                current_amount,
+                participants_count,
+                image_url,
+                status,
+                created_at
+            FROM programs
+            ${whereClause}
+            ORDER BY created_at DESC
+            LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+        `;
+
+        params.push(parseInt(limit), offset);
+        const result = await query(dataQuery, params);
+
+        const totalPages = Math.ceil(total / limit);
+        const pagination = {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            total,
+            totalPages
+        };
+
+        return successResponse(res, {
+            programs: result.rows,
+            pagination
+        }, 'تم جلب البرامج بنجاح');
     } catch (error) {
         console.error('Programs fetch error:', error);
         return errorResponse(res, 'خطأ في جلب البرامج', 500, error);
@@ -26,7 +76,25 @@ export const getAllPrograms = async (req, res) => {
 // Get single program (public)
 export const getProgramById = async (req, res) => {
     try {
-        const result = await query('SELECT * FROM programs WHERE id = $1', [req.params.id]);
+        const result = await query(`
+            SELECT
+                id,
+                title,
+                description,
+                start_date,
+                end_date,
+                category,
+                goal_amount,
+                current_amount,
+                participants_count,
+                image_url,
+                status,
+                created_at,
+                updated_at
+            FROM programs
+            WHERE id = $1
+        `, [req.params.id]);
+
         if (result.rows.length === 0) {
             return errorResponse(res, 'البرنامج غير موجود', 404);
         }
@@ -69,13 +137,26 @@ export const createProgram = async (req, res) => {
             title,
             description,
             start_date,
-            end_date
+            end_date,
+            category,
+            goal_amount,
+            current_amount = 0,
+            participants_count = 0
         } = req.body;
+
+        // معالجة الصورة المرفوعة
+        let image_url = null;
+        if (req.file) {
+            image_url = `/uploads/${req.file.filename}`;
+            console.log('📸 تم رفع الصورة:', image_url);
+        }
+
         const result = await query(`
-      INSERT INTO programs (title, description, start_date, end_date)
-      VALUES ($1, $2, $3, $4)
-      RETURNING id, title, description, start_date, end_date, created_at
-    `, [title, description, start_date, end_date]);
+      INSERT INTO programs (title, description, start_date, end_date, category, goal_amount, current_amount, participants_count, image_url)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      RETURNING id, title, description, start_date, end_date, category, goal_amount, current_amount, participants_count, image_url, created_at
+    `, [title, description, start_date, end_date, category, goal_amount, current_amount, participants_count, image_url]);
+
         return successResponse(res, result.rows[0], 'تم إضافة البرنامج بنجاح');
     } catch (error) {
         console.error('Program creation error:', error);
@@ -91,14 +172,39 @@ export const updateProgram = async (req, res) => {
             title,
             description,
             start_date,
-            end_date
+            end_date,
+            category,
+            goal_amount,
+            current_amount,
+            participants_count
         } = req.body;
-        const result = await query(`
-      UPDATE programs
-      SET title = $1, description = $2, start_date = $3, end_date = $4
-      WHERE id = $5
-      RETURNING id, title, description, start_date, end_date, created_at
-    `, [title, description, start_date, end_date, id]);
+
+        // معالجة الصورة المرفوعة
+        let image_url = null;
+        if (req.file) {
+            image_url = `/uploads/${req.file.filename}`;
+            console.log('📸 تم رفع الصورة الجديدة:', image_url);
+        }
+
+        // بناء استعلام التحديث
+        let updateQuery = `
+            UPDATE programs
+            SET title = $1, description = $2, start_date = $3, end_date = $4,
+                category = $5, goal_amount = $6, current_amount = $7, participants_count = $8
+        `;
+        let queryParams = [title, description, start_date, end_date, category, goal_amount, current_amount, participants_count];
+
+        // إضافة الصورة إذا كانت موجودة
+        if (image_url) {
+            updateQuery += `, image_url = $${queryParams.length + 1}`;
+            queryParams.push(image_url);
+        }
+
+        updateQuery += ` WHERE id = $${queryParams.length + 1} RETURNING *`;
+        queryParams.push(id);
+
+        const result = await query(updateQuery, queryParams);
+
         if (result.rows.length === 0) {
             return errorResponse(res, 'البرنامج غير موجود', 404);
         }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { tokens, hoverEffects, microInteractions } from '../../../theme/tokens';
+import { designTokens, componentStyles } from '../../../theme/designTokens';
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -25,25 +25,25 @@ export interface ButtonProps
   children: React.ReactNode;
 }
 
-// Button variants مع التحسينات الجديدة والألوان الغامقة
+// Button variants محسنة ومتناسقة
 const buttonVariants = {
   primary:
-    'bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 border border-primary-500',
+    'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg transition-all duration-300',
   secondary:
-    'bg-gradient-to-r from-secondary-600 to-secondary-700 text-white hover:from-secondary-700 hover:to-secondary-800 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 border border-secondary-500',
+    'bg-gray-600 text-white hover:bg-gray-700 shadow-md hover:shadow-lg transition-all duration-300',
   accent:
-    'bg-gradient-to-r from-accent-600 to-accent-700 text-white hover:from-accent-700 hover:to-accent-800 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 border border-accent-500',
+    'bg-purple-600 text-white hover:bg-purple-700 shadow-md hover:shadow-lg transition-all duration-300',
   ghost:
-    'bg-transparent text-primary-600 hover:bg-primary-50 hover:text-primary-700 transition-all duration-200',
+    'bg-transparent text-blue-600 hover:bg-blue-50 transition-all duration-200',
   outline:
-    'bg-transparent border-2 border-primary-600 text-primary-600 hover:bg-primary-50 hover:border-primary-700 hover:text-primary-700 transition-all duration-200',
+    'bg-transparent border-2 border-blue-600 text-blue-600 hover:bg-blue-50 transition-all duration-200',
   success:
-    'bg-gradient-to-r from-success-600 to-success-700 text-white hover:from-success-700 hover:to-success-800 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 border border-success-500',
+    'bg-green-600 text-white hover:bg-green-700 shadow-md hover:shadow-lg transition-all duration-300',
   error:
-    'bg-gradient-to-r from-error-600 to-error-700 text-white hover:from-error-700 hover:to-error-800 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 border border-error-500',
+    'bg-red-600 text-white hover:bg-red-700 shadow-md hover:shadow-lg transition-all duration-300',
   warning:
-    'bg-gradient-to-r from-warning-600 to-warning-700 text-white hover:from-warning-700 hover:to-warning-800 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 border border-warning-500',
-  info: 'bg-gradient-to-r from-info-600 to-info-700 text-white hover:from-info-700 hover:to-info-800 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 border border-info-500',
+    'bg-yellow-600 text-white hover:bg-yellow-700 shadow-md hover:shadow-lg transition-all duration-300',
+  info: 'bg-blue-500 text-white hover:bg-blue-600 shadow-md hover:shadow-lg transition-all duration-300',
 };
 
 // Button sizes مع التحسينات الجديدة
@@ -86,10 +86,7 @@ export const Button: React.FC<ButtonProps> = ({
   const sizeClasses = buttonSizes[size];
   const widthClasses = fullWidth ? 'w-full' : '';
   const roundedClasses = rounded ? 'rounded-full' : 'rounded-lg';
-  const glowClasses = glow
-    ? glowEffects[variant as keyof typeof glowEffects]
-    : '';
-  const microClasses = microInteractions.buttonPress;
+  const glowClasses = glow ? 'shadow-lg' : '';
 
   const buttonClasses = [
     baseClasses,
@@ -98,7 +95,6 @@ export const Button: React.FC<ButtonProps> = ({
     widthClasses,
     roundedClasses,
     glowClasses,
-    microClasses,
     className,
   ]
     .filter(Boolean)
@@ -136,14 +132,7 @@ export const Button: React.FC<ButtonProps> = ({
   );
 
   return (
-    <motion.button
-      className={buttonClasses}
-      disabled={disabled || loading}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      transition={{ duration: 0.2 }}
-      {...props}
-    >
+    <button className={buttonClasses} disabled={disabled || loading} {...props}>
       {loading ? (
         <>
           <LoadingSpinner />
@@ -160,7 +149,7 @@ export const Button: React.FC<ButtonProps> = ({
           )}
         </>
       )}
-    </motion.button>
+    </button>
   );
 };
 

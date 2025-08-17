@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 interface SEOProps {
   title?: string;
   description?: string;
-  keywords?: string[];
+  keywords?: string | string[];
   image?: string;
   url?: string;
   type?: 'website' | 'article' | 'event' | 'organization';
@@ -13,63 +13,95 @@ interface SEOProps {
   modifiedTime?: string;
   section?: string;
   tags?: string[];
+  canonical?: string;
+  noindex?: boolean;
+  nofollow?: boolean;
 }
 
 const SEO: React.FC<SEOProps> = ({
-  title = 'Shababna Global - Empowering Youth Worldwide',
-  description = 'Join Shababna Global in creating positive change through innovative programs and community engagement. Empowering youth to build a better tomorrow.',
+  title = 'شبابنا العالمية - منصة شبابية عالمية للتنمية والتطوير',
+  description = 'انضم إلى شبابنا العالمية في خلق تغيير إيجابي من خلال برامج مبتكرة ومشاركة مجتمعية. تمكين الشباب لبناء مستقبل أفضل.',
   keywords = [
-    'youth empowerment',
-    'community development',
-    'global youth',
-    'leadership development',
-    'social impact',
-    'volunteer opportunities',
-    'youth programs',
-    'international community',
+    'تمكين الشباب',
+    'التنمية المجتمعية',
+    'الشباب العالمي',
+    'تطوير القيادة',
+    'التأثير الاجتماعي',
+    'فرص التطوع',
+    'برامج الشباب',
+    'المجتمع الدولي',
+    'شبابنا',
+    'تنمية',
+    'تطوير',
+    'شباب',
+    'مجتمع',
   ],
   image = '/og-image.jpg',
-  url = window.location.href,
+  url = typeof window !== 'undefined' ? window.location.href : '',
   type = 'website',
-  author = 'Shababna Global',
+  author = 'شبابنا العالمية',
   publishedTime,
   modifiedTime,
   section,
   tags = [],
+  canonical,
+  noindex = false,
+  nofollow = false,
 }) => {
-  const siteName = 'Shababna Global';
+  const siteName = 'شبابنا العالمية';
   const fullTitle = title === siteName ? title : `${title} | ${siteName}`;
+  const fullUrl = canonical || url;
+
+  // معالجة keywords - التأكد من أنه مصفوفة
+  const processedKeywords = Array.isArray(keywords)
+    ? keywords.join(', ')
+    : typeof keywords === 'string'
+    ? keywords
+    : keywords?.join(', ') || '';
 
   return (
     <Helmet>
       {/* Basic Meta Tags */}
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
-      <meta name="keywords" content={keywords.join(', ')} />
+      <meta name="keywords" content={processedKeywords} />
       <meta name="author" content={author} />
+      <meta
+        name="robots"
+        content={noindex ? 'noindex' : nofollow ? 'nofollow' : 'index, follow'}
+      />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta name="theme-color" content="#27548A" />
+      <meta name="msapplication-TileColor" content="#27548A" />
+
+      {/* Canonical URL */}
+      <link rel="canonical" href={fullUrl} />
 
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={type} />
-      <meta property="og:url" content={url} />
+      <meta property="og:url" content={fullUrl} />
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={image} />
       <meta property="og:site_name" content={siteName} />
-      <meta property="og:locale" content="en_US" />
+      <meta property="og:locale" content="ar_SA" />
+      <meta property="og:locale:alternate" content="en_US" />
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:url" content={url} />
+      <meta name="twitter:url" content={fullUrl} />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />
       <meta name="twitter:site" content="@shababnaglobal" />
+      <meta name="twitter:creator" content="@shababnaglobal" />
 
       {/* Additional Meta Tags */}
-      <meta name="robots" content="index, follow" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <meta name="theme-color" content="#2563eb" />
-      <meta name="msapplication-TileColor" content="#2563eb" />
+      <meta name="format-detection" content="telephone=no" />
+      <meta name="mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      <meta name="apple-mobile-web-app-title" content={siteName} />
 
       {/* Article specific meta tags */}
       {type === 'article' && (
@@ -106,9 +138,6 @@ const SEO: React.FC<SEOProps> = ({
         </>
       )}
 
-      {/* Canonical URL */}
-      <link rel="canonical" href={url} />
-
       {/* Favicon */}
       <link rel="icon" type="image/x-icon" href="/favicon.ico" />
       <link
@@ -139,6 +168,55 @@ const SEO: React.FC<SEOProps> = ({
         href="https://fonts.gstatic.com"
         crossOrigin="anonymous"
       />
+
+      {/* DNS Prefetch for performance */}
+      <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+      <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+
+      {/* Additional SEO Meta Tags */}
+      <meta name="application-name" content={siteName} />
+      <meta name="msapplication-TileColor" content="#27548A" />
+      <meta name="msapplication-config" content="/browserconfig.xml" />
+
+      {/* Language and Region */}
+      <meta name="language" content="Arabic" />
+      <meta name="geo.region" content="SA" />
+      <meta name="geo.placename" content="Riyadh" />
+      <meta name="geo.position" content="24.7136;46.6753" />
+      <meta name="ICBM" content="24.7136, 46.6753" />
+
+      {/* Social Media Verification */}
+      <meta name="twitter:site" content="@shababnaglobal" />
+      <meta name="twitter:creator" content="@shababnaglobal" />
+
+      {/* Structured Data for Organization */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'NonProfit',
+          name: siteName,
+          description: 'منصة شبابية عالمية للتنمية والتطوير',
+          url: 'https://shababnaglobal.org',
+          logo: 'https://shababnaglobal.org/logo.png',
+          address: {
+            '@type': 'PostalAddress',
+            addressLocality: 'Riyadh',
+            addressCountry: 'SA',
+            addressRegion: 'Riyadh',
+          },
+          contactPoint: {
+            '@type': 'ContactPoint',
+            telephone: '+966501234567',
+            email: 'info@shababnaglobal.org',
+            contactType: 'customer service',
+          },
+          sameAs: [
+            'https://facebook.com/shababnaglobal',
+            'https://twitter.com/shababnaglobal',
+            'https://instagram.com/shababnaglobal',
+          ],
+        })}
+      </script>
     </Helmet>
   );
 };

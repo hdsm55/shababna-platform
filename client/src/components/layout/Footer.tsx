@@ -24,10 +24,10 @@ const Footer: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // تأخير ظهور الفوتر لضمان عدم ظهوره مبكراً
+    // إظهار الفوتر بعد تأخير قصير
     const timer = setTimeout(() => {
       setIsVisible(true);
-    }, 2000); // 2 ثانية بعد تحميل الصفحة
+    }, 200);
 
     return () => clearTimeout(timer);
   }, []);
@@ -192,14 +192,14 @@ const Footer: React.FC = () => {
                 </span>
               </a>
               <a
-                href="tel:+966501234567"
+                href="tel:+905050505645"
                 className="flex items-center space-x-3 rtl:space-x-reverse group cursor-pointer"
               >
                 <div className="w-8 h-8 bg-primary-600/20 rounded-lg flex items-center justify-center group-hover:bg-primary-600 transition-all duration-300">
                   <Phone className="w-4 h-4 text-primary-400 group-hover:text-white transition-colors duration-300" />
                 </div>
                 <span className="text-neutral-300 text-sm group-hover:text-white transition-colors duration-300">
-                  {t('footer.phone')}
+                  +90 50 505 05645
                 </span>
               </a>
               <a
@@ -210,7 +210,7 @@ const Footer: React.FC = () => {
                   <Mail className="w-4 h-4 text-primary-400 group-hover:text-white transition-colors duration-300" />
                 </div>
                 <span className="text-neutral-300 text-sm group-hover:text-white transition-colors duration-300">
-                  {t('footer.email')}
+                  info@shaababna.com
                 </span>
               </a>
             </div>

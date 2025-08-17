@@ -37,7 +37,14 @@ export const fetchEventById = async (id: string): Promise<any> => {
     console.log('🔍 Fetching event by ID:', id);
     const response = await http.get(`/events/${id}`);
     console.log('📊 Event API Response:', response.data);
-    return response.data.data || response.data;
+
+    // API يرجع البيانات في response.data.data
+    if (response.data && response.data.success && response.data.data) {
+      return response.data.data;
+    }
+
+    // إذا لم تكن البيانات في الشكل المتوقع، نرجع الاستجابة كاملة
+    return response.data;
   } catch (error) {
     console.error('Event API failed:', error);
     throw error; // إعادة رمي الخطأ بدلاً من إرجاع بيانات وهمية
