@@ -329,7 +329,7 @@ const ProgramsDashboard: React.FC = () => {
         await createProgram(programData);
         setModalMsg(
           `✅ تم إنشاء البرنامج "${form.title}" بنجاح! 🎉\n\n` +
-            `📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `📅 التاريخ: ${new Date().toLocaleDateString('en-US')}\n` +
             `💰 المبلغ المطلوب: ${parseFloat(form.goal_amount).toLocaleString(
               'ar-SA'
             )} ريال\n` +
@@ -340,7 +340,7 @@ const ProgramsDashboard: React.FC = () => {
         await updateProgram(selectedProgram.id, programData);
         setModalMsg(
           `✅ تم تحديث البرنامج "${form.title}" بنجاح! 🔄\n\n` +
-            `📅 آخر تحديث: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `📅 آخر تحديث: ${new Date().toLocaleDateString('en-US')}\n` +
             `💰 المبلغ المطلوب: ${parseFloat(form.goal_amount).toLocaleString(
               'ar-SA'
             )} ريال\n` +
@@ -419,7 +419,7 @@ const ProgramsDashboard: React.FC = () => {
   const formatDate = (dateString: string) => {
     if (!dateString) return 'غير محدد';
     try {
-      return new Date(dateString).toLocaleDateString('ar-SA', {
+      return new Date(dateString).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
@@ -447,7 +447,7 @@ const ProgramsDashboard: React.FC = () => {
         queryClient.invalidateQueries(['dashboard-programs']);
         setModalMsg(
           `✅ تم حذف البرنامج "${programTitle}" بنجاح! 🗑️\n\n` +
-            `📅 تاريخ الحذف: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `📅 تاريخ الحذف: ${new Date().toLocaleDateString('en-US')}\n` +
             `💰 المبلغ المجمع: ${currentAmount.toLocaleString(
               'ar-SA'
             )} ريال\n` +

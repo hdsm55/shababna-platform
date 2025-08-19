@@ -98,36 +98,26 @@ const PresidentMessage = memo(() => {
             <h2 className="text-2xl font-bold text-dark-500 mb-1">
               كلمة رئيس المنظمة
             </h2>
-            <p className="text-sm text-primary-500">
-              أحمد محمد - رئيس منصة شبابنا العالمية
-            </p>
+            <p className="text-sm text-dark-400">أحمد محمد علي</p>
           </div>
 
-          <div className="text-dark-400 space-y-4 text-sm leading-relaxed">
-            <p>بسم الله الرحمن الرحيم،</p>
-
-            <p>
-              يسعدني أن أرحب بكم في منصة شبابنا العالمية، منصة رقمية تجمع الشباب
-              المسلم من جميع أنحاء العالم لصناعة التغيير الإيجابي.
+          <div className="prose prose-sm max-w-none text-dark-500 leading-relaxed">
+            <p className="mb-4">
+              بسم الله الرحمن الرحيم، الحمد لله رب العالمين، والصلاة والسلام على
+              سيدنا محمد وعلى آله وصحبه أجمعين.
             </p>
-
-            <p>
-              من قلب إسطنبول، المدينة التي تجمع بين الشرق والغرب، نعمل معاً
-              لبناء مستقبل مشرق للشباب المسلم. نؤمن بأن الشباب هم قادة الغد، وأن
-              لديهم القدرة على إحداث تغيير إيجابي في العالم.
+            <p className="mb-4">
+              أهلاً وسهلاً بكم في منصة شبابنا العالمية، منصة تهدف إلى تمكين
+              الشباب المسلم وبناء مستقبل مشرق له ولأمته.
             </p>
-
-            <p>
-              من خلال برامجنا وفعالياتنا المتنوعة، نسعى لتطوير مهارات الشباب،
-              وتعزيز قيمهم الإسلامية، وتمكينهم من المساهمة في بناء مجتمعاتهم.
+            <p className="mb-4">
+              نحن نؤمن بأن الشباب هم عماد الأمة وثروتها الحقيقية، ومن خلال هذه
+              المنصة نسعى إلى توفير بيئة إيجابية ومحفزة للشباب المسلم ليتعلم
+              وينمو ويطور مهاراته وقدراته.
             </p>
-
-            <p className="font-medium">
-              مع تحياتي،
-              <br />
-              أحمد محمد
-              <br />
-              رئيس منصة شبابنا العالمية
+            <p>
+              نعمل معاً من قلب اسطنبول، مدينة الجسور بين الشرق والغرب، لنكون
+              جسراً للتواصل والتعاون بين الشباب المسلم في جميع أنحاء العالم.
             </p>
           </div>
         </Card>
@@ -137,10 +127,7 @@ const PresidentMessage = memo(() => {
 });
 
 const VisionMission = memo(() => {
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
+  const { t } = useTranslation();
 
   return (
     <motion.section
@@ -150,71 +137,72 @@ const VisionMission = memo(() => {
       viewport={{ once: true }}
       className="mb-12"
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* رؤيتنا */}
-        <motion.div variants={itemVariants} className="group">
-          <Card className="h-full p-6 bg-primary-50 border border-primary-200 shadow-brand-sm">
-            <div className="text-center mb-4">
-              <div className="w-12 h-12 mx-auto mb-3 bg-primary-500 rounded-full flex items-center justify-center">
-                <Target className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-dark-500 mb-3">رؤيتنا</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* الرؤية */}
+        <Card className="p-6 bg-gradient-to-br from-primary-50 to-primary-100 border border-primary-200 shadow-brand-sm">
+          <div className="flex items-center mb-4">
+            <div className="w-12 h-12 bg-primary-500 rounded-full flex items-center justify-center mr-3">
+              <Target className="w-6 h-6 text-white" />
             </div>
-            <p className="text-sm text-dark-400 text-center leading-relaxed">
-              نسعى لأن نكون المنصة الرائدة عالمياً في تطوير وتمكين الشباب
-              المسلم، وإعدادهم ليكونوا قادة الغد المؤثرين في مجتمعاتهم والعالم.
-            </p>
-          </Card>
-        </motion.div>
+            <h2 className="text-xl font-bold text-dark-500">رؤيتنا</h2>
+          </div>
+          <p className="text-dark-500 leading-relaxed">
+            نسعى لأن نكون المنصة الرائدة عالمياً في تمكين الشباب المسلم وبناء
+            مستقبل مشرق له ولأمته، من خلال توفير بيئة إيجابية ومحفزة للتعلم
+            والنمو والتطوير.
+          </p>
+        </Card>
 
-        {/* رسالتنا */}
-        <motion.div variants={itemVariants} className="group">
-          <Card className="h-full p-6 bg-secondary-50 border border-secondary-200 shadow-brand-sm">
-            <div className="text-center mb-4">
-              <div className="w-12 h-12 mx-auto mb-3 bg-secondary-500 rounded-full flex items-center justify-center">
-                <Globe className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-dark-500 mb-3">رسالتنا</h3>
+        {/* الرسالة */}
+        <Card className="p-6 bg-gradient-to-br from-accent-50 to-accent-100 border border-accent-200 shadow-brand-sm">
+          <div className="flex items-center mb-4">
+            <div className="w-12 h-12 bg-accent-500 rounded-full flex items-center justify-center mr-3">
+              <Heart className="w-6 h-6 text-white" />
             </div>
-            <p className="text-sm text-dark-400 text-center leading-relaxed">
-              توفير منصة رقمية شاملة تجمع الشباب المسلم من جميع أنحاء العالم،
-              وتوفر لهم البرامج والفعاليات المتنوعة لتطوير مهاراتهم، وتعزيز
-              قيمهم، وتمكينهم من المساهمة في بناء مجتمعاتهم.
-            </p>
-          </Card>
-        </motion.div>
+            <h2 className="text-xl font-bold text-dark-500">رسالتنا</h2>
+          </div>
+          <p className="text-dark-500 leading-relaxed">
+            تمكين الشباب المسلم من خلال توفير برامج ومبادرات مبتكرة تساهم في
+            تطوير مهاراته وقدراته، وتعزيز قيمه الإسلامية، وبناء شخصية متوازنة
+            ومؤثرة في المجتمع.
+          </p>
+        </Card>
       </div>
     </motion.section>
   );
 });
 
 const CoreValues = memo(() => {
-  const { t } = useTranslation();
-
   const values = [
     {
-      icon: Heart,
-      title: 'التميز',
-      description: 'نسعى للتميز في كل ما نقوم به من برامج وفعاليات',
-      color: 'text-accent-500',
+      icon: Shield,
+      title: 'الأمانة',
+      description: 'نلتزم بالأمانة والشفافية في جميع أعمالنا',
     },
     {
-      icon: Shield,
-      title: 'الشفافية',
-      description: 'نؤمن بالشفافية الكاملة في جميع أعمالنا وبرامجنا',
-      color: 'text-primary-500',
+      icon: Star,
+      title: 'التميز',
+      description: 'نسعى للتميز في كل ما نقدمه من خدمات',
     },
     {
       icon: Users,
       title: 'التعاون',
-      description: 'نعمل معاً كفريق واحد لتحقيق أهدافنا المشتركة',
-      color: 'text-secondary-500',
+      description: 'نؤمن بقوة العمل الجماعي والتعاون المشترك',
     },
     {
       icon: Lightbulb,
       title: 'الابتكار',
-      description: 'نبتكر حلولاً جديدة ومبتكرة لتحديات الشباب',
-      color: 'text-accent-500',
+      description: 'نشجع الابتكار والإبداع في حل المشكلات',
+    },
+    {
+      icon: Globe,
+      title: 'العالمية',
+      description: 'نعمل على مستوى عالمي لخدمة الشباب المسلم',
+    },
+    {
+      icon: Heart,
+      title: 'الرحمة',
+      description: 'نعامل الجميع بالرحمة واللطف والاحترام',
     },
   ];
 
@@ -246,7 +234,7 @@ const CoreValues = memo(() => {
           قيمنا الأساسية
         </h2>
         <p className="text-sm text-dark-400 max-w-xl mx-auto">
-          القيم التي نؤمن بها ونسعى لتطبيقها في جميع أعمالنا وبرامجنا
+          القيم التي تحكم عملنا وتوجه رؤيتنا المستقبلية
         </p>
       </div>
 
@@ -255,7 +243,7 @@ const CoreValues = memo(() => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
       >
         {values.map((value, index) => (
           <motion.div
@@ -265,16 +253,14 @@ const CoreValues = memo(() => {
             transition={{ duration: 0.2 }}
             className="group"
           >
-            <Card className="h-full p-4 text-center border border-neutral-200 shadow-brand-sm">
-              <div
-                className={`w-10 h-10 mx-auto mb-3 rounded-full bg-neutral-100 flex items-center justify-center group-hover:bg-primary-50 transition-colors duration-200`}
-              >
-                <value.icon className={`w-5 h-5 ${value.color}`} />
+            <Card className="h-full p-4 text-center border border-neutral-200 shadow-brand-sm bg-white hover:shadow-brand-md transition-shadow">
+              <div className="w-12 h-12 mx-auto mb-3 bg-primary-500 rounded-full flex items-center justify-center">
+                <value.icon className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-bold text-dark-500 mb-2">
+              <h3 className="text-base font-bold text-dark-500 mb-2">
                 {value.title}
               </h3>
-              <p className="text-sm text-dark-400">{value.description}</p>
+              <p className="text-xs text-dark-400">{value.description}</p>
             </Card>
           </motion.div>
         ))}
@@ -287,18 +273,18 @@ const Achievements = memo(() => {
   const achievements = [
     {
       number: '1000+',
-      label: 'شاب وشابة',
-      description: 'عدد الشباب المستفيدين من برامجنا',
+      label: 'شاب',
+      description: 'شاب مسلم مستفيد',
     },
     {
       number: '50+',
       label: 'فعالية',
-      description: 'فعالية ناجحة تم تنظيمها',
+      description: 'فعالية ناجحة',
     },
     {
       number: '20+',
       label: 'برنامج',
-      description: 'برنامج تطويري تم إطلاقه',
+      description: 'برنامج تطويري',
     },
     {
       number: '10+',

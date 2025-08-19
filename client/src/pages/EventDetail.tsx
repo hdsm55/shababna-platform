@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, memo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import SEO from '../components/common/SEO';
-import { Button } from '../components/ui/Button/Button';
+import { Button } from '../components/ui/Button/ButtonSimple';
 import { Card } from '../components/ui/Card/Card';
-import { Input } from '../components/ui/Input/Input';
-import Alert from '../components/common/Alert';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import { Input } from '../components/ui/Input/InputSimple';
+import { Alert } from '../components/common/AlertSimple';
+import UnifiedLoader from '../components/common/UnifiedLoader';
 import { fetchEventById } from '../services/eventsApi';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -23,7 +23,11 @@ import {
   CheckCircle,
   Award,
   Tag,
+  Eye,
+  Heart,
+  Star,
 } from 'lucide-react';
+import ShareButtons from '../components/common/ShareButtons';
 
 interface RegistrationForm {
   firstName: string;
@@ -33,51 +37,9 @@ interface RegistrationForm {
   message?: string;
 }
 
-const EventDetail: React.FC = () => {
-  const { t, i18n } = useTranslation();
-  const { id } = useParams<{ id: string }>();
-  const isRTL = i18n.dir() === 'rtl';
-
-  const [showRegistration, setShowRegistration] = useState(false);
-  const [registrationForm, setRegistrationForm] = useState<RegistrationForm>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    message: '',
-  });
-  const [registrationStatus, setRegistrationStatus] = useState<
-    'idle' | 'loading' | 'success' | 'error'
-  >('idle');
-  const [registrationMessage, setRegistrationMessage] = useState('');
-
-  // Fetch event details
-  const {
-    data: eventData,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['event', id],
-    queryFn: () => fetchEventById(id!),
-    enabled: !!id,
-  });
-
-  const event = eventData?.data || eventData;
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
-  const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('ar-SA', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+// تحسين الأداء - مكونات منفصلة
+const EventHeader = memo(({ event }: { event: any }) => {
+  const { t } = useTranslation();
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -109,553 +71,334 @@ const EventDetail: React.FC = () => {
     }
   };
 
-  const getCategoryIcon = (category: string) => {
-    const categoryMap: { [key: string]: string } = {
-      workshop: '🔧',
-      conference: '🎤',
-      networking: '🤝',
-      seminar: '📚',
-      training: '💡',
-    };
-    return categoryMap[category] || '🎯';
-  };
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+      className="text-center mb-8"
+    >
+      <motion.div
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="inline-block"
+      >
+        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-dark-500 bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+          {event?.title}
+        </h1>
+      </motion.div>
 
-  const getCategoryColor = (category: string) => {
-    const colorMap: { [key: string]: string } = {
-      workshop: 'bg-orange-100 text-orange-800',
-      conference: 'bg-blue-100 text-blue-800',
-      networking: 'bg-green-100 text-green-800',
-      seminar: 'bg-purple-100 text-purple-800',
-      training: 'bg-yellow-100 text-yellow-800',
-    };
-    return colorMap[category] || 'bg-gray-100 text-gray-800';
-  };
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className="flex items-center justify-center gap-4 mb-6"
+      >
+        <span
+          className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(
+            event?.status
+          )}`}
+        >
+          {getStatusText(event?.status)}
+        </span>
+        <div className="flex items-center gap-2 text-dark-400">
+          <Eye className="w-4 h-4" />
+          <span className="text-sm">مشاهدات: {event?.views || 0}</span>
+        </div>
+      </motion.div>
 
-  const calculateDaysUntil = (dateString: string) => {
-    const eventDate = new Date(dateString);
-    const today = new Date();
-    const diffTime = eventDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.6 }}
+        className="text-lg text-dark-400 max-w-3xl mx-auto leading-relaxed"
+      >
+        {event?.description}
+      </motion.p>
+    </motion.div>
+  );
+});
 
-  const calculateRegistrationProgress = () => {
-    if (!event?.max_attendees) return 0;
-    return Math.min(((event.attendees || 0) / event.max_attendees) * 100, 100);
-  };
+const EventInfo = memo(({ event }: { event: any }) => {
+  const { t, i18n } = useTranslation();
 
-  const handleRegistration = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setRegistrationStatus('loading');
-
-    try {
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
-        }/events/${id}/register`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            first_name: registrationForm.firstName,
-            last_name: registrationForm.lastName,
-            email: registrationForm.email,
-            phone: registrationForm.phone,
-            message: registrationForm.message,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('فشل في التسجيل');
-      }
-
-      const result = await response.json();
-
-      if (result.success) {
-        setRegistrationStatus('success');
-        setRegistrationMessage(
-          'تم التسجيل بنجاح! ستتلقى تأكيداً عبر البريد الإلكتروني.'
-        );
-        setShowRegistration(false);
-        setRegistrationForm({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          message: '',
-        });
-      } else {
-        throw new Error(result.message || 'حدث خطأ أثناء التسجيل');
-      }
-    } catch (error) {
-      console.error('Registration error:', error);
-      setRegistrationStatus('error');
-      setRegistrationMessage('حدث خطأ أثناء التسجيل. يرجى المحاولة مرة أخرى.');
-    }
-  };
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setRegistrationForm({
-      ...registrationForm,
-      [e.target.name]: e.target.value,
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
 
-  if (error || !event) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50">
-        <Alert type="error">
-          {t('eventDetail.error', 'حدث خطأ أثناء جلب تفاصيل الفعالية.')}
-        </Alert>
-      </div>
-    );
-  }
+  const infoItems = [
+    {
+      icon: Calendar,
+      label: t('event.date', 'التاريخ'),
+      value: formatDate(event?.start_date),
+    },
+    {
+      icon: Clock,
+      label: t('event.time', 'الوقت'),
+      value: formatTime(event?.start_date),
+    },
+    {
+      icon: MapPin,
+      label: t('event.location', 'الموقع'),
+      value: event?.location || t('event.online', 'أونلاين'),
+    },
+    {
+      icon: Users,
+      label: t('event.capacity', 'السعة'),
+      value: `${event?.capacity || 0} ${t('event.participants', 'مشارك')}`,
+    },
+  ];
 
   return (
-    <div
-      className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50"
-      dir={isRTL ? 'rtl' : 'ltr'}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.3 }}
+      className="mb-8"
     >
-      <SEO
-        title={`${event.title} - منصة شبابنا العالمية`}
-        description={event.description}
-        type="event"
-      />
-
-      {/* Enhanced Back Button */}
-      <section className="container mx-auto px-4 py-6">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Link to="/events">
-            <Button
-              variant="outline"
-              className="flex items-center gap-2 hover:bg-slate-50"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              {t('eventDetail.backToEvents', 'العودة إلى الفعاليات')}
-            </Button>
-          </Link>
-        </motion.div>
-      </section>
-
-      {/* Enhanced Event Header */}
-      <section className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Enhanced Event Image */}
-          <div className="lg:col-span-2">
+      <Card className="p-6 bg-gradient-to-br from-white via-primary-50/30 to-secondary-50/30 backdrop-blur-sm border border-primary-200">
+        <h2 className="text-xl font-bold text-dark-500 mb-6 text-center">
+          {t('event.details', 'تفاصيل الفعالية')}
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {infoItems.map((item, index) => (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="relative"
-            >
-              <div className="relative h-96 bg-gradient-to-br from-slate-700 via-blue-700 to-slate-800 rounded-2xl shadow-2xl overflow-hidden">
-                <div className="absolute inset-0 bg-black bg-opacity-30"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center text-white">
-                    <div className="text-8xl mb-4">
-                      {getCategoryIcon(event.category)}
-                    </div>
-                    <h1 className="text-3xl font-bold mb-2">{event.title}</h1>
-                    <p className="text-xl opacity-90">{event.category}</p>
-                  </div>
-                </div>
-
-                {/* Floating Action Buttons */}
-                <div className="absolute top-4 right-4 flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="bg-white bg-opacity-90 hover:bg-opacity-100"
-                  >
-                    <Share2 className="w-4 h-4" />
-                  </Button>
-                </div>
-
-                {/* Status Badge */}
-                <div className="absolute top-4 left-4">
-                  <span
-                    className={`px-4 py-2 rounded-full text-sm font-medium border ${getStatusColor(
-                      event.status
-                    )}`}
-                  >
-                    {getStatusText(event.status)}
-                  </span>
-                </div>
-
-                {/* Days Until Badge */}
-                {event.status === 'upcoming' && (
-                  <div className="absolute bottom-4 left-4">
-                    <span className="bg-white bg-opacity-95 text-gray-800 px-4 py-2 rounded-full text-sm font-medium">
-                      {calculateDaysUntil(event.start_date)} يوم متبقي
-                    </span>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Enhanced Event Info Card */}
-          <div className="lg:col-span-1">
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
+              key={index}
+              initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
+              className="flex items-center gap-3 p-4 bg-white rounded-lg border border-primary-100 hover:shadow-md transition-all duration-300"
             >
-              <Card className="p-6 sticky top-6 shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-                {/* Category Badge */}
-                <div className="flex items-center justify-between mb-6">
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${getCategoryColor(
-                      event.category
-                    )}`}
-                  >
-                    {event.category}
-                  </span>
-                </div>
-
-                {/* Event Details */}
-                <div className="space-y-4 mb-6">
-                  <div className="flex items-center text-gray-600 p-3 bg-blue-50 rounded-lg">
-                    <Calendar className="w-5 h-5 mr-3 text-blue-500" />
-                    <div>
-                      <div className="font-medium text-gray-900">
-                        {formatDate(event.start_date)}
-                        {event.end_date !== event.start_date &&
-                          ` - ${formatDate(event.end_date)}`}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {formatTime(event.start_date)}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center text-gray-600 p-3 bg-green-50 rounded-lg">
-                    <MapPin className="w-5 h-5 mr-3 text-green-500" />
-                    <span className="font-medium">{event.location}</span>
-                  </div>
-
-                  <div className="flex items-center text-gray-600 p-3 bg-purple-50 rounded-lg">
-                    <Users className="w-5 h-5 mr-3 text-purple-500" />
-                    <div>
-                      <div className="font-medium text-gray-900">
-                        {event.attendees} من {event.max_attendees || 'غير محدد'}{' '}
-                        مشارك
-                      </div>
-                      {event.max_attendees && (
-                        <div className="text-sm text-gray-500">
-                          {Math.round(
-                            ((event.attendees || 0) / event.max_attendees) * 100
-                          )}
-                          % ممتلئة
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center text-gray-600 p-3 bg-orange-50 rounded-lg">
-                    <Clock className="w-5 h-5 mr-3 text-orange-500" />
-                    <span className="font-medium">{event.category}</span>
-                  </div>
-                </div>
-
-                {/* Registration Progress */}
-                {event.max_attendees && (
-                  <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-gray-700">
-                        التسجيل
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        {calculateRegistrationProgress()}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div
-                        className="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-300"
-                        style={{ width: `${calculateRegistrationProgress()}%` }}
-                      ></div>
-                    </div>
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                      <span>{event.attendees || 0} مسجل</span>
-                      <span>{event.max_attendees} مقعد</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Registration Button */}
-                <Button
-                  className="w-full mb-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3"
-                  onClick={() => setShowRegistration(true)}
-                  disabled={
-                    event.status === 'completed' || event.status === 'cancelled'
-                  }
-                >
-                  {event.status === 'completed'
-                    ? 'انتهت الفعالية'
-                    : event.status === 'cancelled'
-                    ? 'ألغيت الفعالية'
-                    : 'سجل الآن'}
-                </Button>
-
-                {/* Contact Info */}
-                <div className="border-t pt-4">
-                  <h3 className="font-semibold mb-3 text-gray-900">
-                    {t('eventDetail.contactInfo', 'معلومات التواصل')}
-                  </h3>
-                  <div className="space-y-2 text-sm text-gray-600">
-                    <a
-                      href="tel:+905050505645"
-                      className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors duration-200"
-                    >
-                      <Phone className="w-4 h-4 mr-2 text-green-500" />
-                      <span className="text-blue-600 hover:text-blue-800">
-                        +905050505645
-                      </span>
-                    </a>
-                    <a
-                      href="mailto:info@shaababna.com"
-                      className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors duration-200"
-                    >
-                      <Mail className="w-4 h-4 mr-2 text-blue-500" />
-                      <span className="text-blue-600 hover:text-blue-800">
-                        info@shaababna.com
-                      </span>
-                    </a>
-                    <a
-                      href="https://maps.app.goo.gl/yz4Nc1RmLt6CuTh47"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors duration-200"
-                    >
-                      <MapPin className="w-4 h-4 mr-2 text-red-500" />
-                      <span className="text-blue-600 hover:text-blue-800">
-                        موقعنا على الخريطة
-                      </span>
-                    </a>
-                    <a
-                      href="https://shaababna.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors duration-200"
-                    >
-                      <Globe className="w-4 h-4 mr-2 text-purple-500" />
-                      <span className="text-blue-600 hover:text-blue-800">
-                        www.shaababna.com
-                      </span>
-                    </a>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Enhanced Event Description */}
-      <section className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          <Card className="p-8 shadow-lg border-0">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <Award className="w-8 h-8 text-blue-500" />
-              {t('eventDetail.about', 'عن الفعالية')}
-            </h2>
-            <div className="prose prose-lg max-w-none">
-              <p className="text-gray-700 leading-relaxed text-lg">
-                {event.description}
-              </p>
-
-              {/* Enhanced Additional Details */}
-              <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-gradient-to-br from-green-50 to-blue-50 p-6 rounded-xl">
-                  <h3 className="text-xl font-semibold mb-4 flex items-center gap-2 text-green-800">
-                    <CheckCircle className="w-6 h-6" />
-                    {t('eventDetail.whatToExpect', 'ما يمكن توقعه')}
-                  </h3>
-                  <ul className="space-y-3 text-gray-700">
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                      <span>محاضرات قيمة ومفيدة من خبراء في المجال</span>
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                      <span>فرص للتواصل مع الشباب والمهنيين</span>
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                      <span>شهادات مشاركة معتمدة</span>
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                      <span>مواد تعليمية مجانية</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-xl">
-                  <h3 className="text-xl font-semibold mb-4 flex items-center gap-2 text-orange-800">
-                    <Tag className="w-6 h-6" />
-                    {t('eventDetail.requirements', 'المتطلبات')}
-                  </h3>
-                  <ul className="space-y-3 text-gray-700">
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-orange-500 mr-3" />
-                      <span>التسجيل المسبق مطلوب</span>
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-orange-500 mr-3" />
-                      <span>الحضور في الوقت المحدد</span>
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-orange-500 mr-3" />
-                      <span>الالتزام بآداب الحضور</span>
-                    </li>
-                  </ul>
-                </div>
+              <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                <item.icon className="w-5 h-5 text-primary-600" />
               </div>
-            </div>
-          </Card>
-        </motion.div>
-      </section>
+              <div>
+                <p className="text-sm text-dark-400">{item.label}</p>
+                <p className="font-semibold text-dark-500">{item.value}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </Card>
+    </motion.div>
+  );
+});
 
-      {/* Enhanced Registration Modal */}
+const RegistrationForm = memo(
+  ({
+    event,
+    showRegistration,
+    setShowRegistration,
+    registrationForm,
+    setRegistrationForm,
+    registrationStatus,
+    setRegistrationStatus,
+    registrationMessage,
+    setRegistrationMessage,
+  }: {
+    event: any;
+    showRegistration: boolean;
+    setShowRegistration: (show: boolean) => void;
+    registrationForm: RegistrationForm;
+    setRegistrationForm: (form: RegistrationForm) => void;
+    registrationStatus: 'idle' | 'loading' | 'success' | 'error';
+    setRegistrationStatus: (
+      status: 'idle' | 'loading' | 'success' | 'error'
+    ) => void;
+    registrationMessage: string;
+    setRegistrationMessage: (message: string) => void;
+  }) => {
+    const { t } = useTranslation();
+
+    const handleSubmit = useCallback(
+      async (e: React.FormEvent) => {
+        e.preventDefault();
+        setRegistrationStatus('loading');
+        setRegistrationMessage('');
+
+        try {
+          const response = await fetch('/api/events/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              event_id: event.id,
+              ...registrationForm,
+            }),
+          });
+
+          if (!response.ok) throw new Error('فشل في التسجيل');
+
+          setRegistrationStatus('success');
+          setRegistrationMessage(
+            t('event.registration.success', 'تم التسجيل بنجاح!')
+          );
+          setRegistrationForm({
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+            message: '',
+          });
+
+          setTimeout(() => {
+            setShowRegistration(false);
+            setRegistrationStatus('idle');
+          }, 3000);
+        } catch (error) {
+          setRegistrationStatus('error');
+          setRegistrationMessage(
+            t('event.registration.error', 'حدث خطأ أثناء التسجيل')
+          );
+        }
+      },
+      [
+        event?.id,
+        registrationForm,
+        t,
+        setRegistrationForm,
+        setShowRegistration,
+        setRegistrationStatus,
+      ]
+    );
+
+    return (
       <AnimatePresence>
         {showRegistration && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            onClick={() => setShowRegistration(false)}
           >
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white rounded-2xl p-4 sm:p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-xl p-6 w-full max-w-md"
             >
-              <div className="flex items-center justify-between mb-4 sm:mb-6">
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
-                  {t('eventDetail.register', 'تسجيل في الفعالية')}
-                </h3>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowRegistration(false)}
-                  className="rounded-full w-8 h-8 p-0 flex-shrink-0"
-                >
-                  ×
-                </Button>
-              </div>
+              <h3 className="text-xl font-bold text-dark-500 mb-4 text-center">
+                {t('event.registration.title', 'تسجيل في الفعالية')}
+              </h3>
 
-              {/* Event Summary - Compact for Mobile */}
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 border border-blue-200">
-                <h4 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">
-                  {event.title}
-                </h4>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
-                    <span>{formatDate(event.start_date)}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
-                    <span className="truncate">{event.location}</span>
-                  </div>
-                </div>
-              </div>
-
-              <form
-                onSubmit={handleRegistration}
-                className="space-y-3 sm:space-y-4"
-              >
-                {/* Name Fields - Stack on Mobile */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
                   <Input
-                    name="firstName"
-                    placeholder={t('eventDetail.firstName', 'الاسم الأول')}
+                    label={t('event.registration.firstName', 'الاسم الأول')}
+                    type="text"
                     value={registrationForm.firstName}
-                    onChange={handleInputChange}
+                    onChange={(e) =>
+                      setRegistrationForm({
+                        ...registrationForm,
+                        firstName: e.target.value,
+                      })
+                    }
                     required
-                    className="text-sm sm:text-base"
+                    fullWidth
                   />
                   <Input
-                    name="lastName"
-                    placeholder={t('eventDetail.lastName', 'اسم العائلة')}
+                    label={t('event.registration.lastName', 'الاسم الأخير')}
+                    type="text"
                     value={registrationForm.lastName}
-                    onChange={handleInputChange}
+                    onChange={(e) =>
+                      setRegistrationForm({
+                        ...registrationForm,
+                        lastName: e.target.value,
+                      })
+                    }
                     required
-                    className="text-sm sm:text-base"
+                    fullWidth
                   />
                 </div>
 
                 <Input
-                  name="email"
+                  label={t('event.registration.email', 'البريد الإلكتروني')}
                   type="email"
-                  placeholder={t('eventDetail.email', 'البريد الإلكتروني')}
                   value={registrationForm.email}
-                  onChange={handleInputChange}
+                  onChange={(e) =>
+                    setRegistrationForm({
+                      ...registrationForm,
+                      email: e.target.value,
+                    })
+                  }
                   required
-                  className="text-sm sm:text-base"
+                  fullWidth
                 />
 
                 <Input
-                  name="phone"
-                  placeholder={t('eventDetail.phone', 'رقم الجوال')}
+                  label={t('event.registration.phone', 'رقم الهاتف')}
+                  type="tel"
                   value={registrationForm.phone}
-                  onChange={handleInputChange}
+                  onChange={(e) =>
+                    setRegistrationForm({
+                      ...registrationForm,
+                      phone: e.target.value,
+                    })
+                  }
                   required
-                  className="text-sm sm:text-base"
+                  fullWidth
                 />
 
-                <textarea
-                  name="message"
-                  placeholder={t('eventDetail.message', 'رسالة (اختياري)')}
-                  value={registrationForm.message}
-                  onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm sm:text-base"
-                  rows={2}
-                />
+                <div>
+                  <label className="block text-sm font-medium text-dark-500 mb-2">
+                    {t('event.registration.message', 'رسالة (اختياري)')}
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={registrationForm.message}
+                    onChange={(e) =>
+                      setRegistrationForm({
+                        ...registrationForm,
+                        message: e.target.value,
+                      })
+                    }
+                    className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-neutral-900 placeholder:text-neutral-400 bg-white resize-none"
+                    placeholder={t(
+                      'event.registration.messagePlaceholder',
+                      'أي رسالة إضافية...'
+                    )}
+                  />
+                </div>
 
-                {/* Buttons - Stack on Mobile */}
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
+                {registrationMessage && (
+                  <Alert
+                    type={
+                      registrationStatus === 'success' ? 'success' : 'error'
+                    }
+                    className="mt-4"
+                  >
+                    {registrationMessage}
+                  </Alert>
+                )}
+
+                <div className="flex gap-3">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setShowRegistration(false)}
-                    className="flex-1 text-sm sm:text-base py-2 sm:py-3"
+                    className="flex-1"
                   >
-                    {t('eventDetail.cancel', 'إلغاء')}
+                    {t('common.cancel', 'إلغاء')}
                   </Button>
                   <Button
                     type="submit"
-                    disabled={registrationStatus === 'loading'}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-sm sm:text-base py-2 sm:py-3"
+                    loading={registrationStatus === 'loading'}
+                    className="flex-1 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700"
                   >
-                    {registrationStatus === 'loading' ? (
-                      <LoadingSpinner size="sm" />
-                    ) : (
-                      t('eventDetail.submit', 'تأكيد التسجيل')
-                    )}
+                    {t('event.registration.submit', 'تسجيل')}
                   </Button>
                 </div>
               </form>
@@ -663,25 +406,282 @@ const EventDetail: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+    );
+  }
+);
 
-      {/* Enhanced Registration Status Alert */}
-      <AnimatePresence>
-        {registrationStatus !== 'idle' && (
+const EventDetail: React.FC = () => {
+  const { t, i18n } = useTranslation();
+  const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  const isRTL = i18n.dir() === 'rtl';
+
+  const [showRegistration, setShowRegistration] = useState(false);
+  const [registrationForm, setRegistrationForm] = useState<RegistrationForm>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    message: '',
+  });
+  const [registrationStatus, setRegistrationStatus] = useState<
+    'idle' | 'loading' | 'success' | 'error'
+  >('idle');
+  const [registrationMessage, setRegistrationMessage] = useState('');
+
+  // Fetch event details
+  const {
+    data: eventData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['event', id],
+    queryFn: () => fetchEventById(id!),
+    enabled: !!id,
+  });
+
+  const event = eventData?.data || eventData;
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('section') === 'register') {
+      const el = document.getElementById('register');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }, [location.search]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center">
+        <UnifiedLoader type="centered" size="lg" />
+      </div>
+    );
+  }
+
+  if (error || !event) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center">
+        <Alert type="error">
+          {t('event.notFound', 'لم يتم العثور على الفعالية')}
+        </Alert>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 relative overflow-hidden">
+      {/* Background decoration */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+        className="absolute inset-0 pointer-events-none"
+      >
+        <div className="absolute top-20 left-10 w-32 h-32 bg-primary-200 rounded-full blur-3xl opacity-30" />
+        <div className="absolute bottom-20 right-10 w-40 h-40 bg-secondary-200 rounded-full blur-3xl opacity-30" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-primary-100 rounded-full blur-3xl opacity-20" />
+        <div className="absolute top-1/3 right-1/4 w-24 h-24 bg-accent-200 rounded-full blur-2xl opacity-25" />
+      </motion.div>
+
+      <SEO
+        title={`${event.title} - منصة شبابنا`}
+        description={event.description}
+        type="website"
+        keywords={['فعالية', event.title, 'منصة شبابنا']}
+      />
+
+      <div className="container mx-auto px-4 py-12 relative z-10">
+        <section className="max-w-4xl mx-auto">
+          {/* Back Button */}
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-4 right-4 z-50"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
           >
-            <Alert
-              type={registrationStatus === 'success' ? 'success' : 'error'}
-              onClose={() => setRegistrationStatus('idle')}
+            <Link
+              to="/events"
+              className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 transition-colors"
             >
-              {registrationMessage}
-            </Alert>
+              <ArrowLeft className="w-5 h-5" />
+              {t('common.back', 'العودة للفعاليات')}
+            </Link>
           </motion.div>
-        )}
-      </AnimatePresence>
+
+          <EventHeader event={event} />
+          <EventInfo event={event} />
+
+          {/* Action Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center mb-8"
+          >
+            <Button
+              onClick={() => setShowRegistration(true)}
+              className="bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+            >
+              <CheckCircle className="w-5 h-5 mr-2" />
+              {t('event.register', 'تسجيل في الفعالية')}
+            </Button>
+
+            <ShareButtons
+              variant="button"
+              size="md"
+              title={event.title}
+              description={event.description}
+              image={event.image}
+              url={`${window.location.origin}/events/${event.id}`}
+              className="border-primary-200 text-primary-600 hover:bg-primary-50 font-semibold py-3 px-8 rounded-lg transition-all duration-300"
+            />
+          </motion.div>
+
+          {/* Additional Info */}
+          {event.additional_info && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+            >
+              <Card className="p-6 bg-gradient-to-br from-white via-primary-50/30 to-secondary-50/30 backdrop-blur-sm border border-primary-200">
+                <h3 className="text-lg font-bold text-dark-500 mb-4">
+                  {t('event.additionalInfo', 'معلومات إضافية')}
+                </h3>
+                <div className="prose prose-sm text-dark-400">
+                  {event.additional_info}
+                </div>
+              </Card>
+            </motion.div>
+          )}
+
+          {/* Inline Registration Section */}
+          <motion.div
+            id="register"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
+            className="mt-8"
+          >
+            <Card className="p-6 border border-primary-200 bg-white/90 backdrop-blur-sm">
+              <h3 className="text-xl font-bold text-dark-500 mb-4 text-center">
+                {t('event.registration.title', 'تسجيل في الفعالية')}
+              </h3>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleRegistrationSubmit(e);
+                }}
+                className="space-y-4"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input
+                    label={t('event.registration.firstName', 'الاسم الأول')}
+                    type="text"
+                    value={registrationForm.firstName}
+                    onChange={(e) =>
+                      setRegistrationForm({
+                        ...registrationForm,
+                        firstName: e.target.value,
+                      })
+                    }
+                    required
+                    fullWidth
+                  />
+                  <Input
+                    label={t('event.registration.lastName', 'الاسم الأخير')}
+                    type="text"
+                    value={registrationForm.lastName}
+                    onChange={(e) =>
+                      setRegistrationForm({
+                        ...registrationForm,
+                        lastName: e.target.value,
+                      })
+                    }
+                    required
+                    fullWidth
+                  />
+                </div>
+                <Input
+                  label={t('event.registration.email', 'البريد الإلكتروني')}
+                  type="email"
+                  value={registrationForm.email}
+                  onChange={(e) =>
+                    setRegistrationForm({
+                      ...registrationForm,
+                      email: e.target.value,
+                    })
+                  }
+                  required
+                  fullWidth
+                />
+                <Input
+                  label={t('event.registration.phone', 'رقم الهاتف')}
+                  type="tel"
+                  value={registrationForm.phone}
+                  onChange={(e) =>
+                    setRegistrationForm({
+                      ...registrationForm,
+                      phone: e.target.value,
+                    })
+                  }
+                  required
+                  fullWidth
+                />
+                <div>
+                  <label className="block text-sm font-medium text-dark-500 mb-2">
+                    {t('event.registration.message', 'رسالة (اختياري)')}
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={registrationForm.message}
+                    onChange={(e) =>
+                      setRegistrationForm({
+                        ...registrationForm,
+                        message: e.target.value,
+                      })
+                    }
+                    className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-neutral-900 placeholder:text-neutral-400 bg-white resize-none"
+                  />
+                </div>
+                {registrationMessage && (
+                  <Alert
+                    type={
+                      registrationStatus === 'success' ? 'success' : 'error'
+                    }
+                    className="mt-2"
+                  >
+                    {registrationMessage}
+                  </Alert>
+                )}
+                <div className="flex gap-3">
+                  <Button
+                    type="submit"
+                    loading={registrationStatus === 'loading'}
+                    className="flex-1 bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700"
+                  >
+                    {t('event.registration.submit', 'تسجيل')}
+                  </Button>
+                </div>
+              </form>
+            </Card>
+          </motion.div>
+        </section>
+      </div>
+
+      <RegistrationForm
+        event={event}
+        showRegistration={showRegistration}
+        setShowRegistration={setShowRegistration}
+        registrationForm={registrationForm}
+        setRegistrationForm={setRegistrationForm}
+        registrationStatus={registrationStatus}
+        setRegistrationStatus={setRegistrationStatus}
+        registrationMessage={registrationMessage}
+        setRegistrationMessage={setRegistrationMessage}
+      />
     </div>
   );
 };

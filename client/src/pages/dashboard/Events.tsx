@@ -317,7 +317,7 @@ const EventsDashboard: React.FC = () => {
         await createEvent(eventData);
         setModalMsg(
           `✅ تم إنشاء الفعالية "${form.title}" بنجاح! 🎉\n\n` +
-            `📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `📅 التاريخ: ${new Date().toLocaleDateString('en-US')}\n` +
             `📍 الموقع: ${form.location}\n` +
             `👥 الحد الأقصى: ${form.max_attendees || 'غير محدد'} مشارك`
         );
@@ -325,7 +325,7 @@ const EventsDashboard: React.FC = () => {
         await updateEvent(selectedEvent.id, eventData);
         setModalMsg(
           `✅ تم تحديث الفعالية "${form.title}" بنجاح! 🔄\n\n` +
-            `📅 آخر تحديث: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `📅 آخر تحديث: ${new Date().toLocaleDateString('en-US')}\n` +
             `📍 الموقع: ${form.location}\n` +
             `👥 الحد الأقصى: ${form.max_attendees || 'غير محدد'} مشارك\n` +
             `📊 المشاركين الحاليين: ${form.attendees || 0}`
@@ -400,7 +400,7 @@ const EventsDashboard: React.FC = () => {
   const formatDate = (dateString: string) => {
     if (!dateString) return 'غير محدد';
     try {
-      return new Date(dateString).toLocaleDateString('ar-SA', {
+      return new Date(dateString).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
@@ -428,7 +428,7 @@ const EventsDashboard: React.FC = () => {
         queryClient.invalidateQueries(['dashboard-events']);
         setModalMsg(
           `✅ تم حذف الفعالية "${eventTitle}" بنجاح! 🗑️\n\n` +
-            `📅 تاريخ الحذف: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `📅 تاريخ الحذف: ${new Date().toLocaleDateString('en-US')}\n` +
             `📊 تم حذف جميع البيانات المرتبطة بالفعالية`
         );
       } catch (error: any) {

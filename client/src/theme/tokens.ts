@@ -160,14 +160,14 @@ export const tokens = {
       lg: '1.125rem',  // 18px
       xl: '1.25rem',   // 20px
       '2xl': '1.5rem', // 24px
-      '3xl': '1.875rem', // 30px
-      '4xl': '2.25rem', // 36px
-      '5xl': '3rem',    // 48px
-      '6xl': '3.75rem', // 60px
+      '3xl': '1.75rem', // 28px
+      '4xl': '2rem',   // 32px
+      '5xl': '2.5rem', // 40px
+      '6xl': '3rem',   // 48px
       // أحجام display جديدة
-      'display-1': '3.5rem', // 56px
-      'display-2': '3rem',   // 48px
-      'display-3': '2.5rem', // 40px
+      'display-1': '2.5rem', // 40px
+      'display-2': '2rem',   // 32px
+      'display-3': '1.75rem', // 28px
       // أحجام body جديدة
       'body-lg': '1.125rem', // 18px
       'body-md': '1rem',     // 16px

@@ -11,6 +11,11 @@ import {
   Users2,
   ArrowRight,
 } from 'lucide-react';
+import {
+  cacheConfig,
+  queryOptimizations,
+  progressiveLoading,
+} from '../utils/performanceOptimizations';
 
 import SEO from '../components/common/SEO';
 import { Button } from '../components/ui/Button/ButtonSimple';
@@ -24,8 +29,12 @@ import { Program } from '../types';
 
 // تحسين الاستيراد - استخدام lazy loading للمكونات الثقيلة
 const HeroSection = React.lazy(() => import('../components/home/HeroSection'));
-const StatsSection = React.lazy(() => import('../components/home/StatsSection'));
-const FeaturesSection = React.lazy(() => import('../components/home/FeaturesSection'));
+const StatsSection = React.lazy(
+  () => import('../components/home/StatsSection')
+);
+const FeaturesSection = React.lazy(
+  () => import('../components/home/FeaturesSection')
+);
 
 // تحسين الأداء - مكونات منفصلة مع تحسينات
 const TestimonialsSection = memo(() => {
@@ -36,19 +45,19 @@ const TestimonialsSection = memo(() => {
       name: 'أحمد محمد',
       role: 'طالب جامعي',
       content:
-        'شبابنا منظمة رائعة ساعدتني في تطوير مهاراتي القيادية والتواصل مع شباب من مختلف الدول',
+        'منصة شبابنا ساعدتني في تطوير مهاراتي القيادية والتواصل مع شباب من مختلف الدول الإسلامية',
     },
     {
       name: 'فاطمة علي',
       role: 'مهندسة',
       content:
-        'البرامج التطويرية ممتازة وساعدتني في بناء شبكة علاقات قوية مع شباب مسلمين من حول العالم',
+        'البرامج التطويرية ممتازة وساعدتني في بناء شبكة علاقات قوية مع شباب مسلمين طموحين',
     },
     {
       name: 'محمد حسن',
       role: 'طبيب',
       content:
-        'الفعاليات والورش التفاعلية كانت تجربة رائعة ساعدتني في تطوير شخصيتي ومهاراتي',
+        'الفعاليات التفاعلية كانت تجربة رائعة ساعدتني في تطوير شخصيتي ومهاراتي القيادية',
     },
   ];
 
@@ -60,30 +69,30 @@ const TestimonialsSection = memo(() => {
   }, [testimonials.length]);
 
   return (
-    <section className="py-16 bg-gradient-to-br from-dark-500 via-primary-900 to-secondary-800 text-white relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-br from-dark-500 via-primary-900 to-secondary-800 text-white relative overflow-hidden">
       <div className="absolute inset-0 bg-dark-500/30" />
       <div className="relative max-w-5xl mx-auto px-6">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
           transition={{ duration: 0.3 }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-            ماذا يقول شبابنا
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            تجارب شبابنا
           </h2>
-          <p className="text-base md:text-lg text-primary-100 max-w-3xl mx-auto leading-relaxed">
-            قصص نجاح وتجارب ملهمة من شبابنا حول العالم
+          <p className="text-lg md:text-xl text-primary-100 max-w-3xl mx-auto leading-relaxed">
+            قصص نجاح وتجارب ملهمة من شبابنا في مختلف الدول
           </p>
         </motion.div>
 
         <AnimatePresence mode="wait">
           <motion.div
             key={currentTestimonial}
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            exit={{ opacity: 0, x: -10 }}
             transition={{ duration: 0.2 }}
             className="max-w-3xl mx-auto"
           >
@@ -139,18 +148,12 @@ TestimonialsSection.displayName = 'TestimonialsSection';
 const LatestEventsSection = memo(() => {
   const navigate = useNavigate();
 
-  // تحسين الاستعلام - تقليل البيانات المطلوبة
-  const {
-    data: eventsData,
-    isLoading: eventsLoading,
-    error: eventsError,
-  } = useQuery({
+  // تحسين الاستعلام - تقليل البيانات المطلوبة وتحسين التخزين المؤقت
+  const { data: eventsData, isLoading: eventsLoading } = useQuery({
     queryKey: ['latest-events'],
     queryFn: () => fetchEvents({ page: 1, limit: 3 }),
-    staleTime: 15 * 60 * 1000, // زيادة وقت التخزين المؤقت
-    refetchOnWindowFocus: false, // منع إعادة التحميل عند التركيز
-    refetchOnMount: false, // منع إعادة التحميل عند التركيب
-    refetchOnReconnect: false, // منع إعادة التحميل عند إعادة الاتصال
+    ...queryOptimizations,
+    ...cacheConfig.events,
   });
 
   const latestEvents = eventsData?.data?.events || [];
@@ -158,7 +161,7 @@ const LatestEventsSection = memo(() => {
   // تحسين حالة التحميل
   if (eventsLoading) {
     return (
-      <section className="py-16 bg-gradient-to-br from-neutral-50 to-primary-50">
+      <section className="py-20 bg-gradient-to-br from-neutral-50 to-primary-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <div className="animate-pulse bg-dark-200 h-8 w-48 mx-auto mb-4 rounded"></div>
@@ -182,16 +185,16 @@ const LatestEventsSection = memo(() => {
     <section className="py-16 bg-gradient-to-br from-neutral-50 to-primary-50">
       <div className="max-w-6xl mx-auto px-6">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
           transition={{ duration: 0.3 }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
-          <h2 className="text-2xl md:text-3xl font-bold text-dark-500 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-dark-500 mb-6">
             شبابنا
           </h2>
-          <p className="text-base md:text-lg text-dark-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-dark-600 max-w-3xl mx-auto leading-relaxed">
             الفعاليات
           </p>
         </motion.div>
@@ -200,7 +203,7 @@ const LatestEventsSection = memo(() => {
           {latestEvents.map((event) => (
             <motion.div
               key={event.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.3 }}
@@ -255,7 +258,7 @@ const LatestEventsSection = memo(() => {
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
           transition={{ duration: 0.3, delay: 0.1 }}
@@ -282,26 +285,19 @@ const LatestProgramsSection = memo(() => {
   const navigate = useNavigate();
 
   // تحسين الاستعلام - تقليل البيانات المطلوبة
-  const {
-    data: programsData,
-    isLoading: programsLoading,
-    error: programsError,
-  } = useQuery({
+  const { data: programsData, isLoading: programsLoading } = useQuery({
     queryKey: ['latest-programs'],
     queryFn: () => fetchPrograms({ page: 1, limit: 3 }),
-    staleTime: 15 * 60 * 1000, // زيادة وقت التخزين المؤقت
-    refetchOnWindowFocus: false, // منع إعادة التحميل عند التركيز
-    refetchOnMount: false, // منع إعادة التحميل عند التركيب
-    refetchOnReconnect: false, // منع إعادة التحميل عند إعادة الاتصال
+    ...queryOptimizations,
+    ...cacheConfig.programs,
   });
 
-  const latestPrograms =
-    programsData?.data?.programs || programsData?.data?.items || [];
+  const latestPrograms = programsData?.data?.events || [];
 
   // تحسين حالة التحميل
   if (programsLoading) {
     return (
-      <section className="py-16 bg-gradient-to-br from-neutral-50 to-primary-50">
+      <section className="py-20 bg-gradient-to-br from-neutral-50 to-primary-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <div className="animate-pulse bg-dark-200 h-8 w-48 mx-auto mb-4 rounded"></div>
@@ -329,12 +325,12 @@ const LatestProgramsSection = memo(() => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
           transition={{ duration: 0.3 }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
-          <h2 className="text-2xl md:text-3xl font-bold text-dark-500 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-dark-500 mb-6">
             أحدث البرامج
           </h2>
-          <p className="text-base md:text-lg text-dark-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-dark-600 max-w-3xl mx-auto leading-relaxed">
             اكتشف برامجنا التطويرية المميزة المصممة لبناء قادة المستقبل
           </p>
         </motion.div>
@@ -451,7 +447,7 @@ const NewsletterSection = memo(() => {
   );
 
   return (
-    <section className="py-16 bg-gradient-to-br from-dark-500 via-primary-900 to-secondary-800 relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-br from-dark-500 via-primary-900 to-secondary-800 relative overflow-hidden">
       <div className="absolute inset-0">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary-600/20 via-secondary-600/20 to-primary-600/20" />
         <div className="absolute top-20 right-20 w-48 h-48 bg-white/5 rounded-full blur-2xl" />
@@ -465,10 +461,10 @@ const NewsletterSection = memo(() => {
         transition={{ duration: 0.3 }}
         className="relative max-w-4xl mx-auto px-6 text-center"
       >
-        <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
           ابق على اطلاع
         </h2>
-        <p className="text-base md:text-lg text-primary-100 max-w-3xl mx-auto leading-relaxed mb-8">
+        <p className="text-lg md:text-xl text-primary-100 max-w-3xl mx-auto leading-relaxed mb-8">
           اشترك في نشرتنا البريدية لتصلك آخر الأخبار والفعاليات والبرامج الجديدة
         </p>
 
@@ -558,20 +554,28 @@ const Home: React.FC = () => {
         </Suspense>
 
         {/* Stats Section */}
-        <Suspense fallback={<div className="py-16 bg-gradient-to-br from-neutral-50 to-white">
-          <div className="max-w-6xl mx-auto px-6">
-            <div className="animate-pulse bg-dark-200 h-8 w-48 mx-auto mb-4 rounded"></div>
-          </div>
-        </div>}>
+        <Suspense
+          fallback={
+            <div className="py-16 bg-gradient-to-br from-neutral-50 to-white">
+              <div className="max-w-6xl mx-auto px-6">
+                <div className="animate-pulse bg-dark-200 h-8 w-48 mx-auto mb-4 rounded"></div>
+              </div>
+            </div>
+          }
+        >
           <StatsSection />
         </Suspense>
 
         {/* Features Section */}
-        <Suspense fallback={<div className="py-16 bg-white">
-          <div className="max-w-6xl mx-auto px-6">
-            <div className="animate-pulse bg-dark-200 h-8 w-48 mx-auto mb-4 rounded"></div>
-          </div>
-        </div>}>
+        <Suspense
+          fallback={
+            <div className="py-16 bg-white">
+              <div className="max-w-6xl mx-auto px-6">
+                <div className="animate-pulse bg-dark-200 h-8 w-48 mx-auto mb-4 rounded"></div>
+              </div>
+            </div>
+          }
+        >
           <FeaturesSection />
         </Suspense>
 

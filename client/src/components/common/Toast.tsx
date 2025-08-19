@@ -5,7 +5,7 @@ import React, {
   useContext,
   ReactNode,
 } from 'react';
-import { CheckCircle, AlertCircle, Info, AlertTriangle, X } from 'lucide-react';
+import { CheckCircle, Info, AlertTriangle } from 'lucide-react';
 import { DESIGN_SYSTEM } from './DesignSystem';
 import { motion, AnimatePresence } from 'framer-motion';
 

@@ -13,13 +13,13 @@ import {
   Filter,
   Eye,
   Heart,
-  Share2,
   ArrowRight,
   ChevronDown,
   Target,
   DollarSign,
   TrendingUp,
 } from 'lucide-react';
+import ShareButtons from '../components/common/ShareButtons';
 
 import { fetchPrograms } from '../services/programsApi';
 import { Program } from '../types';
@@ -40,14 +40,6 @@ const Programs: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const debouncedSearch = useDebounce(searchTerm, 500);
   const [currentPage, setCurrentPage] = useState(1);
-  const [showDonationModal, setShowDonationModal] = useState(false);
-  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
-  const [donationForm, setDonationForm] = useState({
-    amount: '',
-    name: '',
-    email: '',
-    message: '',
-  });
 
   const filters = [
     {
@@ -115,42 +107,8 @@ const Programs: React.FC = () => {
   const programs = programsData?.data?.programs || [];
   const pagination = programsData?.data?.pagination;
 
-  const handleDonationClick = (program: Program) => {
-    setSelectedProgram(program);
-    setShowDonationModal(true);
-  };
-
-  const handleDonationSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      setShowDonationModal(false);
-      setDonationForm({
-        amount: '',
-        name: '',
-        email: '',
-        message: '',
-      });
-      setSelectedProgram(null);
-
-      await refetch();
-      queryClient.invalidateQueries({ queryKey: ['programs'] });
-
-      alert('تم التبرع بنجاح!');
-    } catch (error) {
-      console.error('خطأ في التبرع:', error);
-      alert('حدث خطأ في التبرع. حاول مرة أخرى.');
-    }
-  };
-
-  const handleInputChange = (field: string, value: string) => {
-    setDonationForm((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA', {
+    return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -275,7 +233,7 @@ const Programs: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="text-4xl md:text-5xl font-bold text-white mb-4"
+              className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-4"
             >
               {t('programs.title', 'البرامج')}
             </motion.h1>
@@ -411,9 +369,12 @@ const Programs: React.FC = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex justify-center py-20"
+            className="flex items-center justify-center min-h-[60vh]"
           >
-            <CenteredLoader />
+            <div className="text-center">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
+              <p className="text-gray-600 text-lg">جاري تحميل البرامج...</p>
+            </div>
           </motion.div>
         )}
 
@@ -472,7 +433,7 @@ const Programs: React.FC = () => {
                         {/* Category Icon */}
                         <div className="absolute inset-0 flex items-center justify-center">
                           <div className="text-center text-white">
-                            <div className="text-6xl mb-3 drop-shadow-lg">
+                            <div className="text-4xl mb-3 drop-shadow-lg">
                               {getCategoryIcon(program.category)}
                             </div>
                             <p className="text-lg font-medium drop-shadow-md">
@@ -523,13 +484,15 @@ const Programs: React.FC = () => {
                             >
                               <Heart className="w-4 h-4" />
                             </Button>
-                            <Button
-                              variant="outline"
+                            <ShareButtons
+                              variant="icon"
                               size="sm"
+                              title={program.title}
+                              description={program.description}
+                              image={program.image}
+                              url={`${window.location.origin}/programs/${program.id}`}
                               className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30"
-                            >
-                              <Share2 className="w-4 h-4" />
-                            </Button>
+                            />
                           </div>
                         </div>
                       </div>
@@ -616,7 +579,9 @@ const Programs: React.FC = () => {
                             variant="outline"
                             size="sm"
                             className="w-full flex items-center justify-center gap-2 group-hover:border-blue-500 group-hover:text-blue-600 transition-all duration-300"
-                            onClick={() => navigate(`/programs/${program.id}`)}
+                            onClick={() =>
+                              navigate(`/programs/${program.id}?section=donate`)
+                            }
                           >
                             <Info className="w-4 h-4" />
                             التفاصيل الكاملة
@@ -715,110 +680,6 @@ const Programs: React.FC = () => {
           </motion.div>
         )}
       </div>
-
-      {/* Donation Modal */}
-      <Modal
-        open={showDonationModal}
-        onClose={() => {
-          setShowDonationModal(false);
-          setSelectedProgram(null);
-          setDonationForm({
-            amount: '',
-            name: '',
-            email: '',
-            message: '',
-          });
-        }}
-        title={t('programs.donation.title', 'تبرع للبرنامج')}
-      >
-        {selectedProgram && (
-          <div className="space-y-6">
-            {/* Program Info */}
-            <Card className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200">
-              <h3 className="font-bold text-xl mb-3 text-gray-900">
-                {selectedProgram.title}
-              </h3>
-              <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-                {selectedProgram.description}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 text-sm text-gray-600">
-                <div className="flex items-center gap-2">
-                  <Target className="w-4 h-4 text-green-500" />
-                  <span className="font-medium">
-                    الهدف: {formatCurrency(selectedProgram.goal_amount || 0)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-blue-500" />
-                  <span className="font-medium">
-                    المحقق:{' '}
-                    {formatCurrency(selectedProgram.current_amount || 0)}
-                  </span>
-                </div>
-              </div>
-            </Card>
-
-            {/* Donation Form */}
-            <form onSubmit={handleDonationSubmit} className="space-y-4">
-              <Input
-                label={t('programs.donation.amount', 'مبلغ التبرع')}
-                type="number"
-                value={donationForm.amount}
-                onChange={(e) => handleInputChange('amount', e.target.value)}
-                required
-                min="1"
-                step="0.01"
-              />
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  label={t('programs.donation.name', 'الاسم')}
-                  value={donationForm.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  required
-                />
-                <Input
-                  label={t('programs.donation.email', 'البريد الإلكتروني')}
-                  type="email"
-                  value={donationForm.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  required
-                />
-              </div>
-
-              <Input
-                label={t('programs.donation.message', 'رسالة (اختياري)')}
-                value={donationForm.message}
-                onChange={(e) => handleInputChange('message', e.target.value)}
-                multiline
-                rows={3}
-              />
-
-              <div className="flex gap-3 pt-4">
-                <Button type="submit" variant="primary" className="flex-1">
-                  {t('programs.donation.submit', 'تأكيد التبرع')}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setShowDonationModal(false);
-                    setSelectedProgram(null);
-                    setDonationForm({
-                      amount: '',
-                      name: '',
-                      email: '',
-                      message: '',
-                    });
-                  }}
-                >
-                  {t('common.cancel', 'إلغاء')}
-                </Button>
-              </div>
-            </form>
-          </div>
-        )}
-      </Modal>
     </div>
   );
 };

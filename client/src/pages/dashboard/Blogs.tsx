@@ -64,7 +64,7 @@ const BlogsDashboard: React.FC = () => {
         await createBlog(form);
         setModalMsg(
           `✅ تم إنشاء المقالة "${form.title}" بنجاح! 🎉\n\n` +
-            `📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `📅 التاريخ: ${new Date().toLocaleDateString('en-US')}\n` +
             `✍️ الكاتب: ${form.author || 'غير محدد'}\n` +
             `📝 المحتوى: ${form.content.length} حرف`
         );
@@ -72,7 +72,7 @@ const BlogsDashboard: React.FC = () => {
         await updateBlog(selectedBlog.id, form);
         setModalMsg(
           `✅ تم تحديث المقالة "${form.title}" بنجاح! 🔄\n\n` +
-            `📅 آخر تحديث: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `📅 آخر تحديث: ${new Date().toLocaleDateString('en-US')}\n` +
             `✍️ الكاتب: ${form.author || 'غير محدد'}\n` +
             `📝 المحتوى: ${form.content.length} حرف`
         );
@@ -122,7 +122,7 @@ const BlogsDashboard: React.FC = () => {
         refetch();
         setModalMsg(
           `✅ تم حذف المقالة "${blogTitle}" بنجاح! 🗑️\n\n` +
-            `📅 تاريخ الحذف: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `📅 تاريخ الحذف: ${new Date().toLocaleDateString('en-US')}\n` +
             `📊 تم حذف جميع البيانات المرتبطة بالمقالة`
         );
       } catch (err: any) {

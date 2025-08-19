@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchBlogById, fetchRelatedBlogs } from '../services/blogsApi';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import UnifiedLoader from '../components/common/UnifiedLoader';
 import Alert from '../components/common/Alert';
 import Button from '../components/common/Button';
+import ShareButtons from '../components/common/ShareButtons';
 import {
   ArrowLeft,
-  Share2,
   Heart,
   MessageCircle,
   Bookmark,
@@ -24,7 +24,6 @@ const BlogDetail: React.FC = () => {
   const [readingProgress, setReadingProgress] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [showShareModal, setShowShareModal] = useState(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['blog', id],
@@ -51,43 +50,24 @@ const BlogDetail: React.FC = () => {
 
   // Reading progress tracking
   useEffect(() => {
-    const updateReadingProgress = () => {
+    const handleScroll = () => {
       const scrollTop = window.scrollY;
       const docHeight =
         document.documentElement.scrollHeight - window.innerHeight;
-      const progress = (scrollTop / docHeight) * 100;
-      setReadingProgress(Math.min(progress, 100));
+      const scrollPercent = (scrollTop / docHeight) * 100;
+      setReadingProgress(Math.min(scrollPercent, 100));
     };
 
-    window.addEventListener('scroll', updateReadingProgress);
-    return () => window.removeEventListener('scroll', updateReadingProgress);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Share functionality
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: blog?.title,
-          text: blog?.content?.slice(0, 100),
-          url: window.location.href,
-        });
-      } catch (error) {
-        console.log('Error sharing:', error);
-      }
-    } else {
-      setShowShareModal(true);
-    }
-  };
 
   const handleLike = () => {
     setIsLiked(!isLiked);
-    // Here you would typically make an API call to update the like status
   };
 
   const handleBookmark = () => {
     setIsBookmarked(!isBookmarked);
-    // Here you would typically make an API call to update the bookmark status
   };
 
   const scrollToTop = () => {
@@ -95,34 +75,42 @@ const BlogDetail: React.FC = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
+    return <UnifiedLoader type="centered" message="جاري تحميل المقال..." />;
   }
+
   if (error || !blog) {
-    console.error('❌ خطأ في تحميل المدونة:', error);
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center">
-        <Alert type="error">
-          {t('blogs.error', 'حدث خطأ أو لم يتم العثور على التدوينة.')}
-        </Alert>
-        <Link to="/blogs" className="mt-6">
-          <Button variant="primary" icon={ArrowLeft}>
-            {t('blogs.back', 'العودة للمدونة')}
-          </Button>
-        </Link>
+      <div className="min-h-screen flex items-center justify-center">
+        <Alert
+          type="error"
+          message="حدث خطأ أثناء تحميل المقال"
+          onClose={() => window.history.back()}
+        />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+    <div className="min-h-screen bg-white">
+      {/* Reading Progress Bar */}
+      <div className="reading-progress">
+        <div
+          className="reading-progress-bar"
+          style={{ width: `${readingProgress}%` }}
+        />
+      </div>
+
       <SEO
         title={blog.title}
-        description={blog.content?.slice(0, 120)}
+        description={blog.excerpt || blog.content?.substring(0, 160)}
+        image={blog.image}
+        url={`/blogs/${blog.id}`}
         type="article"
+        author={blog.author || 'شبابنا العالمية'}
+        publishedTime={blog.created_at}
+        modifiedTime={blog.updated_at}
+        section="المدونة"
+        tags={blog.tags || []}
       />
 
       {/* Hero Section */}
@@ -134,28 +122,18 @@ const BlogDetail: React.FC = () => {
               <span className="text-2xl">📝</span>
               <span className="text-sm font-medium">مقال</span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold leading-tight">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">
               {blog.title}
             </h1>
-            <div className="flex items-center justify-center gap-6 text-blue-200">
-              <div className="flex items-center gap-2">
-                <span className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm font-bold">
-                  {blog.author?.charAt(0) || 'ش'}
-                </span>
-                <span>{blog.author || 'فريق شبابنا'}</span>
-              </div>
+            <div className="flex items-center justify-center gap-4 text-sm text-blue-200">
+              <span>بواسطة {blog.author || 'شبابنا العالمية'}</span>
               <span>•</span>
               <span>
-                {blog.created_at
-                  ? new Date(blog.created_at).toLocaleDateString(
-                      i18n.language === 'ar' ? 'ar-EG' : 'en-US',
-                      {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      }
-                    )
-                  : ''}
+                {new Date(blog.created_at).toLocaleDateString('ar-SA', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
               </span>
             </div>
           </div>
@@ -163,277 +141,188 @@ const BlogDetail: React.FC = () => {
       </section>
 
       {/* Main Content */}
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-            {/* Featured Image */}
-            {blog.image_url && (
-              <div className="relative h-96 overflow-hidden">
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Article Content */}
+          <div className="lg:col-span-2">
+            {/* Article Image */}
+            {blog.image && (
+              <div className="mb-8">
                 <LazyImage
-                  src={blog.image_url}
+                  src={blog.image}
                   alt={blog.title}
-                  className="w-full h-full object-cover object-center"
+                  className="w-full h-64 md:h-96 object-cover rounded-lg shadow-lg"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
               </div>
             )}
 
-            {/* Article Content */}
-            <div className="p-8 md:p-12">
-              {/* Reading Time Estimate */}
-              <div className="flex items-center gap-4 text-gray-500 mb-8 pb-6 border-b border-gray-100">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">⏱️</span>
-                  <span className="text-sm">
-                    {Math.ceil((blog.content?.length || 0) / 200)} دقيقة قراءة
-                  </span>
+            {/* Article Meta */}
+            <div className="flex items-center justify-between mb-6 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-4">
+                <div className="author-avatar">
+                  {blog.author?.charAt(0) || 'ش'}
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">👁️</span>
-                  <span className="text-sm">مشاهدات</span>
+                <div>
+                  <p className="font-medium text-gray-900">
+                    {blog.author || 'شبابنا العالمية'}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {new Date(blog.created_at).toLocaleDateString('ar-SA', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </p>
                 </div>
               </div>
-
-              {/* Article Body */}
-              <div
-                className="prose prose-lg max-w-none text-gray-800 leading-relaxed"
-                dir="auto"
-              >
-                <div
-                  className="blog-content"
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(blog.content),
-                  }}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleLike}
+                  className={`p-2 rounded-full transition-colors ${
+                    isLiked
+                      ? 'text-red-500 bg-red-50'
+                      : 'text-gray-400 hover:text-red-500 hover:bg-red-50'
+                  }`}
+                >
+                  <Heart
+                    className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`}
+                  />
+                </button>
+                <button
+                  onClick={handleBookmark}
+                  className={`p-2 rounded-full transition-colors ${
+                    isBookmarked
+                      ? 'text-blue-500 bg-blue-50'
+                      : 'text-gray-400 hover:text-blue-500 hover:bg-blue-50'
+                  }`}
+                >
+                  <Bookmark
+                    className={`w-5 h-5 ${isBookmarked ? 'fill-current' : ''}`}
+                  />
+                </button>
+                <ShareButtons
+                  variant="icon"
+                  size="sm"
+                  title={blog.title}
+                  description={blog.excerpt || blog.content?.substring(0, 160)}
+                  image={blog.image}
+                  url={`${window.location.origin}/blogs/${blog.id}`}
                 />
               </div>
+            </div>
 
-              {/* Article Footer */}
-              <div className="mt-12 pt-8 border-t border-gray-100">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">👍</span>
-                      <span className="text-sm text-gray-600">مفيد</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">💬</span>
-                      <span className="text-sm text-gray-600">تعليقات</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg">📤</span>
-                      <span className="text-sm text-gray-600">مشاركة</span>
-                    </div>
-                  </div>
+            {/* Article Content */}
+            <article className="prose prose-lg max-w-none">
+              <div
+                className="blog-content"
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(blog.content || ''),
+                }}
+              />
+            </article>
 
-                  <div className="flex gap-3">
-                    <Link to="/blogs">
-                      <Button
-                        variant="outline"
-                        className="flex items-center gap-2"
-                      >
-                        <ArrowLeft className="w-4 h-4" />
-                        {t('blogs.back', 'العودة للمدونة')}
-                      </Button>
-                    </Link>
-                    <Button
-                      variant="primary"
-                      className="flex items-center gap-2"
-                    >
-                      <span className="text-lg">📤</span>
-                      مشاركة المقال
-                    </Button>
-                  </div>
+            {/* Article Tags */}
+            {blog.tags && blog.tags.length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-lg font-semibold mb-4">العلامات:</h3>
+                <div className="article-tags">
+                  {blog.tags.map((tag: string, index: number) => (
+                    <span key={index} className="article-tag">
+                      {tag}
+                    </span>
+                  ))}
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
-          {/* Related Articles Section */}
-          <div className="mt-16">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
-              مقالات ذات صلة
-            </h2>
-
-            {relatedLoading ? (
-              <div className="flex justify-center">
-                <LoadingSpinner />
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            {/* Share Section */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+              <h3 className="text-lg font-semibold mb-4">مشاركة المقال</h3>
+              <div className="space-y-3">
+                <ShareButtons
+                  variant="button"
+                  size="sm"
+                  title={blog.title}
+                  description={blog.excerpt || blog.content?.substring(0, 160)}
+                  image={blog.image}
+                  url={`${window.location.origin}/blogs/${blog.id}`}
+                  className="w-full"
+                />
               </div>
-            ) : relatedBlogs && relatedBlogs.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {relatedBlogs.map((relatedBlog, index) => {
-                  const gradients = [
-                    'from-blue-400 to-purple-500',
-                    'from-green-400 to-blue-500',
-                    'from-orange-400 to-red-500',
-                    'from-pink-400 to-red-500',
-                    'from-indigo-400 to-purple-500',
-                    'from-teal-400 to-blue-500',
-                  ];
+            </div>
 
-                  const gradient = gradients[index % gradients.length];
-
-                  return (
+            {/* Related Articles */}
+            {relatedBlogs && relatedBlogs.length > 0 && (
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h3 className="text-lg font-semibold mb-4">مقالات ذات صلة</h3>
+                <div className="space-y-4">
+                  {relatedBlogs.map((relatedBlog: any) => (
                     <Link
                       key={relatedBlog.id}
                       to={`/blogs/${relatedBlog.id}`}
-                      className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:transform hover:-translate-y-1"
+                      className="block group"
                     >
-                      <div
-                        className={`h-48 bg-gradient-to-br ${gradient}`}
-                      ></div>
-                      <div className="p-6">
-                        <h3 className="font-bold text-lg mb-2 text-gray-900 hover:text-blue-600 transition-colors">
-                          {relatedBlog.title}
-                        </h3>
-                        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                          {relatedBlog.content?.slice(0, 100)}...
-                        </p>
-                        <div className="flex items-center justify-between text-sm text-gray-500">
-                          <span>{relatedBlog.author || 'فريق شبابنا'}</span>
-                          <span>
-                            {relatedBlog.created_at
-                              ? new Date(
-                                  relatedBlog.created_at
-                                ).toLocaleDateString(
-                                  i18n.language === 'ar' ? 'ar-EG' : 'en-US',
-                                  {
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric',
-                                  }
-                                )
-                              : ''}
-                          </span>
+                      <div className="flex gap-3">
+                        {relatedBlog.image && (
+                          <img
+                            src={relatedBlog.image}
+                            alt={relatedBlog.title}
+                            className="w-16 h-16 object-cover rounded-lg"
+                          />
+                        )}
+                        <div>
+                          <h4 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
+                            {relatedBlog.title}
+                          </h4>
+                          <p className="text-sm text-gray-500 mt-1">
+                            {new Date(
+                              relatedBlog.created_at
+                            ).toLocaleDateString('ar-SA', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })}
+                          </p>
                         </div>
                       </div>
                     </Link>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center text-gray-500 py-8">
-                <p>لا توجد مقالات ذات صلة متاحة حالياً</p>
+                  ))}
+                </div>
               </div>
             )}
           </div>
         </div>
-      </section>
-
-      {/* Reading Progress Bar */}
-      <div className="reading-progress">
-        <div
-          className="reading-progress-bar"
-          style={{ width: `${readingProgress}%` }}
-        ></div>
       </div>
 
       {/* Floating Action Buttons */}
       <div className="floating-actions">
-        <button
-          onClick={handleLike}
-          className={`floating-action-btn ${isLiked ? 'text-red-500' : ''}`}
-          title="إعجاب"
-        >
-          <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
-        </button>
-
-        <button
-          onClick={handleBookmark}
-          className={`floating-action-btn ${
-            isBookmarked ? 'text-blue-500' : ''
-          }`}
-          title="حفظ"
-        >
-          <Bookmark
-            className={`w-5 h-5 ${isBookmarked ? 'fill-current' : ''}`}
+        <button onClick={handleLike} className="floating-action-btn">
+          <Heart
+            className={`w-5 h-5 ${isLiked ? 'text-red-500 fill-current' : ''}`}
           />
         </button>
-
-        <button
-          onClick={handleShare}
-          className="floating-action-btn"
-          title="مشاركة"
-        >
-          <Share2 className="w-5 h-5" />
+        <button onClick={handleBookmark} className="floating-action-btn">
+          <Bookmark
+            className={`w-5 h-5 ${
+              isBookmarked ? 'text-blue-500 fill-current' : ''
+            }`}
+          />
         </button>
-
-        <button
-          onClick={scrollToTop}
-          className="floating-action-btn"
-          title="العودة للأعلى"
-        >
+        <ShareButtons
+          variant="floating"
+          size="md"
+          title={blog.title}
+          description={blog.excerpt || blog.content?.substring(0, 160)}
+          image={blog.image}
+          url={`${window.location.origin}/blogs/${blog.id}`}
+        />
+        <button onClick={scrollToTop} className="floating-action-btn">
           <ArrowUp className="w-5 h-5" />
         </button>
       </div>
-
-      {/* Share Modal */}
-      {showShareModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
-            <h3 className="text-lg font-bold mb-4">مشاركة المقال</h3>
-            <div className="space-y-3">
-              <button
-                onClick={() => {
-                  window.open(
-                    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                      window.location.href
-                    )}`,
-                    '_blank'
-                  );
-                  setShowShareModal(false);
-                }}
-                className="share-btn share-btn-facebook w-full"
-              >
-                مشاركة على فيسبوك
-              </button>
-              <button
-                onClick={() => {
-                  window.open(
-                    `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                      blog?.title
-                    )}&url=${encodeURIComponent(window.location.href)}`,
-                    '_blank'
-                  );
-                  setShowShareModal(false);
-                }}
-                className="share-btn share-btn-twitter w-full"
-              >
-                مشاركة على تويتر
-              </button>
-              <button
-                onClick={() => {
-                  window.open(
-                    `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-                      window.location.href
-                    )}`,
-                    '_blank'
-                  );
-                  setShowShareModal(false);
-                }}
-                className="share-btn share-btn-linkedin w-full"
-              >
-                مشاركة على لينكد إن
-              </button>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  setShowShareModal(false);
-                  // You could show a toast notification here
-                }}
-                className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                نسخ الرابط
-              </button>
-            </div>
-            <button
-              onClick={() => setShowShareModal(false)}
-              className="mt-4 w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              إلغاء
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

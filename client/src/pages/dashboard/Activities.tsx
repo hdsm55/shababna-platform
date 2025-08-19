@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getRecentActivities } from '../../services/dashboardApi';
 import Button from '../../components/common/Button';
 import Card from '../../components/common/Card';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
+import LoadingSpinner from '../../components/common/PageLoadingSpinner';
 import Alert from '../../components/common/Alert';
 import Input from '../../components/common/Input';
 import {

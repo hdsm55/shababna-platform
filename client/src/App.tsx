@@ -8,11 +8,9 @@ import { ToastProvider } from './components/common/Toast';
 import { ThemeProvider } from './components/ThemeProvider';
 import Layout from './components/layout/Layout';
 import DashboardLayout from './layouts/DashboardLayout';
-import LoadingSpinner from './components/common/LoadingSpinner';
-import PageLoader from './components/common/PageLoader';
+import UnifiedLoader from './components/common/UnifiedLoader';
 import AppLoader from './components/common/AppLoader';
-import PageTransitionLoader from './components/common/PageTransitionLoader';
-import PerformanceOptimizer from './components/common/PerformanceOptimizer';
+import AdvancedPerformanceOptimizer from './components/common/AdvancedPerformanceOptimizer';
 
 // Lazy load pages for better performance
 const Home = lazy(() => import('./pages/Home'));
@@ -84,7 +82,7 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <PerformanceOptimizer>
+    <AdvancedPerformanceOptimizer>
       <AppLoader>
         <ErrorBoundary>
           <HelmetProvider>
@@ -92,7 +90,12 @@ function App() {
               <ThemeProvider>
                 <ToastProvider>
                   <BackendIdleHandler>
-                    <HashRouter>
+                    <HashRouter
+                      future={{
+                        v7_startTransition: true,
+                        v7_relativeSplatPath: true,
+                      }}
+                    >
                       <Routes>
                         {/* Public Routes داخل Layout */}
                         <Route element={<Layout />}>
@@ -101,7 +104,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل الصفحة الرئيسية..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل الصفحة الرئيسية..."
+                                  />
                                 }
                               >
                                 <Home />
@@ -113,7 +119,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل صفحة من نحن..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل صفحة من نحن..."
+                                  />
                                 }
                               >
                                 <AboutUs />
@@ -125,7 +134,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل الفعاليات..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل الفعاليات..."
+                                  />
                                 }
                               >
                                 <Events />
@@ -137,7 +149,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل تفاصيل الفعالية..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل تفاصيل الفعالية..."
+                                  />
                                 }
                               >
                                 <EventDetail />
@@ -149,7 +164,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل صفحة التسجيل..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل صفحة التسجيل..."
+                                  />
                                 }
                               >
                                 <EventRegistration />
@@ -161,7 +179,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل البرامج..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل البرامج..."
+                                  />
                                 }
                               >
                                 <Programs />
@@ -173,7 +194,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل تفاصيل البرنامج..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل تفاصيل البرنامج..."
+                                  />
                                 }
                               >
                                 <ProgramDetail />
@@ -185,7 +209,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل المدونة..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل المدونة..."
+                                  />
                                 }
                               >
                                 <Blogs />
@@ -197,7 +224,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل المقال..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل المقال..."
+                                  />
                                 }
                               >
                                 <BlogDetail />
@@ -209,7 +239,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل صفحة التواصل..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل صفحة التواصل..."
+                                  />
                                 }
                               >
                                 <Contact />
@@ -221,7 +254,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل صفحة التبرعات..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل صفحة التبرعات..."
+                                  />
                                 }
                               >
                                 <Donations />
@@ -233,7 +269,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل صفحة الانضمام..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل صفحة الانضمام..."
+                                  />
                                 }
                               >
                                 <JoinUs />
@@ -245,7 +284,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل صفحة المتطوعين..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل صفحة المتطوعين..."
+                                  />
                                 }
                               >
                                 <Volunteers />
@@ -257,7 +299,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل الصفحة..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل الصفحة..."
+                                  />
                                 }
                               >
                                 <NotFound />
@@ -272,7 +317,10 @@ function App() {
                           element={
                             <Suspense
                               fallback={
-                                <PageLoader message="جاري تحميل صفحة تسجيل الدخول..." />
+                                <UnifiedLoader
+                                  type="centered"
+                                  message="جاري تحميل صفحة تسجيل الدخول..."
+                                />
                               }
                             >
                               <Login />
@@ -284,7 +332,10 @@ function App() {
                           element={
                             <Suspense
                               fallback={
-                                <PageLoader message="جاري تحميل صفحة التسجيل..." />
+                                <UnifiedLoader
+                                  type="centered"
+                                  message="جاري تحميل صفحة التسجيل..."
+                                />
                               }
                             >
                               <Register />
@@ -296,7 +347,10 @@ function App() {
                           element={
                             <Suspense
                               fallback={
-                                <PageLoader message="جاري تحميل صفحة إنشاء المدير..." />
+                                <UnifiedLoader
+                                  type="centered"
+                                  message="جاري تحميل صفحة إنشاء المدير..."
+                                />
                               }
                             >
                               <CreateAdmin />
@@ -311,7 +365,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل لوحة التحكم..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل لوحة التحكم..."
+                                  />
                                 }
                               >
                                 <Dashboard />
@@ -323,7 +380,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل إدارة الفعاليات..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل إدارة الفعاليات..."
+                                  />
                                 }
                               >
                                 <DashboardEvents />
@@ -335,7 +395,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل إدارة البرامج..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل إدارة البرامج..."
+                                  />
                                 }
                               >
                                 <DashboardPrograms />
@@ -347,7 +410,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل إدارة المدونة..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل إدارة المدونة..."
+                                  />
                                 }
                               >
                                 <DashboardBlogs />
@@ -359,7 +425,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل إدارة المستخدمين..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل إدارة المستخدمين..."
+                                  />
                                 }
                               >
                                 <DashboardUsers />
@@ -371,7 +440,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل قائمة المسجلين..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل قائمة المسجلين..."
+                                  />
                                 }
                               >
                                 <DashboardRegistrants />
@@ -383,7 +455,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل رسائل التواصل..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل رسائل التواصل..."
+                                  />
                                 }
                               >
                                 <DashboardContactForms />
@@ -395,7 +470,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل التحليلات..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل التحليلات..."
+                                  />
                                 }
                               >
                                 <DashboardAnalytics />
@@ -407,7 +485,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل النشاطات..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل النشاطات..."
+                                  />
                                 }
                               >
                                 <DashboardActivities />
@@ -419,7 +500,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل التقارير..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل التقارير..."
+                                  />
                                 }
                               >
                                 <DashboardReports />
@@ -431,7 +515,10 @@ function App() {
                             element={
                               <Suspense
                                 fallback={
-                                  <PageLoader message="جاري تحميل الإعدادات..." />
+                                  <UnifiedLoader
+                                    type="centered"
+                                    message="جاري تحميل الإعدادات..."
+                                  />
                                 }
                               >
                                 <DashboardSettings />
@@ -446,7 +533,10 @@ function App() {
                           element={
                             <Suspense
                               fallback={
-                                <PageLoader message="جاري تحميل الصفحة..." />
+                                <UnifiedLoader
+                                  type="centered"
+                                  message="جاري تحميل الصفحة..."
+                                />
                               }
                             >
                               <NotFound />
@@ -462,7 +552,7 @@ function App() {
           </HelmetProvider>
         </ErrorBoundary>
       </AppLoader>
-    </PerformanceOptimizer>
+    </AdvancedPerformanceOptimizer>
   );
 }
 

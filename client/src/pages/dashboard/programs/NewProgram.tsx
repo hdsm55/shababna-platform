@@ -5,7 +5,7 @@ import DashboardLayout from '../../../layouts/DashboardLayout';
 import Button from '../../../components/common/Button';
 import Input from '../../../components/common/Input';
 import Alert from '../../../components/common/Alert';
-import { Upload, X, ArrowLeft } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const NewProgram: React.FC = () => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Loader2, Sparkles, Heart } from 'lucide-react';
+import { Sparkles, Heart } from 'lucide-react';
 
 interface LoadingPageProps {
   message?: string;

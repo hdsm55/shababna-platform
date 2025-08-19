@@ -24,10 +24,10 @@ const Footer: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // إظهار الفوتر بعد تأخير قصير
+    // تأخير قصير لإظهار الفوتر
     const timer = setTimeout(() => {
       setIsVisible(true);
-    }, 200);
+    }, 100);
 
     return () => clearTimeout(timer);
   }, []);
@@ -106,9 +106,9 @@ const Footer: React.FC = () => {
 
   return (
     <motion.footer
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: 'easeOut' }}
+      transition={{ duration: 0.6, ease: 'easeOut', delay: 0.1 }}
       className="bg-neutral-900 text-white relative z-10"
     >
       {/* Background Pattern - مبسط */}

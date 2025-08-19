@@ -106,7 +106,7 @@ router.post('/join-us', async (req, res) => {
             phone,
             country,
             age: parseInt(age),
-            interests: Array.isArray(interests) ? interests : [interests],
+            interests: typeof interests === 'string' ? interests : (Array.isArray(interests) ? interests.join(', ') : interests),
             motivation
         };
 
@@ -124,7 +124,7 @@ router.post('/join-us', async (req, res) => {
           <p><strong>الاسم:</strong> ${first_name} ${last_name}</p>
           <p><strong>البلد:</strong> ${country}</p>
           <p><strong>العمر:</strong> ${age}</p>
-          <p><strong>الاهتمامات:</strong> ${interests.join(', ')}</p>
+          <p><strong>الاهتمامات:</strong> ${Array.isArray(interests) ? interests.join(', ') : interests}</p>
           <p><strong>الدافع:</strong> ${motivation}</p>
         </div>
         <p>سنقوم بالتواصل معك خلال 3-5 أيام عمل لتوضيح الخطوات التالية.</p>
@@ -132,10 +132,19 @@ router.post('/join-us', async (req, res) => {
       </div>
     `;
 
-        await emailService.sendEmail(email, first_name, welcomeSubject, welcomeContent, 'join_us_confirmation');
+        // محاولة إرسال إيميل تأكيد للمستخدم
+        try {
+            await emailService.sendEmail(email, first_name, welcomeSubject, welcomeContent, 'join_us_confirmation');
+        } catch (emailError) {
+            console.error('Email sending error:', emailError);
+        }
 
-        // إرسال إشعار للمدير
-        await emailService.sendAdminNotification(formData);
+        // محاولة إرسال إشعار للمدير
+        try {
+            await emailService.sendAdminNotification(formData);
+        } catch (adminEmailError) {
+            console.error('Admin notification error:', adminEmailError);
+        }
 
         res.json({
             success: true,
@@ -614,6 +623,136 @@ router.get('/event-registrations', authenticateToken, requireAdmin, async (req, 
         res.status(500).json({
             success: false,
             message: 'حدث خطأ أثناء جلب تسجيلات الفعاليات'
+        });
+    }
+});
+
+// إرسال نموذج التبرع/الدعم للبرامج
+router.post('/donations', async (req, res) => {
+    try {
+        const {
+            program_id,
+            support_type,
+            amount,
+            email,
+            phone,
+            message,
+            first_name,
+            last_name,
+            org_name,
+            contact_person,
+            website,
+            partnership_type
+        } = req.body;
+
+        // التحقق من البيانات المطلوبة
+        if (!program_id || !support_type || !amount || !email || !phone) {
+            return res.status(400).json({
+                success: false,
+                message: 'جميع الحقول المطلوبة يجب ملؤها'
+            });
+        }
+
+        // التحقق من صحة البريد الإلكتروني
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({
+                success: false,
+                message: 'البريد الإلكتروني غير صالح'
+            });
+        }
+
+        // التحقق من أن البرنامج موجود
+        const programResult = await query('SELECT id, title FROM programs WHERE id = $1', [program_id]);
+        if (programResult.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'البرنامج غير موجود'
+            });
+        }
+
+        // تحديد اسم الداعم بناءً على النوع
+        let supporterName = '';
+        if (support_type === 'individual') {
+            if (!first_name || !last_name) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'اسم الفرد مطلوب'
+                });
+            }
+            supporterName = `${first_name} ${last_name}`;
+        } else if (support_type === 'organization') {
+            if (!org_name || !contact_person) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'اسم المؤسسة ومسؤول التواصل مطلوبان'
+                });
+            }
+            supporterName = org_name;
+        }
+
+        // حفظ التبرع في قاعدة البيانات
+        const insertQuery = `
+            INSERT INTO program_supporters (
+                program_id, supporter_type, supporter_name, supporter_email,
+                supporter_phone, support_type, message, amount,
+                first_name, last_name, org_name, contact_person,
+                website, partnership_type, status
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, 'pending')
+            RETURNING *
+        `;
+
+        const values = [
+            program_id,
+            support_type,
+            supporterName,
+            email,
+            phone,
+            'donation',
+            message || null,
+            amount,
+            first_name || null,
+            last_name || null,
+            org_name || null,
+            contact_person || null,
+            website || null,
+            partnership_type || null
+        ];
+
+        const result = await query(insertQuery, values);
+        const donation = result.rows[0];
+
+        // إرسال إيميل تأكيد
+        try {
+            const emailData = {
+                supporter_name: supporterName,
+                supporter_email: email,
+                program_title: programResult.rows[0].title,
+                amount: amount,
+                support_type: support_type,
+                message: message
+            };
+
+            await emailService.sendDonationConfirmation(emailData);
+        } catch (emailError) {
+            console.error('Email sending error:', emailError);
+        }
+
+        res.json({
+            success: true,
+            message: 'تم استلام طلب الدعم بنجاح! شكراً لك',
+            data: {
+                donationId: donation.id,
+                supporterName: supporterName,
+                amount: amount
+            }
+        });
+
+    } catch (error) {
+        console.error('Donation submission error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'حدث خطأ أثناء إرسال طلب الدعم. يرجى المحاولة مرة أخرى.'
         });
     }
 });

@@ -9,7 +9,7 @@ import {
   SkipToContent,
 } from '../../components/common/AccessibleComponents';
 import Card from '../../components/common/Card';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
+import LoadingSpinner from '../../components/common/PageLoadingSpinner';
 import Alert from '../../components/common/Alert';
 import {
   BarChart3,
@@ -238,7 +238,7 @@ const AnalyticsDashboard: React.FC = () => {
                 </select>
               </div>
               <div className="text-sm text-gray-500">
-                آخر تحديث: {new Date().toLocaleDateString('ar-SA')}
+                آخر تحديث: {new Date().toLocaleDateString('en-US')}
               </div>
             </div>
           </Card>

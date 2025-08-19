@@ -1,14 +1,26 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { splitVendorChunkPlugin } from 'vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    splitVendorChunkPlugin(),
   ],
   optimizeDeps: {
     exclude: ['lucide-react'],
-    include: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query', 'framer-motion'],
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@tanstack/react-query',
+      'framer-motion',
+      'react-i18next',
+      'i18next',
+      'zustand',
+      'react-helmet-async'
+    ],
     // تحسين التبعيات
     force: false,
   },
@@ -21,6 +33,11 @@ export default defineConfig({
     logOverride: { 'this-is-undefined-in-esm': 'silent' },
     // تحسين البناء
     target: 'es2020',
+    // تحسين الأداء
+    treeShaking: true,
+    minifyIdentifiers: true,
+    minifySyntax: true,
+    minifyWhitespace: true,
   },
   server: {
     proxy: {
@@ -48,17 +65,70 @@ export default defineConfig({
     hmr: {
       overlay: false, // إزالة overlay الأخطاء لتحسين الأداء
     },
+    // تحسين الأداء
+    fs: {
+      strict: false,
+    },
   },
   build: {
     rollupOptions: {
       output: {
-        // تحسين تقسيم الباندل
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          router: ['react-router-dom'],
-          ui: ['framer-motion', 'lucide-react'],
-          utils: ['@tanstack/react-query'],
-          i18n: ['react-i18next', 'i18next'],
+        // تحسين تقسيم الباندل - تقسيم أكثر دقة
+        manualChunks: (id) => {
+          // Core React libraries
+          if (id.includes('react') && !id.includes('react-router')) {
+            return 'react-core';
+          }
+
+          // Router
+          if (id.includes('react-router')) {
+            return 'router';
+          }
+
+          // UI Libraries
+          if (id.includes('framer-motion') || id.includes('lucide-react')) {
+            return 'ui-libs';
+          }
+
+          // State Management
+          if (id.includes('@tanstack/react-query') || id.includes('zustand')) {
+            return 'state-management';
+          }
+
+          // Internationalization
+          if (id.includes('react-i18next') || id.includes('i18next')) {
+            return 'i18n';
+          }
+
+          // Dashboard pages - separate chunk
+          if (id.includes('/dashboard/')) {
+            return 'dashboard';
+          }
+
+          // Auth pages - separate chunk
+          if (id.includes('/auth/')) {
+            return 'auth';
+          }
+
+          // Public pages - separate chunk
+          if (id.includes('/pages/') && !id.includes('/dashboard/') && !id.includes('/auth/')) {
+            return 'public-pages';
+          }
+
+          // Components - separate chunk
+          if (id.includes('/components/')) {
+            return 'components';
+          }
+
+          // Services - separate chunk
+          if (id.includes('/services/')) {
+            return 'services';
+          }
+
+          // Utils - separate chunk
+          if (id.includes('/utils/') || id.includes('/hooks/')) {
+            return 'utils';
+          }
         },
         // Ensure proper asset naming for Render
         assetFileNames: (assetInfo) => {
@@ -92,6 +162,12 @@ export default defineConfig({
     // تحسين الأداء
     reportCompressedSize: false, // تسريع البناء
     emptyOutDir: true,
+    // تحسين التحميل
+    modulePreload: {
+      polyfill: false,
+    },
+    // تحسين التخزين المؤقت
+    assetsInlineLimit: 4096,
   },
   base: '/',
   // Add preview configuration for SPA routing
@@ -99,4 +175,11 @@ export default defineConfig({
     port: 5173,
     host: true,
   },
+  // تحسين الأداء
+  css: {
+    devSourcemap: false,
+  },
+  // تحسين التطوير
+  clearScreen: false,
+  logLevel: 'info',
 })

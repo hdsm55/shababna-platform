@@ -121,7 +121,7 @@ const ContactForms: React.FC = () => {
         subject: form.subject,
         message: form.message,
         status: form.is_read ? 'مقروءة' : 'غير مقروءة',
-        date: new Date(form.created_at).toLocaleDateString('ar-SA'),
+        date: new Date(form.created_at).toLocaleDateString('en-US'),
       }));
 
       // تحويل البيانات إلى CSV
@@ -156,7 +156,7 @@ const ContactForms: React.FC = () => {
       link.setAttribute('href', url);
       link.setAttribute(
         'download',
-        `رسائل_التواصل_${new Date().toLocaleDateString('ar-SA')}.csv`
+        `رسائل_التواصل_${new Date().toLocaleDateString('en-US')}.csv`
       );
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
@@ -166,7 +166,7 @@ const ContactForms: React.FC = () => {
       setModalMsg(
         `✅ تم تصدير ${
           exportData.length
-        } رسالة بنجاح!\n\n📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}`
+        } رسالة بنجاح!\n\n📅 التاريخ: ${new Date().toLocaleDateString('en-US')}`
       );
     } catch (error) {
       setModalMsg('❌ حدث خطأ أثناء تصدير البيانات');
@@ -455,7 +455,7 @@ const ContactForms: React.FC = () => {
                 تاريخ الإرسال
               </label>
               <p className="text-sm text-gray-900">
-                {new Date(selectedForm.created_at).toLocaleDateString('ar-SA')}{' '}
+                {new Date(selectedForm.created_at).toLocaleDateString('en-US')}{' '}
                 -{' '}
                 {new Date(selectedForm.created_at).toLocaleTimeString('ar-SA')}
               </p>

@@ -5,7 +5,7 @@ import { Card } from '../components/ui/Card/Card';
 import { Button } from '../components/ui/Button/Button';
 import { Input } from '../components/ui/Input/Input';
 import Alert from '../components/common/Alert';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import LoadingSpinner from '../components/common/PageLoadingSpinner';
 import {
   Users,
   Clock,

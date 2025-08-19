@@ -6,7 +6,7 @@ import Button from '../../../components/common/Button';
 import Input from '../../../components/common/Input';
 import Alert from '../../../components/common/Alert';
 import ImageUpload from '../../../components/common/ImageUpload';
-import { Upload, X, ArrowLeft } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const NewEvent: React.FC = () => {

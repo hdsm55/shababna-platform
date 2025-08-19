@@ -1,11 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
-import {
-  getButtonClasses,
-  getCardClasses,
-  SECTION_VARIANTS,
-} from './DesignSystem';
+import { getButtonClasses, getCardClasses } from './DesignSystem';
 
 // Accessible Button Component
 interface AccessibleButtonProps
@@ -111,7 +107,7 @@ export const AccessibleCard: React.FC<AccessibleCardProps> = ({
 
 // Accessible Section Component
 interface AccessibleSectionProps extends React.HTMLAttributes<HTMLElement> {
-  variant?: keyof typeof SECTION_VARIANTS;
+  variant?: 'default' | 'primary' | 'secondary' | 'accent';
   children: React.ReactNode;
   ariaLabel?: string;
   ariaDescribedBy?: string;
@@ -127,7 +123,7 @@ export const AccessibleSection: React.FC<AccessibleSectionProps> = ({
 }) => {
   return (
     <section
-      className={clsx(SECTION_VARIANTS[variant], className)}
+      className={clsx('py-16', className)}
       aria-label={ariaLabel}
       aria-describedby={ariaDescribedBy}
       {...props}

@@ -277,7 +277,7 @@ const UsersDashboard: React.FC = () => {
         await createUser(form);
         setModalMsg(
           `✅ تم إنشاء المستخدم "${form.firstName} ${form.lastName}" بنجاح! 🎉\n\n` +
-            `📅 التاريخ: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `📅 التاريخ: ${new Date().toLocaleDateString('en-US')}\n` +
             `📧 البريد الإلكتروني: ${form.email}\n` +
             `👤 الدور: ${getRoleText(form.role)}\n` +
             `📱 الهاتف: ${form.phone || 'غير محدد'}`
@@ -286,7 +286,7 @@ const UsersDashboard: React.FC = () => {
         await updateUser(selectedUser.id, form);
         setModalMsg(
           `✅ تم تحديث المستخدم "${form.firstName} ${form.lastName}" بنجاح! 🔄\n\n` +
-            `📅 آخر تحديث: ${new Date().toLocaleDateString('ar-SA')}\n` +
+            `📅 آخر تحديث: ${new Date().toLocaleDateString('en-US')}\n` +
             `📧 البريد الإلكتروني: ${form.email}\n` +
             `👤 الدور: ${getRoleText(form.role)}\n` +
             `📱 الهاتف: ${form.phone || 'غير محدد'}`
@@ -382,7 +382,7 @@ const UsersDashboard: React.FC = () => {
   const formatDate = (dateString: string) => {
     if (!dateString) return 'غير محدد';
     try {
-      return new Date(dateString).toLocaleDateString('ar-SA', {
+      return new Date(dateString).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',

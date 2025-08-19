@@ -1,5 +1,5 @@
 import React from 'react';
-import { Info, CheckCircle, AlertTriangle, AlertCircle, X } from 'lucide-react';
+import { Info, CheckCircle, AlertTriangle } from 'lucide-react';
 import { DESIGN_SYSTEM } from './DesignSystem';
 import { motion, AnimatePresence } from 'framer-motion';
 

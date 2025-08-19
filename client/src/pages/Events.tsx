@@ -57,7 +57,7 @@ const EventsHero = memo(({ events }: { events: Event[] }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className="text-4xl md:text-5xl font-bold text-white mb-4"
+            className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-4"
           >
             {t('events.title', 'الفعاليات')}
           </motion.h1>
@@ -259,7 +259,7 @@ const EventCard = memo(
     const navigate = useNavigate();
 
     const formatDate = useCallback((dateString: string) => {
-      return new Date(dateString).toLocaleDateString('ar-SA', {
+      return new Date(dateString).toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
@@ -348,7 +348,7 @@ const EventCard = memo(
           {/* Event Image */}
           <div className="relative h-48 bg-gradient-to-br from-primary-100 to-secondary-100 overflow-hidden">
             <div className="w-full h-full flex items-center justify-center">
-              <span className="text-6xl">
+              <span className="text-4xl">
                 {getCategoryIcon(event.category)}
               </span>
             </div>
@@ -530,7 +530,7 @@ const Events: React.FC = () => {
 
   const handleRegisterClick = useCallback(
     (event: Event) => {
-      navigate(`/events/${event.id}/register`);
+      navigate(`/events/${event.id}?section=register`);
     },
     [navigate]
   );
@@ -561,8 +561,11 @@ const Events: React.FC = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex justify-center items-center py-12">
-            <EventsLoader />
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
+              <p className="text-gray-600 text-lg">جاري تحميل الفعاليات...</p>
+            </div>
           </div>
         )}
 
@@ -586,7 +589,7 @@ const Events: React.FC = () => {
         {/* Empty State */}
         {!isLoading && !isError && events.length === 0 && (
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">📅</div>
+            <div className="text-4xl mb-4">📅</div>
             <h3 className="text-xl font-bold text-gray-700 mb-2">
               لا توجد فعاليات متاحة
             </h3>

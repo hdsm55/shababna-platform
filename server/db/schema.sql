@@ -76,6 +76,7 @@ CREATE TABLE IF NOT EXISTS program_registrations (
 CREATE TABLE IF NOT EXISTS program_supporters (
     id SERIAL PRIMARY KEY,
     program_id INTEGER REFERENCES programs(id) ON DELETE CASCADE,
+    supporter_type VARCHAR(50) DEFAULT 'individual', -- 'individual' or 'organization'
     supporter_name VARCHAR(255) NOT NULL,
     supporter_email VARCHAR(255),
     supporter_phone VARCHAR(50),
@@ -83,6 +84,17 @@ CREATE TABLE IF NOT EXISTS program_supporters (
     message TEXT,
     amount NUMERIC(10,2),
     status VARCHAR(50) DEFAULT 'pending',
+
+    -- حقول الأفراد
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+
+    -- حقول المؤسسات
+    org_name VARCHAR(255),
+    contact_person VARCHAR(255),
+    website VARCHAR(500),
+    partnership_type VARCHAR(100), -- 'sponsor', 'implementer', 'media', 'other'
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

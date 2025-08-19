@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '../../components/ui/Card/Card';
 import { Button } from '../../components/ui/Button/Button';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
+import UnifiedLoader from '../../components/common/UnifiedLoader';
 import Alert from '../../components/common/Alert';
 import {
   Calendar,
@@ -235,13 +235,14 @@ import Modal from '../../components/common/Modal';
 import QuickActions from '../../components/common/QuickActions';
 import SEO from '../../components/common/SEO';
 
-const DashboardOverview: React.FC = () => {
+const Dashboard: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { user } = useAuthStore();
   const [selectedPeriod, setSelectedPeriod] = useState('week');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMsg, setModalMsg] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const isRTL = i18n.dir() === 'rtl';
 
   // جلب إحصائيات الداشبورد
@@ -292,11 +293,11 @@ const DashboardOverview: React.FC = () => {
       case 'success':
         return CheckCircle;
       case 'warning':
-        return AlertTriangle;
+        return AlertCircle;
       case 'error':
         return AlertCircle;
       case 'info':
-        return Info;
+        return Clock;
       default:
         return Clock;
     }
@@ -336,6 +337,15 @@ const DashboardOverview: React.FC = () => {
     }
   };
 
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([refetchStats(), refetchActivities()]);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   const handleUnavailable = (
     msg = t('dashboard.unavailable', 'هذه الخاصية قيد التطوير، قريبًا!')
   ) => {
@@ -366,329 +376,533 @@ const DashboardOverview: React.FC = () => {
 
   if (statsLoading || activitiesLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <LoadingSpinner size="lg" />
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 relative overflow-hidden">
+        {/* Background Decorations */}
+        <div className="absolute inset-0 overflow-hidden">
+          <motion.div
+            className="absolute -top-40 -right-40 w-80 h-80 bg-primary-100 rounded-full opacity-20"
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 180, 360],
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: 'linear',
+            }}
+          />
+          <motion.div
+            className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary-100 rounded-full opacity-20"
+            animate={{
+              scale: [1.2, 1, 1.2],
+              rotate: [360, 180, 0],
+            }}
+            transition={{
+              duration: 25,
+              repeat: Infinity,
+              ease: 'linear',
+            }}
+          />
+        </div>
+
+        <div className="relative z-10 flex items-center justify-center min-h-[60vh]">
+          <UnifiedLoader type="centered" size="lg" />
+        </div>
       </div>
     );
   }
 
   if (statsError || activitiesError) {
     return (
-      <Alert
-        type="error"
-        title={t('dashboard.error.title', 'خطأ في تحميل البيانات')}
-      >
-        {t('dashboard.error.message', 'حدث خطأ أثناء تحميل بيانات الداشبورد')}
-      </Alert>
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 relative overflow-hidden">
+        <div className="relative z-10 p-6">
+          <Alert
+            type="error"
+            title={t('dashboard.error.title', 'خطأ في تحميل البيانات')}
+          >
+            {t(
+              'dashboard.error.message',
+              'حدث خطأ أثناء تحميل بيانات الداشبورد'
+            )}
+          </Alert>
+        </div>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <SEO
-        title={t('dashboard.seo.title', 'لوحة التحكم - نظرة عامة')}
-        description={t(
-          'dashboard.seo.description',
-          'نظرة شاملة على إحصائيات وأداء النظام'
-        )}
-      />
-
-      {/* Header Section */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-800 mb-1">
-              {t('dashboard.welcome', 'مرحباً')} {user?.first_name}
-            </h1>
-            <p className="text-gray-500 text-sm">
-              {t('dashboard.subtitle', 'نظرة شاملة على أداء النظام')}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                refetchStats();
-                refetchActivities();
-              }}
-              className="text-xs"
-            >
-              <RefreshCw className="w-3 h-3 mr-1" />
-              {t('dashboard.refresh', 'تحديث')}
-            </Button>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 relative overflow-hidden">
+      {/* Background Decorations */}
+      <div className="absolute inset-0 overflow-hidden">
+        <motion.div
+          className="absolute -top-40 -right-40 w-80 h-80 bg-primary-100 rounded-full opacity-20"
+          animate={{
+            scale: [1, 1.2, 1],
+            rotate: [0, 180, 360],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: 'linear',
+          }}
+        />
+        <motion.div
+          className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary-100 rounded-full opacity-20"
+          animate={{
+            scale: [1.2, 1, 1.2],
+            rotate: [360, 180, 0],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: 'linear',
+          }}
+        />
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {Array.isArray(stats.overview) && stats.overview.length > 0 ? (
-          stats.overview.map((stat: any, index: number) => (
-            <div
-              key={index}
-              className="bg-white rounded-lg p-4 border border-gray-100"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div
-                  className={`w-8 h-8 rounded-lg bg-${stat.color}-50 flex items-center justify-center`}
-                >
-                  <stat.icon className={`w-4 h-4 text-${stat.color}-500`} />
-                </div>
-                <div className="flex items-center gap-1">
-                  {(() => {
-                    const IconComponent = getGrowthIcon(stat.changeType);
-                    return (
-                      IconComponent && (
-                        <IconComponent
-                          className={`w-3 h-3 ${
-                            stat.changeType === 'increase'
-                              ? 'text-green-500'
-                              : 'text-red-500'
-                          }`}
-                        />
-                      )
-                    );
-                  })()}
-                  <span
-                    className={`text-xs ${
-                      stat.changeType === 'increase'
-                        ? 'text-green-600'
-                        : 'text-red-600'
-                    }`}
-                  >
-                    {stat.change}
-                  </span>
-                </div>
-              </div>
-              <div className="text-2xl font-bold text-gray-900 mb-1">
-                {stat.value}
-              </div>
-              <div className="text-xs text-gray-500">{stat.title}</div>
-            </div>
-          ))
-        ) : (
-          <div className="col-span-4 text-center py-8">
-            <p className="text-sm text-gray-400">
-              {t('dashboard.noStats', 'لا توجد بيانات إحصائية متاحة حالياً.')}
-            </p>
-          </div>
-        )}
-      </div>
+      <div className="relative z-10 p-6 space-y-6">
+        <SEO
+          title={t('dashboard.seo.title', 'لوحة التحكم - نظرة عامة')}
+          description={t(
+            'dashboard.seo.description',
+            'نظرة شاملة على إحصائيات وأداء النظام'
+          )}
+        />
 
-      {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Performance Metrics */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg p-6 border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">
-                {t('dashboard.performance.title', 'مقاييس الأداء')}
-              </h2>
-              <select
-                value={selectedPeriod}
-                onChange={(e) => setSelectedPeriod(e.target.value)}
-                className="text-xs border border-gray-200 rounded px-2 py-1"
-              >
-                <option value="week">
-                  {t('dashboard.period.week', 'الأسبوع')}
-                </option>
-                <option value="month">
-                  {t('dashboard.period.month', 'الشهر')}
-                </option>
-                <option value="quarter">
-                  {t('dashboard.period.quarter', 'الربع')}
-                </option>
-                <option value="year">
-                  {t('dashboard.period.year', 'السنة')}
-                </option>
-              </select>
-            </div>
-
-            <div className="space-y-3">
-              {Array.isArray(stats.engagement) &&
-              stats.engagement.length > 0 ? (
-                stats.engagement.map((metric: any, index: number) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-8 h-8 rounded-lg bg-${metric.color}-50 flex items-center justify-center`}
-                      >
-                        <metric.icon
-                          className={`w-4 h-4 text-${metric.color}-500`}
-                        />
-                      </div>
-                      <div>
-                        <div className="font-medium text-sm text-gray-800">
-                          {metric.title}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          الهدف: {metric.target}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-gray-900">
-                        {metric.value}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full bg-${metric.color}-500 rounded-full`}
-                            style={{ width: `${metric.percentage}%` }}
-                          />
-                        </div>
-                        <span className="text-xs text-gray-600">
-                          {metric.percentage}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-6">
-                  <p className="text-sm text-gray-400">
-                    {t(
-                      'dashboard.noPerformance',
-                      'لا توجد بيانات أداء متاحة حالياً.'
-                    )}
+        {/* Enhanced Header Section */}
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center">
+                  <Crown className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent mb-1">
+                    {t('dashboard.welcome', 'مرحباً')} {user?.first_name}
+                  </h1>
+                  <p className="text-gray-600 text-sm">
+                    {t('dashboard.subtitle', 'نظرة شاملة على أداء النظام')}
                   </p>
                 </div>
-              )}
+              </div>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  className="bg-white/50 backdrop-blur-sm border-white/20 hover:bg-white/70 transition-all duration-300"
+                >
+                  <RefreshCw
+                    className={`w-4 h-4 mr-2 ${
+                      isRefreshing ? 'animate-spin' : ''
+                    }`}
+                  />
+                  {t('dashboard.refresh', 'تحديث')}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleUnavailable()}
+                  className="bg-white/50 backdrop-blur-sm border-white/20 hover:bg-white/70 transition-all duration-300"
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  {t('dashboard.settings', 'الإعدادات')}
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Recent Activities */}
-        <div>
-          <div className="bg-white rounded-lg p-6 border border-gray-100 h-full">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">
-                {t('dashboard.activities.title', 'الأنشطة الحديثة')}
-              </h2>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleUnavailable()}
-                className="text-xs text-blue-600"
+        {/* Enhanced Stats Grid */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {Array.isArray(stats.overview) && stats.overview.length > 0 ? (
+            stats.overview.map((stat: any, index: number) => (
+              <motion.div
+                key={index}
+                variants={itemVariants}
+                className="group relative"
               >
-                {t('dashboard.activities.viewAll', 'عرض الكل')}
-              </Button>
-            </div>
-
-            <div className="space-y-2">
-              {Array.isArray(activities) && activities.length > 0 ? (
-                activities.slice(0, 5).map((activity, index) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50"
-                  >
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                  <div className="flex items-center justify-between mb-4">
                     <div
-                      className={`w-6 h-6 rounded-lg bg-${activity.color}-50 flex items-center justify-center flex-shrink-0`}
+                      className={`w-12 h-12 rounded-xl bg-gradient-to-br from-${stat.color}-500 to-${stat.color}-600 flex items-center justify-center shadow-lg`}
                     >
-                      <activity.icon
-                        className={`w-3 h-3 text-${activity.color}-500`}
+                      <stat.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {(() => {
+                        const IconComponent = getGrowthIcon(stat.changeType);
+                        return (
+                          IconComponent && (
+                            <div
+                              className={`p-2 rounded-lg ${
+                                stat.changeType === 'increase'
+                                  ? 'bg-green-100 text-green-600'
+                                  : 'bg-red-100 text-red-600'
+                              }`}
+                            >
+                              <IconComponent className="w-4 h-4" />
+                            </div>
+                          )
+                        );
+                      })()}
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold text-gray-900 mb-2">
+                    {stat.value}
+                  </div>
+                  <div className="text-sm text-gray-600 mb-3">{stat.title}</div>
+                  <div className="flex items-center justify-between">
+                    <span
+                      className={`text-xs font-medium ${
+                        stat.changeType === 'increase'
+                          ? 'text-green-600'
+                          : 'text-red-600'
+                      }`}
+                    >
+                      {stat.change}
+                    </span>
+                    <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full bg-gradient-to-r from-${stat.color}-500 to-${stat.color}-600 rounded-full transition-all duration-1000`}
+                        style={{
+                          width: `${Math.min(stat.percentage || 0, 100)}%`,
+                        }}
                       />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-xs text-gray-800 mb-1">
-                        {activity.title}
-                      </div>
-                      <div className="text-xs text-gray-500 mb-2">
-                        {activity.description}
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-400">
-                          {activity.time}
-                        </span>
-                        <span
-                          className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(
-                            activity.status
-                          )}`}
-                        >
-                          {activity.status}
-                        </span>
-                      </div>
-                    </div>
                   </div>
-                ))
-              ) : (
-                <div className="text-center py-6">
-                  <p className="text-sm text-gray-400">
-                    {t('dashboard.noActivities', 'لا توجد أنشطة متاحة حالياً.')}
-                  </p>
                 </div>
-              )}
+              </motion.div>
+            ))
+          ) : (
+            <motion.div className="col-span-full" variants={itemVariants}>
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-white/20 shadow-lg text-center">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <BarChart3 className="w-8 h-8 text-gray-400" />
+                </div>
+                <p className="text-gray-500 mb-2">
+                  {t(
+                    'dashboard.noStats',
+                    'لا توجد بيانات إحصائية متاحة حالياً.'
+                  )}
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefresh}
+                  className="mt-2"
+                >
+                  {t('dashboard.refresh', 'تحديث')}
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </motion.div>
+
+        {/* Enhanced Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Enhanced Performance Metrics */}
+          <motion.div
+            className="lg:col-span-2"
+            variants={itemVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-white" />
+                  </div>
+                  <h2 className="text-xl font-bold text-gray-800">
+                    {t('dashboard.performance.title', 'مقاييس الأداء')}
+                  </h2>
+                </div>
+                <select
+                  value={selectedPeriod}
+                  onChange={(e) => setSelectedPeriod(e.target.value)}
+                  className="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                >
+                  <option value="week">
+                    {t('dashboard.period.week', 'الأسبوع')}
+                  </option>
+                  <option value="month">
+                    {t('dashboard.period.month', 'الشهر')}
+                  </option>
+                  <option value="quarter">
+                    {t('dashboard.period.quarter', 'الربع')}
+                  </option>
+                  <option value="year">
+                    {t('dashboard.period.year', 'السنة')}
+                  </option>
+                </select>
+              </div>
+
+              <div className="space-y-4">
+                {Array.isArray(stats.engagement) &&
+                stats.engagement.length > 0 ? (
+                  stats.engagement.map((metric: any, index: number) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-100 hover:shadow-md transition-all duration-300"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`w-12 h-12 rounded-xl bg-gradient-to-br from-${metric.color}-500 to-${metric.color}-600 flex items-center justify-center shadow-lg`}
+                        >
+                          <metric.icon className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-gray-800 mb-1">
+                            {metric.title}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            الهدف: {metric.target}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-gray-900 mb-2">
+                          {metric.value}
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <motion.div
+                              className={`h-full bg-gradient-to-r from-${metric.color}-500 to-${metric.color}-600 rounded-full`}
+                              initial={{ width: 0 }}
+                              animate={{ width: `${metric.percentage}%` }}
+                              transition={{ duration: 1, delay: index * 0.2 }}
+                            />
+                          </div>
+                          <span className="text-sm font-medium text-gray-600 min-w-[3rem]">
+                            {metric.percentage}%
+                          </span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <TrendingUp className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <p className="text-gray-500">
+                      {t(
+                        'dashboard.noPerformance',
+                        'لا توجد بيانات أداء متاحة حالياً.'
+                      )}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Enhanced Recent Activities */}
+          <motion.div
+            variants={itemVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg h-full">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                    <Activity className="w-5 h-5 text-white" />
+                  </div>
+                  <h2 className="text-xl font-bold text-gray-800">
+                    {t('dashboard.activities.title', 'الأنشطة الحديثة')}
+                  </h2>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleUnavailable()}
+                  className="text-primary-600 hover:bg-primary-50"
+                >
+                  {t('dashboard.activities.viewAll', 'عرض الكل')}
+                </Button>
+              </div>
+
+              <div className="space-y-3">
+                {Array.isArray(activities) && activities.length > 0 ? (
+                  activities.slice(0, 5).map((activity, index) => (
+                    <motion.div
+                      key={activity.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition-all duration-300 group"
+                    >
+                      <div
+                        className={`w-8 h-8 rounded-lg bg-gradient-to-br from-${activity.color}-500 to-${activity.color}-600 flex items-center justify-center flex-shrink-0 shadow-md`}
+                      >
+                        <activity.icon className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-sm text-gray-800 mb-1 group-hover:text-primary-600 transition-colors">
+                          {activity.title}
+                        </div>
+                        <div className="text-sm text-gray-600 mb-2 line-clamp-2">
+                          {activity.description}
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-400 flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {activity.time}
+                          </span>
+                          <span
+                            className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(
+                              activity.status
+                            )}`}
+                          >
+                            {activity.status}
+                          </span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Activity className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <p className="text-gray-500">
+                      {t(
+                        'dashboard.noActivities',
+                        'لا توجد أنشطة متاحة حالياً.'
+                      )}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Enhanced Quick Actions */}
+        <motion.div
+          className="mt-6"
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
+                <Zap className="w-5 h-5 text-white" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-800">
+                {t('dashboard.quickActions.title', 'إجراءات سريعة')}
+              </h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  variant="outline"
+                  className="w-full flex flex-col items-center gap-3 p-4 h-auto bg-white/50 backdrop-blur-sm border-white/20 hover:bg-white/70 transition-all duration-300"
+                  onClick={() => handleUnavailable()}
+                >
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <Plus className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-gray-700">
+                    {t('dashboard.quickActions.newEvent', 'فعالية جديدة')}
+                  </span>
+                </Button>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  variant="outline"
+                  className="w-full flex flex-col items-center gap-3 p-4 h-auto bg-white/50 backdrop-blur-sm border-white/20 hover:bg-white/70 transition-all duration-300"
+                  onClick={() => handleUnavailable()}
+                >
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                    <Target className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-gray-700">
+                    {t('dashboard.quickActions.newProgram', 'برنامج جديد')}
+                  </span>
+                </Button>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  variant="outline"
+                  className="w-full flex flex-col items-center gap-3 p-4 h-auto bg-white/50 backdrop-blur-sm border-white/20 hover:bg-white/70 transition-all duration-300"
+                  onClick={() => handleUnavailable()}
+                >
+                  <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
+                    <UserPlus className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-gray-700">
+                    {t('dashboard.quickActions.newUser', 'مستخدم جديد')}
+                  </span>
+                </Button>
+              </motion.div>
+
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  variant="outline"
+                  className="w-full flex flex-col items-center gap-3 p-4 h-auto bg-white/50 backdrop-blur-sm border-white/20 hover:bg-white/70 transition-all duration-300"
+                  onClick={() => handleUnavailable()}
+                >
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="font-medium text-gray-700">
+                    {t('dashboard.quickActions.newBlog', 'مقال جديد')}
+                  </span>
+                </Button>
+              </motion.div>
             </div>
           </div>
-        </div>
-      </div>
+        </motion.div>
 
-      {/* Quick Actions */}
-      <div className="mt-6">
-        <div className="bg-white rounded-lg p-6 border border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">
-            {t('dashboard.quickActions.title', 'إجراءات سريعة')}
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Button
-              variant="outline"
-              className="flex flex-col items-center gap-2 p-3 h-auto text-xs"
-              onClick={() => handleUnavailable()}
-            >
-              <Plus className="w-4 h-4" />
-              <span>
-                {t('dashboard.quickActions.newEvent', 'فعالية جديدة')}
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              className="flex flex-col items-center gap-2 p-3 h-auto text-xs"
-              onClick={() => handleUnavailable()}
-            >
-              <Target className="w-4 h-4" />
-              <span>
-                {t('dashboard.quickActions.newProgram', 'برنامج جديد')}
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              className="flex flex-col items-center gap-2 p-3 h-auto text-xs"
-              onClick={() => handleUnavailable()}
-            >
-              <UserPlus className="w-4 h-4" />
-              <span>{t('dashboard.quickActions.newUser', 'مستخدم جديد')}</span>
-            </Button>
-            <Button
-              variant="outline"
-              className="flex flex-col items-center gap-2 p-3 h-auto text-xs"
-              onClick={() => handleUnavailable()}
-            >
-              <FileText className="w-4 h-4" />
-              <span>{t('dashboard.quickActions.newBlog', 'مقال جديد')}</span>
+        {/* Modal */}
+        <Modal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          title={t('dashboard.modal.title', 'تنبيه')}
+        >
+          <p className="text-gray-600">{modalMsg}</p>
+          <div className="flex justify-end gap-3 mt-6">
+            <Button variant="outline" onClick={() => setModalOpen(false)}>
+              {t('common.close', 'إغلاق')}
             </Button>
           </div>
-        </div>
+        </Modal>
       </div>
-
-      {/* Modal */}
-      <Modal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title={t('dashboard.modal.title', 'تنبيه')}
-      >
-        <p className="text-gray-600">{modalMsg}</p>
-        <div className="flex justify-end gap-3 mt-6">
-          <Button variant="outline" onClick={() => setModalOpen(false)}>
-            {t('common.close', 'إغلاق')}
-          </Button>
-        </div>
-      </Modal>
     </div>
   );
 };
 
-export default DashboardOverview;
+export default Dashboard;

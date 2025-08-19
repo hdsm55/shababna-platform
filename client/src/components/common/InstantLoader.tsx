@@ -3,19 +3,46 @@ import { useLocation } from 'react-router-dom';
 
 interface InstantLoaderProps {
   children: React.ReactNode;
+  onContentLoad?: () => void;
 }
 
-const InstantLoader: React.FC<InstantLoaderProps> = ({ children }) => {
+const InstantLoader: React.FC<InstantLoaderProps> = ({
+  children,
+  onContentLoad,
+}) => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
+  const [contentReady, setContentReady] = useState(false);
 
   useEffect(() => {
-    // تحميل فوري بدون تأخير
-    setIsLoading(false);
-  }, [location.pathname]);
+    // إعادة تعيين الحالة عند تغيير الصفحة
+    setIsLoading(true);
+    setContentReady(false);
 
-  // إظهار المحتوى فوراً
-  return <>{children}</>;
+    // تأخير قصير لمحاكاة تحميل المحتوى
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      setContentReady(true);
+
+      // استدعاء callback عند تحميل المحتوى
+      if (onContentLoad) {
+        onContentLoad();
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [location.pathname, onContentLoad]);
+
+  // إظهار المحتوى مع تأثير انتقالي بسيط
+  return (
+    <div
+      className={`transition-opacity duration-200 ${
+        isLoading ? 'opacity-0' : 'opacity-100'
+      }`}
+    >
+      {children}
+    </div>
+  );
 };
 
 export default InstantLoader;

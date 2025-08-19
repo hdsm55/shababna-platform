@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Menu, X, Globe, User, LogOut, ChevronDown } from 'lucide-react';
+import { Globe, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguageStore } from '../../store/languageStore';
 import { useAuthStore } from '../../store/authStore';
@@ -51,7 +51,7 @@ const Header: React.FC = () => {
           {/* Logo */}
           <Link
             to="/"
-            className="flex items-center space-x-3 rtl:space-x-reverse group"
+            className="flex items-center space-x-3 rtl:space-x-reverse group no-focus-outline"
           >
             <img
               src="/images/logo.png"
@@ -67,7 +67,7 @@ const Header: React.FC = () => {
               <Link
                 key={item.key}
                 to={item.path}
-                className={`nav-link ${
+                className={`nav-link no-focus-outline ${
                   location.pathname === item.path
                     ? 'nav-link-active'
                     : 'nav-link-inactive'
@@ -91,7 +91,7 @@ const Header: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                className="p-2 text-neutral-600 hover:text-primary-600 transition-colors duration-300 rounded-lg hover:bg-neutral-100 flex items-center space-x-1 rtl:space-x-reverse"
+                className="p-2 text-neutral-600 hover:text-primary-600 transition-colors duration-300 rounded-lg hover:bg-neutral-100 flex items-center space-x-1 rtl:space-x-reverse no-focus-outline"
               >
                 <Globe className="w-4 h-4" />
                 <ChevronDown

@@ -349,12 +349,12 @@ export const getLayoutClasses = {
 
 // ===== أنماط النصوص الموحدة =====
 export const getTextClasses = {
-  h1: 'text-4xl lg:text-5xl font-bold text-neutral-900',
-  h2: 'text-3xl lg:text-4xl font-bold text-neutral-900',
-  h3: 'text-2xl lg:text-3xl font-semibold text-neutral-900',
-  h4: 'text-xl lg:text-2xl font-semibold text-neutral-900',
-  h5: 'text-lg lg:text-xl font-medium text-neutral-900',
-  h6: 'text-base lg:text-lg font-medium text-neutral-900',
+  h1: 'text-2xl lg:text-3xl font-bold text-neutral-900',
+  h2: 'text-xl lg:text-2xl font-bold text-neutral-900',
+  h3: 'text-lg lg:text-xl font-semibold text-neutral-900',
+  h4: 'text-base lg:text-lg font-semibold text-neutral-900',
+  h5: 'text-sm lg:text-base font-medium text-neutral-900',
+  h6: 'text-xs lg:text-sm font-medium text-neutral-900',
   body: 'text-base text-neutral-700',
   small: 'text-sm text-neutral-600',
   caption: 'text-xs text-neutral-500',

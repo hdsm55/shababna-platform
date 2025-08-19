@@ -69,6 +69,159 @@
   }
 }
 
+/* ===== تحسينات الخطوط والنصوص ===== */
+
+@layer base {
+  /* تحسين الخطوط الأساسية */
+  html {
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: 'Tajawal', 'Noto Sans Arabic', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    color: var(--color-dark-600);
+    background-color: #ffffff;
+    font-weight: 400;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* تحسين أحجام النصوص - أحجام متوازنة ومقروءة */
+  h1 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    line-height: 1.3;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+
+  h3 {
+    font-size: clamp(1.25rem, 2.5vw, 2rem);
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  h4 {
+    font-size: clamp(1.125rem, 2vw, 1.5rem);
+    line-height: 1.4;
+    font-weight: 500;
+  }
+
+  h5 {
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  h6 {
+    font-size: clamp(0.875rem, 1.25vw, 1rem);
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  p {
+    font-size: clamp(1rem, 1.2vw, 1.125rem);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  /* تحسين النصوص الصغيرة */
+  .text-xs {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .text-sm {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .text-base {
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+
+  .text-lg {
+    font-size: 1.25rem;
+    line-height: 1.5;
+  }
+
+  .text-xl {
+    font-size: 1.5rem;
+    line-height: 1.4;
+  }
+
+  .text-2xl {
+    font-size: 1.75rem;
+    line-height: 1.3;
+  }
+
+  .text-3xl {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+
+  .text-4xl {
+    font-size: 2.5rem;
+    line-height: 1.1;
+  }
+
+  .text-5xl {
+    font-size: 3rem;
+    line-height: 1;
+  }
+
+  .text-6xl {
+    font-size: 3.5rem;
+    line-height: 1;
+  }
+
+  /* تحسين المسافات بين الأسطر */
+  .leading-tight {
+    line-height: 1.3;
+  }
+
+  .leading-snug {
+    line-height: 1.5;
+  }
+
+  .leading-normal {
+    line-height: 1.7;
+  }
+
+  .leading-relaxed {
+    line-height: 1.8;
+  }
+
+  .leading-loose {
+    line-height: 2.2;
+  }
+
+  /* تحسين المسافات بين الحروف */
+  .tracking-tight {
+    letter-spacing: -0.015em;
+  }
+
+  .tracking-normal {
+    letter-spacing: 0;
+  }
+
+  .tracking-wide {
+    letter-spacing: 0.015em;
+  }
+}
+
 /* ===== مكونات CSS مخصصة ===== */
 
 @layer components {
@@ -254,11 +407,65 @@
   .text-brand-muted {
     @apply text-dark-400;
   }
+
+  /* تحسينات النصوص للعناوين - أحجام محسنة */
+  .hero-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-subtitle {
+    font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+    line-height: 1.4;
+    font-weight: 400;
+  }
+
+  .section-title {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    line-height: 1.3;
+    font-weight: 600;
+  }
+
+  .card-title {
+    font-size: clamp(1.25rem, 1.5vw, 1.5rem);
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  .body-text {
+    font-size: clamp(1rem, 1.2vw, 1.125rem);
+    line-height: 1.6;
+  }
 }
 
 /* ===== تحسينات عامة ===== */
 
 @layer utilities {
+  /* إزالة مؤشر التركيز الافتراضي */
+  * {
+    outline: none !important;
+  }
+
+  /* إزالة مؤشر التركيز من الأزرار والروابط */
+  button:focus,
+  a:focus,
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* إزالة مؤشر التركيز من العناصر التفاعلية */
+  [tabindex]:focus,
+  [role="button"]:focus,
+  [role="link"]:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
   /* تحسين التمرير */
   .scrollbar-brand {
     scrollbar-width: thin;
@@ -285,6 +492,18 @@
   /* تحسين التركيز */
   .focus-brand {
     @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+
+  /* إزالة مؤشر التركيز من جميع العناصر */
+  .no-focus-outline {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* إزالة مؤشر التركيز من الأزرار المخصصة */
+  .btn-no-focus:focus {
+    outline: none !important;
+    box-shadow: none !important;
   }
 
   /* تحسين الانتقالات */
@@ -320,24 +539,274 @@
   }
 }
 
-/* ===== تحسينات الأداء ===== */
+/* تحسينات الأداء العامة */
 
-* {
-  box-sizing: border-box;
-}
-
+/* تحسين التمرير */
 html {
   scroll-behavior: smooth;
 }
 
-body {
-  font-family: 'Tajawal', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.6;
-  color: var(--color-dark-600);
-  background-color: #ffffff;
+/* تحسين الأداء للعناصر المتحركة */
+* {
+  box-sizing: border-box;
 }
 
-/* ===== تحسينات الطباعة ===== */
+/* تحسين الأداء للصور */
+img {
+  max-width: 100%;
+  height: auto;
+  will-change: auto;
+}
+
+/* تحسين الأداء للرسوم المتحركة */
+.animate-optimized {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* تحسين الأداء للتمرير */
+.scroll-optimized {
+  will-change: scroll-position;
+  transform: translateZ(0);
+}
+
+/* تحسين الأداء للعناصر الثقيلة */
+.heavy-element {
+  contain: layout style paint;
+  will-change: auto;
+}
+
+/* تحسين الأداء للخلفيات */
+.bg-optimized {
+  background-attachment: scroll;
+  will-change: auto;
+}
+
+/* تحسين الأداء للظلال */
+.shadow-optimized {
+  will-change: box-shadow;
+  transform: translateZ(0);
+}
+
+/* تحسين الأداء للانتقالات */
+.transition-optimized {
+  transition: all 0.2s ease-out;
+  will-change: transform, opacity;
+}
+
+/* تحسين الأداء للتحميل */
+.loading-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للعناصر المتحركة */
+.motion-optimized {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* تحسين الأداء للصفحة الرئيسية */
+.hero-optimized {
+  contain: layout style paint;
+  will-change: auto;
+}
+
+/* تحسين الأداء للإحصائيات */
+.stats-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للبطاقات */
+.card-optimized {
+  contain: layout style paint;
+  will-change: auto;
+  transform: translateZ(0);
+}
+
+/* تحسين الأداء للأزرار */
+.button-optimized {
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
+}
+
+/* تحسين الأداء للقوائم */
+.list-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للتنقل */
+.nav-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للعناوين */
+.heading-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للنصوص */
+.text-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للشبكات */
+.grid-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للصفوف */
+.flex-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للحاويات */
+.container-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للقوائم */
+.section-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للصفحات */
+.page-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للتطبيق */
+.app-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للعناصر المخصصة */
+.custom-optimized {
+  contain: layout style paint;
+  will-change: auto;
+  transform: translateZ(0);
+}
+
+/* تحسين الأداء للعناصر التفاعلية */
+.interactive-optimized {
+  will-change: transform, opacity, box-shadow;
+  transform: translateZ(0);
+}
+
+/* تحسين الأداء للعناصر المتجاوبة */
+.responsive-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للعناصر الثابتة */
+.fixed-optimized {
+  contain: layout style;
+  will-change: auto;
+  transform: translateZ(0);
+}
+
+/* تحسين الأداء للعناصر المطلقة */
+.absolute-optimized {
+  contain: layout style;
+  will-change: auto;
+  transform: translateZ(0);
+}
+
+/* تحسين الأداء للعناصر النسبية */
+.relative-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للعناصر المطلقة */
+.sticky-optimized {
+  contain: layout style;
+  will-change: auto;
+  transform: translateZ(0);
+}
+
+/* تحسين الأداء للعناصر المخفية */
+.hidden-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للعناصر المرئية */
+.visible-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للعناصر المحددة */
+.focused-optimized {
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
+}
+
+/* تحسين الأداء للعناصر المحددة */
+.hovered-optimized {
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
+}
+
+/* تحسين الأداء للعناصر المحددة */
+.active-optimized {
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
+}
+
+/* تحسين الأداء للعناصر المحددة */
+.disabled-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للعناصر المحددة */
+.loading-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للعناصر المحددة */
+.error-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للعناصر المحددة */
+.success-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للعناصر المحددة */
+.warning-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسين الأداء للعناصر المحددة */
+.info-optimized {
+  contain: layout style;
+  will-change: auto;
+}
+
+/* تحسينات الطباعة ===== */
 
 @media print {
   .no-print {

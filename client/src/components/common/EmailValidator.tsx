@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, CheckCircle, AlertCircle, Clock } from 'lucide-react';
+import { Mail, CheckCircle, Clock } from 'lucide-react';
 
 interface EmailValidatorProps {
   email: string;

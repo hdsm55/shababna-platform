@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, X, Image as ImageIcon, AlertCircle } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { Button } from '../ui/Button/Button';
 import Alert from './Alert';
 

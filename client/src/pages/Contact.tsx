@@ -26,7 +26,7 @@ const ContactHeader = memo(() => {
         transition={{ duration: 0.5, delay: 0.2 }}
         className="inline-block"
       >
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-dark-500 bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+        <h1 className="section-title mb-4 text-dark-500 bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
           {t('contact.title', 'تواصل معنا')}
         </h1>
       </motion.div>
@@ -34,7 +34,7 @@ const ContactHeader = memo(() => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.4 }}
-        className="text-lg text-dark-400 max-w-2xl mx-auto leading-relaxed"
+        className="body-text text-dark-400 max-w-2xl mx-auto leading-relaxed"
       >
         {t(
           'contact.description',
@@ -100,205 +100,151 @@ const ContactForm = memo(() => {
         }, 5000);
       }
     },
-    [formStatus, reset, t]
+    [formStatus, t, reset]
   );
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20, scale: 0.95 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        duration: 0.5,
-        ease: [0.4, 0, 0.2, 1],
-      },
-    },
-  };
-
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="visible">
-      <Card className="p-6 md:p-8 border border-primary-200 shadow-brand-sm hover:shadow-brand-md transition-all duration-300 bg-gradient-to-br from-white via-primary-50/30 to-secondary-50/30 backdrop-blur-sm">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="mb-6"
-        >
-          <h2 className="text-2xl font-bold text-dark-500 mb-2">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+      className="max-w-2xl mx-auto"
+    >
+      <Card className="p-8 bg-white shadow-brand-lg border border-neutral-200">
+        <div className="text-center mb-8">
+          <h2 className="card-title text-dark-500 mb-2">
             {t('contact.form.title', 'أرسل لنا رسالة')}
           </h2>
-          <p className="text-dark-400 text-sm">
+          <p className="body-text text-dark-400">
             {t('contact.form.subtitle', 'سنرد عليك في أقرب وقت ممكن')}
           </p>
-        </motion.div>
+        </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <motion.div
-            variants={itemVariants}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          >
-            <Input
-              label={t('contact.form.firstName', 'الاسم الأول')}
-              type="text"
-              {...register('first_name', {
-                required: t(
-                  'contact.form.firstNameRequired',
-                  'الاسم الأول مطلوب'
-                ),
-                minLength: {
-                  value: 2,
-                  message: t(
-                    'contact.form.firstNameMinLength',
-                    'الاسم الأول يجب أن يكون على الأقل حرفين'
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <Input
+                {...register('firstName', {
+                  required: t(
+                    'contact.form.firstName.required',
+                    'الاسم الأول مطلوب'
                   ),
-                },
-              })}
-              error={errors.first_name?.message}
-              fullWidth
-            />
-            <Input
-              label={t('contact.form.lastName', 'الاسم الأخير')}
-              type="text"
-              {...register('last_name')}
-              error={errors.last_name?.message}
-              fullWidth
-            />
-          </motion.div>
+                })}
+                placeholder={t(
+                  'contact.form.firstName.placeholder',
+                  'الاسم الأول'
+                )}
+                error={errors.firstName?.message}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Input
+                {...register('lastName', {
+                  required: t(
+                    'contact.form.lastName.required',
+                    'الاسم الأخير مطلوب'
+                  ),
+                })}
+                placeholder={t(
+                  'contact.form.lastName.placeholder',
+                  'الاسم الأخير'
+                )}
+                error={errors.lastName?.message}
+                className="w-full"
+              />
+            </div>
+          </div>
 
-          <motion.div variants={itemVariants}>
+          <div>
             <Input
-              label={t('contact.form.email', 'البريد الإلكتروني')}
-              type="email"
               {...register('email', {
                 required: t(
-                  'contact.form.emailRequired',
+                  'contact.form.email.required',
                   'البريد الإلكتروني مطلوب'
                 ),
                 pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                   message: t(
-                    'contact.form.emailInvalid',
-                    'البريد الإلكتروني غير صالح'
+                    'contact.form.email.invalid',
+                    'بريد إلكتروني غير صحيح'
                   ),
                 },
               })}
-              error={errors.email?.message}
-              fullWidth
-            />
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <Input
-              label={t('contact.form.phone', 'رقم الهاتف (اختياري)')}
-              type="tel"
-              {...register('phone', {
-                pattern: {
-                  value:
-                    /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/,
-                  message: t(
-                    'contact.form.phoneInvalid',
-                    'رقم الهاتف غير صالح'
-                  ),
-                },
-              })}
-              error={errors.phone?.message}
-              fullWidth
-            />
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <Input
-              label={t('contact.form.subject', 'الموضوع')}
-              type="text"
-              {...register('subject', {
-                required: t('contact.form.subjectRequired', 'الموضوع مطلوب'),
-                minLength: {
-                  value: 5,
-                  message: t(
-                    'contact.form.subjectMinLength',
-                    'الموضوع يجب أن يكون على الأقل 5 أحرف'
-                  ),
-                },
-              })}
-              error={errors.subject?.message}
-              fullWidth
-            />
-          </motion.div>
-
-          <motion.div variants={itemVariants}>
-            <label className="block text-sm font-medium text-dark-500 mb-2">
-              {t('contact.form.message', 'الرسالة')}
-            </label>
-            <textarea
-              rows={5}
-              {...register('message', {
-                required: t('contact.form.messageRequired', 'الرسالة مطلوبة'),
-                minLength: {
-                  value: 20,
-                  message: t(
-                    'contact.form.messageMinLength',
-                    'الرسالة يجب أن تكون على الأقل 20 حرف'
-                  ),
-                },
-              })}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-dark-500 placeholder:text-dark-300 transition-all duration-200 resize-none bg-white/80 backdrop-blur-sm ${
-                errors.message ? 'border-error-500' : 'border-primary-300'
-              }`}
+              type="email"
               placeholder={t(
-                'contact.form.messagePlaceholder',
-                'كيف يمكننا مساعدتك؟'
+                'contact.form.email.placeholder',
+                'البريد الإلكتروني'
               )}
+              error={errors.email?.message}
+              className="w-full"
+            />
+          </div>
+
+          <div>
+            <Input
+              {...register('phone', {
+                required: t('contact.form.phone.required', 'رقم الهاتف مطلوب'),
+              })}
+              placeholder={t('contact.form.phone.placeholder', 'رقم الهاتف')}
+              error={errors.phone?.message}
+              className="w-full"
+            />
+          </div>
+
+          <div>
+            <textarea
+              {...register('message', {
+                required: t('contact.form.message.required', 'الرسالة مطلوبة'),
+                minLength: {
+                  value: 10,
+                  message: t(
+                    'contact.form.message.minLength',
+                    'الرسالة يجب أن تكون 10 أحرف على الأقل'
+                  ),
+                },
+              })}
+              placeholder={t('contact.form.message.placeholder', 'رسالتك...')}
+              rows={5}
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 ${
+                errors.message
+                  ? 'border-red-500 bg-red-50'
+                  : 'border-neutral-300 hover:border-neutral-400'
+              }`}
             />
             {errors.message && (
-              <p className="text-error-500 text-sm mt-1">
+              <p className="text-red-500 text-sm mt-1">
                 {errors.message.message}
               </p>
             )}
-          </motion.div>
+          </div>
 
-          <motion.div variants={itemVariants}>
-            <Button
-              type="submit"
-              size="lg"
-              loading={formStatus === 'submitting'}
-              className="w-full bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white font-semibold py-3 px-6 rounded-lg shadow-brand-sm hover:shadow-brand-md transition-all duration-200 transform hover:scale-[1.02]"
-              disabled={formStatus === 'submitting'}
-            >
-              {formStatus === 'submitting'
-                ? t('contact.form.sending', 'جاري الإرسال...')
-                : t('contact.form.send', 'إرسال الرسالة')}
-            </Button>
-          </motion.div>
-
-          {showAlert && (
-            <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Alert
-                type={formStatus === 'success' ? 'success' : 'error'}
-                className="mt-4"
-                onClose={() => setShowAlert(false)}
-              >
-                {formMsg}
-              </Alert>
-            </motion.div>
-          )}
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            disabled={formStatus === 'submitting'}
+            className="w-full bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white py-3 text-lg font-semibold shadow-brand-md hover:shadow-brand-lg transform hover:scale-105 transition-all duration-300"
+          >
+            {formStatus === 'submitting' ? (
+              <span className="flex items-center justify-center gap-2">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                {t('contact.form.submitting', 'جاري الإرسال...')}
+              </span>
+            ) : (
+              t('contact.form.submit', 'إرسال الرسالة')
+            )}
+          </Button>
         </form>
+
+        {showAlert && (
+          <Alert
+            type={formStatus === 'success' ? 'success' : 'error'}
+            message={formMsg}
+            onClose={() => setShowAlert(false)}
+            className="mt-6"
+          />
+        )}
       </Card>
     </motion.div>
   );

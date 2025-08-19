@@ -25,7 +25,7 @@ import { Button } from '../../components/ui/Button/Button';
 import { Card } from '../../components/ui/Card/Card';
 import { Input } from '../../components/ui/Input/Input';
 import Alert from '../../components/common/Alert';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
+import UnifiedLoader from '../../components/common/UnifiedLoader';
 import PasswordStrengthIndicator from '../../components/common/PasswordStrengthIndicator';
 import PasswordMatchIndicator from '../../components/common/PasswordMatchIndicator';
 import EmailValidator from '../../components/common/EmailValidator';
@@ -798,7 +798,7 @@ const Register: React.FC = () => {
                           exit={{ opacity: 0 }}
                           className="flex items-center justify-center"
                         >
-                          <LoadingSpinner size="sm" />
+                          <UnifiedLoader type="spinner" size="sm" />
                           <span className="mr-2">
                             {t('auth.register.loading', 'جاري إنشاء الحساب...')}
                           </span>

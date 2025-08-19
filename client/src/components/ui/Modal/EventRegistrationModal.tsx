@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Button } from '../Button/ButtonSimple';
 import { Input } from '../Input/InputSimple';
 import { Card } from '../Card/Card';
-import { X, Calendar, MapPin, Users, Clock, CheckCircle } from 'lucide-react';
+import { Calendar, MapPin, Users, Clock, CheckCircle } from 'lucide-react';
 import { Event } from '../../../types';
 
 interface EventRegistrationModalProps {
@@ -52,7 +52,7 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
   if (!open || !event) return null;
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA', {
+    return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',

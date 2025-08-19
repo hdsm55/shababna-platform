@@ -31,7 +31,7 @@ export const securityHeaders = helmet({
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
             scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
             imgSrc: ["'self'", "data:", "https:", "blob:"],
-            connectSrc: ["'self'", "http://localhost:5000", "http://localhost:5173"],
+            connectSrc: ["'self'", "http://localhost:5000", "http://127.0.0.1:5000", "http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176", "https://fonts.googleapis.com", "https://fonts.gstatic.com", "https://shababna-platform.onrender.com", "https://*.onrender.com", "https://*.render.com", "https://*.googleapis.com", "https://*.gstatic.com"],
             frameSrc: ["'none'"],
             objectSrc: ["'none'"],
             upgradeInsecureRequests: [],
@@ -51,6 +51,9 @@ export const corsOptions = {
             process.env.CLIENT_URL || 'http://localhost:5173',
             'http://localhost:3000',
             'http://localhost:5173',
+            'http://localhost:5174',
+            'http://localhost:5175',
+            'http://localhost:5176',
             'https://shababna.org',
             'https://www.shababna.org'
         ];

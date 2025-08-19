@@ -20,8 +20,8 @@ async function addAdminUser() {
 
         // إنشاء مستخدم أدمن
         await query(`
-            INSERT INTO users (first_name, last_name, email, password, role, created_at, updated_at)
-            VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+            INSERT INTO users (first_name, last_name, email, password, role, created_at)
+            VALUES ($1, $2, $3, $4, $5, NOW())
         `, ['أحمد', 'محمد', 'admin@shababna.org', hashedPassword, 'admin']);
 
         console.log('✅ تم إضافة المستخدم الأدمن بنجاح!');

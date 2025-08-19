@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, CheckCircle, AlertCircle, Clock } from 'lucide-react';
+import { Lock, CheckCircle, Clock } from 'lucide-react';
 
 interface PasswordMatchIndicatorProps {
   password: string;

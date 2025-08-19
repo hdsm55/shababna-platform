@@ -257,6 +257,25 @@ class EmailService {
                     'pending'
                 ]);
                 return result.rows[0];
+            } else if (formData.form_type === 'join_us') {
+                const sqlQuery = `
+                    INSERT INTO join_requests (
+                        first_name, last_name, email, phone, country, age, motivation, status
+                    )
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                    RETURNING *
+                `;
+                const result = await query(sqlQuery, [
+                    formData.first_name,
+                    formData.last_name,
+                    formData.email,
+                    formData.phone || null,
+                    formData.country,
+                    formData.age,
+                    formData.motivation,
+                    'pending'
+                ]);
+                return result.rows[0];
             }
             throw new Error('نوع النموذج غير مدعوم');
         } catch (error) {
@@ -298,6 +317,54 @@ class EmailService {
         } catch (error) {
             console.error('Failed to update form status:', error);
             throw error;
+        }
+    }
+
+    // إرسال إيميل تأكيد التبرع
+    async sendDonationConfirmation(donationData) {
+        const subject = 'تم استلام طلب الدعم - شبابنا العالمية';
+        const content = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; direction: rtl;">
+                <h2 style="color: #14b8a6;">شكراً لك ${donationData.supporter_name}!</h2>
+                <p>لقد تم استلام طلب دعمك بنجاح وسنقوم بالتواصل معك قريباً.</p>
+                <div style="background-color: #f0fdfa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h3>تفاصيل طلب الدعم:</h3>
+                    <p><strong>البرنامج:</strong> ${donationData.program_title}</p>
+                    <p><strong>نوع الداعم:</strong> ${donationData.support_type === 'individual' ? 'فرد' : 'مؤسسة'}</p>
+                    <p><strong>المبلغ:</strong> ${donationData.amount} ريال</p>
+                    ${donationData.message ? `<p><strong>الرسالة:</strong> ${donationData.message}</p>` : ''}
+                </div>
+                <p>سنقوم بالتواصل معك خلال 24-48 ساعة لتأكيد تفاصيل الدعم.</p>
+                <p>مع تحيات،<br>فريق شبابنا العالمية</p>
+            </div>
+        `;
+
+        return this.sendEmail(donationData.supporter_email, donationData.supporter_name, subject, content, 'donation_confirmation');
+    }
+
+    // إرسال إشعار للمدير عن تبرع جديد
+    async sendDonationAdminNotification(donationData) {
+        const subject = `تبرع جديد: ${donationData.program_title} - ${donationData.supporter_name}`;
+        const content = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #ef4444;">تبرع جديد مقدم</h2>
+                <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h3>تفاصيل التبرع:</h3>
+                    <p><strong>البرنامج:</strong> ${donationData.program_title}</p>
+                    <p><strong>الداعم:</strong> ${donationData.supporter_name}</p>
+                    <p><strong>البريد الإلكتروني:</strong> ${donationData.supporter_email}</p>
+                    <p><strong>نوع الداعم:</strong> ${donationData.support_type === 'individual' ? 'فرد' : 'مؤسسة'}</p>
+                    <p><strong>المبلغ:</strong> ${donationData.amount} ريال</p>
+                    ${donationData.message ? `<p><strong>الرسالة:</strong> ${donationData.message}</p>` : ''}
+                    <p><strong>التاريخ:</strong> ${new Date().toLocaleString('ar-SA')}</p>
+                </div>
+                <p>يرجى مراجعة هذا التبرع والتواصل مع الداعم في أقرب وقت ممكن.</p>
+            </div>
+        `;
+
+        // إرسال للمديرين
+        for (const adminEmail of this.adminEmails) {
+            await this.sendEmail(adminEmail, 'Admin', subject, content, 'donation_admin_notification');
         }
     }
 }
