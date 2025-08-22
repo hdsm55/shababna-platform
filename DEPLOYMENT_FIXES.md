@@ -1,93 +1,138 @@
-# تقرير إصلاحات النشر - Shababna Platform
+# حلول مشاكل النشر على Render
 
-## المشاكل التي تم حلها
+## المشاكل التي تم حلها:
 
-### 1. خطأ `require is not defined`
+### 1. مشكلة React useState
+**الخطأ:** `Cannot read properties of undefined (reading 'useState')`
 
-**المشكلة:** استخدام `require` في ES modules
 **الحل:**
+- تحديث إعدادات Vite لتحسين تحميل React
+- إضافة `dedupe` للتأكد من استخدام نسخة واحدة من React
+- تحسين `optimizeDeps` لتحميل React بشكل صحيح
 
-- تحويل `require('fs')` إلى `import('fs')`
-- إضافة `async` للدالة التي تستخدم `await import`
+### 2. مشكلة Content Security Policy (CSP)
+**الخطأ:** `Refused to execute inline script because it violates CSP`
 
-### 2. خطأ الاتصال بقاعدة البيانات
-
-**المشكلة:** timeout في الاتصال بقاعدة البيانات
 **الحل:**
+- تحديث CSP في `index.html` و `_headers`
+- إضافة `'unsafe-inline'` و `'unsafe-eval'` و `'wasm-unsafe-eval'`
+- تحديث `connect-src` لتشمل Render domains
 
-- تحسين إعدادات connection pool
-- زيادة timeouts
-- إضافة معالجة أفضل للأخطاء
+### 3. مشكلة Manifest Icon
+**الخطأ:** `Error while trying to use the following icon from the Manifest`
 
-## التحسينات المطبقة
+**الحل:**
+- تحديث `site.webmanifest` لاستخدام الأيقونات الصحيحة
+- التأكد من وجود جميع الأيقونات في `/public`
 
-### إعدادات قاعدة البيانات المحسنة
+## الإعدادات المحدثة:
 
-```javascript
-const pool = new Pool({
-  max: 10, // تقليل الحد الأقصى
-  min: 2, // إضافة حد أدنى
-  idleTimeoutMillis: 60000, // زيادة وقت الانتظار
-  connectionTimeoutMillis: 10000, // زيادة وقت الاتصال
-  keepAlive: true,
-  keepAliveInitialDelayMillis: 10000,
-});
+### 1. ملف `_headers`:
+```apache
+/*
+X-Frame-Options: DENY
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 1
+Referrer-Policy: no-referrer-when-downgrade
+Cache-Control: public, max-age=60
+Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' http://127.0.0.1:5000 https://api.shababnaglobal.org https://shababna-platform.onrender.com https://*.onrender.com https://*.render.com https://fonts.googleapis.com https://fonts.gstatic.com ws://localhost:* ws://127.0.0.1:*; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';
 ```
 
-### معالجة أفضل للأخطاء
+### 2. ملف `index.html`:
+```html
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' http://localhost:5000 http://127.0.0.1:5000 http://localhost:5173 ws://localhost:* ws://127.0.0.1:* https://shababna-platform.onrender.com https://*.onrender.com https://*.render.com https://fonts.googleapis.com https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self';" />
+```
 
-- إضافة middleware لمعالجة أخطاء قاعدة البيانات
-- تحسين error handling في controllers
-- إضافة رسائل خطأ واضحة للمستخدم
+### 3. ملف `vite.config.ts`:
+```typescript
+resolve: {
+  dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom'],
+  alias: {
+    react: path.resolve(__dirname, 'node_modules/react'),
+    'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+    'react-router': path.resolve(__dirname, 'node_modules/react-router'),
+    'react-router-dom': path.resolve(__dirname, 'node_modules/react-router-dom'),
+  },
+},
+```
 
-### تحسينات الأداء
+## بدائل النشر:
 
-- تقليل عدد الاتصالات المتزامنة
-- إضافة اختبار الاتصال عند بدء التشغيل
-- تحسين إعدادات الذاكرة
+### 1. Netlify
+- ملف `netlify.toml` جاهز للنشر
+- إعدادات SPA routing محسنة
+- إعدادات Cache محسنة
 
-## الملفات المحدثة
+### 2. Vercel
+- ملف `vercel.json` جاهز للنشر
+- إعدادات Headers محسنة
+- إعدادات Rewrites للـ SPA
 
-1. `server/index.js` - إصلاح ES modules
-2. `server/config/database.js` - تحسين إعدادات الاتصال
-3. `server/controllers/programsController.js` - معالجة أفضل للأخطاء
-4. `server/middleware/errorHandler.js` - إضافة معالجة أخطاء قاعدة البيانات
-5. `server/package.json` - تحسين إعدادات التشغيل
-6. `server/env.production` - إعدادات محسنة للإنتاج
+## خطوات النشر على Render:
 
-## خطوات النشر المحدثة
+1. **تحديث إعدادات Render Dashboard:**
+   - Build Command: `cd client && npm install && npm run build`
+   - Publish Directory: `client/dist`
+   - Environment Variables:
+     - `NODE_ENV`: `production`
+     - `VITE_API_URL`: `https://shababna-platform.onrender.com/api`
 
-1. **تأكد من إعدادات البيئة:**
+2. **تحديث إعدادات Headers في Render:**
+   - إضافة CSP headers
+   - إضافة Cache headers للـ static assets
 
+3. **تحديث إعدادات Routes:**
+   - إضافة SPA routing: `/*` → `/index.html`
+   - إضافة API proxy: `/api/*` → `https://shababna-platform.onrender.com/api/*`
+
+## ملاحظات مهمة:
+
+1. **تأكد من وجود جميع الأيقونات:**
+   - `/favicon-16x16.png`
+   - `/favicon-32x32.png`
+   - `/apple-touch-icon.png`
+   - `/images/logo.jpg`
+
+2. **تأكد من إعدادات Environment Variables:**
+   - `VITE_API_URL` يجب أن يشير إلى الـ backend الصحيح
+
+3. **تأكد من إعدادات CSP:**
+   - يجب أن تسمح بـ `'unsafe-inline'` و `'unsafe-eval'` للـ development
+   - يجب أن تشمل جميع الـ domains المطلوبة
+
+4. **تأكد من إعدادات Cache:**
+   - Static assets: `max-age=31536000, immutable`
+   - HTML pages: `max-age=60`
+
+## اختبار النشر:
+
+1. **اختبار محلي:**
    ```bash
-   # في Render.com
-   NODE_ENV=production
-   PORT=10000
+   npm run build
+   npm run serve
    ```
 
-2. **تأكد من إعدادات قاعدة البيانات:**
+2. **اختبار CSP:**
+   - فتح Developer Tools
+   - فحص Console للأخطاء
+   - فحص Network tab للـ requests
 
-   - استخدام إعدادات connection pool المحسنة
-   - التأكد من صحة بيانات الاتصال
+3. **اختبار SPA Routing:**
+   - اختبار التنقل بين الصفحات
+   - اختبار Refresh على صفحات مختلفة
 
-3. **مراقبة السجلات:**
-   - مراقبة أخطاء الاتصال
-   - مراقبة أداء قاعدة البيانات
+## استكشاف الأخطاء:
 
-## النتائج المتوقعة
+1. **إذا لم تظهر الصفحة:**
+   - فحص Console للأخطاء
+   - فحص Network tab للـ failed requests
+   - فحص Render logs
 
-- ✅ إصلاح خطأ `require is not defined`
-- ✅ تحسين استقرار الاتصال بقاعدة البيانات
-- ✅ تقليل أخطاء timeout
-- ✅ تحسين تجربة المستخدم عند حدوث أخطاء
+2. **إذا لم تعمل الـ API calls:**
+   - فحص `VITE_API_URL`
+   - فحص CORS settings
+   - فحص CSP connect-src
 
-## المراقبة المستمرة
-
-1. **مراقبة السجلات في Render.com**
-2. **اختبار الاتصال بقاعدة البيانات**
-3. **مراقبة أداء التطبيق**
-4. **تحديث الإعدادات حسب الحاجة**
-
----
-
-_تم إنشاء هذا التقرير في: ${new Date().toLocaleString('ar-SA')}_
+3. **إذا لم تعمل الـ routing:**
+   - فحص `_redirects` أو `render.yaml`
+   - فحص SPA routing settings

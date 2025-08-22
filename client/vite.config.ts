@@ -45,6 +45,8 @@ export default defineConfig(({ mode }) => ({
   define: {
     // Expose environment variables to the client
     'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL),
+    // تحسين React
+    __DEV__: mode === 'development',
   },
   esbuild: {
     // Ignore TypeScript errors during build

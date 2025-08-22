@@ -1,16 +1,14 @@
 services:
   - type: web
-    name: shababna-frontend
+    name: shababna-platform
     env: static
     buildCommand: cd client && npm install && npm run build
     staticPublishPath: ./client/dist
-    routes:
-      - type: rewrite
-        source: /api/*
-        destination: https://shababna-backend.onrender.com/api/*
-      - type: rewrite
-        source: /*
-        destination: /index.html
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: VITE_API_URL
+        value: https://shababna-platform.onrender.com/api
     headers:
       - path: /*
         name: X-Frame-Options
@@ -20,52 +18,50 @@ services:
         value: nosniff
       - path: /*
         name: X-XSS-Protection
-        value: '1; mode=block'
+        value: 1
       - path: /*
         name: Referrer-Policy
         value: no-referrer-when-downgrade
       - path: /*
         name: Cache-Control
-        value: 'no-cache, no-store, must-revalidate'
-      - path: /*
-        name: Content-Security-Policy
-        value: 'default-src self; script-src self unsafe-inline unsafe-eval; style-src self unsafe-inline https://fonts.googleapis.com; font-src self https://fonts.gstatic.com; img-src self data: https:; connect-src self http://localhost:5000 http://127.0.0.1:5000 https://shababna-backend.onrender.com https://*.onrender.com; object-src none; base-uri self; form-action self;'
-      - path: /api/*
-        name: Access-Control-Allow-Origin
-        value: '*'
-      - path: /api/*
-        name: Access-Control-Allow-Methods
-        value: 'GET, POST, PUT, DELETE, OPTIONS'
-      - path: /api/*
-        name: Access-Control-Allow-Headers
-        value: 'Content-Type, Authorization'
-      - path: '*.js'
+        value: public, max-age=60
+      - path: /assets/*
         name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
-      - path: '*.css'
+        value: public, max-age=31536000, immutable
+      - path: /*.js
         name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
-      - path: '*.png'
+        value: public, max-age=31536000, immutable
+      - path: /*.css
         name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
-      - path: '*.jpg'
+        value: public, max-age=31536000, immutable
+      - path: /*.png
         name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
-      - path: '*.svg'
+        value: public, max-age=31536000, immutable
+      - path: /*.jpg
         name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
-      - path: '*.ico'
+        value: public, max-age=31536000, immutable
+      - path: /*.svg
         name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
-      - path: '*.woff'
+        value: public, max-age=31536000, immutable
+      - path: /*.ico
         name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
-      - path: '*.woff2'
+        value: public, max-age=31536000, immutable
+      - path: /*.woff
         name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
-      - path: '*.ttf'
+        value: public, max-age=31536000, immutable
+      - path: /*.woff2
         name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
-      - path: '*.eot'
+        value: public, max-age=31536000, immutable
+      - path: /*.ttf
         name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
+        value: public, max-age=31536000, immutable
+      - path: /*.eot
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /locales/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

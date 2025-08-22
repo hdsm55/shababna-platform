@@ -1,49 +1,49 @@
 # SPA Routing Headers
 
-/\*
+/*
 X-Frame-Options: DENY
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 1
 Referrer-Policy: no-referrer-when-downgrade
 Cache-Control: public, max-age=60
-Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://127.0.0.1:5000 https://api.shababnaglobal.org https://fonts.googleapis.com https://fonts.gstatic.com; frame-ancestors 'none';
+Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' http://127.0.0.1:5000 https://api.shababnaglobal.org https://shababna-platform.onrender.com https://*.onrender.com https://*.render.com https://fonts.googleapis.com https://fonts.gstatic.com ws://localhost:* ws://127.0.0.1:*; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';
 
 # Static Assets - Long cache
 
-/assets/\*
+/assets/*
 Cache-Control: public, max-age=31536000, immutable
 
-\*.js
+*.js
 Cache-Control: public, max-age=31536000, immutable
 
-\*.css
+*.css
 Cache-Control: public, max-age=31536000, immutable
 
-\*.png
+*.png
 Cache-Control: public, max-age=31536000, immutable
 
-\*.jpg
+*.jpg
 Cache-Control: public, max-age=31536000, immutable
 
-\*.svg
+*.svg
 Cache-Control: public, max-age=31536000, immutable
 
-\*.ico
+*.ico
 Cache-Control: public, max-age=31536000, immutable
 
-\*.woff
+*.woff
 Cache-Control: public, max-age=31536000, immutable
 
-\*.woff2
+*.woff2
 Cache-Control: public, max-age=31536000, immutable
 
-\*.ttf
+*.ttf
 Cache-Control: public, max-age=31536000, immutable
 
-\*.eot
+*.eot
 Cache-Control: public, max-age=31536000, immutable
 
 # Locales - Long cache
 
-/locales/\*
+/locales/*
 Cache-Control: public, max-age=31536000, immutable
