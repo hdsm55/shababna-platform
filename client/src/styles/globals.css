@@ -517,6 +517,68 @@
   }
 }
 
+/* تحسين عرض النصوص المقطوعة */
+@layer utilities {
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+}
+
+/* تحسين عرض التواريخ */
+.event-date {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.event-time {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.event-location {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* تحسين عرض العناوين */
+.event-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.event-description {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #6b7280;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
 /* ===== دعم RTL ===== */
 
 [dir="rtl"] {

@@ -326,7 +326,7 @@ const UsersDashboard: React.FC = () => {
       case 'moderator':
         return 'text-blue-600 bg-blue-50 border-blue-200';
       case 'member':
-        return 'text-green-600 bg-green-50 border-green-200';
+        return 'text-success-600 bg-success-50 border-success-200';
       case 'guest':
         return 'text-gray-600 bg-gray-50 border-gray-200';
       default:
@@ -352,7 +352,7 @@ const UsersDashboard: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'text-green-600 bg-green-50 border-green-200';
+        return 'text-success-600 bg-success-50 border-success-200';
       case 'inactive':
         return 'text-gray-600 bg-gray-50 border-gray-200';
       case 'pending':
@@ -573,11 +573,11 @@ const UsersDashboard: React.FC = () => {
         <div>
           <Card className="p-5 hover:shadow-sm transition-all duration-200 border border-gray-100 bg-white">
             <div className="flex items-center justify-between mb-3">
-              <div className="p-2 rounded-lg bg-green-50">
-                <UserCheck className="w-5 h-5 text-green-500" />
+              <div className="p-2 rounded-lg bg-success-50">
+                <UserCheck className="w-5 h-5 text-success-500" />
               </div>
               <div className="text-right">
-                <span className="text-xs text-green-600">
+                <span className="text-xs text-success-600">
                   {t('users.stats.active', 'نشط')}
                 </span>
               </div>
@@ -1150,7 +1150,7 @@ const UsersDashboard: React.FC = () => {
         title="نجح العملية! 🎉"
       >
         <div className="text-center py-6">
-          <div className="text-green-600 text-lg mb-6 whitespace-pre-line">
+          <div className="text-success-600 text-lg mb-6 whitespace-pre-line">
             {modalMsg}
           </div>
           <div className="flex justify-center gap-3">

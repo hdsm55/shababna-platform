@@ -36,15 +36,13 @@ const JoinUsHeader = memo(() => {
         transition={{ duration: 0.5, delay: 0.2 }}
         className="inline-block"
       >
-        <h1 className="section-title mb-4 text-dark-500 bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-          {t('joinUs.title', 'انضم إلينا')}
-        </h1>
+        <h1 className="join-page-title">{t('joinUs.title', 'انضم إلينا')}</h1>
       </motion.div>
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.4 }}
-        className="body-text text-dark-400 max-w-2xl mx-auto leading-relaxed"
+        className="join-page-subtitle max-w-2xl mx-auto"
       >
         {t(
           'joinUs.subtitle',
@@ -136,10 +134,10 @@ const JoinUsForm = memo(() => {
     >
       <Card className="p-8 bg-white shadow-brand-lg border border-neutral-200">
         <div className="text-center mb-8">
-          <h2 className="card-title text-dark-500 mb-2">
+          <h2 className="form-section-title">
             {t('joinUs.form.title', 'نموذج الانضمام')}
           </h2>
-          <p className="body-text text-dark-400">
+          <p className="form-section-subtitle">
             {t(
               'joinUs.form.subtitle',
               'املأ النموذج أدناه للانضمام إلى مجتمعنا'

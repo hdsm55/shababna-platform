@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, Info } from 'lucide-react';
+import { CheckCircle, Info, AlertCircle, XCircle, X } from 'lucide-react';
 
 export type AlertType = 'info' | 'success' | 'warning' | 'error';
 
@@ -29,7 +29,7 @@ const Alert: React.FC<AlertProps> = ({
 
   const alertStyles = {
     info: 'bg-blue-50 border-blue-200 text-blue-800',
-    success: 'bg-green-50 border-green-200 text-green-800',
+    success: 'bg-success-50 border-success-200 text-success-800',
     warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
     error: 'bg-red-50 border-red-200 text-red-800',
   };

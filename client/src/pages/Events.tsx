@@ -23,6 +23,14 @@ import { Input } from '../components/ui/Input/InputSimple';
 import { Alert } from '../components/common/DesignSystem';
 import EventsLoader from '../components/common/EventsLoader';
 import { useDebounce } from '../hooks/useDebounce';
+import {
+  formatEventDate,
+  formatEventTime,
+  formatEventDateTime,
+  calculateDaysUntil,
+  formatEventDateShort,
+  formatEventDateFull,
+} from '../utils/dateUtils';
 
 // تحسين الأداء - مكونات منفصلة
 const EventsHero = memo(({ events }: { events: Event[] }) => {
@@ -259,18 +267,11 @@ const EventCard = memo(
     const navigate = useNavigate();
 
     const formatDate = useCallback((dateString: string) => {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
+      return formatEventDate(dateString);
     }, []);
 
     const formatTime = useCallback((dateString: string) => {
-      return new Date(dateString).toLocaleTimeString('ar-SA', {
-        hour: '2-digit',
-        minute: '2-digit',
-      });
+      return formatEventTime(dateString);
     }, []);
 
     const getStatusColor = useCallback((status: string) => {
@@ -346,12 +347,19 @@ const EventCard = memo(
       >
         <Card className="h-full bg-white border border-primary-200 hover:shadow-brand-md transition-all duration-300 overflow-hidden">
           {/* Event Image */}
-          <div className="relative h-48 bg-gradient-to-br from-primary-100 to-secondary-100 overflow-hidden">
-            <div className="w-full h-full flex items-center justify-center">
-              <span className="text-4xl">
-                {getCategoryIcon(event.category)}
-              </span>
-            </div>
+          <div className="relative h-48 overflow-hidden">
+            <img
+              src={event.image_url || '/images/events/default.jpg'}
+              alt={event.title}
+              className="absolute inset-0 w-full h-full object-cover"
+              loading="lazy"
+              onError={(e) => {
+                const img = e.currentTarget as HTMLImageElement;
+                img.onerror = null;
+                img.src = '/images/event-placeholder.svg';
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
 
             {/* Status Badge */}
             <div className="absolute top-3 right-3">
@@ -378,29 +386,29 @@ const EventCard = memo(
 
           {/* Event Content */}
           <div className="p-6">
-            <h3 className="text-xl font-bold text-dark-500 mb-3 group-hover:text-primary-600 transition-colors">
+            <h3 className="event-title text-dark-500 mb-2 group-hover:text-primary-600 transition-colors">
               {event.title}
             </h3>
 
-            <p className="text-dark-400 text-sm mb-4 line-clamp-3">
-              {event.description}
-            </p>
+            <p className="event-description mb-4">{event.description}</p>
 
             {/* Event Details */}
             <div className="space-y-2 mb-4">
               <div className="flex items-center gap-2 text-sm text-dark-400">
                 <Calendar className="w-4 h-4 text-primary-500" />
-                <span>{formatDate(event.start_date)}</span>
-              </div>
-
-              <div className="flex items-center gap-2 text-sm text-dark-400">
-                <Clock className="w-4 h-4 text-secondary-500" />
-                <span>{formatTime(event.start_date)}</span>
+                <span className="event-date">
+                  {formatDate(event.start_date)}
+                </span>
+                <span className="text-xs text-dark-300">•</span>
+                <Clock className="w-3 h-3 text-secondary-500" />
+                <span className="event-time">
+                  {formatTime(event.start_date)}
+                </span>
               </div>
 
               <div className="flex items-center gap-2 text-sm text-dark-400">
                 <MapPin className="w-4 h-4 text-accent-500" />
-                <span>{event.location}</span>
+                <span className="event-location">{event.location}</span>
               </div>
 
               {event.max_attendees && (

@@ -102,7 +102,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => (
               <div className="text-xs text-gray-500">فعالية</div>
             </div>
             <div>
-              <div className="flex items-center justify-center text-green-600 mb-1">
+              <div className="flex items-center justify-center text-success-600 mb-1">
                 <Star className="w-4 h-4" />
               </div>
               <div className="text-sm font-medium text-gray-900">
@@ -124,7 +124,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => (
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               {user.isVerified ? (
-                <CheckCircle className="w-4 h-4 text-green-600 mr-1" />
+                <CheckCircle className="w-4 h-4 text-success-600 mr-1" />
               ) : (
                 <XCircle className="w-4 h-4 text-gray-400 mr-1" />
               )}

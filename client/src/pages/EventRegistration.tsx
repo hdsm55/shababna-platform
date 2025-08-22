@@ -197,9 +197,9 @@ const EventRegistration: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-2xl mx-auto"
           >
-            <div className="bg-white rounded-2xl shadow-2xl p-8 border border-green-100">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="w-8 h-8 text-green-600" />
+            <div className="bg-white rounded-2xl shadow-2xl p-8 border border-success-100">
+        <div className="w-16 h-16 bg-success-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <CheckCircle className="w-8 h-8 text-success-600" />
               </div>
               <h1 className="text-2xl font-bold text-gray-800 mb-4 text-center">
                 تم التسجيل بنجاح! 🎉

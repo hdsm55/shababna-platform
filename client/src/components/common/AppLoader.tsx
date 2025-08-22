@@ -9,10 +9,11 @@ const AppLoader: React.FC<AppLoaderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // تحميل فوري وسريع
+    // تحميل شبه فوري: بدون تأخير في التطوير و80ms في الإنتاج
+    const delay = import.meta.env.MODE === 'development' ? 0 : 80;
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 300);
+    }, delay);
 
     return () => {
       clearTimeout(timer);

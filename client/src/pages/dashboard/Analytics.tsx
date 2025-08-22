@@ -153,13 +153,13 @@ const AnalyticsDashboard: React.FC = () => {
   };
 
   const getGrowthIcon = (rate: number) => {
-    if (rate > 0) return <TrendingUp className="w-4 h-4 text-green-600" />;
+    if (rate > 0) return <TrendingUp className="w-4 h-4 text-success-600" />;
     if (rate < 0) return <TrendingDown className="w-4 h-4 text-red-600" />;
     return <Minus className="w-4 h-4 text-gray-600" />;
   };
 
   const getGrowthColor = (rate: number) => {
-    if (rate > 0) return 'text-green-600';
+    if (rate > 0) return 'text-success-600';
     if (rate < 0) return 'text-red-600';
     return 'text-gray-600';
   };
@@ -315,8 +315,8 @@ const AnalyticsDashboard: React.FC = () => {
                       <Card>
                         <div className="p-6">
                           <div className="flex items-center">
-                            <div className="p-2 bg-green-100 rounded-lg">
-                              <Calendar className="w-6 h-6 text-green-600" />
+                            <div className="p-2 bg-success-100 rounded-lg">
+                              <Calendar className="w-6 h-6 text-success-600" />
                             </div>
                             <div className="mr-4 rtl:ml-4 rtl:mr-0">
                               <p className="text-sm font-medium text-gray-600">
@@ -328,8 +328,8 @@ const AnalyticsDashboard: React.FC = () => {
                             </div>
                           </div>
                           <div className="flex items-center mt-4 text-sm">
-                            <CheckCircle className="w-4 h-4 text-green-600 mr-1" />
-                            <span className="text-green-600">
+                            <CheckCircle className="w-4 h-4 text-success-600 mr-1" />
+                            <span className="text-success-600">
                               {analytics.overview.activeUsers}
                             </span>
                             <span className="text-gray-500 mr-2 rtl:ml-2 rtl:mr-0">
@@ -519,7 +519,7 @@ const AnalyticsDashboard: React.FC = () => {
                                   <div className="flex items-center">
                                     <div className="w-32 bg-gray-200 rounded-full h-2 mr-2">
                                       <div
-                                        className="bg-green-600 h-2 rounded-full"
+                                        className="bg-success-600 h-2 rounded-full"
                                         style={{
                                           width: `${(item.count / 45) * 100}%`,
                                         }}
@@ -599,7 +599,7 @@ const AnalyticsDashboard: React.FC = () => {
                                   <div className="flex items-center">
                                     <div className="w-24 bg-gray-200 rounded-full h-2 mr-2">
                                       <div
-                                        className="bg-green-600 h-2 rounded-full"
+                                        className="bg-success-600 h-2 rounded-full"
                                         style={{
                                           width: `${location.percentage}%`,
                                         }}
@@ -716,7 +716,7 @@ const AnalyticsDashboard: React.FC = () => {
                                     </p>
                                   </div>
                                   <div className="flex items-center">
-                                    <CheckCircle className="w-4 h-4 text-green-500 mr-1" />
+                                    <CheckCircle className="w-4 h-4 text-success-500 mr-1" />
                                     <span className="text-sm font-medium text-gray-900">
                                       {program.completion}%
                                     </span>
@@ -891,7 +891,7 @@ const AnalyticsDashboard: React.FC = () => {
                                 <div className="flex items-center">
                                   <div className="w-32 bg-gray-200 rounded-full h-2 mr-2">
                                     <div
-                                      className="bg-green-600 h-2 rounded-full"
+                                      className="bg-success-600 h-2 rounded-full"
                                       style={{ width: `${retention.rate}%` }}
                                     />
                                   </div>

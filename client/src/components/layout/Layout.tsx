@@ -1,5 +1,4 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
 import { useLanguageStore } from '../../store/languageStore';
 import Header from './Header';
 import Footer from './Footer';
@@ -13,9 +12,8 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { isRTL } = useLanguageStore();
-  const location = useLocation();
-  const [showFooter, setShowFooter] = React.useState(true);
-  const [contentLoaded, setContentLoaded] = React.useState(true);
+  const [showFooter, setShowFooter] = React.useState(false);
+  const [contentLoaded, setContentLoaded] = React.useState(false);
   const [pageTransitioning, setPageTransitioning] = React.useState(false);
 
   React.useEffect(() => {
@@ -33,11 +31,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const handlePageLoad = () => {
     setPageTransitioning(false);
     setContentLoaded(true);
-
-    // تأخير قصير لإظهار الفوتر بعد تحميل المحتوى
+    // تأخير إظهار الفوتر لضمان ظهور المحتوى أولاً
     setTimeout(() => {
       setShowFooter(true);
-    }, 100);
+    }, 500);
   };
 
   return (
@@ -47,7 +44,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       }`}
     >
       <Header />
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col min-h-[60vh]">
         <div className="flex-1">
           <PageTransitionHandler
             onPageChange={handlePageChange}
@@ -57,7 +54,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               onContentLoad={() => {
                 if (!pageTransitioning) {
                   setContentLoaded(true);
-                  setShowFooter(true);
+                  // تأخير إظهار الفوتر لضمان ظهور المحتوى أولاً
+                  setTimeout(() => {
+                    setShowFooter(true);
+                  }, 500);
                 }
               }}
             >

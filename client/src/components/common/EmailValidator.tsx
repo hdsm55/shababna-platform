@@ -47,13 +47,13 @@ const EmailValidator: React.FC<EmailValidatorProps> = ({
     >
       <div className="flex items-center gap-2 mb-2">
         {emailInfo?.isValid ? (
-          <CheckCircle className="w-4 h-4 text-green-500" />
+          <CheckCircle className="w-4 h-4 text-success-500" />
         ) : (
           <Clock className="w-4 h-4 text-yellow-500" />
         )}
         <span
           className={`text-sm font-medium ${
-            emailInfo?.isValid ? 'text-green-600' : 'text-yellow-600'
+            emailInfo?.isValid ? 'text-success-600' : 'text-yellow-600'
           }`}
         >
           {emailInfo?.isValid
@@ -66,7 +66,7 @@ const EmailValidator: React.FC<EmailValidatorProps> = ({
       <div className="space-y-1">
         <div
           className={`flex items-center gap-1 text-xs ${
-            emailInfo?.hasLocalPart ? 'text-green-600' : 'text-gray-400'
+            emailInfo?.hasLocalPart ? 'text-success-600' : 'text-gray-400'
           }`}
         >
           <CheckCircle className="w-3 h-3" />
@@ -74,7 +74,7 @@ const EmailValidator: React.FC<EmailValidatorProps> = ({
         </div>
         <div
           className={`flex items-center gap-1 text-xs ${
-            emailInfo?.hasAtSymbol ? 'text-green-600' : 'text-gray-400'
+            emailInfo?.hasAtSymbol ? 'text-success-600' : 'text-gray-400'
           }`}
         >
           <CheckCircle className="w-3 h-3" />
@@ -82,7 +82,7 @@ const EmailValidator: React.FC<EmailValidatorProps> = ({
         </div>
         <div
           className={`flex items-center gap-1 text-xs ${
-            emailInfo?.hasDomainPart ? 'text-green-600' : 'text-gray-400'
+            emailInfo?.hasDomainPart ? 'text-success-600' : 'text-gray-400'
           }`}
         >
           <CheckCircle className="w-3 h-3" />
@@ -90,7 +90,7 @@ const EmailValidator: React.FC<EmailValidatorProps> = ({
         </div>
         <div
           className={`flex items-center gap-1 text-xs ${
-            emailInfo?.hasDomain ? 'text-green-600' : 'text-gray-400'
+            emailInfo?.hasDomain ? 'text-success-600' : 'text-gray-400'
           }`}
         >
           <CheckCircle className="w-3 h-3" />

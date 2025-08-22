@@ -53,8 +53,8 @@ const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps> = ({
     } else {
       return {
         label: 'قوية',
-        color: 'text-green-500',
-        bgColor: 'bg-green-500',
+        color: 'text-success-500',
+        bgColor: 'bg-success-500',
         icon: CheckCircle,
         message: 'كلمة مرور قوية جداً',
       };
@@ -101,7 +101,7 @@ const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps> = ({
       <div className="mt-2 space-y-1">
         <div
           className={`flex items-center gap-1 text-xs ${
-            password.length >= 6 ? 'text-green-600' : 'text-gray-400'
+            password.length >= 6 ? 'text-success-600' : 'text-gray-400'
           }`}
         >
           <CheckCircle className="w-3 h-3" />
@@ -109,7 +109,7 @@ const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps> = ({
         </div>
         <div
           className={`flex items-center gap-1 text-xs ${
-            /[A-Z]/.test(password) ? 'text-green-600' : 'text-gray-400'
+            /[A-Z]/.test(password) ? 'text-success-600' : 'text-gray-400'
           }`}
         >
           <CheckCircle className="w-3 h-3" />
@@ -117,7 +117,7 @@ const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps> = ({
         </div>
         <div
           className={`flex items-center gap-1 text-xs ${
-            /[0-9]/.test(password) ? 'text-green-600' : 'text-gray-400'
+            /[0-9]/.test(password) ? 'text-success-600' : 'text-gray-400'
           }`}
         >
           <CheckCircle className="w-3 h-3" />
@@ -125,7 +125,7 @@ const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps> = ({
         </div>
         <div
           className={`flex items-center gap-1 text-xs ${
-            /[^A-Za-z0-9]/.test(password) ? 'text-green-600' : 'text-gray-400'
+            /[^A-Za-z0-9]/.test(password) ? 'text-success-600' : 'text-gray-400'
           }`}
         >
           <CheckCircle className="w-3 h-3" />

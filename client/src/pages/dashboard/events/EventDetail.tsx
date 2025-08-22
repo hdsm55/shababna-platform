@@ -145,7 +145,7 @@ const DashboardEventDetail: React.FC = () => {
       case 'upcoming':
         return 'text-blue-600 bg-blue-50 border-blue-200';
       case 'active':
-        return 'text-green-600 bg-green-50 border-green-200';
+        return 'text-success-600 bg-success-50 border-success-200';
       case 'completed':
         return 'text-gray-600 bg-gray-50 border-gray-200';
       case 'cancelled':
@@ -282,8 +282,8 @@ const DashboardEventDetail: React.FC = () => {
 
             <Card className="p-6">
               <div className="flex items-center">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Users className="w-6 h-6 text-green-600" />
+                <div className="p-2 bg-success-100 rounded-lg">
+                  <Users className="w-6 h-6 text-success-600" />
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">
@@ -352,7 +352,7 @@ const DashboardEventDetail: React.FC = () => {
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3">
                   <div
-                    className="bg-gradient-to-r from-blue-500 to-green-500 h-3 rounded-full transition-all duration-300"
+                    className="bg-gradient-to-r from-blue-500 to-success-500 h-3 rounded-full transition-all duration-300"
                     style={{
                       width: `${getRegistrationPercentage(
                         registrations.length,
@@ -604,7 +604,7 @@ const DashboardEventDetail: React.FC = () => {
                         </h4>
                         <div className="space-y-2">
                           <div className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                            <CheckCircle className="w-4 h-4 text-success-500 mr-2" />
                             <span className="text-sm text-gray-600">
                               {t(
                                 'eventDetail.details.registration',
@@ -613,7 +613,7 @@ const DashboardEventDetail: React.FC = () => {
                             </span>
                           </div>
                           <div className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                            <CheckCircle className="w-4 h-4 text-success-500 mr-2" />
                             <span className="text-sm text-gray-600">
                               {t(
                                 'eventDetail.details.attendance',
@@ -622,7 +622,7 @@ const DashboardEventDetail: React.FC = () => {
                             </span>
                           </div>
                           <div className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+                            <CheckCircle className="w-4 h-4 text-success-500 mr-2" />
                             <span className="text-sm text-gray-600">
                               {t(
                                 'eventDetail.details.etiquette',
@@ -660,7 +660,7 @@ const DashboardEventDetail: React.FC = () => {
                         <h4 className="text-lg font-semibold mb-4">
                           {t('eventDetail.analytics.occupancy', 'معدل الإشغال')}
                         </h4>
-                        <div className="text-3xl font-bold text-green-600">
+                        <div className="text-3xl font-bold text-success-600">
                           {getRegistrationPercentage(
                             registrations.length,
                             event.max_attendees || 0

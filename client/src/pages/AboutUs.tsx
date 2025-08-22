@@ -51,7 +51,7 @@ const HeroSection = memo(() => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="text-3xl md:text-4xl font-bold text-white"
+            className="page-title text-white"
           >
             {t('about.title', 'من نحن')}
           </motion.h1>
@@ -60,7 +60,7 @@ const HeroSection = memo(() => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="text-base md:text-lg text-neutral-100 max-w-2xl mx-auto"
+            className="page-subtitle text-neutral-100 max-w-2xl mx-auto"
           >
             {t(
               'about.subtitle',
@@ -95,29 +95,21 @@ const PresidentMessage = memo(() => {
                 }}
               />
             </div>
-            <h2 className="text-2xl font-bold text-dark-500 mb-1">
-              كلمة رئيس المنظمة
-            </h2>
-            <p className="text-sm text-dark-400">أحمد محمد علي</p>
+            <h2 className="form-section-title">كلمة رئيس المنظمة</h2>
+            <p className="body-text-small text-dark-400">أحمد محمد علي</p>
           </div>
 
           <div className="prose prose-sm max-w-none text-dark-500 leading-relaxed">
-            <p className="mb-4">
-              بسم الله الرحمن الرحيم، الحمد لله رب العالمين، والصلاة والسلام على
-              سيدنا محمد وعلى آله وصحبه أجمعين.
+            <p className="body-text-medium mb-4">
+              منظمة شبابنا العالمية هي منصة شبابية عالمية مستقلة، تُعنى ببناء
+              جيل شبابي فاعل ومؤثر، يحمل همّ أمّته، ويتسلّح بالعلم والوعي
+              والقيم، ويشارك بفعالية في نهضة مجتمعه وأمّته.
             </p>
-            <p className="mb-4">
-              أهلاً وسهلاً بكم في منصة شبابنا العالمية، منصة تهدف إلى تمكين
-              الشباب المسلم وبناء مستقبل مشرق له ولأمته.
-            </p>
-            <p className="mb-4">
-              نحن نؤمن بأن الشباب هم عماد الأمة وثروتها الحقيقية، ومن خلال هذه
-              المنصة نسعى إلى توفير بيئة إيجابية ومحفزة للشباب المسلم ليتعلم
-              وينمو ويطور مهاراته وقدراته.
-            </p>
-            <p>
-              نعمل معاً من قلب اسطنبول، مدينة الجسور بين الشرق والغرب، لنكون
-              جسراً للتواصل والتعاون بين الشباب المسلم في جميع أنحاء العالم.
+            <p className="body-text-medium mb-4">
+              ننطلق من رؤية شمولية تعزز التواصل بين الشباب حول العالم، وننفّذ
+              برامج نوعية في مجالات التربية، والإعلام، والتنمية، والهوية،
+              والقضايا الإسلامية، ضمن منظومة قيادية وكوادر مؤمنة برسالة التغيير
+              الإيجابي.
             </p>
           </div>
         </Card>
@@ -144,12 +136,10 @@ const VisionMission = memo(() => {
             <div className="w-12 h-12 bg-primary-500 rounded-full flex items-center justify-center mr-3">
               <Target className="w-6 h-6 text-white" />
             </div>
-            <h2 className="text-xl font-bold text-dark-500">رؤيتنا</h2>
+            <h2 className="form-section-title">رؤيتنا</h2>
           </div>
-          <p className="text-dark-500 leading-relaxed">
-            نسعى لأن نكون المنصة الرائدة عالمياً في تمكين الشباب المسلم وبناء
-            مستقبل مشرق له ولأمته، من خلال توفير بيئة إيجابية ومحفزة للتعلم
-            والنمو والتطوير.
+          <p className="body-text-medium leading-relaxed">
+            الريادة العالمية في تمكين الشباب لصناعة التأثير في واقعهم وأمتهم.
           </p>
         </Card>
 
@@ -159,12 +149,13 @@ const VisionMission = memo(() => {
             <div className="w-12 h-12 bg-accent-500 rounded-full flex items-center justify-center mr-3">
               <Heart className="w-6 h-6 text-white" />
             </div>
-            <h2 className="text-xl font-bold text-dark-500">رسالتنا</h2>
+            <h2 className="form-section-title">رسالتنا</h2>
           </div>
-          <p className="text-dark-500 leading-relaxed">
-            تمكين الشباب المسلم من خلال توفير برامج ومبادرات مبتكرة تساهم في
-            تطوير مهاراته وقدراته، وتعزيز قيمه الإسلامية، وبناء شخصية متوازنة
-            ومؤثرة في المجتمع.
+          <p className="body-text-medium leading-relaxed">
+            نسعى إلى إعداد شبابٍ واعٍ وملتزم، من خلال تنفيذ برامج نوعية تجمع بين
+            التأصيل التربوي والتأهيل القيادي والتأثير المجتمعي، بما يسهم في
+            صناعة التغيير الإيجابي، ويُعزز الانتماء للهُوية والقضايا الإسلامية،
+            في بيئة محفزة على الإبداع والعطاء والعمل الجماعي.
           </p>
         </Card>
       </div>

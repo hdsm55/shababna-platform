@@ -85,7 +85,7 @@ const ToastContainer: React.FC = () => {
   const getIcon = (type: ToastType) => {
     switch (type) {
       case 'success':
-        return <CheckCircle className="w-5 h-5 text-green-600" />;
+        return <CheckCircle className="w-5 h-5 text-success-600" />;
       case 'error':
         return <AlertCircle className="w-5 h-5 text-red-600" />;
       case 'warning':
@@ -98,7 +98,7 @@ const ToastContainer: React.FC = () => {
   const getClasses = (type: ToastType) => {
     switch (type) {
       case 'success':
-        return 'bg-green-50 border-green-200';
+        return 'bg-success-50 border-success-200';
       case 'error':
         return 'bg-red-50 border-red-200';
       case 'warning':

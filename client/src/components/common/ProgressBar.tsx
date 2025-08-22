@@ -22,7 +22,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
       case 'accent':
         return 'from-accent-500 to-accent-600';
       case 'success':
-        return 'from-green-500 to-green-600';
+        return 'from-success-500 to-success-600';
       case 'warning':
         return 'from-yellow-500 to-yellow-600';
       case 'error':

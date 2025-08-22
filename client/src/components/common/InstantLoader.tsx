@@ -19,7 +19,8 @@ const InstantLoader: React.FC<InstantLoaderProps> = ({
     setIsLoading(true);
     setContentReady(false);
 
-    // تأخير قصير لمحاكاة تحميل المحتوى
+    // تقليل التأخير قدر الإمكان
+    const delay = import.meta.env.MODE === 'development' ? 0 : 60;
     const timer = setTimeout(() => {
       setIsLoading(false);
       setContentReady(true);
@@ -28,7 +29,7 @@ const InstantLoader: React.FC<InstantLoaderProps> = ({
       if (onContentLoad) {
         onContentLoad();
       }
-    }, 100);
+    }, delay);
 
     return () => clearTimeout(timer);
   }, [location.pathname, onContentLoad]);
@@ -36,7 +37,7 @@ const InstantLoader: React.FC<InstantLoaderProps> = ({
   // إظهار المحتوى مع تأثير انتقالي بسيط
   return (
     <div
-      className={`transition-opacity duration-200 ${
+      className={`transition-opacity duration-150 ${
         isLoading ? 'opacity-0' : 'opacity-100'
       }`}
     >

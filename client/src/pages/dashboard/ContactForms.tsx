@@ -88,7 +88,7 @@ const ContactForms: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'read':
-        return 'text-green-600 bg-green-50';
+        return 'text-success-600 bg-success-50';
       case 'unread':
         return 'text-red-600 bg-red-50';
       default:
@@ -291,7 +291,7 @@ const ContactForms: React.FC = () => {
                   <div
                     key={form.id}
                     className={`p-4 rounded-lg border-l-4 ${
-                      form.is_read ? 'border-l-green-500' : 'border-l-red-500'
+                      form.is_read ? 'border-l-success-500' : 'border-l-red-500'
                     } bg-gray-50 hover:bg-gray-100 transition-colors`}
                   >
                     <div className="flex items-start justify-between">
@@ -471,7 +471,7 @@ const ContactForms: React.FC = () => {
         title="نجح العملية! 🎉"
       >
         <div className="text-center py-6">
-          <div className="text-green-600 text-lg mb-6 whitespace-pre-line">
+          <div className="text-success-600 text-lg mb-6 whitespace-pre-line">
             {modalMsg}
           </div>
           <div className="flex justify-center gap-3">

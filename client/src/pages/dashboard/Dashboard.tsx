@@ -40,6 +40,7 @@ import {
   Home,
   FileText,
   UserPlus,
+  User,
   Gift,
   Zap,
   TrendingDown,
@@ -243,6 +244,9 @@ const Dashboard: React.FC = () => {
   const [modalMsg, setModalMsg] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [viewMode, setViewMode] = useState<'individual' | 'organization'>(
+    'individual'
+  );
   const isRTL = i18n.dir() === 'rtl';
 
   // جلب إحصائيات الداشبورد
@@ -273,10 +277,49 @@ const Dashboard: React.FC = () => {
   const stats = statsData?.data || { overview: [], engagement: [] };
   const activities = activitiesData || [];
 
+  // تصفية البيانات حسب الوضع المختار
+  const getFilteredStats = () => {
+    if (viewMode === 'individual') {
+      return {
+        overview:
+          stats.overview?.filter(
+            (stat: any) =>
+              !stat.title?.includes('مؤسسة') && !stat.title?.includes('شركة')
+          ) || [],
+        engagement:
+          stats.engagement?.filter(
+            (stat: any) =>
+              !stat.title?.includes('مؤسسة') && !stat.title?.includes('شركة')
+          ) || [],
+      };
+    } else {
+      return {
+        overview:
+          stats.overview?.filter(
+            (stat: any) =>
+              stat.title?.includes('مؤسسة') ||
+              stat.title?.includes('شركة') ||
+              stat.title?.includes('رعاية') ||
+              stat.title?.includes('شراكة')
+          ) || [],
+        engagement:
+          stats.engagement?.filter(
+            (stat: any) =>
+              stat.title?.includes('مؤسسة') ||
+              stat.title?.includes('شركة') ||
+              stat.title?.includes('رعاية') ||
+              stat.title?.includes('شراكة')
+          ) || [],
+      };
+    }
+  };
+
+  const filteredStats = getFilteredStats();
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'success':
-        return 'text-green-600 bg-green-50 border-green-200';
+        return 'text-success-600 bg-success-50 border-success-200';
       case 'warning':
         return 'text-yellow-600 bg-yellow-50 border-yellow-200';
       case 'error':
@@ -310,7 +353,7 @@ const Dashboard: React.FC = () => {
       case 'medium':
         return 'text-yellow-600 bg-yellow-50';
       case 'low':
-        return 'text-green-600 bg-green-50';
+        return 'text-success-600 bg-success-50';
       default:
         return 'text-gray-600 bg-gray-50';
     }
@@ -492,6 +535,35 @@ const Dashboard: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center gap-3">
+                {/* View Mode Toggle */}
+                <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                  <button
+                    onClick={() => setViewMode('individual')}
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
+                      viewMode === 'individual'
+                        ? 'bg-white text-primary-600 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      <span>فرد</span>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setViewMode('organization')}
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
+                      viewMode === 'organization'
+                        ? 'bg-white text-primary-600 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      <span>مؤسسة</span>
+                    </div>
+                  </button>
+                </div>
                 <Button
                   variant="outline"
                   size="sm"
@@ -527,8 +599,9 @@ const Dashboard: React.FC = () => {
           initial="hidden"
           animate="visible"
         >
-          {Array.isArray(stats.overview) && stats.overview.length > 0 ? (
-            stats.overview.map((stat: any, index: number) => (
+          {Array.isArray(filteredStats.overview) &&
+          filteredStats.overview.length > 0 ? (
+            filteredStats.overview.map((stat: any, index: number) => (
               <motion.div
                 key={index}
                 variants={itemVariants}
@@ -549,7 +622,7 @@ const Dashboard: React.FC = () => {
                             <div
                               className={`p-2 rounded-lg ${
                                 stat.changeType === 'increase'
-                                  ? 'bg-green-100 text-green-600'
+                                  ? 'bg-success-100 text-success-600'
                                   : 'bg-red-100 text-red-600'
                               }`}
                             >
@@ -568,7 +641,7 @@ const Dashboard: React.FC = () => {
                     <span
                       className={`text-xs font-medium ${
                         stat.changeType === 'increase'
-                          ? 'text-green-600'
+                          ? 'text-success-600'
                           : 'text-red-600'
                       }`}
                     >
@@ -651,9 +724,9 @@ const Dashboard: React.FC = () => {
               </div>
 
               <div className="space-y-4">
-                {Array.isArray(stats.engagement) &&
-                stats.engagement.length > 0 ? (
-                  stats.engagement.map((metric: any, index: number) => (
+                {Array.isArray(filteredStats.engagement) &&
+                filteredStats.engagement.length > 0 ? (
+                  filteredStats.engagement.map((metric: any, index: number) => (
                     <motion.div
                       key={index}
                       initial={{ opacity: 0, x: -20 }}
@@ -722,7 +795,7 @@ const Dashboard: React.FC = () => {
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/20 shadow-lg h-full">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-success-500 to-success-600 rounded-xl flex items-center justify-center">
                     <Activity className="w-5 h-5 text-white" />
                   </div>
                   <h2 className="text-xl font-bold text-gray-800">
@@ -839,7 +912,7 @@ const Dashboard: React.FC = () => {
                   className="w-full flex flex-col items-center gap-3 p-4 h-auto bg-white/50 backdrop-blur-sm border-white/20 hover:bg-white/70 transition-all duration-300"
                   onClick={() => handleUnavailable()}
                 >
-                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-success-500 to-success-600 rounded-lg flex items-center justify-center">
                     <Target className="w-5 h-5 text-white" />
                   </div>
                   <span className="font-medium text-gray-700">

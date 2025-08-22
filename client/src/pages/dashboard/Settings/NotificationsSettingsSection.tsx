@@ -18,7 +18,7 @@ const NotificationsSettingsSection: React.FC<
   <div className="space-y-6">
     <h2 className="text-xl font-semibold text-gray-900">إعدادات الإشعارات</h2>
     <div className="space-y-4">
-      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+      <div className="flex items-center justify-between p-4 bg-transparent border border-gray-200 rounded-lg hover:bg-gray-50/50 transition-colors">
         <div className="flex items-center">
           <Mail className="w-5 h-5 text-gray-600 mr-3 rtl:ml-3 rtl:mr-0" />
           <div>
@@ -44,7 +44,7 @@ const NotificationsSettingsSection: React.FC<
           <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
         </label>
       </div>
-      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+      <div className="flex items-center justify-between p-4 bg-transparent border border-gray-200 rounded-lg hover:bg-gray-50/50 transition-colors">
         <div className="flex items-center">
           <Smartphone className="w-5 h-5 text-gray-600 mr-3 rtl:ml-3 rtl:mr-0" />
           <div>
@@ -70,7 +70,7 @@ const NotificationsSettingsSection: React.FC<
           <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
         </label>
       </div>
-      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+      <div className="flex items-center justify-between p-4 bg-transparent border border-gray-200 rounded-lg hover:bg-gray-50/50 transition-colors">
         <div className="flex items-center">
           <Bell className="w-5 h-5 text-gray-600 mr-3 rtl:ml-3 rtl:mr-0" />
           <div>
@@ -95,7 +95,7 @@ const NotificationsSettingsSection: React.FC<
         </label>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-between p-4 bg-transparent border border-gray-200 rounded-lg hover:bg-gray-50/50 transition-colors">
           <div className="flex items-center">
             <Calendar className="w-5 h-5 text-gray-600 mr-3 rtl:ml-3 rtl:mr-0" />
             <div>
@@ -117,7 +117,7 @@ const NotificationsSettingsSection: React.FC<
             <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
           </label>
         </div>
-        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-between p-4 bg-transparent border border-gray-200 rounded-lg hover:bg-gray-50/50 transition-colors">
           <div className="flex items-center">
             <SettingsIcon className="w-5 h-5 text-gray-600 mr-3 rtl:ml-3 rtl:mr-0" />
             <div>

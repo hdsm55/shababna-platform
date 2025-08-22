@@ -117,7 +117,13 @@ export const CardImage: React.FC<{
 }> = ({ src, alt, className = '' }) => {
   return (
     <div className={`w-full h-48 object-cover rounded-t-lg ${className}`}>
-      <img src={src} alt={alt} className="w-full h-full object-cover" />
+      <img
+        src={src}
+        alt={alt}
+        className="w-full h-full object-cover"
+        loading="lazy"
+        decoding="async"
+      />
     </div>
   );
 };

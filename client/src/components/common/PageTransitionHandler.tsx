@@ -27,7 +27,8 @@ const PageTransitionHandler: React.FC<PageTransitionHandlerProps> = ({
         onPageChange();
       }
 
-      // تأخير قصير لإظهار المحتوى الجديد
+      // تقليل التأخير لإظهار المحتوى سريعًا
+      const delay = import.meta.env.MODE === 'development' ? 0 : 80;
       const timer = setTimeout(() => {
         setIsTransitioning(false);
 
@@ -35,7 +36,7 @@ const PageTransitionHandler: React.FC<PageTransitionHandlerProps> = ({
         if (onPageLoad) {
           onPageLoad();
         }
-      }, 200);
+      }, delay);
 
       return () => clearTimeout(timer);
     }
@@ -43,11 +44,16 @@ const PageTransitionHandler: React.FC<PageTransitionHandlerProps> = ({
 
   return (
     <div
-      className={`transition-all duration-300 ${
+      className={`transition-all duration-150 ${
         isTransitioning
           ? 'opacity-0 translate-y-2'
           : 'opacity-100 translate-y-0'
       }`}
+      style={{
+        willChange: 'transform, opacity',
+        backfaceVisibility: 'hidden',
+        transform: 'translateZ(0)',
+      }}
     >
       {children}
     </div>

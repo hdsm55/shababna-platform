@@ -26,6 +26,12 @@ import { fetchEvents } from '../services/eventsApi';
 import { fetchPrograms } from '../services/programsApi';
 import { subscribeToNewsletter } from '../services/newsletterApi';
 import { Program } from '../types';
+import {
+  formatEventDate,
+  formatEventTime,
+  formatEventDateShort,
+  formatEventDateFull,
+} from '../utils/dateUtils';
 
 // تحسين الاستيراد - استخدام lazy loading للمكونات الثقيلة
 const HeroSection = React.lazy(() => import('../components/home/HeroSection'));
@@ -219,7 +225,7 @@ const LatestEventsSection = memo(() => {
                 <div className="absolute bottom-3 left-3">
                   <div className="flex items-center gap-2 text-white text-xs">
                     <Clock className="w-3 h-3" />
-                    <span>{event.start_date}</span>
+                    <span>{formatEventDate(event.start_date)}</span>
                   </div>
                   <div className="flex items-center gap-2 text-white text-xs mt-1">
                     <MapPin className="w-3 h-3" />
@@ -234,7 +240,7 @@ const LatestEventsSection = memo(() => {
                 <div className="space-y-1 mb-3">
                   <div className="flex items-center gap-2 text-xs text-dark-600">
                     <Clock className="w-3 h-3" />
-                    <span>{event.start_date}</span>
+                    <span>{formatEventDate(event.start_date)}</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-dark-600">
                     <MapPin className="w-3 h-3" />
@@ -292,7 +298,8 @@ const LatestProgramsSection = memo(() => {
     ...cacheConfig.programs,
   });
 
-  const latestPrograms = programsData?.data?.events || [];
+  const latestPrograms =
+    programsData?.data?.programs || programsData?.data?.items || [];
 
   // تحسين حالة التحميل
   if (programsLoading) {

@@ -163,13 +163,13 @@ const ActivitiesDashboard: React.FC = () => {
       case 'DollarSign':
         return <DollarSign className="w-5 h-5 text-yellow-600" />;
       case 'TrendingUp':
-        return <TrendingUp className="w-5 h-5 text-green-600" />;
+        return <TrendingUp className="w-5 h-5 text-success-600" />;
       case 'Users':
         return <Users className="w-5 h-5 text-blue-600" />;
       case 'AlertCircle':
         return <AlertCircle className="w-5 h-5 text-red-600" />;
       case 'CheckCircle':
-        return <CheckCircle className="w-5 h-5 text-green-600" />;
+        return <CheckCircle className="w-5 h-5 text-success-600" />;
       case 'Clock':
         return <Clock className="w-5 h-5 text-gray-600" />;
       case 'Settings':
@@ -182,7 +182,7 @@ const ActivitiesDashboard: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'text-green-600 bg-green-50';
+        return 'text-success-600 bg-success-50';
       case 'pending':
         return 'text-yellow-600 bg-yellow-50';
       case 'warning':
@@ -201,7 +201,7 @@ const ActivitiesDashboard: React.FC = () => {
       case 'medium':
         return 'border-l-yellow-500';
       case 'low':
-        return 'border-l-green-500';
+        return 'border-l-success-500';
       default:
         return 'border-l-gray-500';
     }
@@ -214,7 +214,7 @@ const ActivitiesDashboard: React.FC = () => {
       case 'donation':
         return 'bg-yellow-100 text-yellow-800';
       case 'program':
-        return 'bg-green-100 text-green-800';
+        return 'bg-success-100 text-success-800';
       case 'user':
         return 'bg-purple-100 text-purple-800';
       case 'alert':

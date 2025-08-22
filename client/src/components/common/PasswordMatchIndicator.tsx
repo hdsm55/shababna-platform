@@ -42,13 +42,13 @@ const PasswordMatchIndicator: React.FC<PasswordMatchIndicatorProps> = ({
     >
       <div className="flex items-center gap-2 mb-2">
         {matchInfo?.isMatch ? (
-          <CheckCircle className="w-4 h-4 text-green-500" />
+          <CheckCircle className="w-4 h-4 text-success-500" />
         ) : (
           <Clock className="w-4 h-4 text-yellow-500" />
         )}
         <span
           className={`text-sm font-medium ${
-            matchInfo?.isMatch ? 'text-green-600' : 'text-yellow-600'
+            matchInfo?.isMatch ? 'text-success-600' : 'text-yellow-600'
           }`}
         >
           {matchInfo?.isMatch
@@ -61,7 +61,7 @@ const PasswordMatchIndicator: React.FC<PasswordMatchIndicatorProps> = ({
       <div className="space-y-1">
         <div
           className={`flex items-center gap-1 text-xs ${
-            password.length > 0 ? 'text-green-600' : 'text-gray-400'
+            password.length > 0 ? 'text-success-600' : 'text-gray-400'
           }`}
         >
           <CheckCircle className="w-3 h-3" />
@@ -69,7 +69,7 @@ const PasswordMatchIndicator: React.FC<PasswordMatchIndicatorProps> = ({
         </div>
         <div
           className={`flex items-center gap-1 text-xs ${
-            confirmPassword.length > 0 ? 'text-green-600' : 'text-gray-400'
+            confirmPassword.length > 0 ? 'text-success-600' : 'text-gray-400'
           }`}
         >
           <CheckCircle className="w-3 h-3" />
@@ -77,7 +77,7 @@ const PasswordMatchIndicator: React.FC<PasswordMatchIndicatorProps> = ({
         </div>
         <div
           className={`flex items-center gap-1 text-xs ${
-            matchInfo?.isMatch ? 'text-green-600' : 'text-gray-400'
+            matchInfo?.isMatch ? 'text-success-600' : 'text-gray-400'
           }`}
         >
           <CheckCircle className="w-3 h-3" />
@@ -115,7 +115,7 @@ const PasswordMatchIndicator: React.FC<PasswordMatchIndicatorProps> = ({
           />
           <div
             className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-              matchInfo?.isMatch ? 'bg-green-500' : 'bg-gray-200'
+              matchInfo?.isMatch ? 'bg-success-500' : 'bg-gray-200'
             }`}
           />
         </div>

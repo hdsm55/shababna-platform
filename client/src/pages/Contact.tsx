@@ -26,7 +26,7 @@ const ContactHeader = memo(() => {
         transition={{ duration: 0.5, delay: 0.2 }}
         className="inline-block"
       >
-        <h1 className="section-title mb-4 text-dark-500 bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+        <h1 className="contact-page-title">
           {t('contact.title', 'تواصل معنا')}
         </h1>
       </motion.div>
@@ -34,7 +34,7 @@ const ContactHeader = memo(() => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.4 }}
-        className="body-text text-dark-400 max-w-2xl mx-auto leading-relaxed"
+        className="contact-page-subtitle max-w-2xl mx-auto"
       >
         {t(
           'contact.description',
@@ -112,10 +112,10 @@ const ContactForm = memo(() => {
     >
       <Card className="p-8 bg-white shadow-brand-lg border border-neutral-200">
         <div className="text-center mb-8">
-          <h2 className="card-title text-dark-500 mb-2">
+          <h2 className="form-section-title">
             {t('contact.form.title', 'أرسل لنا رسالة')}
           </h2>
-          <p className="body-text text-dark-400">
+          <p className="form-section-subtitle">
             {t('contact.form.subtitle', 'سنرد عليك في أقرب وقت ممكن')}
           </p>
         </div>

@@ -158,6 +158,9 @@ const ProgramsDashboard: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [viewMode, setViewMode] = useState<'individual' | 'organization'>(
+    'individual'
+  );
 
   // نموذج البيانات
   const [form, setForm] = useState({
@@ -180,8 +183,35 @@ const ProgramsDashboard: React.FC = () => {
   console.log('📊 data.data:', data?.data);
   console.log('📊 data.data.programs:', data?.data?.programs);
   console.log('📊 data.data.items:', data?.data?.items);
-  const programs = data?.data?.programs || data?.data?.items || [];
-  console.log('📋 قائمة البرامج:', programs);
+  const allPrograms = data?.data?.programs || data?.data?.items || [];
+
+  // تصفية البرامج حسب الوضع المختار
+  const getFilteredPrograms = () => {
+    if (viewMode === 'individual') {
+      return allPrograms.filter(
+        (program: any) =>
+          !program.title?.includes('مؤسسة') &&
+          !program.title?.includes('شركة') &&
+          !program.description?.includes('مؤسسة') &&
+          !program.description?.includes('شركة')
+      );
+    } else {
+      return allPrograms.filter(
+        (program: any) =>
+          program.title?.includes('مؤسسة') ||
+          program.title?.includes('شركة') ||
+          program.title?.includes('رعاية') ||
+          program.title?.includes('شراكة') ||
+          program.description?.includes('مؤسسة') ||
+          program.description?.includes('شركة') ||
+          program.description?.includes('رعاية') ||
+          program.description?.includes('شراكة')
+      );
+    }
+  };
+
+  const programs = getFilteredPrograms();
+  console.log('📋 قائمة البرامج المصفاة:', programs);
 
   const handleOpenModal = (
     type: 'add' | 'edit' | 'view',
@@ -384,7 +414,7 @@ const ProgramsDashboard: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'text-green-600 bg-green-50 border-green-200';
+        return 'text-success-600 bg-success-50 border-success-200';
       case 'completed':
         return 'text-blue-600 bg-blue-50 border-blue-200';
       case 'pending':
@@ -596,6 +626,35 @@ const ProgramsDashboard: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            {/* View Mode Toggle */}
+            <div className="flex items-center bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('individual')}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
+                  viewMode === 'individual'
+                    ? 'bg-white text-primary-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  <span>فرد</span>
+                </div>
+              </button>
+              <button
+                onClick={() => setViewMode('organization')}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
+                  viewMode === 'organization'
+                    ? 'bg-white text-primary-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  <span>مؤسسة</span>
+                </div>
+              </button>
+            </div>
             <Button
               variant="outline"
               size="sm"
@@ -651,11 +710,11 @@ const ProgramsDashboard: React.FC = () => {
         <motion.div variants={itemVariants}>
           <Card className="p-5 hover:shadow-sm transition-all duration-200 border border-gray-100 bg-white">
             <div className="flex items-center justify-between mb-3">
-              <div className="p-2 rounded-lg bg-green-50">
-                <CheckCircle className="w-5 h-5 text-green-500" />
+              <div className="p-2 rounded-lg bg-success-50">
+                <CheckCircle className="w-5 h-5 text-success-500" />
               </div>
               <div className="text-right">
-                <span className="text-xs text-green-600">
+                <span className="text-xs text-success-600">
                   {t('programs.stats.active', 'نشط')}
                 </span>
               </div>
@@ -1181,7 +1240,7 @@ const ProgramsDashboard: React.FC = () => {
         title="نجح العملية! 🎉"
       >
         <div className="text-center py-6">
-          <div className="text-green-600 text-lg mb-6 whitespace-pre-line">
+          <div className="text-success-600 text-lg mb-6 whitespace-pre-line">
             {modalMsg}
           </div>
           <div className="flex justify-center gap-3">

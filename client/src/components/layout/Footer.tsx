@@ -24,10 +24,10 @@ const Footer: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // تأخير قصير لإظهار الفوتر
+    // تأخير إظهار الفوتر لضمان ظهور المحتوى أولاً
     const timer = setTimeout(() => {
       setIsVisible(true);
-    }, 100);
+    }, 300);
 
     return () => clearTimeout(timer);
   }, []);
@@ -267,8 +267,8 @@ const Footer: React.FC = () => {
 
             {/* Status Messages */}
             {newsletterStatus === 'success' && (
-              <div className="p-3 bg-green-500/20 border border-green-500/30 rounded-lg">
-                <p className="text-green-400 text-sm text-center">
+              <div className="p-3 bg-success-500/20 border border-success-500/30 rounded-lg">
+                <p className="text-success-400 text-sm text-center">
                   {t('home.newsletter.success', 'تم الاشتراك بنجاح!')}
                 </p>
               </div>

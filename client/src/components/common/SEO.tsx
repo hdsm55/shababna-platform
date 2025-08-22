@@ -20,8 +20,12 @@ interface SEOProps {
 
 const SEO: React.FC<SEOProps> = ({
   title = 'شبابنا العالمية - منصة شبابية عالمية للتنمية والتطوير',
-  description = 'انضم إلى شبابنا العالمية في خلق تغيير إيجابي من خلال برامج مبتكرة ومشاركة مجتمعية. تمكين الشباب لبناء مستقبل أفضل.',
+  description = 'منظمة شبابنا العالمية - منصة شبابية عالمية للتنمية والتطوير. تمكين الشباب لبناء مستقبل أفضل من خلال برامج مبتكرة ومشاركة مجتمعية. انضم إلينا في خلق تغيير إيجابي.',
   keywords = [
+    'منظمة شبابنا العالمية',
+    'شبابنا العالمية',
+    'منظمة شبابنا',
+    'شبابنا',
     'تمكين الشباب',
     'التنمية المجتمعية',
     'الشباب العالمي',
@@ -30,11 +34,13 @@ const SEO: React.FC<SEOProps> = ({
     'فرص التطوع',
     'برامج الشباب',
     'المجتمع الدولي',
-    'شبابنا',
     'تنمية',
     'تطوير',
     'شباب',
     'مجتمع',
+    'منظمة غير ربحية',
+    'منظمات شبابية',
+    'منظمات المجتمع المدني',
   ],
   image = '/og-image.jpg',
   url = typeof window !== 'undefined' ? window.location.href : '',
@@ -194,27 +200,73 @@ const SEO: React.FC<SEOProps> = ({
         {JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'NonProfit',
-          name: siteName,
-          description: 'منصة شبابية عالمية للتنمية والتطوير',
+          name: 'منظمة شبابنا العالمية',
+          alternateName: 'Shababna Global Organization',
+          description:
+            'منصة شبابية عالمية للتنمية والتطوير. تمكين الشباب لبناء مستقبل أفضل من خلال برامج مبتكرة ومشاركة مجتمعية.',
           url: 'https://shababnaglobal.org',
-          logo: 'https://shababnaglobal.org/logo.png',
+          logo: 'https://shababnaglobal.org/images/logo.jpg',
+          image: 'https://shababnaglobal.org/images/hero-bg.jpg',
+          foundingDate: '2020',
           address: {
             '@type': 'PostalAddress',
-            addressLocality: 'Riyadh',
+            addressLocality: 'الرياض',
             addressCountry: 'SA',
-            addressRegion: 'Riyadh',
+            addressRegion: 'الرياض',
           },
           contactPoint: {
             '@type': 'ContactPoint',
             telephone: '+966501234567',
             email: 'info@shababnaglobal.org',
             contactType: 'customer service',
+            availableLanguage: ['Arabic', 'English'],
           },
           sameAs: [
             'https://facebook.com/shababnaglobal',
             'https://twitter.com/shababnaglobal',
             'https://instagram.com/shababnaglobal',
+            'https://linkedin.com/company/shababnaglobal',
           ],
+          areaServed: {
+            '@type': 'Country',
+            name: 'Saudi Arabia',
+          },
+          serviceArea: {
+            '@type': 'Country',
+            name: 'Worldwide',
+          },
+          hasOfferCatalog: {
+            '@type': 'OfferCatalog',
+            name: 'برامج الشباب',
+            itemListElement: [
+              {
+                '@type': 'Offer',
+                itemOffered: {
+                  '@type': 'Service',
+                  name: 'برامج التطوير القيادي',
+                  description: 'برامج لتنمية مهارات القيادة لدى الشباب',
+                },
+              },
+              {
+                '@type': 'Offer',
+                itemOffered: {
+                  '@type': 'Service',
+                  name: 'برامج التطوع',
+                  description: 'فرص التطوع في المشاريع المجتمعية',
+                },
+              },
+              {
+                '@type': 'Offer',
+                itemOffered: {
+                  '@type': 'Service',
+                  name: 'برامج التنمية المجتمعية',
+                  description: 'مشاريع لتنمية المجتمعات المحلية',
+                },
+              },
+            ],
+          },
+          keywords:
+            'منظمة شبابنا العالمية, شبابنا العالمية, تمكين الشباب, التنمية المجتمعية, الشباب العالمي, تطوير القيادة, التأثير الاجتماعي, فرص التطوع, برامج الشباب, المجتمع الدولي',
         })}
       </script>
     </Helmet>

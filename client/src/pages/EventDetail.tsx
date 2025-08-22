@@ -46,7 +46,7 @@ const EventHeader = memo(({ event }: { event: any }) => {
       case 'upcoming':
         return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'active':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-success-100 text-success-800 border-success-200';
       case 'completed':
         return 'bg-gray-100 text-gray-800 border-gray-200';
       case 'cancelled':

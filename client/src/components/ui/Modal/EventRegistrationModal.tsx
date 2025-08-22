@@ -3,6 +3,7 @@ import { Button } from '../Button/ButtonSimple';
 import { Input } from '../Input/InputSimple';
 import { Card } from '../Card/Card';
 import { Calendar, MapPin, Users, Clock, CheckCircle } from 'lucide-react';
+import { formatEventDate, formatEventTime, formatEventDateShort, formatEventDateFull } from '../../../utils/dateUtils';
 import { Event } from '../../../types';
 
 interface EventRegistrationModalProps {
@@ -52,18 +53,11 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
   if (!open || !event) return null;
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    return formatEventDate(dateString);
   };
 
   const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('ar-SA', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return formatEventTime(dateString);
   };
 
   const getEventIcon = (category: string) => {
@@ -152,8 +146,7 @@ export const EventRegistrationModal: React.FC<EventRegistrationModalProps> = ({
                     <span className="font-semibold">
                       {formatDate(event.start_date)}
                     </span>
-                  </div>
-                  <div className="flex items-center gap-1 text-secondary-700 bg-secondary-50 px-2 py-1 rounded">
+                    <span className="text-primary-500">•</span>
                     <Clock className="w-3 h-3 text-secondary-600" />
                     <span className="font-semibold">
                       {formatTime(event.start_date)}

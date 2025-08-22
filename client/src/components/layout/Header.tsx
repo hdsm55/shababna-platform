@@ -1,17 +1,17 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Globe, User } from 'lucide-react';
+import { Globe, User, ChevronDown, X, Menu, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguageStore } from '../../store/languageStore';
-import { useAuthStore } from '../../store/authStore';
+import { useAuth } from '../../store/auth';
 
 const Header: React.FC = () => {
   const { t, i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { language, isRTL, setLanguage } = useLanguageStore();
-  const { isAuthenticated, user, logout } = useAuthStore();
+  const { isAuthenticated, user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = React.useState(false);
 
@@ -54,8 +54,8 @@ const Header: React.FC = () => {
             className="flex items-center space-x-3 rtl:space-x-reverse group no-focus-outline"
           >
             <img
-              src="/images/logo.png"
-              alt="شبابنا - الشعار"
+              src="/images/logo.jpg"
+              alt="منظمة شبابنا العالمية - الشعار"
               className="h-10 w-auto object-contain drop-shadow"
               style={{ maxHeight: 40 }}
             />

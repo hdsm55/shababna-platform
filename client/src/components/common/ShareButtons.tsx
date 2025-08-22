@@ -199,7 +199,7 @@ const ShareButtons: React.FC<ShareButtonsProps> = ({
                 {showWhatsApp && (
                   <button
                     onClick={() => handleShare('whatsapp')}
-                    className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-medium transition-all duration-300"
+                    className="flex items-center justify-center gap-2 bg-success-500 hover:bg-success-600 text-white px-4 py-3 rounded-lg font-medium transition-all duration-300"
                   >
                     <svg
                       className="w-5 h-5"
@@ -236,8 +236,8 @@ const ShareButtons: React.FC<ShareButtonsProps> = ({
                 >
                   {copied ? (
                     <>
-                      <Check className="w-5 h-5 text-green-600" />
-                      <span className="text-sm text-green-600">
+                      <Check className="w-5 h-5 text-success-600" />
+                      <span className="text-sm text-success-600">
                         {t('common.copied', 'تم النسخ')}
                       </span>
                     </>

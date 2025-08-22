@@ -22,6 +22,8 @@ export interface Program {
   description: string;
   category: string;
   image_url?: string;
+  image?: string; // Alternative image property
+  location?: string; // Location property
   goal_amount?: number;
   current_amount?: number;
   start_date: string;

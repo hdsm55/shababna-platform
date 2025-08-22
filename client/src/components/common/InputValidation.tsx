@@ -174,7 +174,7 @@ export const InputValidation: React.FC<InputValidationProps> = ({
             disabled:opacity-50 disabled:cursor-not-allowed
             ${isFocused ? 'border-primary-500 focus:ring-primary-500' : ''}
             ${hasErrors ? 'border-red-500 focus:ring-red-500' : ''}
-            ${isValid ? 'border-green-500 focus:ring-green-500' : ''}
+            ${isValid ? 'border-success-500 focus:ring-success-500' : ''}
             ${!isFocused && !hasErrors && !isValid ? 'border-gray-300' : ''}
           `}
         />
@@ -212,7 +212,7 @@ export const InputValidation: React.FC<InputValidationProps> = ({
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   exit={{ scale: 0 }}
-                  className="text-green-500"
+                  className="text-success-500"
                 >
                   <CheckCircle className="w-5 h-5" />
                 </motion.div>

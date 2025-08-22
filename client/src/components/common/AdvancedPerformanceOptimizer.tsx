@@ -200,9 +200,12 @@ const AdvancedPerformanceOptimizer: React.FC<AdvancedPerformanceOptimizerProps> 
     // تحسين الشبكة - Network Optimization
     const setupNetworkOptimization = useCallback(() => {
       // تحسين طلبات API
-      if ('serviceWorker' in navigator) {
+      if (
+        import.meta.env.MODE === 'production' &&
+        'serviceWorker' in navigator
+      ) {
         navigator.serviceWorker.register('/sw.js').catch(() => {
-          // Service Worker غير متاح
+          // Service Worker غير متاح في هذا السياق
         });
       }
 

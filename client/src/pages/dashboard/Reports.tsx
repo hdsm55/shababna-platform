@@ -209,7 +209,7 @@ const ReportsDashboard: React.FC = () => {
       case 'events':
         return 'text-blue-600 bg-blue-50 border-blue-200';
       case 'programs':
-        return 'text-green-600 bg-green-50 border-green-200';
+        return 'text-success-600 bg-success-50 border-success-200';
       case 'users':
         return 'text-purple-600 bg-purple-50 border-purple-200';
       case 'financial':
@@ -241,7 +241,7 @@ const ReportsDashboard: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'text-green-600 bg-green-50 border-green-200';
+        return 'text-success-600 bg-success-50 border-success-200';
       case 'processing':
         return 'text-yellow-600 bg-yellow-50 border-yellow-200';
       case 'failed':
@@ -381,7 +381,7 @@ const ReportsDashboard: React.FC = () => {
         <motion.div variants={itemVariants}>
           <Card className="p-5 hover:shadow-sm transition-all duration-200 cursor-pointer border border-gray-100 bg-white">
             <div className="text-center">
-              <Target className="w-6 h-6 text-green-500 mx-auto mb-3" />
+              <Target className="w-6 h-6 text-success-500 mx-auto mb-3" />
               <h3 className="font-medium text-gray-900 mb-2 text-sm">
                 {t('reports.quick.programs', 'البرامج')}
               </h3>

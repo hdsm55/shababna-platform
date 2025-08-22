@@ -144,8 +144,8 @@ const Volunteers: React.FC = () => {
             className="grid md:grid-cols-3 gap-8 mb-12"
           >
             <Card className="text-center p-6 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="w-6 h-6 text-green-600" />
+              <div className="w-12 h-12 bg-success-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="w-6 h-6 text-success-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">مجتمع متطوعين</h3>
               <p className="text-gray-600">
@@ -435,7 +435,7 @@ const Volunteers: React.FC = () => {
                 <div className="text-gray-600">متطوع نشط</div>
               </Card>
               <Card className="text-center p-6">
-                <div className="text-3xl font-bold text-green-600 mb-2">
+                <div className="text-3xl font-bold text-success-600 mb-2">
                   2,500+
                 </div>
                 <div className="text-gray-600">ساعة تطوع</div>

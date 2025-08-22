@@ -1,0 +1,321 @@
+{
+  "nav": {
+    "home": "Home",
+    "events": "Events",
+    "programs": "Programs",
+    "blogs": "Blogs",
+    "joinUs": "Join Us",
+    "contact": "Contact",
+    "login": "Login",
+    "dashboard": "Dashboard",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "breadcrumb": "Dashboard",
+    "sidebar": {
+      "main": "Main",
+      "overview": "Overview",
+      "overviewDesc": "System overview and statistics",
+      "content": "Content Management",
+      "programs": "Programs",
+      "programsDesc": "Manage programs and projects",
+      "events": "Events",
+      "eventsDesc": "Manage events and workshops",
+      "blogs": "Blogs",
+      "blogsDesc": "Manage articles and content",
+      "users": "Users",
+      "usersDesc": "Manage users and permissions",
+      "registrants": "Registrants",
+      "registrantsDesc": "View program and event registrations",
+      "communication": "Communication",
+      "contactForms": "Contact Forms",
+      "contactFormsDesc": "Manage contact messages and inquiries",
+      "analytics": "Analytics & Reports",
+      "analyticsDesc": "Comprehensive system analytics",
+      "reports": "Reports",
+      "reportsDesc": "Detailed reports and statistics",
+      "activities": "Activities",
+      "activitiesDesc": "Activity log and events",
+      "system": "System",
+      "settings": "Settings",
+      "settingsDesc": "System and account settings",
+      "logout": "Logout"
+    }
+  },
+  "home": {
+    "hero": {
+      "badge": "Empowering Youth Worldwide",
+      "title": "Empowering Youth, Building Tomorrow",
+      "subtitle": "Join Shababna Global in creating positive change through innovative programs and community engagement.",
+      "cta": "Get Involved",
+      "learn": "Learn More"
+    },
+    "stats": {
+      "members": "Active Members",
+      "events": "Events Hosted",
+      "countries": "Countries Reached",
+      "programs": "Active Programs",
+      "membersNumber": "1240",
+      "eventsNumber": "87",
+      "countriesNumber": "18",
+      "programsNumber": "12"
+    },
+    "features": {
+      "title": "What We Do",
+      "subtitle": "Discover our comprehensive approach to youth development and community building",
+      "events": {
+        "title": "Events & Workshops",
+        "description": "Interactive sessions, workshops, and networking events designed to develop skills and build connections."
+      },
+      "programs": {
+        "title": "Development Programs",
+        "description": "Long-term programs focused on leadership development, skill building, and community impact."
+      },
+      "community": {
+        "title": "Global Community",
+        "description": "Connect with like-minded youth from around the world and make lasting friendships."
+      }
+    },
+    "latest": {
+      "title": "Latest Updates",
+      "subtitle": "Stay updated with our latest events and programs",
+      "events": "Latest Events",
+      "programs": "Latest Programs",
+      "noEvents": "No upcoming events at the moment.",
+      "noPrograms": "No active programs at the moment.",
+      "viewAll": "View All",
+      "explore": "Explore Programs"
+    },
+    "testimonials": {
+      "title": "What Our Members Say",
+      "subtitle": "Hear from our community members about their experiences",
+      "role1": "Community Member",
+      "role2": "Program Participant",
+      "role3": "Event Organizer",
+      "content1": "Shababna Global has transformed my perspective on community service and leadership. The programs are truly life-changing.",
+      "content2": "I've met incredible people from around the world and learned skills that I use every day in my career and personal life.",
+      "content3": "The events and workshops are well-organized and provide valuable networking opportunities for young professionals."
+    },
+    "newsletter": {
+      "title": "Stay Connected",
+      "subtitle": "Subscribe to our newsletter for the latest updates on events, programs, and community news",
+      "placeholder": "Enter your email address",
+      "cta": "Subscribe",
+      "success": "Thank you for subscribing! We'll keep you updated.",
+      "error": "Something went wrong. Please try again.",
+      "privacy": "We respect your privacy. Unsubscribe at any time.",
+      "badge": "Subscribe to the Newsletter"
+    },
+    "cta": {
+      "title": "Ready to Make a Difference?",
+      "subtitle": "Join thousands of young people who are already making positive changes in their communities",
+      "join": "Join Our Community",
+      "explore": "Explore Events"
+    },
+    "modal": {
+      "title": "Welcome to Shababna Global",
+      "content": "Thank you for your interest in our community. We're excited to have you join us on this journey of growth and positive change."
+    }
+  },
+  "events": {
+    "title": "Upcoming Events",
+    "subtitle": "Discover exciting events and workshops designed for youth development",
+    "hero": {
+      "title": "Our Diverse Events",
+      "subtitle": "Discover our diverse activities in the fields of education, spirituality, and professional development. Join us in making positive change."
+    },
+    "search": {
+      "placeholder": "Search events..."
+    },
+    "filter": {
+      "all": "All Events",
+      "workshop": "Workshops",
+      "conference": "Conferences",
+      "networking": "Networking",
+      "seminar": "Seminars",
+      "training": "Training",
+      "competition": "Competitions",
+      "cultural": "Cultural Events"
+    },
+    "advancedFilters": {
+      "title": "Advanced Filters",
+      "dateRange": "Date Range",
+      "location": "Location",
+      "price": "Price",
+      "status": "Status",
+      "capacity": "Capacity",
+      "duration": "Duration",
+      "organizer": "Organizer",
+      "tags": "Tags",
+      "apply": "Apply Filters",
+      "clear": "Clear Filters",
+      "showMore": "Show More",
+      "showLess": "Show Less"
+    },
+    "filters": {
+      "status": "Status",
+      "category": "Category",
+      "location": "Location",
+      "date": "Date",
+      "price": "Price",
+      "allStatus": "All Status",
+      "upcoming": "Upcoming",
+      "ongoing": "Ongoing",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "allCategories": "All Categories",
+      "allLocations": "All Locations",
+      "allPrices": "All Prices",
+      "free": "Free",
+      "paid": "Paid",
+      "donation": "Optional Donation",
+      "lowPrice": "Low Price",
+      "mediumPrice": "Medium Price",
+      "highPrice": "High Price"
+    },
+    "sort": {
+      "title": "Sort by",
+      "date": "Date",
+      "title": "Title",
+      "price": "Price",
+      "popularity": "Popularity",
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "priceLow": "Price: Low to High",
+      "priceHigh": "Price: High to Low"
+    },
+    "results": "Found {{count}} events",
+    "noResults": "No events found matching your search criteria",
+    "noResultsDesc": "Try adjusting your filters or search terms",
+    "register": "Register Now",
+    "completed": "Completed",
+    "full": "Full",
+    "learnMore": "Learn More",
+    "registration": {
+      "title": "Register for Event",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone Number",
+      "submit": "Confirm Registration",
+      "success": "Registration Successful!",
+      "successMessage": "Thank you! You have been successfully registered for the event. You will receive a confirmation email shortly.",
+      "registerAnother": "Register Another",
+      "unavailable": "Registration Unavailable",
+      "completedMessage": "Cannot register for a completed event",
+      "fullMessage": "Event is full and registration is not available"
+    },
+    "date": "Date",
+    "location": "Location",
+    "category": "Category",
+    "notFound": "Sorry, this event could not be found.",
+    "viewDetails": "View Details",
+    "seo": {
+      "title": "Events - Shababna Global Platform",
+      "description": "Discover our diverse activities in the fields of education, spirituality, and professional development."
+    },
+    "cta": {
+      "title": "Join Us in Making Change",
+      "subtitle": "Be part of a global Islamic youth community that innovates and impacts the world",
+      "join": "Join Us Now",
+      "contact": "Contact Us"
+    }
+  },
+  "programs": {
+    "title": "Our Programs",
+    "subtitle": "Comprehensive programs designed to develop the next generation of leaders",
+    "filter": {
+      "all": "All Programs",
+      "education": "Education",
+      "technology": "Technology",
+      "entrepreneurship": "Entrepreneurship",
+      "volunteering": "Volunteering"
+    },
+    "results": "Found {{count}} programs",
+    "support": "Support This Program",
+    "sponsor": "Become a Sponsor",
+    "volunteer": "Volunteer",
+    "notFound": "Sorry, this program could not be found."
+  },
+  "joinUs": {
+    "title": "Join Our Community",
+    "subtitle": "Become part of a global network of young changemakers",
+    "form": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "country": "Country",
+      "age": "Age",
+      "interests": "Areas of Interest",
+      "motivation": "Why do you want to join us?",
+      "submit": "Submit Application",
+      "send": "Send Application"
+    }
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "We'd love to hear from you. Send us a message and we'll respond as soon as possible.",
+    "form": {
+      "name": "Full Name",
+      "email": "Email Address",
+      "subject": "Subject",
+      "message": "Message",
+      "send": "Send Message"
+    },
+    "info": {
+      "address": "123 Youth Street, Global City",
+      "phone": "+1 (555) 123-4567",
+      "email": "info@shababnaglobal.org"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to your account",
+      "email": "Email Address",
+      "password": "Password",
+      "submit": "Sign In",
+      "noAccount": "Don't have an account?",
+      "register": "Register here"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Join our community",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "submit": "Create Account",
+      "hasAccount": "Already have an account?",
+      "login": "Sign in here"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "learnMore": "Learn More",
+    "close": "Close",
+    "error": {
+      "title": "An error occurred",
+      "message": "An unexpected error occurred. Please try again later."
+    },
+    "retry": "Try Again",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "back": "Back",
+    "backToEvents": "Back to Events",
+    "backToPrograms": "Back to Programs",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "apply": "Apply"
+  }
+}
+

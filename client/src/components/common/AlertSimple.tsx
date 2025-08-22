@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, Info } from 'lucide-react';
+import { CheckCircle, Info, XCircle, AlertCircle, X } from 'lucide-react';
 
 interface AlertProps {
   type?: 'success' | 'error' | 'warning' | 'info';
@@ -11,9 +11,9 @@ interface AlertProps {
 
 const alertStyles = {
   success: {
-    container: 'bg-green-50 border-green-200 text-green-800',
+    container: 'bg-success-50 border-success-200 text-success-800',
     icon: CheckCircle,
-    iconColor: 'text-green-400',
+    iconColor: 'text-success-400',
   },
   error: {
     container: 'bg-red-50 border-red-200 text-red-800',

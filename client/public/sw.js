@@ -1,4 +1,29 @@
 // Service Worker for Shababna Platform
+const IS_LOCALHOST = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
+
+// In development, disable the Service Worker entirely to avoid caching Vite dev modules
+if (IS_LOCALHOST) {
+    self.addEventListener('install', (event) => {
+        self.skipWaiting();
+    });
+
+    self.addEventListener('activate', (event) => {
+        event.waitUntil(
+            (async () => {
+                try {
+                    await self.registration.unregister();
+                    const allClients = await self.clients.matchAll({ type: 'window' });
+                    allClients.forEach((client) => client.navigate(client.url));
+                } catch (_) { }
+            })()
+        );
+    });
+
+    // No fetch handling in dev
+    self.addEventListener('fetch', () => { });
+
+    console.log('Service Worker disabled on localhost to prevent dev caching issues');
+}
 const CACHE_NAME = 'shababna-v1.0.0';
 const STATIC_CACHE = 'shababna-static-v1.0.0';
 const DYNAMIC_CACHE = 'shababna-dynamic-v1.0.0';
@@ -28,7 +53,9 @@ const ALLOWED_DOMAINS = [
     'tiles.mapbox.com',
     'shababna-platform.onrender.com',
     'localhost:5000',
-    '127.0.0.1:5000'
+    '127.0.0.1:5000',
+    'localhost:5173',
+    '127.0.0.1:5173'
 ];
 
 // Install event
@@ -131,7 +158,7 @@ async function handleExternalResource(request) {
     } catch (error) {
         console.warn('Failed to fetch external resource:', request.url, error);
 
-        // Return a fallback response for fonts
+        // Return a fallback response for fonts (allow page to render without blocking)
         if (request.url.includes('fonts.googleapis.com') || request.url.includes('fonts.gstatic.com')) {
             return new Response('', {
                 status: 200,

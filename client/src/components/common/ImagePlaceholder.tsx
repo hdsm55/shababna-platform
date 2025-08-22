@@ -48,10 +48,36 @@ const ImagePlaceholder: React.FC<ImagePlaceholderProps> = ({
     if (type === 'event') {
       return 'فعاليات شبابنا';
     } else {
-      return 'برامج شبابنا';
+      return 'البرامج';
     }
   };
 
+  // للبرامج، استخدم الصورة الجديدة
+  if (type === 'program') {
+    const placeholderSrc =
+      size === 'lg'
+        ? '/images/program-placeholder-large.jpg'
+        : '/images/program-placeholder.jpg';
+
+    return (
+      <motion.div
+        className={`relative ${sizeClasses[size]} rounded-lg overflow-hidden ${className}`}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <img
+          src={placeholderSrc}
+          alt={getText()}
+          className="w-full h-full object-cover"
+        />
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none"></div>
+      </motion.div>
+    );
+  }
+
+  // للفعاليات، استخدم التصميم الأصلي
   return (
     <motion.div
       className={`relative ${

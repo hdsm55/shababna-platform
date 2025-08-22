@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload } from 'lucide-react';
+import { Upload, Image as ImageIcon, X } from 'lucide-react';
 import { Button } from '../ui/Button/Button';
 import Alert from './Alert';
 
@@ -159,6 +159,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 src={preview}
                 alt="Preview"
                 className="w-full h-48 object-cover rounded-lg"
+                loading="lazy"
+                decoding="async"
               />
               <button
                 type="button"

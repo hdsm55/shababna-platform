@@ -1,0 +1,69 @@
+{
+  "@context": "https://schema.org",
+  "@type": "NonProfit",
+  "name": "منظمة شبابنا العالمية",
+  "alternateName": "Shababna Global Organization",
+  "description": "منصة شبابية عالمية للتنمية والتطوير. تمكين الشباب لبناء مستقبل أفضل من خلال برامج مبتكرة ومشاركة مجتمعية.",
+  "url": "https://shababnaglobal.org",
+  "logo": "https://shababnaglobal.org/images/logo.jpg",
+  "image": "https://shababnaglobal.org/images/hero-bg.jpg",
+  "foundingDate": "2020",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "الرياض",
+    "addressCountry": "SA",
+    "addressRegion": "الرياض"
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+966501234567",
+    "email": "info@shababnaglobal.org",
+    "contactType": "customer service",
+    "availableLanguage": ["Arabic", "English"]
+  },
+  "sameAs": [
+    "https://facebook.com/shababnaglobal",
+    "https://twitter.com/shababnaglobal",
+    "https://instagram.com/shababnaglobal",
+    "https://linkedin.com/company/shababnaglobal"
+  ],
+  "areaServed": {
+    "@type": "Country",
+    "name": "Saudi Arabia"
+  },
+  "serviceArea": {
+    "@type": "Country",
+    "name": "Worldwide"
+  },
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "برامج الشباب",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "برامج التطوير القيادي",
+          "description": "برامج لتنمية مهارات القيادة لدى الشباب"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "برامج التطوع",
+          "description": "فرص التطوع في المشاريع المجتمعية"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "برامج التنمية المجتمعية",
+          "description": "مشاريع لتنمية المجتمعات المحلية"
+        }
+      }
+    ]
+  },
+  "keywords": "منظمة شبابنا العالمية, شبابنا العالمية, تمكين الشباب, التنمية المجتمعية, الشباب العالمي, تطوير القيادة, التأثير الاجتماعي, فرص التطوع, برامج الشباب, المجتمع الدولي"
+}

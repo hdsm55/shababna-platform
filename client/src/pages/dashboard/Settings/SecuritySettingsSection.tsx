@@ -29,9 +29,9 @@ const SecuritySettingsSection: React.FC<SecuritySettingsSectionProps> = ({
       )}
     </div>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div className="p-4 bg-green-50 rounded-lg">
+      <div className="p-4 bg-success-50 rounded-lg">
         <div className="flex items-center mb-2">
-          <CheckCircle className="w-5 h-5 text-green-600 mr-2 rtl:ml-2 rtl:mr-0" />
+          <CheckCircle className="w-5 h-5 text-success-600 mr-2 rtl:ml-2 rtl:mr-0" />
           <h3 className="font-medium text-green-900">المصادقة الثنائية</h3>
         </div>
         <p className="text-sm text-green-700">

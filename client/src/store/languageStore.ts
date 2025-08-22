@@ -7,14 +7,14 @@ interface LanguageState {
   setLanguage: (lang: 'ar' | 'en' | 'tr') => void;
 }
 
-export const useLanguageStore = create<LanguageState>()(
+export const useLanguageStore = create<LanguageState>(
   persist(
     (set) => ({
       language: 'ar',
       isRTL: true,
-      setLanguage: (lang) => set({ 
-        language: lang, 
-        isRTL: lang === 'ar' 
+      setLanguage: (lang) => set({
+        language: lang,
+        isRTL: lang === 'ar'
       }),
     }),
     {

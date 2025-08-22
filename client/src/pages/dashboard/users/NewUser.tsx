@@ -129,7 +129,7 @@ const NewUser: React.FC = () => {
             إضافة المستخدم
           </button>
           {success && (
-            <div className="text-green-600 text-center font-semibold mt-2">
+            <div className="text-success-600 text-center font-semibold mt-2">
               تمت إضافة المستخدم بنجاح!
             </div>
           )}

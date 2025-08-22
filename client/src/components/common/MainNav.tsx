@@ -99,8 +99,8 @@ const MainNav: React.FC = () => {
           tabIndex={0}
         >
           <img
-            src="/images/logo.png"
-            alt="شبابنا - الشعار"
+            src="/images/logo.jpg"
+            alt="منظمة شبابنا العالمية - الشعار"
             className="h-10 w-auto object-contain"
             style={{ maxHeight: 40 }}
           />

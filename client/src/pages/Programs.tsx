@@ -28,8 +28,14 @@ import { Button } from '../components/ui/Button/ButtonSimple';
 import { Card } from '../components/ui/Card/Card';
 import { Input } from '../components/ui/Input/InputSimple';
 import { Modal } from '../components/ui/Modal/ModalSimple';
-import CenteredLoader from '../components/common/CenteredLoader';
+// import CenteredLoader from '../components/common/CenteredLoader';
 import { useDebounce } from '../hooks/useDebounce';
+import {
+  formatEventDate,
+  formatEventTime,
+  formatEventDateShort,
+  formatEventDateFull,
+} from '../utils/dateUtils';
 
 const Programs: React.FC = () => {
   const { t } = useTranslation();
@@ -52,7 +58,7 @@ const Programs: React.FC = () => {
       key: 'education',
       label: t('programs.filter.education', 'التعليم'),
       icon: '📚',
-      color: 'green',
+      color: 'success',
     },
     {
       key: 'health',
@@ -104,21 +110,18 @@ const Programs: React.FC = () => {
     refetchOnWindowFocus: true,
   });
 
-  const programs = programsData?.data?.programs || [];
+  const programs =
+    programsData?.data?.programs || programsData?.data?.events || [];
   const pagination = programsData?.data?.pagination;
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    return formatEventDate(dateString);
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-success-100 text-success-800 border-success-200';
       case 'completed':
         return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'paused':
@@ -158,7 +161,7 @@ const Programs: React.FC = () => {
 
   const getCategoryColor = (category: string) => {
     const colorMap: { [key: string]: string } = {
-      education: 'bg-green-100 text-green-800',
+      education: 'bg-success-100 text-success-800',
       health: 'bg-red-100 text-red-800',
       environment: 'bg-emerald-100 text-emerald-800',
       community: 'bg-purple-100 text-purple-800',
@@ -176,6 +179,11 @@ const Programs: React.FC = () => {
 
   const calculateProgress = (current: number, goal: number) => {
     return Math.min((current / goal) * 100, 100);
+  };
+
+  // Handle donation click
+  const handleDonationClick = (program: Program) => {
+    navigate(`/programs/${program.id}?section=donate`);
   };
 
   const containerVariants = {
@@ -423,24 +431,22 @@ const Programs: React.FC = () => {
                       className="h-full overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500"
                     >
                       {/* Program Image/Header */}
-                      <div className="relative h-56 bg-gradient-to-br from-slate-600 via-blue-600 to-slate-700 overflow-hidden">
-                        {/* Background Pattern */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-slate-600/50 via-blue-600/50 to-slate-700/50"></div>
-
-                        {/* Overlay */}
+                      <div className="relative h-56 overflow-hidden">
+                        <img
+                          src={
+                            program.image_url ||
+                            '/images/program-placeholder.jpg'
+                          }
+                          alt={program.title}
+                          className="absolute inset-0 w-full h-full object-cover"
+                          loading="lazy"
+                          onError={(e) => {
+                            const img = e.currentTarget as HTMLImageElement;
+                            img.onerror = null;
+                            img.src = '/images/program-placeholder.jpg';
+                          }}
+                        />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-
-                        {/* Category Icon */}
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="text-center text-white">
-                            <div className="text-4xl mb-3 drop-shadow-lg">
-                              {getCategoryIcon(program.category)}
-                            </div>
-                            <p className="text-lg font-medium drop-shadow-md">
-                              {program.category || 'برنامج'}
-                            </p>
-                          </div>
-                        </div>
 
                         {/* Status Badge */}
                         <div className="absolute top-4 right-4">
@@ -489,7 +495,7 @@ const Programs: React.FC = () => {
                               size="sm"
                               title={program.title}
                               description={program.description}
-                              image={program.image}
+                              image={program.image || program.image_url}
                               url={`${window.location.origin}/programs/${program.id}`}
                               className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30"
                             />
@@ -520,7 +526,7 @@ const Programs: React.FC = () => {
                           <div className="flex items-center gap-3 text-gray-600">
                             <MapPin className="w-4 h-4 text-red-500 flex-shrink-0" />
                             <span className="line-clamp-1 font-medium">
-                              {program.location}
+                              {program.location || 'غير محدد'}
                             </span>
                           </div>
                           <div className="flex items-center gap-3 text-gray-600">
@@ -543,7 +549,7 @@ const Programs: React.FC = () => {
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
                               <div
-                                className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full transition-all duration-500 ease-out"
+                                className="bg-gradient-to-r from-success-500 to-success-600 h-2 rounded-full transition-all duration-500 ease-out"
                                 style={{
                                   width: `${calculateProgress(
                                     program.current_amount || 0,
@@ -568,7 +574,7 @@ const Programs: React.FC = () => {
                         <div className="pt-4 space-y-3">
                           <Button
                             variant="primary"
-                            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium py-3"
+                            className="w-full bg-gradient-to-r from-success-600 to-success-700 hover:from-success-700 hover:to-success-800 text-white font-medium py-3"
                             onClick={() => handleDonationClick(program)}
                           >
                             <DollarSign className="w-4 h-4 mr-2" />

@@ -299,7 +299,7 @@ const BlogsDashboard: React.FC = () => {
           title="نجح العملية! 🎉"
         >
           <div className="text-center py-6">
-            <div className="text-green-600 text-lg mb-6 whitespace-pre-line">
+            <div className="text-success-600 text-lg mb-6 whitespace-pre-line">
               {modalMsg}
             </div>
             <div className="flex justify-center gap-3">

@@ -1,12 +1,17 @@
 import { defineConfig } from 'vite'
+import path from 'path'
 import react from '@vitejs/plugin-react'
 import { splitVendorChunkPlugin } from 'vite'
+import viteCompression from 'vite-plugin-compression'
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     splitVendorChunkPlugin(),
+    // Generate pre-compressed assets for production (Brotli + Gzip)
+    viteCompression({ algorithm: 'brotliCompress', ext: '.br', deleteOriginFile: false, threshold: 1024 }),
+    viteCompression({ algorithm: 'gzip', ext: '.gz', deleteOriginFile: false, threshold: 1024 }),
   ],
   optimizeDeps: {
     exclude: ['lucide-react'],
@@ -22,7 +27,20 @@ export default defineConfig({
       'react-helmet-async'
     ],
     // تحسين التبعيات
-    force: false,
+    force: true,
+    esbuildOptions: {
+      target: 'es2020',
+    },
+  },
+  resolve: {
+    // Ensure only one copy of these libs is used
+    dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom'],
+    alias: {
+      react: path.resolve(__dirname, 'node_modules/react'),
+      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+      'react-router': path.resolve(__dirname, 'node_modules/react-router'),
+      'react-router-dom': path.resolve(__dirname, 'node_modules/react-router-dom'),
+    },
   },
   define: {
     // Expose environment variables to the client
@@ -38,6 +56,8 @@ export default defineConfig({
     minifyIdentifiers: true,
     minifySyntax: true,
     minifyWhitespace: true,
+    // Strip debug code only in production
+    drop: mode === 'production' ? ['console', 'debugger'] : [],
   },
   server: {
     proxy: {
@@ -51,10 +71,10 @@ export default defineConfig({
       'Content-Security-Policy': [
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-        "font-src 'self' https://fonts.gstatic.com",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com",
+        "font-src 'self' https://fonts.gstatic.com data:",
         "img-src 'self' data: https: blob:",
-        "connect-src 'self' http://localhost:5000 http://127.0.0.1:5000 https://shababna-platform.onrender.com https://*.onrender.com https://*.render.com",
+        "connect-src 'self' http://localhost:5000 http://127.0.0.1:5000 ws://localhost:* ws://127.0.0.1:* https://shababna-platform.onrender.com https://*.onrender.com https://*.render.com https://fonts.googleapis.com https://fonts.gstatic.com",
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
@@ -64,6 +84,8 @@ export default defineConfig({
     // تحسين سرعة التطوير
     hmr: {
       overlay: false, // إزالة overlay الأخطاء لتحسين الأداء
+      clientPort: 5173,
+      host: 'localhost'
     },
     // تحسين الأداء
     fs: {
@@ -75,58 +97,59 @@ export default defineConfig({
       output: {
         // تحسين تقسيم الباندل - تقسيم أكثر دقة
         manualChunks: (id) => {
+          const normalizedId = id.split('\\').join('/');
           // Core React libraries
-          if (id.includes('react') && !id.includes('react-router')) {
+          if (normalizedId.includes('react') && !normalizedId.includes('react-router')) {
             return 'react-core';
           }
 
           // Router
-          if (id.includes('react-router')) {
+          if (normalizedId.includes('react-router')) {
             return 'router';
           }
 
           // UI Libraries
-          if (id.includes('framer-motion') || id.includes('lucide-react')) {
+          if (normalizedId.includes('framer-motion') || normalizedId.includes('lucide-react')) {
             return 'ui-libs';
           }
 
           // State Management
-          if (id.includes('@tanstack/react-query') || id.includes('zustand')) {
+          if (normalizedId.includes('@tanstack/react-query') || normalizedId.includes('zustand')) {
             return 'state-management';
           }
 
           // Internationalization
-          if (id.includes('react-i18next') || id.includes('i18next')) {
+          if (normalizedId.includes('react-i18next') || normalizedId.includes('i18next')) {
             return 'i18n';
           }
 
           // Dashboard pages - separate chunk
-          if (id.includes('/dashboard/')) {
+          if (normalizedId.includes('/dashboard/')) {
             return 'dashboard';
           }
 
           // Auth pages - separate chunk
-          if (id.includes('/auth/')) {
+          if (normalizedId.includes('/auth/')) {
             return 'auth';
           }
 
           // Public pages - separate chunk
-          if (id.includes('/pages/') && !id.includes('/dashboard/') && !id.includes('/auth/')) {
+          if (normalizedId.includes('/pages/') && !normalizedId.includes('/dashboard/') && !normalizedId.includes('/auth/')) {
             return 'public-pages';
           }
 
           // Components - separate chunk
-          if (id.includes('/components/')) {
+          if (normalizedId.includes('/components/')) {
             return 'components';
           }
 
           // Services - separate chunk
-          if (id.includes('/services/')) {
+          if (normalizedId.includes('/services/')) {
             return 'services';
           }
 
           // Utils - separate chunk
-          if (id.includes('/utils/') || id.includes('/hooks/')) {
+          if (normalizedId.includes('/utils/') || normalizedId.includes('/hooks/')) {
             return 'utils';
           }
         },
@@ -159,6 +182,7 @@ export default defineConfig({
     // تحسين الأمان
     minify: 'esbuild',
     target: 'es2015',
+    cssCodeSplit: true,
     // تحسين الأداء
     reportCompressedSize: false, // تسريع البناء
     emptyOutDir: true,
@@ -182,4 +206,4 @@ export default defineConfig({
   // تحسين التطوير
   clearScreen: false,
   logLevel: 'info',
-})
+}))

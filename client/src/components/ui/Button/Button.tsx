@@ -38,7 +38,7 @@ const buttonVariants = {
   outline:
     'bg-transparent border-2 border-blue-600 text-blue-600 hover:bg-blue-50 transition-all duration-200',
   success:
-    'bg-green-600 text-white hover:bg-green-700 shadow-md hover:shadow-lg transition-all duration-300',
+    'bg-success-500 text-white hover:bg-success-600 shadow-md hover:shadow-lg transition-all duration-300',
   error:
     'bg-red-600 text-white hover:bg-red-700 shadow-md hover:shadow-lg transition-all duration-300',
   warning:

@@ -31,7 +31,10 @@ const SmartImage: React.FC<SmartImageProps> = ({
     if (type === 'event') {
       return '/images/event-placeholder.svg';
     } else {
-      return '/images/program-placeholder.svg';
+      // استخدام الصورة الجديدة للبرامج
+      return size === 'lg'
+        ? '/images/program-placeholder-large.jpg'
+        : '/images/program-placeholder.jpg';
     }
   };
 

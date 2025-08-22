@@ -18,7 +18,7 @@ interface QuickActionsProps {
 
 const colorMap: Record<string, string> = {
   primary: 'border-blue-300 text-blue-500 hover:bg-blue-50',
-  success: 'border-green-300 text-green-500 hover:bg-green-50',
+  success: 'border-success-300 text-success-500 hover:bg-success-50',
   warning: 'border-yellow-200 text-yellow-500 hover:bg-yellow-50',
   info: 'border-blue-300 text-blue-500 hover:bg-blue-50',
 };
