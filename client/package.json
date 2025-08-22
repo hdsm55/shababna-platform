@@ -16,7 +16,7 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "clean-imports": "node scripts/clean-imports.js",
-    "postbuild": "cp static.json dist/ && cp public/_headers dist/ && cp public/_redirects dist/"
+    "postbuild": "node -e \"const fs = require('fs'); fs.copyFileSync('static.json', 'dist/static.json'); fs.copyFileSync('public/_headers', 'dist/_headers'); fs.copyFileSync('public/_redirects', 'dist/_redirects');\""
   },
   "dependencies": {
     "@tanstack/react-query": "^5.0.0",

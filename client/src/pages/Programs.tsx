@@ -8,16 +8,12 @@ import {
   MapPin,
   Users,
   Search,
-  Clock,
   Info,
   Filter,
   Eye,
   Heart,
-  ArrowRight,
   ChevronDown,
-  Target,
   DollarSign,
-  TrendingUp,
 } from 'lucide-react';
 import ShareButtons from '../components/common/ShareButtons';
 
@@ -27,20 +23,17 @@ import SEO from '../components/common/SEO';
 import { Button } from '../components/ui/Button/ButtonSimple';
 import { Card } from '../components/ui/Card/Card';
 import { Input } from '../components/ui/Input/InputSimple';
-import { Modal } from '../components/ui/Modal/ModalSimple';
+// import { Modal } from '../components/ui/Modal/ModalSimple';
 // import CenteredLoader from '../components/common/CenteredLoader';
 import { useDebounce } from '../hooks/useDebounce';
 import {
   formatEventDate,
-  formatEventTime,
-  formatEventDateShort,
-  formatEventDateFull,
 } from '../utils/dateUtils';
 
 const Programs: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -111,7 +104,7 @@ const Programs: React.FC = () => {
   });
 
   const programs =
-    programsData?.data?.programs || programsData?.data?.events || [];
+    programsData?.data?.programs || programsData?.data || [];
   const pagination = programsData?.data?.pagination;
 
   const formatDate = (dateString: string) => {
@@ -148,16 +141,16 @@ const Programs: React.FC = () => {
     }
   };
 
-  const getCategoryIcon = (category: string) => {
-    const categoryMap: { [key: string]: string } = {
-      education: '📚',
-      health: '🏥',
-      environment: '🌱',
-      community: '🤝',
-      technology: '💻',
-    };
-    return categoryMap[category] || '🎯';
-  };
+  // const getCategoryIcon = (category: string) => {
+  //   const categoryMap: { [key: string]: string } = {
+  //     education: '📚',
+  //     health: '🏥',
+  //     environment: '🌱',
+  //     community: '🤝',
+  //     technology: '💻',
+  //   };
+  //   return categoryMap[category] || '🎯';
+  // };
 
   const getCategoryColor = (category: string) => {
     const colorMap: { [key: string]: string } = {
@@ -418,7 +411,7 @@ const Programs: React.FC = () => {
                 animate="visible"
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
               >
-                {programs.map((program: Program, index: number) => (
+                {programs.map((program: Program, _index: number) => (
                   <motion.div
                     key={program.id}
                     variants={itemVariants}
