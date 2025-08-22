@@ -7,14 +7,17 @@ import viteCompression from 'vite-plugin-compression'
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   plugins: [
-    react(),
+    react({
+      // تحسين إعدادات React
+      jsxRuntime: 'automatic',
+      jsxImportSource: undefined,
+    }),
     splitVendorChunkPlugin(),
     // Generate pre-compressed assets for production (Brotli + Gzip)
     viteCompression({ algorithm: 'brotliCompress', ext: '.br', deleteOriginFile: false, threshold: 1024 }),
     viteCompression({ algorithm: 'gzip', ext: '.gz', deleteOriginFile: false, threshold: 1024 }),
   ],
   optimizeDeps: {
-    exclude: ['lucide-react'],
     include: [
       'react',
       'react-dom',

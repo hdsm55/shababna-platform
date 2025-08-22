@@ -15,7 +15,8 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "clean-imports": "node scripts/clean-imports.js"
+    "clean-imports": "node scripts/clean-imports.js",
+    "postbuild": "cp static.json dist/ && cp public/_headers dist/ && cp public/_redirects dist/"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.0.0",
