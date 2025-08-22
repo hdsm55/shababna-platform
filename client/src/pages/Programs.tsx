@@ -26,9 +26,7 @@ import { Input } from '../components/ui/Input/InputSimple';
 // import { Modal } from '../components/ui/Modal/ModalSimple';
 // import CenteredLoader from '../components/common/CenteredLoader';
 import { useDebounce } from '../hooks/useDebounce';
-import {
-  formatEventDate,
-} from '../utils/dateUtils';
+import { formatEventDate } from '../utils/dateUtils';
 
 const Programs: React.FC = () => {
   const { t } = useTranslation();
@@ -103,8 +101,7 @@ const Programs: React.FC = () => {
     refetchOnWindowFocus: true,
   });
 
-  const programs =
-    programsData?.data?.programs || programsData?.data || [];
+  const programs = programsData?.data?.programs || programsData?.data || [];
   const pagination = programsData?.data?.pagination;
 
   const formatDate = (dateString: string) => {
