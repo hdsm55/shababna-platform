@@ -4,7 +4,13 @@ import App from './App.tsx';
 import './index.css';
 import './i18n';
 
-const root = createRoot(document.getElementById('root')!);
+// تأكد من وجود العنصر قبل إنشاء React root
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error('Failed to find the root element');
+}
+
+const root = createRoot(rootElement);
 
 root.render(
   <React.StrictMode>
