@@ -2,7 +2,7 @@
 /*    /index.html   200
 
 # API Proxy - Redirect API calls to backend
-/api/*  https://shababna-platform-backend.onrender.com/api/:splat  200
+/api/*  https://shababna-backend-new.onrender.com/api/:splat  200
 
 # Static assets
 /assets/*  /assets/:splat  200
