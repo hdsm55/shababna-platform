@@ -16,7 +16,7 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "clean-imports": "node scripts/clean-imports.js",
-    "postbuild": "node -e \"const fs = require('fs'); fs.copyFileSync('static.json', 'dist/static.json'); fs.copyFileSync('public/_headers', 'dist/_headers'); fs.copyFileSync('public/_redirects', 'dist/_redirects');\""
+    "postbuild": "node -e \"const fs = require('fs'); const path = require('path'); try { fs.copyFileSync('static.json', 'dist/static.json'); console.log('✅ static.json copied'); } catch(e) { console.log('⚠️ static.json not found'); } try { fs.copyFileSync('public/_headers', 'dist/_headers'); console.log('✅ _headers copied'); } catch(e) { console.log('⚠️ _headers not found'); } try { fs.copyFileSync('public/_redirects', 'dist/_redirects'); console.log('✅ _redirects copied'); } catch(e) { console.log('⚠️ _redirects not found'); }\""
   },
   "dependencies": {
     "@tanstack/react-query": "^5.0.0",

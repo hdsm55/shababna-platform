@@ -31,12 +31,19 @@ export default defineConfig(({ mode }) => ({
       'react-i18next',
       'i18next',
       'zustand',
-      'react-helmet-async'
+      'react-helmet-async',
+      'axios',
+      'clsx',
+      'jwt-decode',
+      'lucide-react'
     ],
     // تحسين التبعيات
     force: true,
     esbuildOptions: {
       target: 'es2020',
+      define: {
+        global: 'globalThis',
+      },
     },
   },
   resolve: {
@@ -63,6 +70,13 @@ export default defineConfig(({ mode }) => ({
     minifyWhitespace: true,
     // Strip debug code only in production
     drop: mode === 'production' ? ['console', 'debugger'] : [],
+    // إضافة define لحل مشاكل global
+    define: {
+      global: 'globalThis',
+    },
+    // إعدادات إضافية لتحسين التوافق
+    format: 'esm',
+    platform: 'browser',
   },
   server: {
     proxy: {
@@ -75,7 +89,7 @@ export default defineConfig(({ mode }) => ({
     headers: {
       'Content-Security-Policy': [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com",
         "font-src 'self' https://fonts.gstatic.com data:",
         "img-src 'self' data: https: blob:",
@@ -83,7 +97,8 @@ export default defineConfig(({ mode }) => ({
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
-        "frame-ancestors 'none'"
+        "frame-ancestors 'none'",
+        "worker-src 'self' blob:"
       ].join('; ')
     },
     // تحسين سرعة التطوير
@@ -191,12 +206,15 @@ export default defineConfig(({ mode }) => ({
     // تحسين الأداء
     reportCompressedSize: false, // تسريع البناء
     emptyOutDir: true,
-    // تحسين التحميل
-    modulePreload: {
-      polyfill: false,
-    },
+    // تحسين التحميل - تعطيل module preload لتجنب مشاكل التحميل
+    modulePreload: false,
     // تحسين التخزين المؤقت
     assetsInlineLimit: 4096,
+    // إعدادات إضافية لتحسين الاستقرار
+    commonjsOptions: {
+      include: [/node_modules/],
+      transformMixedEsModules: true,
+    },
   },
   base: '/',
   // Add preview configuration for SPA routing

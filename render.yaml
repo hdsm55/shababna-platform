@@ -2,7 +2,7 @@ services:
   - type: web
     name: shababna-platform-frontend
     env: static
-    buildCommand: cd client && npm ci && npm run build
+    buildCommand: cd client && npm ci && npm run build && npm run postbuild
     staticPublishPath: ./client/dist
     envVars:
       - key: NODE_ENV
