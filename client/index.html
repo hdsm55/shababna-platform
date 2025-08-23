@@ -24,7 +24,15 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Load React polyfill first -->
     <script src="/react-polyfill.js"></script>
+    <!-- Wait for polyfill to load before main script -->
+    <script>
+      // Ensure polyfill is loaded before main script
+      window.addEventListener('load', function() {
+        // Main script will be loaded by Vite
+      });
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

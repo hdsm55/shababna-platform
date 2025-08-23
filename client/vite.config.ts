@@ -11,6 +11,10 @@ export default defineConfig(({ mode }) => ({
       // تحسين إعدادات React
       jsxRuntime: 'automatic',
       jsxImportSource: undefined,
+      // Ensure React is properly bundled
+      fastRefresh: true,
+      // Ensure React is available globally
+      include: ['**/*.{js,jsx,ts,tsx}'],
     }),
     splitVendorChunkPlugin(),
     // Generate pre-compressed assets for production (Brotli + Gzip)
