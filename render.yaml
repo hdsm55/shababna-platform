@@ -2,15 +2,15 @@ services:
   - type: web
     name: shababna-platform-frontend
     env: static
-    buildCommand: cd client && npm ci && npm run build && npm run postbuild
+    buildCommand: cd client && npm install && npm run build
     staticPublishPath: ./client/dist
     envVars:
       - key: NODE_ENV
         value: production
       - key: VITE_API_URL
-        value: https://shababna-platform-backend.onrender.com/api
+        value: https://shababna-backend.onrender.com/api
       - key: VITE_PRODUCTION_API_URL
-        value: https://shababna-platform-backend.onrender.com/api
+        value: https://shababna-backend.onrender.com/api
     headers:
       - path: /*
         name: X-Frame-Options
@@ -30,37 +30,37 @@ services:
       - path: /assets/*
         name: Cache-Control
         value: public, max-age=31536000, immutable
-      - path: /*.js
+      - path: /**/*.js
         name: Cache-Control
         value: public, max-age=31536000, immutable
-      - path: /*.css
+      - path: /**/*.css
         name: Cache-Control
         value: public, max-age=31536000, immutable
-      - path: /*.png
+      - path: /**/*.png
         name: Cache-Control
         value: public, max-age=31536000, immutable
-      - path: /*.jpg
+      - path: /**/*.jpg
         name: Cache-Control
         value: public, max-age=31536000, immutable
-      - path: /*.svg
+      - path: /**/*.svg
         name: Cache-Control
         value: public, max-age=31536000, immutable
-      - path: /*.ico
+      - path: /**/*.ico
         name: Cache-Control
         value: public, max-age=31536000, immutable
-      - path: /*.woff
+      - path: /**/*.woff
         name: Cache-Control
         value: public, max-age=31536000, immutable
-      - path: /*.woff2
+      - path: /**/*.woff2
         name: Cache-Control
         value: public, max-age=31536000, immutable
-      - path: /*.ttf
+      - path: /**/*.ttf
         name: Cache-Control
         value: public, max-age=31536000, immutable
-      - path: /*.eot
+      - path: /**/*.eot
         name: Cache-Control
         value: public, max-age=31536000, immutable
-      - path: /locales/*
+      - path: /locales/**
         name: Cache-Control
         value: public, max-age=31536000, immutable
     routes:
