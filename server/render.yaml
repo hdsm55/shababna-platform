@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: shababna-backend
+    name: shababna-platform-backend
     env: node
     plan: free
-    buildCommand: npm install
+    buildCommand: npm ci
     startCommand: npm start
     envVars:
       - key: NODE_ENV
@@ -25,6 +25,6 @@ services:
       - key: JWT_EXPIRES_IN
         value: 7d
       - key: CLIENT_URL
-        value: https://shababna-frontend.onrender.com
+        value: https://shababna-platform-frontend.onrender.com
       - key: FRONTEND_URL
-        value: https://shababna-frontend.onrender.com
+        value: https://shababna-platform-frontend.onrender.com

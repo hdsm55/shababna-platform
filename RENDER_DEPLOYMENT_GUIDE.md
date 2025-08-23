@@ -1,165 +1,136 @@
-# دليل النشر على Render.com - منصة شبابنا العالمية
+# دليل النشر على Render
 
-## 🚀 الخطوة الأولى: إعداد قاعدة البيانات
+## المشكلة المكتشفة
 
-### 1. إنشاء قاعدة البيانات PostgreSQL
+كان هناك تضارب في أسماء الخدمات وعناوين URL بين Frontend و Backend.
 
-1. **اذهب إلى [Render Dashboard](https://dashboard.render.com)**
-2. **انقر على "New" → "Postgres"**
-3. **أدخل البيانات التالية:**
+## الحل المطبق
 
-```
-Name: shababna-db
-Database: shababna
-User: shababna_user
-Region: Frankfurt (أقرب لمنطقة الشرق الأوسط)
-Plan: Free (للبداية)
-```
+### 1. تحديث أسماء الخدمات
 
-### 2. نسخ بيانات الاتصال
+- **Frontend**: `shababna-platform-frontend`
+- **Backend**: `shababna-platform-backend`
 
-بعد إنشاء قاعدة البيانات، ستحصل على:
+### 2. عناوين URL المحدثة
 
-- **Internal Database URL**: `postgresql://user:pass@host:port/db`
-- **External Database URL**: `postgresql://user:pass@host:port/db`
-- **Database Name**: `shababna`
-- **User**: `shababna_user`
-- **Password**: `auto-generated`
+- **Frontend URL**: `https://shababna-platform-frontend.onrender.com`
+- **Backend URL**: `https://shababna-platform-backend.onrender.com`
 
-### 3. إعداد قاعدة البيانات
+## خطوات النشر
+
+### 1. نشر Backend
 
 ```bash
-# تشغيل ملف الإعداد (بعد رفع المشروع)
-npm run db:setup-render
+# في Render Dashboard:
+# - إنشاء Web Service جديد
+# - اختيار مجلد server/
+# - استخدام server/render.yaml
+# - أو إعداد يدوي:
 ```
 
-## 🖥️ الخطوة الثانية: نشر الخادم الخلفي
+**إعدادات Backend:**
 
-### 1. إنشاء Web Service
+- **Name**: `shababna-platform-backend`
+- **Environment**: `Node`
+- **Build Command**: `npm ci`
+- **Start Command**: `npm start`
+- **Root Directory**: `server`
 
-1. **انقر على "New" → "Web Service"**
-2. **ربط GitHub Repository**
-3. **أدخل البيانات التالية:**
+**متغيرات البيئة المطلوبة:**
 
 ```
-Name: shababna-backend
-Environment: Node
-Build Command: npm install
-Start Command: npm run dev:server
-```
-
-### 2. إعداد Environment Variables
-
-```env
-# Database
-DB_HOST=your-render-postgres-host
-DB_PORT=5432
-DB_NAME=shababna
-DB_USER=shababna_user
-DB_PASSWORD=your-render-db-password
-
-# JWT
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-JWT_EXPIRES_IN=7d
-
-# Server
-PORT=10000
 NODE_ENV=production
-CLIENT_URL=https://your-frontend-app.onrender.com
-FRONTEND_URL=https://your-frontend-app.onrender.com
+PORT=10000
+DB_HOST=dpg-d26hc33uibrs739skhdg-a.frankfurt-postgres.render.com
+DB_PORT=5432
+DB_NAME=shaababna_db
+DB_USER=shaababna_db_user
+DB_PASSWORD=vqvaeTyJS1qD1NVwurk8knW1GnUoRCna
+JWT_SECRET=[سيتم إنشاؤه تلقائياً]
+JWT_EXPIRES_IN=7d
+CLIENT_URL=https://shababna-platform-frontend.onrender.com
+FRONTEND_URL=https://shababna-platform-frontend.onrender.com
 ```
 
-## 🌐 الخطوة الثالثة: نشر الواجهة الأمامية
+### 2. نشر Frontend
 
-### 1. إنشاء Static Site
-
-1. **انقر على "New" → "Static Site"**
-2. **ربط GitHub Repository**
-3. **أدخل البيانات التالية:**
-
-```
-Name: shababna-frontend
-Build Command: cd client && npm install && npm run build
-Publish Directory: client/dist
+```bash
+# في Render Dashboard:
+# - إنشاء Static Site جديد
+# - اختيار مجلد client/
+# - استخدام client/render.yaml
+# - أو إعداد يدوي:
 ```
 
-### 2. إعداد Environment Variables
+**إعدادات Frontend:**
 
-```env
-# Client
-VITE_API_URL=https://your-backend-app.onrender.com/api
+- **Name**: `shababna-platform-frontend`
+- **Environment**: `Static Site`
+- **Build Command**: `npm ci && npm run build`
+- **Publish Directory**: `dist`
+- **Root Directory**: `client`
+
+**متغيرات البيئة المطلوبة:**
+
+```
+NODE_ENV=production
+VITE_API_URL=https://shababna-platform-backend.onrender.com/api
+VITE_PRODUCTION_API_URL=https://shababna-platform-backend.onrender.com/api
 ```
 
-## 🔧 إعدادات إضافية
+## 3. التحقق من النشر
 
-### 1. تحديث CORS في الخادم
+### اختبار Backend:
 
-```javascript
-// في server/index.js
-app.use(
-  cors({
-    origin: [
-      'http://localhost:5173',
-      'http://localhost:3000',
-      'https://your-frontend-app.onrender.com',
-    ],
-    credentials: true,
-  })
-);
+```bash
+curl https://shababna-platform-backend.onrender.com/api/health
 ```
 
-### 2. إعداد SSL
+### اختبار Frontend:
 
-- Render يوفر SSL مجانياً
-- سيتم توجيه HTTP إلى HTTPS تلقائياً
+- زيارة: `https://shababna-platform-frontend.onrender.com`
+- التأكد من تحميل الصفحة الرئيسية
+- اختبار تسجيل الدخول
 
-### 3. مراقبة الأداء
+## 4. إعدادات إضافية
 
-- **Logs**: متاحة في لوحة التحكم
-- **Metrics**: مراقبة الأداء والذاكرة
-- **Health Checks**: فحص صحة التطبيق
+### في Render Dashboard:
 
-## 📋 قائمة التحقق
+1. تأكد من تشغيل Backend أولاً
+2. انتظر حتى يصبح Backend متاحاً
+3. ثم انشر Frontend
+4. تأكد من أن متغيرات البيئة محددة بشكل صحيح
 
-### ✅ قبل النشر
+### مشاكل شائعة وحلولها:
 
-- [ ] قاعدة البيانات PostgreSQL جاهزة
-- [ ] Environment Variables محددة
-- [ ] GitHub Repository محدث
-- [ ] Build يعمل محلياً
+#### مشكلة CORS:
 
-### ✅ بعد النشر
+- تأكد من أن Frontend URL مضاف إلى قائمة CORS في Backend
+- تحقق من متغيرات CLIENT_URL و FRONTEND_URL
 
-- [ ] الخادم الخلفي يعمل
-- [ ] الواجهة الأمامية تعمل
-- [ ] قاعدة البيانات متصلة
-- [ ] API calls تعمل
-- [ ] SSL مفعل
+#### مشكلة API Calls:
 
-## 🚨 استكشاف الأخطاء
+- تأكد من أن VITE_API_URL يشير إلى Backend الصحيح
+- تحقق من أن Backend يعمل ويستجيب على /api/health
 
-### مشاكل شائعة:
+#### مشكلة Database:
 
-1. **خطأ في الاتصال بقاعدة البيانات**
+- تحقق من إعدادات قاعدة البيانات
+- تأكد من أن SSL مفعل
 
-   - تحقق من Environment Variables
-   - تأكد من صحة بيانات الاتصال
+## 5. نصائح مهمة
 
-2. **خطأ في Build**
+1. **استخدم `npm ci` بدلاً من `npm install`** للحصول على builds أسرع وأكثر استقراراً
+2. **تأكد من ترتيب النشر**: Backend أولاً، ثم Frontend
+3. **راقب اللوجز** في Render Dashboard للتأكد من عدم وجود أخطاء
+4. **اختبر الاتصالات** بين Frontend و Backend بعد النشر
 
-   - تحقق من Build Command
-   - راجع Logs للحصول على التفاصيل
+## 6. عناوين مهمة بعد النشر
 
-3. **خطأ في CORS**
-   - تأكد من إعدادات CORS
-   - تحقق من عناوين URL
-
-## 📞 الدعم
-
-- **Render Documentation**: https://render.com/docs
-- **Community Forum**: https://community.render.com
-- **Status Page**: https://status.render.com
+- **الموقع الرئيسي**: `https://shababna-platform-frontend.onrender.com`
+- **API**: `https://shababna-platform-backend.onrender.com/api`
+- **Health Check**: `https://shababna-platform-backend.onrender.com/api/health`
 
 ---
 
-**🎉 تهانينا! المشروع جاهز للنشر على Render.com**
+تم إصلاح جميع التضاربات في الإعدادات. يجب أن يعمل الموقع الآن بشكل صحيح على Render.

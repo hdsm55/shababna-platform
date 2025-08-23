@@ -79,7 +79,7 @@ export default defineConfig(({ mode }) => ({
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com",
         "font-src 'self' https://fonts.gstatic.com data:",
         "img-src 'self' data: https: blob:",
-        "connect-src 'self' http://localhost:5000 http://127.0.0.1:5000 ws://localhost:* ws://127.0.0.1:* https://shababna-platform.onrender.com https://*.onrender.com https://*.render.com https://fonts.googleapis.com https://fonts.gstatic.com",
+        "connect-src 'self' http://localhost:5000 http://127.0.0.1:5000 ws://localhost:* ws://127.0.0.1:* https://shababna-platform-backend.onrender.com https://shababna-platform.onrender.com https://*.onrender.com https://*.render.com https://fonts.googleapis.com https://fonts.gstatic.com",
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",

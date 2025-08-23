@@ -4,8 +4,8 @@ export const getApiUrl = () => {
   if (import.meta.env.DEV) {
     return import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
   }
-  // في البيئة الإنتاجية
-  return import.meta.env.VITE_PRODUCTION_API_URL || 'https://shababna-platform.onrender.com/api';
+  // في البيئة الإنتاجية - استخدام VITE_API_URL أولاً ثم fallback
+  return import.meta.env.VITE_API_URL || import.meta.env.VITE_PRODUCTION_API_URL || 'https://shababna-platform.onrender.com/api';
 };
 
 export const getEnvironment = () => {

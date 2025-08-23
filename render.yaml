@@ -1,14 +1,16 @@
 services:
   - type: web
-    name: shababna-platform
+    name: shababna-platform-frontend
     env: static
-    buildCommand: cd client && npm install && npm run build
+    buildCommand: cd client && npm ci && npm run build
     staticPublishPath: ./client/dist
     envVars:
       - key: NODE_ENV
         value: production
       - key: VITE_API_URL
-        value: https://shababna-platform.onrender.com/api
+        value: https://shababna-platform-backend.onrender.com/api
+      - key: VITE_PRODUCTION_API_URL
+        value: https://shababna-platform-backend.onrender.com/api
     headers:
       - path: /*
         name: X-Frame-Options
