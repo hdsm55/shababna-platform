@@ -2,10 +2,10 @@
 export const getApiUrl = () => {
   // في البيئة المحلية
   if (import.meta.env.DEV) {
-    return 'http://localhost:5000/api';
+    return import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
   }
   // في البيئة الإنتاجية
-  return 'https://shababna-platform.onrender.com/api';
+  return import.meta.env.VITE_PRODUCTION_API_URL || 'https://shababna-platform.onrender.com/api';
 };
 
 export const getEnvironment = () => {

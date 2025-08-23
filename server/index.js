@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import { existsSync, readdirSync } from 'fs';
 
 // Load environment variables first
-dotenv.config();
+dotenv.config({ path: './env.development' });
 
 // Set NODE_ENV to development for local development
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
