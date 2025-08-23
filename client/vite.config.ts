@@ -40,13 +40,8 @@ export default defineConfig(({ mode }) => ({
     },
   },
   resolve: {
-    // Ensure only one copy of these libs is used
-    dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom'],
     alias: {
-      react: path.resolve(__dirname, 'node_modules/react'),
-      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
-      'react-router': path.resolve(__dirname, 'node_modules/react-router'),
-      'react-router-dom': path.resolve(__dirname, 'node_modules/react-router-dom'),
+      '@': path.resolve(__dirname, './src'),
     },
   },
   define: {

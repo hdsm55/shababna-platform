@@ -3,6 +3,7 @@
   "short_name": "شبابنا العالمية",
   "description": "منظمة شبابنا العالمية - منصة شبابية عالمية للتنمية والتطوير",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#27548A",
