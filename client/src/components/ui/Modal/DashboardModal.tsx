@@ -79,7 +79,7 @@ export const DashboardModal: React.FC<DashboardModalProps> = ({
           sizeClasses[size],
           getCardClasses('elevated'),
           'rounded-xl shadow-2xl bg-white',
-          `focus:outline-none focus:ring-2 focus:ring-[${DESIGN_SYSTEM.colors.primary}] focus:ring-offset-2`,
+          'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
           className,
         ].join(' ')}
         role="dialog"

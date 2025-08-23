@@ -68,7 +68,7 @@ export const Modal: React.FC<ModalProps> = ({
           'relative w-full max-w-4xl max-h-[90vh] overflow-y-auto',
           getCardClasses('elevated'),
           'rounded-xl shadow-xl bg-white',
-          `focus:outline-none focus:ring-2 focus:ring-[${DESIGN_SYSTEM.colors.primary}] focus:ring-offset-2`,
+          'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
           className,
         ].join(' ')}
         role="dialog"
