@@ -153,6 +153,8 @@ const corsOptions = {
       'https://shababna-backend.onrender.com',
       'https://shababna-platform-frontend.onrender.com',
       'https://shababna-platform-backend.onrender.com',
+      'https://shababna-frontend-new.onrender.com',
+      'https://shababna-backend-new.onrender.com',
       'https://shababna-platform-1.onrender.com',
       'https://shababna-platform.onrender.com',
       'https://shaababna.com',

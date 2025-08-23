@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: shababna-backend-new
+    env: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_HOST
+        value: dpg-d26hc33uibrs739skhdg-a.frankfurt-postgres.render.com
+      - key: DB_PORT
+        value: 5432
+      - key: DB_NAME
+        value: shaababna_db
+      - key: DB_USER
+        value: shaababna_db_user
+      - key: DB_PASSWORD
+        value: vqvaeTyJS1qD1NVwurk8knW1GnUoRCna
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: CLIENT_URL
+        value: https://shababna-frontend-new.onrender.com
+      - key: FRONTEND_URL
+        value: https://shababna-frontend-new.onrender.com
