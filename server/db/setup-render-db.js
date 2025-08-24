@@ -67,8 +67,9 @@ const setupDatabase = async () => {
             process.exit(1);
         }
 
-        // تنفيذ schema
-        await executeSQLFile('./server/db/schema.sql');
+        // تنفيذ schema (غير مدمّر)
+        const safeSchema = existsSync('./server/db/schema.safe.sql') ? './server/db/schema.safe.sql' : './server/db/schema.sql';
+        await executeSQLFile(safeSchema);
 
         // إدخال البيانات التجريبية
         await executeSQLFile('./server/db/seed-render.sql');

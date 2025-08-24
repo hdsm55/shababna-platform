@@ -28,6 +28,7 @@
     "db:seed-blogs": "psql -U postgres -d shababna -f server/db/seed-blogs.sql",
     "db:setup-forms": "node server/db/setup_contact_forms.js",
     "db:setup-render": "node server/db/setup-render-db.js",
+    "db:deploy:safe": "node -e \"process.env.NODE_ENV='production'; require('child_process').execSync('node server/db/setup-render-db.js', { stdio: 'inherit' })\"",
     "test:render-db": "node test-render-db.js",
     "test:api": "node server/test-api.js",
     "setup:database": "node setup-render-database.js",
