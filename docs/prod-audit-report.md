@@ -97,6 +97,12 @@ node server/db/setup-render-db.js
 ```
 - Recommended: Convert to migration tool (Prisma/Knex) later
 
+#### Checklist Verification
+- Local prod build: `npm --prefix client run build` outputs assets in `client/dist`
+- Server: binds to `0.0.0.0:${PORT}` and serves static from `client/dist`
+- Health endpoints: `/healthz` and `/api/health` return 200
+- CORS/CSP: allowlisted via `ALLOWED_ORIGINS`, `CLIENT_URL`, `FRONTEND_URL`, `BACKEND_URL`
+
 #### Notes
 - Frontend should consume API via `VITE_API_URL` matching Nginx upstream (e.g., https://api.shaababna.com/api)
 - Update `ALLOWED_ORIGINS` as needed

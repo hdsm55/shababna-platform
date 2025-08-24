@@ -17,6 +17,8 @@
     "build": "npm run build:client",
     "build:full": "npm install && npm run build:client",
     "check:build": "node server/check-build.js",
+    "db:deploy": "node server/db/setup-render-db.js",
+    "db:migrate": "npm run db:deploy",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "preview": "cd client && vite preview",
