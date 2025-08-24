@@ -14,7 +14,7 @@ export default defineConfig({
   },
   define: {
     // Expose environment variables to the client
-    'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL),
+    'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL || 'https://shababna-backend.onrender.com/api'),
   },
   esbuild: {
     // Ignore TypeScript errors during build
@@ -37,7 +37,7 @@ export default defineConfig({
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "font-src 'self' https://fonts.gstatic.com",
         "img-src 'self' data: https: blob:",
-        "connect-src 'self' http://localhost:5000 http://127.0.0.1:5000 https://shababna-platform.onrender.com https://*.onrender.com https://*.render.com",
+        "connect-src 'self' http://localhost:5000 http://127.0.0.1:5000 https://shababna-backend.onrender.com https://*.onrender.com https://*.render.com",
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
