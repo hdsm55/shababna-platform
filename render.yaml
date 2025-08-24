@@ -2,14 +2,12 @@ services:
   - type: web
     name: shababna-frontend
     env: static
-    buildCommand: cd client && npm install && npm run build
+    buildCommand: cd client && npm ci && npm run build
     staticPublishPath: ./client/dist
     envVars:
       - key: NODE_ENV
         value: production
       - key: VITE_API_URL
-        value: https://shababna-backend.onrender.com/api
-      - key: VITE_PRODUCTION_API_URL
         value: https://shababna-backend.onrender.com/api
     headers:
       - path: /*

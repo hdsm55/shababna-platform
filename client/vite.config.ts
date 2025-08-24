@@ -18,9 +18,23 @@ export default defineConfig(({ mode }) => ({
     }),
     splitVendorChunkPlugin(),
     // Generate pre-compressed assets for production (Brotli + Gzip)
-    viteCompression({ algorithm: 'brotliCompress', ext: '.br', deleteOriginFile: false, threshold: 1024 }),
-    viteCompression({ algorithm: 'gzip', ext: '.gz', deleteOriginFile: false, threshold: 1024 }),
-  ],
+    ...(mode === 'production' ? [
+      viteCompression({ 
+        algorithm: 'brotliCompress', 
+        ext: '.br', 
+        deleteOriginFile: false, 
+        threshold: 1024,
+        verbose: false
+      }),
+      viteCompression({ 
+        algorithm: 'gzip', 
+        ext: '.gz', 
+        deleteOriginFile: false, 
+        threshold: 1024,
+        verbose: false
+      })
+    ] : [])
+  ].filter(Boolean),
   optimizeDeps: {
     include: [
       'react',
@@ -175,6 +189,7 @@ export default defineConfig(({ mode }) => ({
         },
         // Ensure proper asset naming for Render
         assetFileNames: (assetInfo) => {
+          if (!assetInfo.name) return 'assets/[name]-[hash][extname]';
           const info = assetInfo.name.split('.')
           const ext = info[info.length - 1]
           if (/\.(css)$/.test(assetInfo.name)) {
