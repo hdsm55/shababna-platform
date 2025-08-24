@@ -43,7 +43,7 @@ services:
       - key: VITE_API_URL
         value: https://shababna-backend.onrender.com/api
       - key: NODE_VERSION
-        value: 18
+        value: 20
 
 databases:
   - name: shababna-database
