@@ -1,71 +1,51 @@
 services:
+  # Backend Service
+  - type: web
+    name: shababna-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm run prod:server
+    rootDir: server
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: DB_HOST
+        value: dpg-d2lhhgh5pdvs73anravg-a.oregon-postgres.render.com
+      - key: DB_PORT
+        value: 5432
+      - key: DB_NAME
+        value: shababna
+      - key: DB_USER
+        value: shababna_user
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        value: shababna_global_secret_key_2024_production
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: CLIENT_URL
+        value: https://shababna-frontend.onrender.com
+      - key: FRONTEND_URL
+        value: https://shababna-frontend.onrender.com
+
+  # Frontend Service
   - type: web
     name: shababna-frontend
     env: static
-    buildCommand: cd client && npm install && npm run build
-    staticPublishPath: ./client/dist
-    routes:
-      - type: rewrite
-        source: /api/*
-        destination: https://shababna-backend.onrender.com/api/*
-      - type: rewrite
-        source: /*
-        destination: /index.html
-    headers:
-      - path: /*
-        name: X-Frame-Options
-        value: DENY
-      - path: /*
-        name: X-Content-Type-Options
-        value: nosniff
-      - path: /*
-        name: X-XSS-Protection
-        value: '1; mode=block'
-      - path: /*
-        name: Referrer-Policy
-        value: no-referrer-when-downgrade
-      - path: /*
-        name: Cache-Control
-        value: 'no-cache, no-store, must-revalidate'
-      - path: /*
-        name: Content-Security-Policy
-        value: 'default-src self; script-src self unsafe-inline unsafe-eval; style-src self unsafe-inline https://fonts.googleapis.com; font-src self https://fonts.gstatic.com; img-src self data: https:; connect-src self http://localhost:5000 http://127.0.0.1:5000 https://shababna-backend.onrender.com https://*.onrender.com; object-src none; base-uri self; form-action self;'
-      - path: /api/*
-        name: Access-Control-Allow-Origin
-        value: '*'
-      - path: /api/*
-        name: Access-Control-Allow-Methods
-        value: 'GET, POST, PUT, DELETE, OPTIONS'
-      - path: /api/*
-        name: Access-Control-Allow-Headers
-        value: 'Content-Type, Authorization'
-      - path: '*.js'
-        name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
-      - path: '*.css'
-        name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
-      - path: '*.png'
-        name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
-      - path: '*.jpg'
-        name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
-      - path: '*.svg'
-        name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
-      - path: '*.ico'
-        name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
-      - path: '*.woff'
-        name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
-      - path: '*.woff2'
-        name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
-      - path: '*.ttf'
-        name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
-      - path: '*.eot'
-        name: Cache-Control
-        value: 'public, max-age=31536000, immutable'
+    plan: free
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    rootDir: client
+    envVars:
+      - key: VITE_API_URL
+        value: https://shababna-backend.onrender.com/api
+      - key: NODE_VERSION
+        value: 18
+
+databases:
+  - name: shababna-database
+    databaseName: shababna
+    user: shababna_user
