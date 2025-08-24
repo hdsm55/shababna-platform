@@ -49,7 +49,7 @@ if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
 }
 
-// Health check endpoint
+// Health check endpoints
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
@@ -58,6 +58,9 @@ app.get('/api/health', (req, res) => {
     environment: process.env.NODE_ENV,
     version: '1.0.0'
   });
+});
+app.get('/healthz', (req, res) => {
+  res.status(200).send('ok');
 });
 
 // Prepare allowed origins for CSP and CORS
