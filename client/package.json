@@ -34,6 +34,7 @@
     "zustand": "^4.4.7",
     "i18next-http-backend": "^2.6.2",
     "i18next-browser-languagedetector": "^7.2.0",
+    "react-hook-form": "^7.48.2",
     "vite": "^5.0.0",
     "@vitejs/plugin-react": "^4.2.0",
     "typescript": "^5.0.2",
