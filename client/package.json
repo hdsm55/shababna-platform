@@ -35,7 +35,8 @@
     "i18next-http-backend": "^2.6.2",
     "vite": "^5.0.0",
     "@vitejs/plugin-react": "^4.2.0",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.2",
+    "vite-plugin-compression": "^0.5.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.1.0",
@@ -54,7 +55,6 @@
     "jsdom": "^23.0.0",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.3.6",
-    "vitest": "^1.0.0",
-    "vite-plugin-compression": "^0.5.1"
+    "vitest": "^1.0.0"
   }
 }
