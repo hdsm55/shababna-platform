@@ -3,11 +3,15 @@ import fs from 'fs';
 import path from 'path';
 
 const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
+  host: process.env.DB_HOST || 'dpg-d2lhhgh5pdvs73anravg-a.oregon-postgres.render.com',
   port: process.env.DB_PORT || 5432,
   database: process.env.DB_NAME || 'shababna',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || '123456',
+  user: process.env.DB_USER || 'shababna_user',
+  password: process.env.DB_PASSWORD || 'mWiirXAZ4L7jZNoG1TQOGePRaVkEZgL8',
+  ssl: {
+    rejectUnauthorized: false,
+    require: true
+  }
 });
 
 async function setupPostgreSQL() {
@@ -37,11 +41,15 @@ async function setupPostgreSQL() {
     client.release();
 
     const dbPool = new Pool({
-      host: process.env.DB_HOST || 'localhost',
+      host: process.env.DB_HOST || 'dpg-d2lhhgh5pdvs73anravg-a.oregon-postgres.render.com',
       port: process.env.DB_PORT || 5432,
       database: 'shababna',
-      user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || '123456',
+      user: process.env.DB_USER || 'shababna_user',
+      password: process.env.DB_PASSWORD || 'mWiirXAZ4L7jZNoG1TQOGePRaVkEZgL8',
+      ssl: {
+        rejectUnauthorized: false,
+        require: true
+      }
     });
 
     const dbClient = await dbPool.connect();

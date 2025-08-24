@@ -6,11 +6,11 @@ dotenv.config();
 
 // إنشاء pool للاتصال بقاعدة البيانات
 const pool = new Pool({
-    host: process.env.DB_HOST || 'dpg-d26hc33uibrs739skhdg-a.frankfurt-postgres.render.com',
+    host: process.env.DB_HOST || 'dpg-d2lhhgh5pdvs73anravg-a.oregon-postgres.render.com',
     port: process.env.DB_PORT || 5432,
-    database: process.env.DB_NAME || 'shaababna_db',
-    user: process.env.DB_USER || 'shaababna_db_user',
-    password: process.env.DB_PASSWORD || 'vqvaeTyJS1qD1NVwurk8knW1GnUoRCna',
+    database: process.env.DB_NAME || 'shababna',
+    user: process.env.DB_USER || 'shababna_user',
+    password: process.env.DB_PASSWORD || 'mWiirXAZ4L7jZNoG1TQOGePRaVkEZgL8',
     max: 20, // زيادة الحد الأقصى لعدد الاتصالات
     min: 5, // زيادة الحد الأدنى لعدد الاتصالات
     idleTimeoutMillis: 30000000, // 5 دقائق - زيادة وقت الانتظار قبل إغلاق الاتصال

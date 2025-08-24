@@ -24,8 +24,12 @@ import { Program } from '../types';
 
 // تحسين الاستيراد - استخدام lazy loading للمكونات الثقيلة
 const HeroSection = React.lazy(() => import('../components/home/HeroSection'));
-const StatsSection = React.lazy(() => import('../components/home/StatsSection'));
-const FeaturesSection = React.lazy(() => import('../components/home/FeaturesSection'));
+const StatsSection = React.lazy(
+  () => import('../components/home/StatsSection')
+);
+const FeaturesSection = React.lazy(
+  () => import('../components/home/FeaturesSection')
+);
 
 // تحسين الأداء - مكونات منفصلة مع تحسينات
 const TestimonialsSection = memo(() => {
@@ -296,7 +300,15 @@ const LatestProgramsSection = memo(() => {
   });
 
   const latestPrograms =
-    programsData?.data?.programs || programsData?.data?.items || [];
+    programsData?.data?.programs ||
+    programsData?.data?.items ||
+    programsData?.programs ||
+    [];
+
+  // معالجة الأخطاء
+  if (programsError) {
+    console.error('خطأ في تحميل البرامج:', programsError);
+  }
 
   // تحسين حالة التحميل
   if (programsLoading) {
@@ -340,58 +352,64 @@ const LatestProgramsSection = memo(() => {
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {latestPrograms.slice(0, 3).map((program) => (
-            <motion.div
-              key={program.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.3 }}
-              className="h-full overflow-hidden shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
-            >
-              <div className="h-40 bg-gradient-to-br from-secondary-700 via-secondary-800 to-dark-800 relative overflow-hidden">
-                <div className="absolute inset-0 bg-dark-500/20" />
-                <div className="absolute top-3 right-3">
-                  <span className="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">
-                    {program.category}
-                  </span>
+          {latestPrograms && latestPrograms.length > 0 ? (
+            latestPrograms.slice(0, 3).map((program) => (
+              <motion.div
+                key={program.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.3 }}
+                className="h-full overflow-hidden shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
+              >
+                <div className="h-40 bg-gradient-to-br from-secondary-700 via-secondary-800 to-dark-800 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-dark-500/20" />
+                  <div className="absolute top-3 right-3">
+                    <span className="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">
+                      {program.category}
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <div className="p-4">
-                <h3 className="text-lg font-bold text-dark-500 mb-2 line-clamp-2">
-                  {program.title}
-                </h3>
-                <p className="text-dark-600 mb-3 line-clamp-3 leading-relaxed text-sm">
-                  {program.description}
-                </p>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs text-dark-500">
-                    {program.participants_count || 0} مشارك
-                  </span>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      program.status === 'active'
-                        ? 'bg-primary-100 text-primary-700'
-                        : 'bg-dark-100 text-dark-700'
-                    }`}
+                <div className="p-4">
+                  <h3 className="text-lg font-bold text-dark-500 mb-2 line-clamp-2">
+                    {program.title}
+                  </h3>
+                  <p className="text-dark-600 mb-3 line-clamp-3 leading-relaxed text-sm">
+                    {program.description}
+                  </p>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs text-dark-500">
+                      {program.participants_count || 0} مشارك
+                    </span>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        program.status === 'active'
+                          ? 'bg-primary-100 text-primary-700'
+                          : 'bg-dark-100 text-dark-700'
+                      }`}
+                    >
+                      {program.status === 'active' ? 'متاح' : 'مغلق'}
+                    </span>
+                  </div>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="w-full py-2 text-xs font-semibold bg-gradient-to-r from-secondary-700 to-secondary-800 hover:from-secondary-800 hover:to-dark-800"
+                    onClick={() => navigate(`/programs/${program.id}`)}
                   >
-                    {program.status === 'active' ? 'متاح' : 'مغلق'}
-                  </span>
+                    <span className="flex items-center justify-center gap-2">
+                      عرض التفاصيل
+                      <ArrowRight className="w-3 h-3" />
+                    </span>
+                  </Button>
                 </div>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  className="w-full py-2 text-xs font-semibold bg-gradient-to-r from-secondary-700 to-secondary-800 hover:from-secondary-800 hover:to-dark-800"
-                  onClick={() => navigate(`/programs/${program.id}`)}
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    عرض التفاصيل
-                    <ArrowRight className="w-3 h-3" />
-                  </span>
-                </Button>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-8">
+              <p className="text-dark-600">لا توجد برامج متاحة حالياً</p>
+            </div>
+          )}
         </div>
 
         <motion.div
@@ -558,20 +576,28 @@ const Home: React.FC = () => {
         </Suspense>
 
         {/* Stats Section */}
-        <Suspense fallback={<div className="py-16 bg-gradient-to-br from-neutral-50 to-white">
-          <div className="max-w-6xl mx-auto px-6">
-            <div className="animate-pulse bg-dark-200 h-8 w-48 mx-auto mb-4 rounded"></div>
-          </div>
-        </div>}>
+        <Suspense
+          fallback={
+            <div className="py-16 bg-gradient-to-br from-neutral-50 to-white">
+              <div className="max-w-6xl mx-auto px-6">
+                <div className="animate-pulse bg-dark-200 h-8 w-48 mx-auto mb-4 rounded"></div>
+              </div>
+            </div>
+          }
+        >
           <StatsSection />
         </Suspense>
 
         {/* Features Section */}
-        <Suspense fallback={<div className="py-16 bg-white">
-          <div className="max-w-6xl mx-auto px-6">
-            <div className="animate-pulse bg-dark-200 h-8 w-48 mx-auto mb-4 rounded"></div>
-          </div>
-        </div>}>
+        <Suspense
+          fallback={
+            <div className="py-16 bg-white">
+              <div className="max-w-6xl mx-auto px-6">
+                <div className="animate-pulse bg-dark-200 h-8 w-48 mx-auto mb-4 rounded"></div>
+              </div>
+            </div>
+          }
+        >
           <FeaturesSection />
         </Suspense>
 

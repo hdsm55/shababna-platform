@@ -5,7 +5,7 @@ export const getApiUrl = () => {
     return 'http://localhost:5000/api';
   }
   // في البيئة الإنتاجية
-  return 'https://shababna-platform.onrender.com/api';
+  return 'https://shababna-backend.onrender.com/api';
 };
 
 export const getEnvironment = () => {
