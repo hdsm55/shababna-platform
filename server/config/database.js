@@ -1,36 +1,38 @@
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
 
-// تحميل متغيرات البيئة
+// Load environment variables (server/index.js already loads env.* if present)
 dotenv.config();
 
-// إنشاء pool للاتصال بقاعدة البيانات
+// Prefer DATABASE_URL when provided; fall back to discrete env vars
+const useConnectionString = !!process.env.DATABASE_URL;
+const baseConfig = useConnectionString
+  ? {
+      connectionString: process.env.DATABASE_URL,
+    }
+  : {
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 5432,
+      database: process.env.DB_NAME,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+    };
+
+// Create pool
 const pool = new Pool({
-    host: process.env.DB_HOST || 'dpg-d26hc33uibrs739skhdg-a.frankfurt-postgres.render.com',
-    port: process.env.DB_PORT || 5432,
-    database: process.env.DB_NAME || 'shaababna_db',
-    user: process.env.DB_USER || 'shaababna_db_user',
-    password: process.env.DB_PASSWORD || 'vqvaeTyJS1qD1NVwurk8knW1GnUoRCna',
-    max: 20, // زيادة الحد الأقصى لعدد الاتصالات
-    min: 5, // زيادة الحد الأدنى لعدد الاتصالات
-    idleTimeoutMillis: 30000000, // 5 دقائق - زيادة وقت الانتظار قبل إغلاق الاتصال
-    connectionTimeoutMillis: 6000000, // دقيقة واحدة - زيادة وقت الانتظار للاتصال
-    ssl: {
-        rejectUnauthorized: false,
-        require: true
-    },
-    // إعدادات إضافية لتحسين الاستقرار
+    ...baseConfig,
+    max: process.env.PG_MAX ? Number(process.env.PG_MAX) : 20,
+    min: process.env.PG_MIN ? Number(process.env.PG_MIN) : 0,
+    idleTimeoutMillis: process.env.PG_IDLE_TIMEOUT ? Number(process.env.PG_IDLE_TIMEOUT) : 30000,
+    connectionTimeoutMillis: process.env.PG_CONN_TIMEOUT ? Number(process.env.PG_CONN_TIMEOUT) : 20000,
+    ssl: (process.env.PGSSL === 'disable' || process.env.PGSSL === 'false')
+      ? false
+      : { rejectUnauthorized: false },
     keepAlive: true,
-    keepAliveInitialDelayMillis: 30000, // 30 ثانية
-    // إعدادات إضافية لتحسين الاستقرار
-    statement_timeout: 300000, // 5 دقائق للاستعلامات
-    query_timeout: 300000, // 5 دقائق للاستعلامات
-    // إعدادات إضافية للاستقرار
-    application_name: 'shababna-platform',
-    // إعدادات إضافية للاتصال
-    tcp_keepalives_idle: 300, // 5 دقائق
-    tcp_keepalives_interval: 60, // دقيقة واحدة
-    tcp_keepalives_count: 3
+    keepAliveInitialDelayMillis: 30000,
+    statement_timeout: process.env.PG_STATEMENT_TIMEOUT ? Number(process.env.PG_STATEMENT_TIMEOUT) : 30000,
+    query_timeout: process.env.PG_QUERY_TIMEOUT ? Number(process.env.PG_QUERY_TIMEOUT) : 30000,
+    application_name: process.env.PG_APP_NAME || 'shababna-platform',
 });
 
 // دالة لاختبار الاتصال

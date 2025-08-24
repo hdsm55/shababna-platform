@@ -1,10 +1,13 @@
 import dotenv from 'dotenv';
 import { existsSync, readdirSync } from 'fs';
 
-// Load environment variables first
-dotenv.config({ path: './env.development' });
+// Load environment variables based on NODE_ENV (fallback to default .env)
+import path from 'path';
+const envFileName = (process.env.NODE_ENV === 'production') ? 'env.production' : 'env.development';
+const envPath = path.join(process.cwd(), 'server', envFileName);
+dotenv.config({ path: existsSync(envPath) ? envPath : undefined });
 
-// Set NODE_ENV to development for local development
+// Ensure NODE_ENV default
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 import express from 'express';
@@ -12,7 +15,6 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import path from 'path';
 import bodyParser from 'body-parser';
 
 // Import database configuration
@@ -40,6 +42,12 @@ const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const HOST = process.env.HOST || '0.0.0.0';
+
+// Trust proxy when behind load balancers (e.g., Nginx)
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -52,6 +60,21 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Prepare allowed origins for CSP and CORS
+const additionalOrigins = (process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim()) : []);
+const envOrigins = [process.env.CLIENT_URL, process.env.FRONTEND_URL, process.env.BACKEND_URL].filter(Boolean);
+const cspConnectSrc = [
+  "'self'",
+  'http://localhost:5000',
+  'http://127.0.0.1:5000',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  ...envOrigins,
+  ...additionalOrigins,
+  'https://fonts.googleapis.com',
+  'https://fonts.gstatic.com'
+];
+
 // Middleware
 app.use(helmet({
   contentSecurityPolicy: {
@@ -61,7 +84,7 @@ app.use(helmet({
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
       imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "http://localhost:5000", "http://127.0.0.1:5000", "http://localhost:5173", "http://127.0.0.1:5173"],
+      connectSrc: cspConnectSrc,
     },
   },
 }));
@@ -77,11 +100,6 @@ app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
-
-  // Add CORS headers for better compatibility
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   // Set timeout for requests (5 minutes)
   req.setTimeout(300000); // 5 minutes
@@ -149,6 +167,7 @@ const corsOptions = {
       'http://127.0.0.1:3000',
       process.env.CLIENT_URL,
       process.env.FRONTEND_URL,
+      process.env.BACKEND_URL,
       'https://shababna-frontend.onrender.com',
       'https://shababna-backend.onrender.com',
       'https://shababna-platform-frontend.onrender.com',
@@ -158,7 +177,8 @@ const corsOptions = {
       'https://shababna-platform-1.onrender.com',
       'https://shababna-platform.onrender.com',
       'https://shaababna.com',
-      'https://www.shaababna.com'
+      'https://www.shaababna.com',
+      ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim()) : [])
     ].filter(Boolean);
 
     if (allowedOrigins.indexOf(origin) !== -1) {
@@ -180,6 +200,7 @@ app.options('*', cors(corsOptions));
 
 // جعل مجلد uploads متاحاً للقراءة عبر HTTP
 app.use('/uploads', express.static(path.join(process.cwd(), 'server', 'uploads')));
+app.use('/uploads', express.static(path.join(process.cwd(), 'server', 'public', 'uploads')));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -372,7 +393,7 @@ app.get('*', async (req, res) => {
   }
 });
 
-app.listen(PORT, async () => {
+app.listen(PORT, HOST, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📱 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'http://localhost:5173'}`);
