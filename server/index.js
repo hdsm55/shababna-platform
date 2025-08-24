@@ -251,9 +251,8 @@ app.use((req, res, next) => {
 app.use(errorHandler);
 
 // Serve static files from the React app (must be after API routes)
-app.use(express.static(path.join(process.cwd(), 'client', 'dist')));
-app.use(express.static(path.join(process.cwd(), 'dist')));
-app.use(express.static(path.join(process.cwd())));
+const staticRoot = path.join(process.cwd(), 'client', 'dist');
+app.use(express.static(staticRoot));
 
 // Handle React routing, return all requests to React app
 // This must be the LAST route handler
@@ -280,7 +279,7 @@ app.get('*', async (req, res) => {
   }
 
   // Serve React app for all other routes (SPA fallback)
-  const indexPath = path.join(process.cwd(), 'client', 'dist', 'index.html');
+  const indexPath = path.join(staticRoot, 'index.html');
   const indexPathAlt = path.join(process.cwd(), 'dist', 'index.html');
   const indexPathRoot = path.join(process.cwd(), 'index.html');
 
