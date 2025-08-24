@@ -19,17 +19,17 @@ export default defineConfig(({ mode }) => ({
     splitVendorChunkPlugin(),
     // Generate pre-compressed assets for production (Brotli + Gzip)
     ...(mode === 'production' ? [
-      viteCompression({ 
-        algorithm: 'brotliCompress', 
-        ext: '.br', 
-        deleteOriginFile: false, 
+      viteCompression({
+        algorithm: 'brotliCompress',
+        ext: '.br',
+        deleteOriginFile: false,
         threshold: 1024,
         verbose: false
       }),
-      viteCompression({ 
-        algorithm: 'gzip', 
-        ext: '.gz', 
-        deleteOriginFile: false, 
+      viteCompression({
+        algorithm: 'gzip',
+        ext: '.gz',
+        deleteOriginFile: false,
         threshold: 1024,
         verbose: false
       })
