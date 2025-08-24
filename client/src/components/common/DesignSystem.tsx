@@ -360,4 +360,14 @@ export const getTextClasses = {
   caption: 'text-xs text-neutral-500',
 };
 
+// ===== أنماط الأقسام الموحدة =====
+export const SECTION_VARIANTS = {
+  default: 'py-12 lg:py-16',
+  compact: 'py-8 lg:py-12',
+  spacious: 'py-16 lg:py-24',
+  hero: 'py-20 lg:py-32',
+  footer: 'py-8 lg:py-12 bg-neutral-50',
+  header: 'py-4 lg:py-6',
+};
+
 export default DESIGN_SYSTEM;
