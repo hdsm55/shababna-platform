@@ -56,7 +56,7 @@ const DashboardSettings = lazy(() => import('./pages/dashboard/Settings'));
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 15 * 60 * 1000, // 15 minutes - increased for better caching
+      staleTime: 30 * 60 * 1000, // 30 minutes - increased for better caching
       retry: (failureCount, error: any) => {
         // Retry up to 2 times for network errors or 5xx errors
         if (failureCount < 2) {
@@ -68,16 +68,20 @@ const queryClient = new QueryClient({
       },
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 15000),
       refetchOnMount: false, // Don't refetch on mount if data is fresh
-      gcTime: 20 * 60 * 1000, // 20 minutes garbage collection time
+      gcTime: 30 * 60 * 1000, // 30 minutes garbage collection time
       refetchOnWindowFocus: false,
       refetchOnReconnect: true,
       // تحسين الأداء
       refetchInterval: false,
       refetchIntervalInBackground: false,
+      // تحسين الأداء الإضافي
+      networkMode: 'online',
+      structuralSharing: true,
     },
     mutations: {
       retry: 1,
       retryDelay: 1000,
+      networkMode: 'online',
     },
   },
 });
@@ -92,7 +96,12 @@ function App() {
               <ThemeProvider>
                 <ToastProvider>
                   <BackendIdleHandler>
-                    <HashRouter>
+                    <HashRouter
+                      future={{
+                        v7_startTransition: true,
+                        v7_relativeSplatPath: true,
+                      }}
+                    >
                       <Routes>
                         {/* Public Routes داخل Layout */}
                         <Route element={<Layout />}>

@@ -8,7 +8,20 @@ export default defineConfig({
   ],
   optimizeDeps: {
     exclude: ['lucide-react'],
-    include: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query', 'framer-motion'],
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@tanstack/react-query',
+      'framer-motion',
+      'zustand',
+      'react-hook-form',
+      'i18next',
+      'react-i18next',
+      'i18next-browser-languagedetector',
+      'clsx',
+      'dompurify'
+    ],
     // تحسين التبعيات
     force: false,
   },
@@ -57,8 +70,10 @@ export default defineConfig({
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
           ui: ['framer-motion', 'lucide-react'],
-          utils: ['@tanstack/react-query'],
-          i18n: ['react-i18next', 'i18next'],
+          utils: ['@tanstack/react-query', 'zustand'],
+          forms: ['react-hook-form'],
+          i18n: ['react-i18next', 'i18next', 'i18next-browser-languagedetector'],
+          dom: ['dompurify', 'clsx'],
         },
         // Ensure proper asset naming for Render
         assetFileNames: (assetInfo) => {

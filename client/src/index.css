@@ -38,13 +38,29 @@
     font-family: 'Tajawal', 'Noto Sans Arabic', system-ui, sans-serif;
   }
 
+  /* تحسين أداء الخطوط */
+  .fonts-loaded {
+    /* تحسين الأداء */
+    font-display: swap;
+  }
+
+  /* تحسين أداء النصوص */
+  h1, h2, h3, h4, h5, h6, p, span, div {
+    /* تحسين الأداء */
+    contain: layout style;
+  }
+
   /* تحسين أداء العناصر المتحركة */
   * {
-    /* تسريع الحركة */
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     /* تحسين الأداء */
     transform: translateZ(0);
     backface-visibility: hidden;
+  }
+
+  /* تحسين أداء العناصر المتحركة فقط */
+  .animate, .transition, [class*="hover:"], [class*="focus:"] {
+    /* تسريع الحركة */
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* تحسين أداء الصور */
@@ -54,6 +70,20 @@
     image-rendering: crisp-edges;
     /* تحسين الأداء */
     transform: translateZ(0);
+    /* تحسين الأداء */
+    will-change: auto;
+    /* تحسين الأداء */
+    contain: layout style paint;
+  }
+
+  /* تحسين أداء الصور المحملة */
+  img[loading="lazy"] {
+    /* تحسين الأداء */
+    will-change: auto;
+  }
+
+  /* تحسين أداء الصور المهمة */
+  img[loading="eager"] {
     /* تحسين الأداء */
     will-change: auto;
   }

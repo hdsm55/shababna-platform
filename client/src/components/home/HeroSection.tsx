@@ -1,7 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Sparkles, Users, Globe, Award, Calendar } from 'lucide-react';
+import {
+  ArrowRight,
+  Sparkles,
+  Users,
+  Globe,
+  Award,
+  Calendar,
+} from 'lucide-react';
 import { Button } from '../ui/Button/ButtonSimple';
 
 const HeroSection: React.FC = () => {
@@ -45,6 +52,7 @@ const HeroSection: React.FC = () => {
           backgroundImage: "url('/images/hero-bg.jpg')",
           backgroundPosition: 'center center',
         }}
+        loading="eager"
       />
 
       {/* Enhanced Dark Overlay - استخدام اللون الداكن المعتمد */}
@@ -88,11 +96,15 @@ const HeroSection: React.FC = () => {
                 </span>
               </h1>
               <p className="text-lg md:text-xl text-primary-100 max-w-3xl mx-auto leading-relaxed">
-                نربط شباب العالم الإسلامي من خلال برامج وفعاليات تطويرية مصممة لبناء قادة المستقبل
+                نربط شباب العالم الإسلامي من خلال برامج وفعاليات تطويرية مصممة
+                لبناء قادة المستقبل
               </p>
             </motion.div>
 
-            <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <motion.div
+              variants={itemVariants}
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            >
               <Button
                 variant="primary"
                 size="lg"
@@ -117,31 +129,6 @@ const HeroSection: React.FC = () => {
               </Button>
             </motion.div>
           </motion.div>
-        </motion.div>
-
-        {/* Stats Preview */}
-        <motion.div
-          variants={itemVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16"
-        >
-          <div className="text-center">
-            <div className="text-2xl md:text-3xl font-bold text-white mb-2">1,240+</div>
-            <div className="text-sm text-primary-200">شباب مشاركون</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl md:text-3xl font-bold text-white mb-2">18</div>
-            <div className="text-sm text-primary-200">دول مملكة</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl md:text-3xl font-bold text-white mb-2">87</div>
-            <div className="text-sm text-primary-200">فعاليات منظمة</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl md:text-3xl font-bold text-white mb-2">12</div>
-            <div className="text-sm text-primary-200">برامج نشطة</div>
-          </div>
         </motion.div>
       </div>
     </section>

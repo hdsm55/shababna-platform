@@ -1,11 +1,13 @@
-import { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 
-interface PerformanceOptimizerProps {
+interface PagePerformanceOptimizerProps {
   children: React.ReactNode;
+  pageName?: string;
 }
 
-const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
+const PagePerformanceOptimizer: React.FC<PagePerformanceOptimizerProps> = ({
   children,
+  pageName = 'page',
 }) => {
   // تحسين الأداء عند التمرير
   const handleScroll = useCallback(() => {
@@ -57,7 +59,7 @@ const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
     };
   }, [handleScroll, handleResize]);
 
-  // تحسين الأداء للصور
+  // تحسين الأداء للصور في هذه الصفحة
   useEffect(() => {
     // تحسين تحميل الصور
     const images = document.querySelectorAll('img[data-src]');
@@ -73,7 +75,7 @@ const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
         });
       },
       {
-        rootMargin: '100px',
+        rootMargin: '150px',
         threshold: 0.01,
       }
     );
@@ -95,7 +97,21 @@ const PerformanceOptimizer: React.FC<PerformanceOptimizerProps> = ({
     }
   }, []);
 
+  // تحسين الأداء للروابط
+  useEffect(() => {
+    // تحسين تحميل الروابط
+    const links = document.querySelectorAll('a[href]');
+    links.forEach((link) => {
+      const href = link.getAttribute('href');
+      if (href && href.startsWith('/')) {
+        link.setAttribute('data-prefetch', 'true');
+      }
+    });
+  }, []);
+
   return <>{children}</>;
 };
 
-export default PerformanceOptimizer;
+export default PagePerformanceOptimizer;
+
+

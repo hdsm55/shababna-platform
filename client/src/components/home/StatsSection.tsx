@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Users, Globe, Calendar, TrendingUp } from 'lucide-react';
 
 const StatsSection: React.FC = () => {
+  // استخدام البيانات الثابتة لتجنب مشاكل التحميل اللانهائي
   const stats = [
     {
       icon: Users,

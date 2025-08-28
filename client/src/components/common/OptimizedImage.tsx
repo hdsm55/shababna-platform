@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-interface LazyImageProps {
+interface OptimizedImageProps {
   src: string;
   alt: string;
   className?: string;
@@ -9,9 +9,11 @@ interface LazyImageProps {
   fallback?: string;
   onLoad?: () => void;
   onError?: () => void;
+  priority?: boolean;
+  sizes?: string;
 }
 
-const LazyImage: React.FC<LazyImageProps> = ({
+const OptimizedImage: React.FC<OptimizedImageProps> = ({
   src,
   alt,
   className = '',
@@ -19,16 +21,18 @@ const LazyImage: React.FC<LazyImageProps> = ({
   fallback = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmVmMmYyIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2RjMjYyNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4=',
   onLoad,
   onError,
+  priority = false,
+  sizes = '100vw',
 }) => {
   const [imageSrc, setImageSrc] = useState(placeholder);
   const [imageRef, setImageRef] = useState<HTMLImageElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [isInView, setIsInView] = useState(false);
+  const [isInView, setIsInView] = useState(priority);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    if (!imageRef) return;
+    if (!imageRef || priority) return;
 
     const loadImage = () => {
       const img = new Image();
@@ -56,7 +60,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
         });
       },
       {
-        rootMargin: '100px',
+        rootMargin: '150px',
         threshold: 0.01,
       }
     );
@@ -68,7 +72,25 @@ const LazyImage: React.FC<LazyImageProps> = ({
         observerRef.current.disconnect();
       }
     };
-  }, [src, imageRef, onLoad, onError, fallback]);
+  }, [src, imageRef, onLoad, onError, fallback, priority]);
+
+  // تحميل فوري للصور المهمة
+  useEffect(() => {
+    if (priority) {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        setImageSrc(src);
+        setIsLoaded(true);
+        onLoad?.();
+      };
+      img.onerror = () => {
+        setImageSrc(fallback);
+        setHasError(true);
+        onError?.();
+      };
+    }
+  }, [src, priority, fallback, onLoad, onError]);
 
   return (
     <motion.div
@@ -84,7 +106,9 @@ const LazyImage: React.FC<LazyImageProps> = ({
         className={`w-full h-full object-cover transition-opacity duration-300 ${
           isLoaded ? 'opacity-100' : 'opacity-60'
         }`}
-        loading="lazy"
+        loading={priority ? 'eager' : 'lazy'}
+        sizes={sizes}
+        decoding="async"
       />
 
       {/* Loading overlay */}
@@ -113,4 +137,6 @@ const LazyImage: React.FC<LazyImageProps> = ({
   );
 };
 
-export default LazyImage;
+export default OptimizedImage;
+
+
