@@ -259,18 +259,38 @@ const EventCard = memo(
     const navigate = useNavigate();
 
     const formatDate = useCallback((dateString: string) => {
-      return new Date(dateString).toLocaleDateString('ar-SA', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
+      try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+          console.error('❌ Invalid date string:', dateString);
+          return 'تاريخ غير صحيح';
+        }
+        return date.toLocaleDateString('ar-SA', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+      } catch (error) {
+        console.error('❌ Error formatting date:', error);
+        return 'تاريخ غير صحيح';
+      }
     }, []);
 
     const formatTime = useCallback((dateString: string) => {
-      return new Date(dateString).toLocaleTimeString('ar-SA', {
-        hour: '2-digit',
-        minute: '2-digit',
-      });
+      try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+          console.error('❌ Invalid time string:', dateString);
+          return 'وقت غير صحيح';
+        }
+        return date.toLocaleTimeString('ar-SA', {
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+      } catch (error) {
+        console.error('❌ Error formatting time:', error);
+        return 'وقت غير صحيح';
+      }
     }, []);
 
     const getStatusColor = useCallback((status: string) => {
@@ -346,12 +366,16 @@ const EventCard = memo(
       >
         <Card className="h-full bg-white border border-primary-200 hover:shadow-brand-md transition-all duration-300 overflow-hidden">
           {/* Event Image */}
-          <div className="relative h-48 bg-gradient-to-br from-primary-100 to-secondary-100 overflow-hidden">
-            <div className="w-full h-full flex items-center justify-center">
-              <span className="text-6xl">
-                {getCategoryIcon(event.category)}
-              </span>
-            </div>
+          <div className="relative h-48 overflow-hidden">
+            <img
+              src={event.image_url || '/images/events-default.jpg'}
+              alt={event.title}
+              className="w-full h-full object-cover"
+              loading="lazy"
+              onError={(e) => {
+                e.currentTarget.src = '/images/events-default.jpg';
+              }}
+            />
 
             {/* Status Badge */}
             <div className="absolute top-3 right-3">
@@ -536,7 +560,7 @@ const Events: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-blue-50">
+    <div className="page-container bg-blue-50">
       <SEO
         title={t('events.pageTitle', 'الفعاليات - منصة شبابنا')}
         description={t(

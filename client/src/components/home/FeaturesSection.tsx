@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   HeartHandshake,
   Lightbulb,
@@ -15,6 +16,7 @@ import { Button } from '../ui/Button/ButtonSimple';
 const FeatureCard = memo(
   ({ feature, index }: { feature: any; index: number }) => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const itemVariants = {
       hidden: { opacity: 0, y: 20 },
@@ -65,7 +67,7 @@ const FeatureCard = memo(
             className="mt-4 w-full py-2 text-xs font-semibold border-2 border-dark-300 hover:bg-dark-50 text-dark-700"
             onClick={() => navigate('/programs')}
           >
-            اعرف المزيد
+            {t('common.learnMore')}
             <ArrowRight className="w-3 h-3 mr-1" />
           </Button>
         </Card>
@@ -77,28 +79,40 @@ const FeatureCard = memo(
 FeatureCard.displayName = 'FeatureCard';
 
 const FeaturesSection: React.FC = () => {
+  const { t } = useTranslation();
+
   const features = [
     {
       icon: HeartHandshake,
-      title: 'مجتمع عالمي',
-      description:
-        'تواصل مع شباب من مختلف الدول الإسلامية والعالمية في بيئة داعمة ومحفزة',
-      features: ['شباب من 18 دولة', 'خدمات دائمة', 'برنامج ماهر'],
+      title: t('home.features.community.title'),
+      description: t('home.features.community.description'),
+      features: [
+        t('home.features.community.features.members'),
+        t('home.features.community.features.services'),
+        t('home.features.community.features.programs'),
+      ],
       gradient: 'from-secondary-600 to-secondary-700',
     },
     {
       icon: Lightbulb,
-      title: 'برامج تطويرية',
-      description: 'برامج طويلة المدى لبناء الشخصية والقيادة والتأثير المجتمعي',
-      features: ['برامج قيادية', 'تطوير المهارات', 'نجاح مستمر'],
+      title: t('home.features.programs.title'),
+      description: t('home.features.programs.description'),
+      features: [
+        t('home.features.programs.features.leadership'),
+        t('home.features.programs.features.skills'),
+        t('home.features.programs.features.success'),
+      ],
       gradient: 'from-primary-600 to-primary-700',
     },
     {
       icon: Globe,
-      title: 'ورش وفعاليات',
-      description:
-        'لقاءات تفاعلية وورش عمل لتعزيز المعرفة ومهارات القيادة للشباب المسلم',
-      features: ['فعاليات دورية', 'ورش تفاعلية', 'شبكات مهنية'],
+      title: t('home.features.events.title'),
+      description: t('home.features.events.description'),
+      features: [
+        t('home.features.events.features.regular'),
+        t('home.features.events.features.interactive'),
+        t('home.features.events.features.networks'),
+      ],
       gradient: 'from-accent-600 to-accent-700',
     },
   ];
@@ -123,10 +137,10 @@ const FeaturesSection: React.FC = () => {
           className="text-center mb-12"
         >
           <h2 className="text-2xl md:text-3xl font-bold text-dark-500 mb-4">
-            ماذا نقدم
+            {t('home.features.title')}
           </h2>
           <p className="text-base md:text-lg text-dark-600 max-w-3xl mx-auto leading-relaxed">
-            برامج وفعاليات شبابية إسلامية مصرية مصممة لبناء قادة المستقبل
+            {t('home.features.subtitle')}
           </p>
         </motion.div>
 

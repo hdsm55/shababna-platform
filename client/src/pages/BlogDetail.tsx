@@ -5,15 +5,8 @@ import { fetchBlogById, fetchRelatedBlogs } from '../services/blogsApi';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import Alert from '../components/common/Alert';
 import Button from '../components/common/Button';
-import {
-  ArrowLeft,
-  Share2,
-  Heart,
-  MessageCircle,
-  Bookmark,
-  ArrowUp,
-} from 'lucide-react';
-import LazyImage from '../components/common/LazyImage';
+import { ArrowLeft, Share2, Heart, Bookmark, ArrowUp } from 'lucide-react';
+import SmartImage from '../components/common/SmartImage';
 import DOMPurify from 'dompurify';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/common/SEO';
@@ -44,10 +37,9 @@ const BlogDetail: React.FC = () => {
   });
 
   console.log('🔍 بيانات المدونة:', data);
-  const blog = data?.data || data;
+  const blog = data;
   console.log('📋 المدونة المعالجة:', blog);
   console.log('📋 المقالات ذات الصلة:', relatedBlogs);
-  const isRTL = i18n.dir() === 'rtl';
 
   // Reading progress tracking
   useEffect(() => {
@@ -130,8 +122,17 @@ const BlogDetail: React.FC = () => {
         <div className="absolute inset-0 bg-black bg-opacity-40"></div>
         <div className="relative max-w-4xl mx-auto px-4">
           <div className="text-center space-y-6">
+            <div className="relative h-48 w-full max-w-2xl mx-auto mb-6 overflow-hidden rounded-2xl shadow-2xl">
+              <SmartImage
+                src={blog.image_url}
+                alt={blog.title}
+                type="blog"
+                className="w-full h-full"
+                size="md"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+            </div>
             <div className="flex items-center justify-center gap-2 text-blue-200 mb-4">
-              <span className="text-2xl">📝</span>
               <span className="text-sm font-medium">مقال</span>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold leading-tight">
@@ -166,30 +167,16 @@ const BlogDetail: React.FC = () => {
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-            {/* Featured Image */}
-            {blog.image_url && (
-              <div className="relative h-96 overflow-hidden">
-                <LazyImage
-                  src={blog.image_url}
-                  alt={blog.title}
-                  className="w-full h-full object-cover object-center"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-              </div>
-            )}
-
             {/* Article Content */}
             <div className="p-8 md:p-12">
               {/* Reading Time Estimate */}
               <div className="flex items-center gap-4 text-gray-500 mb-8 pb-6 border-b border-gray-100">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">⏱️</span>
                   <span className="text-sm">
                     {Math.ceil((blog.content?.length || 0) / 200)} دقيقة قراءة
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">👁️</span>
                   <span className="text-sm">مشاهدات</span>
                 </div>
               </div>
@@ -212,15 +199,12 @@ const BlogDetail: React.FC = () => {
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
-                      <span className="text-lg">👍</span>
                       <span className="text-sm text-gray-600">مفيد</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-lg">💬</span>
                       <span className="text-sm text-gray-600">تعليقات</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-lg">📤</span>
                       <span className="text-sm text-gray-600">مشاركة</span>
                     </div>
                   </div>
@@ -239,7 +223,6 @@ const BlogDetail: React.FC = () => {
                       variant="primary"
                       className="flex items-center gap-2"
                     >
-                      <span className="text-lg">📤</span>
                       مشاركة المقال
                     </Button>
                   </div>
@@ -260,27 +243,21 @@ const BlogDetail: React.FC = () => {
               </div>
             ) : relatedBlogs && relatedBlogs.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {relatedBlogs.map((relatedBlog, index) => {
-                  const gradients = [
-                    'from-blue-400 to-purple-500',
-                    'from-green-400 to-blue-500',
-                    'from-orange-400 to-red-500',
-                    'from-pink-400 to-red-500',
-                    'from-indigo-400 to-purple-500',
-                    'from-teal-400 to-blue-500',
-                  ];
-
-                  const gradient = gradients[index % gradients.length];
-
-                  return (
-                    <Link
-                      key={relatedBlog.id}
-                      to={`/blogs/${relatedBlog.id}`}
-                      className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:transform hover:-translate-y-1"
-                    >
-                      <div
-                        className={`h-48 bg-gradient-to-br ${gradient}`}
-                      ></div>
+                {relatedBlogs.map((relatedBlog) => (
+                  <Link
+                    key={relatedBlog.id}
+                    to={`/blogs/${relatedBlog.id}`}
+                    className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:transform hover:-translate-y-1"
+                  >
+                    <div className="h-48 overflow-hidden">
+                      <SmartImage
+                        src={relatedBlog.image_url}
+                        alt={relatedBlog.title}
+                        type="blog"
+                        className="w-full h-full"
+                        size="md"
+                      />
+                    </div>
                       <div className="p-6">
                         <h3 className="font-bold text-lg mb-2 text-gray-900 hover:text-blue-600 transition-colors">
                           {relatedBlog.title}

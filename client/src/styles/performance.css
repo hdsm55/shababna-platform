@@ -1,0 +1,444 @@
+/* Performance Optimized CSS - Shababna Platform */
+
+/* Critical CSS - يتم تحميله في <head> */
+:root {
+  --font-display: swap;
+  --font-loading: fallback;
+  --image-loading: lazy;
+  --transition-duration: 300ms;
+  --animation-duration: 500ms;
+}
+
+/* تحسين تحميل الخطوط */
+@font-face {
+  font-family: 'Inter';
+  font-display: var(--font-display);
+  font-weight: 400;
+  src: url('/fonts/Inter-Regular.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-display: var(--font-display);
+  font-weight: 600;
+  src: url('/fonts/Inter-SemiBold.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-display: var(--font-display);
+  font-weight: 700;
+  src: url('/fonts/Inter-Bold.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Noto Sans Arabic';
+  font-display: var(--font-display);
+  font-weight: 400;
+  src: url('/fonts/NotoSansArabic-Regular.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE80-FEFC;
+}
+
+@font-face {
+  font-family: 'Noto Sans Arabic';
+  font-display: var(--font-display);
+  font-weight: 600;
+  src: url('/fonts/NotoSansArabic-SemiBold.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE80-FEFC;
+}
+
+@font-face {
+  font-family: 'Noto Sans Arabic';
+  font-display: var(--font-display);
+  font-weight: 700;
+  src: url('/fonts/NotoSansArabic-Bold.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE80-FEFC;
+}
+
+/* تحسين تحميل الصور */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: optimize-contrast;
+  image-rendering: crisp-edges;
+  will-change: opacity;
+}
+
+/* تحسين التمرير */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+/* تحسين الأداء للعناصر المتحركة */
+.animate-on-scroll {
+  will-change: transform, opacity;
+}
+
+.animate-on-hover {
+  will-change: transform;
+}
+
+/* تحسين الأداء للصور */
+.lazy-image {
+  opacity: 0;
+  transition: opacity var(--transition-duration) ease-in-out;
+}
+
+.lazy-image.loaded {
+  opacity: 1;
+}
+
+.lazy-image.error {
+  opacity: 0.5;
+}
+
+/* تحسين الأداء للخطوط */
+.fonts-loading {
+  font-display: var(--font-loading);
+}
+
+.fonts-loaded {
+  font-display: var(--font-display);
+}
+
+/* تحسين الأداء للقوائم */
+.virtual-list {
+  will-change: transform;
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.virtual-list-item {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء للنماذج */
+.form-input {
+  will-change: border-color, box-shadow;
+  transition: border-color var(--transition-duration) ease-in-out,
+              box-shadow var(--transition-duration) ease-in-out;
+}
+
+.form-input:focus {
+  will-change: border-color, box-shadow;
+}
+
+/* تحسين الأداء للأزرار */
+.btn {
+  will-change: transform, box-shadow;
+  transition: transform var(--transition-duration) ease-in-out,
+              box-shadow var(--transition-duration) ease-in-out;
+}
+
+.btn:hover {
+  will-change: transform, box-shadow;
+}
+
+.btn:active {
+  will-change: transform;
+}
+
+/* تحسين الأداء للبطاقات */
+.card {
+  will-change: transform, box-shadow;
+  transition: transform var(--transition-duration) ease-in-out,
+              box-shadow var(--transition-duration) ease-in-out;
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.card:hover {
+  will-change: transform, box-shadow;
+}
+
+/* تحسين الأداء للصور الخلفية */
+.bg-image {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  will-change: opacity;
+}
+
+/* تحسين الأداء للرسوم المتحركة */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* تحسين الأداء للعناصر المتحركة */
+.animate-fade-in {
+  animation: fadeIn var(--animation-duration) ease-out;
+}
+
+.animate-slide-in {
+  animation: slideIn var(--animation-duration) ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn var(--animation-duration) ease-out;
+}
+
+/* تحسين الأداء للقوائم */
+.list-container {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.list-item {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء للجداول */
+.table-container {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.table-row {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.table-cell {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء للتنقل */
+.nav-container {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.nav-item {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء للشريط الجانبي */
+.sidebar-container {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.sidebar-item {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء للمحتوى */
+.content-section {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.content-item {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء للحاويات */
+.container-element {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.container-item {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء للصور */
+.image-container {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.image-item {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء للفيديو */
+.video-container {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.video-item {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء للخرائط */
+.map-container {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.map-item {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء للرسوم البيانية */
+.chart-container {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.chart-item {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء للقوائم المنسدلة */
+.dropdown-container {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.dropdown-item {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء للنوافذ المنبثقة */
+.modal-container {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.modal-item {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء للإشعارات */
+.toast-container {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.toast-item {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء لرسائل التحميل */
+.loading-container {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.loading-item {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء لرسائل الخطأ */
+.error-container {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.error-item {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء لرسائل النجاح */
+.success-container {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.success-item {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء لرسائل التحذير */
+.warning-container {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.warning-item {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء لرسائل المعلومات */
+.info-container {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+.info-item {
+  /* إزالة contain الذي يسبب مشاكل في العرض */
+  box-sizing: border-box;
+}
+
+/* تحسين الأداء للطباعة */
+@media print {
+  * {
+    /* إزالة contain الذي يسبب مشاكل في الطباعة */
+    box-sizing: border-box;
+  }
+}
+
+/* تحسين الأداء للأجهزة المحمولة */
+@media (max-width: 768px) {
+  * {
+    /* إزالة contain الذي يسبب مشاكل في الأجهزة المحمولة */
+    box-sizing: border-box;
+  }
+}
+
+/* تحسين الأداء لأجهزة الكمبيوتر */
+@media (min-width: 769px) {
+  * {
+    /* إزالة contain الذي يسبب مشاكل في أجهزة الكمبيوتر */
+    box-sizing: border-box;
+  }
+}
+
+/* تحسين الأداء للشاشات عالية الدقة */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  * {
+    /* إزالة contain الذي يسبب مشاكل في الشاشات عالية الدقة */
+    box-sizing: border-box;
+  }
+}

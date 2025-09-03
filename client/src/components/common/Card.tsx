@@ -12,9 +12,10 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const variantStyles: Record<CardVariant, string> = {
-  base: 'bg-surface text-textPrimary shadow-sm',
-  accent: 'bg-primary/10 text-primary border border-primary/20',
-  elevated: 'bg-surface text-textPrimary shadow-lg',
+  base: 'bg-surface text-textPrimary shadow-secondary-sm',
+  accent:
+    'bg-primary/10 text-primary border border-primary/20 shadow-accent-sm',
+  elevated: 'bg-surface text-textPrimary shadow-secondary-lg',
 };
 
 const paddingStyles: Record<CardProps['padding'], string> = {
@@ -38,7 +39,7 @@ const Card: React.FC<CardProps> = ({
         'rounded-lg transition-shadow duration-200',
         variantStyles[variant],
         paddingStyles[padding],
-        hover && 'hover:shadow-lg',
+        hover && 'hover:shadow-secondary-hover',
         className
       )}
       {...props}

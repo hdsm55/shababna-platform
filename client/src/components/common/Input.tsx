@@ -34,7 +34,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             className={clsx(
               'block w-full rounded-md border bg-surface text-textPrimary placeholder:text-textSecondary focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-150',
-              'py-2 px-3',
+              'py-2 px-3 shadow-secondary-sm focus:shadow-accent-md',
               Icon && 'pl-10 rtl:pr-10 rtl:pl-3',
               error && 'border-error focus:ring-error focus:border-error',
               !error && 'border-secondary',

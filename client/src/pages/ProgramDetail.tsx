@@ -257,13 +257,13 @@ const ProgramDetail: React.FC = () => {
               transition={{ duration: 0.6 }}
             >
               <img
-                src={program.image_url || '/images/program-placeholder.svg'}
+                src={program.image_url || '/images/programs-default.jpg'}
                 alt={program.title}
                 className="w-full h-96 object-cover rounded-2xl shadow-lg"
                 loading="lazy"
                 onError={(e) => {
                   console.log('Image failed to load:', program.image_url);
-                  e.currentTarget.src = '/images/program-placeholder.svg';
+                  e.currentTarget.src = '/images/programs-default.jpg';
                 }}
               />
             </motion.div>

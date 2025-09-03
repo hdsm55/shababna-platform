@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار الظلال المخصصة - منصة شبابنا</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* الظلال المخصصة */
+        .shadow-primary {
+            box-shadow: 0 1px 3px 0 rgba(39, 84, 138, 0.1), 0 1px 2px 0 rgba(39, 84, 138, 0.06);
+        }
+
+        .shadow-primary-md {
+            box-shadow: 0 4px 6px -1px rgba(39, 84, 138, 0.1), 0 2px 4px -1px rgba(39, 84, 138, 0.06);
+        }
+
+        .shadow-primary-lg {
+            box-shadow: 0 10px 15px -3px rgba(39, 84, 138, 0.1), 0 4px 6px -2px rgba(39, 84, 138, 0.05);
+        }
+
+        .shadow-primary-xl {
+            box-shadow: 0 20px 25px -5px rgba(39, 84, 138, 0.1), 0 10px 10px -5px rgba(39, 84, 138, 0.04);
+        }
+
+        .shadow-primary-2xl {
+            box-shadow: 0 25px 50px -12px rgba(39, 84, 138, 0.25);
+        }
+
+        .shadow-secondary {
+            box-shadow: 0 1px 3px 0 rgba(24, 59, 78, 0.1), 0 1px 2px 0 rgba(24, 59, 78, 0.06);
+        }
+
+        .shadow-secondary-md {
+            box-shadow: 0 4px 6px -1px rgba(24, 59, 78, 0.1), 0 2px 4px -1px rgba(24, 59, 78, 0.06);
+        }
+
+        .shadow-secondary-lg {
+            box-shadow: 0 10px 15px -3px rgba(24, 59, 78, 0.1), 0 4px 6px -2px rgba(24, 59, 78, 0.05);
+        }
+
+        .shadow-secondary-xl {
+            box-shadow: 0 20px 25px -5px rgba(24, 59, 78, 0.1), 0 10px 10px -5px rgba(24, 59, 78, 0.04);
+        }
+
+        .shadow-accent {
+            box-shadow: 0 1px 3px 0 rgba(221, 168, 83, 0.1), 0 1px 2px 0 rgba(221, 168, 83, 0.06);
+        }
+
+        .shadow-accent-md {
+            box-shadow: 0 4px 6px -1px rgba(221, 168, 83, 0.1), 0 2px 4px -1px rgba(221, 168, 83, 0.06);
+        }
+
+        .shadow-accent-lg {
+            box-shadow: 0 10px 15px -3px rgba(221, 168, 83, 0.1), 0 4px 6px -2px rgba(221, 168, 83, 0.05);
+        }
+
+        .shadow-accent-xl {
+            box-shadow: 0 20px 25px -5px rgba(221, 168, 83, 0.1), 0 10px 10px -5px rgba(221, 168, 83, 0.04);
+        }
+
+        /* ظلال تفاعلية */
+        .shadow-primary-hover {
+            transition: box-shadow 0.3s ease;
+        }
+
+        .shadow-primary-hover:hover {
+            box-shadow: 0 20px 25px -5px rgba(39, 84, 138, 0.15), 0 10px 10px -5px rgba(39, 84, 138, 0.06);
+        }
+
+        .shadow-secondary-hover {
+            transition: box-shadow 0.3s ease;
+        }
+
+        .shadow-secondary-hover:hover {
+            box-shadow: 0 20px 25px -5px rgba(24, 59, 78, 0.15), 0 10px 10px -5px rgba(24, 59, 78, 0.06);
+        }
+
+        .shadow-accent-hover {
+            transition: box-shadow 0.3s ease;
+        }
+
+        .shadow-accent-hover:hover {
+            box-shadow: 0 20px 25px -5px rgba(221, 168, 83, 0.15), 0 10px 10px -5px rgba(221, 168, 83, 0.06);
+        }
+
+        /* ألوان الهوية */
+        .bg-primary-500 { background-color: #27548A; }
+        .bg-secondary-500 { background-color: #183B4E; }
+        .bg-accent-500 { background-color: #DDA853; }
+        .text-primary-500 { color: #27548A; }
+        .text-secondary-500 { color: #183B4E; }
+        .text-accent-500 { color: #DDA853; }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-center mb-12 text-gray-800">🎨 اختبار الظلال المخصصة</h1>
+
+        <!-- الظلال الأساسية -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6 text-primary-500">🔵 الظلال الأساسية (Primary)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-primary text-center">
+                    <h3 class="font-semibold mb-2">خفيف</h3>
+                    <p class="text-sm text-gray-600">shadow-primary</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-primary-md text-center">
+                    <h3 class="font-semibold mb-2">متوسط</h3>
+                    <p class="text-sm text-gray-600">shadow-primary-md</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-primary-lg text-center">
+                    <h3 class="font-semibold mb-2">كبير</h3>
+                    <p class="text-sm text-gray-600">shadow-primary-lg</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-primary-xl text-center">
+                    <h3 class="font-semibold mb-2">كبير جداً</h3>
+                    <p class="text-sm text-gray-600">shadow-primary-xl</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-primary-2xl text-center">
+                    <h3 class="font-semibold mb-2">ضخم</h3>
+                    <p class="text-sm text-gray-600">shadow-primary-2xl</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- الظلال الثانوية -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6 text-secondary-500">🔷 الظلال الثانوية (Secondary)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-secondary text-center">
+                    <h3 class="font-semibold mb-2">خفيف</h3>
+                    <p class="text-sm text-gray-600">shadow-secondary</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-secondary-md text-center">
+                    <h3 class="font-semibold mb-2">متوسط</h3>
+                    <p class="text-sm text-gray-600">shadow-secondary-md</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-secondary-lg text-center">
+                    <h3 class="font-semibold mb-2">كبير</h3>
+                    <p class="text-sm text-gray-600">shadow-secondary-lg</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-secondary-xl text-center">
+                    <h3 class="font-semibold mb-2">كبير جداً</h3>
+                    <p class="text-sm text-gray-600">shadow-secondary-xl</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- الظلال المميزة -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6 text-accent-500">🟡 الظلال المميزة (Accent)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-accent text-center">
+                    <h3 class="font-semibold mb-2">خفيف</h3>
+                    <p class="text-sm text-gray-600">shadow-accent</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-accent-md text-center">
+                    <h3 class="font-semibold mb-2">متوسط</h3>
+                    <p class="text-sm text-gray-600">shadow-accent-md</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-accent-lg text-center">
+                    <h3 class="font-semibold mb-2">كبير</h3>
+                    <p class="text-sm text-gray-600">shadow-accent-lg</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-accent-xl text-center">
+                    <h3 class="font-semibold mb-2">كبير جداً</h3>
+                    <p class="text-sm text-gray-600">shadow-accent-xl</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- الظلال التفاعلية -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">⚡ الظلال التفاعلية</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-primary-md shadow-primary-hover text-center cursor-pointer">
+                    <h3 class="font-semibold mb-2 text-primary-500">أساسي تفاعلي</h3>
+                    <p class="text-sm text-gray-600">hover للتفاعل</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-secondary-md shadow-secondary-hover text-center cursor-pointer">
+                    <h3 class="font-semibold mb-2 text-secondary-500">ثانوي تفاعلي</h3>
+                    <p class="text-sm text-gray-600">hover للتفاعل</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-accent-md shadow-accent-hover text-center cursor-pointer">
+                    <h3 class="font-semibold mb-2 text-accent-500">مميز تفاعلي</h3>
+                    <p class="text-sm text-gray-600">hover للتفاعل</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- أمثلة عملية -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">📱 أمثلة عملية</h2>
+
+            <!-- البطاقات -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-secondary-md p-6">
+                    <h3 class="font-bold text-lg mb-2">بطاقة عادية</h3>
+                    <p class="text-gray-600">هذه بطاقة تستخدم الظلال الثانوية المتوسطة</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-primary-lg p-6">
+                    <h3 class="font-bold text-lg mb-2">بطاقة مهمة</h3>
+                    <p class="text-gray-600">هذه بطاقة تستخدم الظلال الأساسية الكبيرة</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-accent-md p-6">
+                    <h3 class="font-bold text-lg mb-2">بطاقة مميزة</h3>
+                    <p class="text-gray-600">هذه بطاقة تستخدم الظلال المميزة المتوسطة</p>
+                </div>
+            </div>
+
+            <!-- الأزرار -->
+            <div class="flex flex-wrap gap-4 justify-center">
+                <button class="bg-primary-500 text-white px-6 py-3 rounded-lg shadow-primary-md hover:shadow-primary-hover transition-all duration-300">
+                    زر أساسي
+                </button>
+                <button class="bg-secondary-500 text-white px-6 py-3 rounded-lg shadow-secondary-md hover:shadow-secondary-hover transition-all duration-300">
+                    زر ثانوي
+                </button>
+                <button class="bg-accent-500 text-white px-6 py-3 rounded-lg shadow-accent-md hover:shadow-accent-hover transition-all duration-300">
+                    زر مميز
+                </button>
+            </div>
+        </section>
+
+        <!-- معلومات الألوان -->
+        <section class="bg-white rounded-lg shadow-secondary-lg p-8">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">🎨 معلومات الألوان المستخدمة</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-primary-500 rounded-lg mx-auto mb-3"></div>
+                    <h3 class="font-bold text-primary-500">أساسي (Primary)</h3>
+                    <p class="text-sm text-gray-600">#27548A</p>
+                    <p class="text-xs text-gray-500">YInMn Blue</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-secondary-500 rounded-lg mx-auto mb-3"></div>
+                    <h3 class="font-bold text-secondary-500">ثانوي (Secondary)</h3>
+                    <p class="text-sm text-gray-600">#183B4E</p>
+                    <p class="text-xs text-gray-500">Japanese Indigo</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-accent-500 rounded-lg mx-auto mb-3"></div>
+                    <h3 class="font-bold text-accent-500">مميز (Accent)</h3>
+                    <p class="text-sm text-gray-600">#DDA853</p>
+                    <p class="text-xs text-gray-500">Indian Yellow</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // إضافة تأثيرات تفاعلية إضافية
+        document.addEventListener('DOMContentLoaded', function() {
+            const interactiveCards = document.querySelectorAll('.shadow-primary-hover, .shadow-secondary-hover, .shadow-accent-hover');
+
+            interactiveCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

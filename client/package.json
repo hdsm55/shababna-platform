@@ -9,14 +9,22 @@
     "build:render": "npm install && npm run build",
     "build:check": "tsc && vite build",
     "build:verify": "npm run build && node scripts/check-build.js",
+    "build:analyze": "vite build --mode analyze",
+    "build:prod": "vite build --mode production",
     "serve": "vite preview",
+    "preview": "vite preview --port 4173",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "clean-imports": "node scripts/clean-imports.js"
+    "clean-imports": "node scripts/clean-imports.js",
+    "performance:lighthouse": "lighthouse http://localhost:5173 --output html --output-path ./lighthouse-report.html",
+    "performance:build": "npm run build && npm run performance:lighthouse",
+    "performance:analyze": "npm run build:analyze && npm run performance:lighthouse",
+    "performance:monitor": "node scripts/performance-monitor.js",
+    "performance:optimize": "node scripts/performance-optimizer.js"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.0.0",

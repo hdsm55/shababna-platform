@@ -32,18 +32,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, [location.pathname]);
 
   return (
-    <div
-      className={`min-h-screen flex flex-col ${
-        isRTL ? 'font-arabic' : 'font-sans'
-      }`}
-    >
+    <div className={`fix-layout ${isRTL ? 'font-arabic' : 'font-sans'}`}>
       <Header />
-      <main className="flex-1 flex flex-col">
-        <div className="flex-1">
+      <main className="fix-content">
+        <div className="page-container">
           <InstantLoader>{children || <Outlet />}</InstantLoader>
         </div>
       </main>
-      {showFooter && <Footer />}
+      {showFooter && (
+        <div className="fix-footer">
+          <Footer />
+        </div>
+      )}
     </div>
   );
 };

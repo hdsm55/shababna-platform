@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 interface SmartImageProps {
   src?: string;
   alt: string;
-  type: 'event' | 'program';
+  type: 'event' | 'program' | 'blog';
   title?: string;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
@@ -29,9 +29,11 @@ const SmartImage: React.FC<SmartImageProps> = ({
 
   const getPlaceholderSrc = () => {
     if (type === 'event') {
-      return '/images/event-placeholder.svg';
+      return '/images/events-default.jpg';
+    } else if (type === 'blog') {
+      return '/images/blog-logo.jpg';
     } else {
-      return '/images/program-placeholder.svg';
+      return '/images/programs-default.jpg';
     }
   };
 
@@ -50,6 +52,12 @@ const SmartImage: React.FC<SmartImageProps> = ({
 
   // إذا لم توجد صورة أو حدث خطأ، اعرض placeholder
   if (!src || hasError) {
+    const placeholderSrc = getPlaceholderSrc();
+    console.log(
+      `🔍 SmartImage: Using placeholder for ${type}:`,
+      placeholderSrc
+    );
+
     return (
       <motion.div
         className={`relative overflow-hidden rounded-lg ${sizeClasses[size]} ${className}`}
@@ -58,9 +66,16 @@ const SmartImage: React.FC<SmartImageProps> = ({
         transition={{ duration: 0.3 }}
       >
         <img
-          src={getPlaceholderSrc()}
+          src={placeholderSrc}
           alt={alt}
           className="w-full h-full object-cover"
+          onError={(e) => {
+            console.error(
+              `❌ SmartImage: Failed to load placeholder for ${type}:`,
+              placeholderSrc
+            );
+            e.currentTarget.style.display = 'none';
+          }}
         />
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none"></div>

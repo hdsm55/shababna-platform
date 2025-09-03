@@ -33,26 +33,24 @@ const FeaturesSection = React.lazy(
 
 // تحسين الأداء - مكونات منفصلة مع تحسينات
 const TestimonialsSection = memo(() => {
+  const { t } = useTranslation();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
 
   const testimonials = [
     {
-      name: 'أحمد محمد',
-      role: 'طالب جامعي',
-      content:
-        'شبابنا منظمة رائعة ساعدتني في تطوير مهاراتي القيادية والتواصل مع شباب من مختلف الدول',
+      name: t('home.testimonials.name1'),
+      role: t('home.testimonials.role1'),
+      content: t('home.testimonials.content1'),
     },
     {
-      name: 'فاطمة علي',
-      role: 'مهندسة',
-      content:
-        'البرامج التطويرية ممتازة وساعدتني في بناء شبكة علاقات قوية مع شباب مسلمين من حول العالم',
+      name: t('home.testimonials.name2'),
+      role: t('home.testimonials.role2'),
+      content: t('home.testimonials.content2'),
     },
     {
-      name: 'محمد حسن',
-      role: 'طبيب',
-      content:
-        'الفعاليات والورش التفاعلية كانت تجربة رائعة ساعدتني في تطوير شخصيتي ومهاراتي',
+      name: t('home.testimonials.name3'),
+      role: t('home.testimonials.role3'),
+      content: t('home.testimonials.content3'),
     },
   ];
 
@@ -75,10 +73,10 @@ const TestimonialsSection = memo(() => {
           className="text-center mb-12"
         >
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-            ماذا يقول شبابنا
+            {t('home.testimonials.title')}
           </h2>
           <p className="text-base md:text-lg text-primary-100 max-w-3xl mx-auto leading-relaxed">
-            قصص نجاح وتجارب ملهمة من شبابنا حول العالم
+            {t('home.testimonials.subtitle')}
           </p>
         </motion.div>
 
@@ -210,7 +208,16 @@ const LatestEventsSection = memo(() => {
               transition={{ duration: 0.3 }}
               className="h-full overflow-hidden shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
             >
-              <div className="h-40 bg-gradient-to-br from-primary-700 via-primary-800 to-secondary-800 relative overflow-hidden">
+              <div className="h-40 relative overflow-hidden">
+                <img
+                  src={event.image_url || '/images/events-default.jpg'}
+                  alt={event.title}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.src = '/images/events-default.jpg';
+                  }}
+                />
                 <div className="absolute inset-0 bg-dark-500/20" />
                 <div className="absolute top-3 right-3">
                   <span className="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">
@@ -362,7 +369,16 @@ const LatestProgramsSection = memo(() => {
                 transition={{ duration: 0.3 }}
                 className="h-full overflow-hidden shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
               >
-                <div className="h-40 bg-gradient-to-br from-secondary-700 via-secondary-800 to-dark-800 relative overflow-hidden">
+                <div className="h-40 relative overflow-hidden">
+                  <img
+                    src={program.image_url || '/images/programs-default.jpg'}
+                    alt={program.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.src = '/images/programs-default.jpg';
+                    }}
+                  />
                   <div className="absolute inset-0 bg-dark-500/20" />
                   <div className="absolute top-3 right-3">
                     <span className="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-xs font-medium">
@@ -532,7 +548,7 @@ NewsletterSection.displayName = 'NewsletterSection';
 
 // مكون التحميل المحسن
 const LoadingFallback = () => (
-  <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-primary-50 flex items-center justify-center">
+  <div className="page-container bg-gradient-to-br from-neutral-50 to-primary-50 flex items-center justify-center">
     <div className="text-center">
       <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
       <p className="text-dark-600">جاري التحميل...</p>
@@ -569,7 +585,7 @@ const Home: React.FC = () => {
         image="/images/hero-bg.jpg"
       />
 
-      <main className="min-h-screen">
+      <main className="page-container">
         {/* Hero Section */}
         <Suspense fallback={<LoadingFallback />}>
           <HeroSection />

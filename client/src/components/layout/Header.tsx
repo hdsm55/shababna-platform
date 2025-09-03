@@ -54,10 +54,9 @@ const Header: React.FC = () => {
             className="flex items-center space-x-3 rtl:space-x-reverse group"
           >
             <img
-              src="/images/logo.png"
+              src="/images/logo.jpg"
               alt="شبابنا - الشعار"
-              className="h-10 w-auto object-contain drop-shadow"
-              style={{ maxHeight: 40 }}
+              className="h-12 w-12 object-cover rounded-lg drop-shadow"
             />
           </Link>
 

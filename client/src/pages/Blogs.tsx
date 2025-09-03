@@ -7,7 +7,7 @@ import { Button } from '../components/ui/Button/ButtonSimple';
 import SEO from '../components/common/SEO';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { useTranslation } from 'react-i18next';
-import LazyImage from '../components/common/LazyImage';
+import SmartImage from '../components/common/SmartImage';
 import { useDebounce } from '../hooks/useDebounce';
 import { Input } from '../components/ui/Input/Input';
 import { Skeleton } from '../components/common/Skeleton';
@@ -29,16 +29,21 @@ const Blogs: React.FC = () => {
   const isRTL = i18n.dir() === 'rtl';
 
   return (
-    <section className="py-12 bg-neutral-50" dir={isRTL ? 'rtl' : 'ltr'}>
+    <section
+      className="page-container py-12 bg-neutral-50"
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
       <SEO
         title={t('blogs.title', 'المدونة')}
         description={t('blogs.subtitle', 'أحدث المقالات والتدوينات من شبابنا')}
         type="website"
       />
       <div className="max-w-5xl mx-auto px-4">
-        <h1 className="text-4xl font-extrabold text-primary-700 mb-10 text-center drop-shadow-sm">
-          {t('blogs.title', 'المدونة')}
-        </h1>
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-extrabold text-primary-700 drop-shadow-sm">
+            {t('blogs.title', 'المدونة')}
+          </h1>
+        </div>
         <div className="flex flex-col md:flex-row gap-4 items-center mb-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -110,17 +115,23 @@ const Blogs: React.FC = () => {
                 variant="elevated"
                 className="flex flex-col h-full shadow-lg hover:shadow-2xl transition-all group"
               >
-                <div className="h-44 w-full rounded-lg overflow-hidden mb-4 bg-neutral-100 flex items-center justify-center">
+                <div className="h-44 w-full rounded-lg overflow-hidden mb-4">
                   {blog.image_url ? (
-                    <LazyImage
+                    <SmartImage
                       src={blog.image_url}
                       alt={blog.title}
-                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                      type="blog"
+                      className="w-full h-full group-hover:scale-105 transition-transform duration-300"
+                      size="sm"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-neutral-400 text-6xl">
-                      <span>📝</span>
-                    </div>
+                    <SmartImage
+                      src={null}
+                      alt={blog.title}
+                      type="blog"
+                      className="w-full h-full group-hover:scale-105 transition-transform duration-300"
+                      size="sm"
+                    />
                   )}
                 </div>
                 <h2 className="text-xl font-bold text-primary-800 mb-2 line-clamp-2">

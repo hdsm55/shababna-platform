@@ -137,11 +137,31 @@ export default {
         'gradient-brand-text': 'linear-gradient(135deg, #27548A 0%, #DDA853 100%)',
       },
       boxShadow: {
+        // ظلال اللون الأساسي (Primary)
         'brand-sm': '0 1px 2px 0 rgba(39, 84, 138, 0.05)',
         'brand-md': '0 4px 6px -1px rgba(39, 84, 138, 0.1), 0 2px 4px -1px rgba(39, 84, 138, 0.06)',
         'brand-lg': '0 10px 15px -3px rgba(39, 84, 138, 0.1), 0 4px 6px -2px rgba(39, 84, 138, 0.05)',
         'brand-xl': '0 20px 25px -5px rgba(39, 84, 138, 0.1), 0 10px 10px -5px rgba(39, 84, 138, 0.04)',
         'brand-2xl': '0 25px 50px -12px rgba(39, 84, 138, 0.25)',
+
+        // ظلال اللون الثانوي (Secondary)
+        'secondary-sm': '0 1px 2px 0 rgba(24, 59, 78, 0.05)',
+        'secondary-md': '0 4px 6px -1px rgba(24, 59, 78, 0.1), 0 2px 4px -1px rgba(24, 59, 78, 0.06)',
+        'secondary-lg': '0 10px 15px -3px rgba(24, 59, 78, 0.1), 0 4px 6px -2px rgba(24, 59, 78, 0.05)',
+        'secondary-xl': '0 20px 25px -5px rgba(24, 59, 78, 0.1), 0 10px 10px -5px rgba(24, 59, 78, 0.04)',
+        'secondary-2xl': '0 25px 50px -12px rgba(24, 59, 78, 0.25)',
+
+        // ظلال اللون المميز (Accent)
+        'accent-sm': '0 1px 2px 0 rgba(221, 168, 83, 0.05)',
+        'accent-md': '0 4px 6px -1px rgba(221, 168, 83, 0.1), 0 2px 4px -1px rgba(221, 168, 83, 0.06)',
+        'accent-lg': '0 10px 15px -3px rgba(221, 168, 83, 0.1), 0 4px 6px -2px rgba(221, 168, 83, 0.05)',
+        'accent-xl': '0 20px 25px -5px rgba(221, 168, 83, 0.1), 0 10px 10px -5px rgba(221, 168, 83, 0.04)',
+        'accent-2xl': '0 25px 50px -12px rgba(221, 168, 83, 0.25)',
+
+        // ظلال تفاعلية
+        'brand-hover': '0 20px 25px -5px rgba(39, 84, 138, 0.15), 0 10px 10px -5px rgba(39, 84, 138, 0.06)',
+        'secondary-hover': '0 20px 25px -5px rgba(24, 59, 78, 0.15), 0 10px 10px -5px rgba(24, 59, 78, 0.06)',
+        'accent-hover': '0 20px 25px -5px rgba(221, 168, 83, 0.15), 0 10px 10px -5px rgba(221, 168, 83, 0.06)',
       },
       animation: {
         'gradient-shift': 'gradientShift 15s ease infinite',

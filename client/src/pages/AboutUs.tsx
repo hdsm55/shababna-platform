@@ -47,6 +47,14 @@ const HeroSection = memo(() => {
           animate="visible"
           className="text-center space-y-4"
         >
+          <motion.img
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.5 }}
+            src="/images/logo.jpg"
+            alt="شبابنا العالمية"
+            className="h-16 w-16 object-cover rounded-2xl mx-auto mb-4 shadow-lg"
+          />
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -99,33 +107,51 @@ const PresidentMessage = memo(() => {
               كلمة رئيس المنظمة
             </h2>
             <p className="text-sm text-primary-500">
-              أحمد محمد - رئيس منصة شبابنا العالمية
+              محمود الحسنات - رئيس منصة شبابنا العالمية
             </p>
           </div>
 
           <div className="text-dark-400 space-y-4 text-sm leading-relaxed">
-            <p>بسم الله الرحمن الرحيم،</p>
+            <p>بسم الله الرحمن الرحيم</p>
 
             <p>
-              يسعدني أن أرحب بكم في منصة شبابنا العالمية، منصة رقمية تجمع الشباب
-              المسلم من جميع أنحاء العالم لصناعة التغيير الإيجابي.
+              مرحباً بكم في الموقع الرسمي لـ منظمة شبابنا العالمية، المنصة التي
+              انطلقت من هموم الأمة وآمال شبابها، لتصنع من الحلم واقعاً، ومن
+              الوعي عملاً، ومن الطموح نهضةً ممتدة.
             </p>
 
             <p>
-              من قلب إسطنبول، المدينة التي تجمع بين الشرق والغرب، نعمل معاً
-              لبناء مستقبل مشرق للشباب المسلم. نؤمن بأن الشباب هم قادة الغد، وأن
-              لديهم القدرة على إحداث تغيير إيجابي في العالم.
+              لقد آمنتُ منذ اللحظة الأولى أن الشباب هم طاقة التغيير، وهم الأمل
+              الذي تُبنى عليه الأوطان وتُصاغ به الحضارات. ومن هنا، كان لا بد من
+              إنشاء هذا الصرح الشبابي العالمي المستقل، ليجمع القلوب والعقول،
+              ويوحّد الطاقات في مسارٍ يليق بأمة أراد الله لها أن تكون شاهدةً على
+              الناس.
             </p>
 
             <p>
-              من خلال برامجنا وفعالياتنا المتنوعة، نسعى لتطوير مهارات الشباب،
-              وتعزيز قيمهم الإسلامية، وتمكينهم من المساهمة في بناء مجتمعاتهم.
+              في منظمة شبابنا العالمية، نسعى إلى بناء جيلٍ واعٍ، مؤمن برسالته،
+              راسخ في قيمه، مبدع في عطائه، وقادر على صناعة الأثر في مجتمعه
+              وأمته. رؤيتنا واضحة: الريادة العالمية في تمكين الشباب. ورسالتنا
+              راسخة: إعداد شبابٍ ملتزمٍ يحمل رسالة الإيمان، ويخوض معركة الوعي،
+              ويسهم في صناعة التغيير الإيجابي.
+            </p>
+
+            <p>
+              إننا اليوم، مع كل شابٍ وشابةٍ يؤمنون بقوة الفكرة، وبعظمة الانتماء،
+              وبأن الإصلاح يبدأ منّا نحن، نمضي لنقدّم برامج نوعية في التربية
+              والإعلام والتنمية والهوية والقضايا الإسلامية، لنصنع معاً غداً
+              أجمل، ومستقبلاً أوسع، وأمةً أرفع.
+            </p>
+
+            <p>
+              فأهلاً بكم في بيتكم، ومرحبا بانضمامكم إلى مسيرةٍ شبابيةٍ عالميةٍ
+              لا تعرف الحدود، شعارها: إيمان، وعي، عمل، وتأثير.
             </p>
 
             <p className="font-medium">
               مع تحياتي،
               <br />
-              أحمد محمد
+              محمود الحسنات
               <br />
               رئيس منصة شبابنا العالمية
             </p>
@@ -375,7 +401,19 @@ const AboutUs: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-gradient-brand-light">
+    <div className="page-container bg-gradient-to-br from-primary-50 via-white to-secondary-50 relative overflow-hidden">
+      {/* Background decoration - مطابق لصفحات Contact/JoinUs */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+        className="absolute inset-0 pointer-events-none"
+      >
+        <div className="absolute top-20 left-10 w-32 h-32 bg-primary-200 rounded-full blur-3xl opacity-30" />
+        <div className="absolute bottom-20 right-10 w-40 h-40 bg-secondary-200 rounded-full blur-3xl opacity-30" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-primary-100 rounded-full blur-3xl opacity-20" />
+        <div className="absolute top-1/3 right-1/4 w-24 h-24 bg-accent-200 rounded-full blur-2xl opacity-25" />
+      </motion.div>
       <SEO
         title={t('about.pageTitle', 'من نحن - منصة شبابنا')}
         description={t(
@@ -388,7 +426,7 @@ const AboutUs: React.FC = () => {
 
       <HeroSection />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 relative z-10">
         <PresidentMessage />
         <VisionMission />
         <CoreValues />

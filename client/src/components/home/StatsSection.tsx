@@ -1,32 +1,35 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Users, Globe, Calendar, TrendingUp } from 'lucide-react';
 
 const StatsSection: React.FC = () => {
-  // استخدام البيانات الثابتة لتجنب مشاكل التحميل اللانهائي
+  const { t } = useTranslation();
+
+  // استخدام البيانات من الترجمة
   const stats = [
     {
       icon: Users,
-      number: '1,240+',
-      label: 'شباب مشاركون',
+      number: t('home.stats.membersNumber'),
+      label: t('home.stats.members'),
       color: 'primary',
     },
     {
       icon: Globe,
-      number: '18',
-      label: 'دول مملكة',
+      number: t('home.stats.countriesNumber'),
+      label: t('home.stats.countries'),
       color: 'secondary',
     },
     {
       icon: Calendar,
-      number: '87',
-      label: 'فعاليات منظمة',
+      number: t('home.stats.eventsNumber'),
+      label: t('home.stats.events'),
       color: 'primary',
     },
     {
       icon: TrendingUp,
-      number: '12',
-      label: 'برامج نشطة',
+      number: t('home.stats.programsNumber'),
+      label: t('home.stats.programs'),
       color: 'secondary',
     },
   ];

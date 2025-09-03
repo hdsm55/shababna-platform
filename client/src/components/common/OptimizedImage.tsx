@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface OptimizedImageProps {
   src: string;
@@ -7,47 +7,94 @@ interface OptimizedImageProps {
   className?: string;
   placeholder?: string;
   fallback?: string;
+  sizes?: string;
+  loading?: 'lazy' | 'eager';
   onLoad?: () => void;
   onError?: () => void;
   priority?: boolean;
-  sizes?: string;
 }
 
 const OptimizedImage: React.FC<OptimizedImageProps> = ({
   src,
   alt,
   className = '',
-  placeholder = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzY2NzM4NyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkxvYWRpbmcuLi48L3RleHQ+PC9zdmc+',
-  fallback = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZmVmMmYyIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2RjMjYyNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4=',
+  placeholder = '/images/placeholder.svg',
+  fallback = '/images/fallback.jpg',
+  sizes = '100vw',
+  loading = 'lazy',
   onLoad,
   onError,
   priority = false,
-  sizes = '100vw',
 }) => {
   const [imageSrc, setImageSrc] = useState(placeholder);
-  const [imageRef, setImageRef] = useState<HTMLImageElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [isInView, setIsInView] = useState(priority);
+  const [isInView, setIsInView] = useState(false);
+  const [webpSupported, setWebpSupported] = useState(false);
+  const imageRef = useRef<HTMLImageElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
+  // فحص دعم WebP
   useEffect(() => {
-    if (!imageRef || priority) return;
+    const canvas = document.createElement('canvas');
+    const isWebpSupported =
+      canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+    setWebpSupported(isWebpSupported);
+  }, []);
 
-    const loadImage = () => {
-      const img = new Image();
-      img.src = src;
-      img.onload = () => {
-        setImageSrc(src);
-        setIsLoaded(true);
-        onLoad?.();
-      };
-      img.onerror = () => {
-        setImageSrc(fallback);
-        setHasError(true);
-        onError?.();
-      };
+  // إنشاء مصادر الصور المحسنة
+  const getOptimizedSources = () => {
+    if (!src) return [];
+
+    const baseName = src.replace(/\.(jpg|jpeg|png|webp)$/, '');
+    const extension = webpSupported ? 'webp' : 'jpg';
+
+    return [
+      {
+        media: '(min-width: 1200px)',
+        srcSet: `${baseName}-large.${extension} 1200w`,
+        type: `image/${extension}`,
+      },
+      {
+        media: '(min-width: 768px)',
+        srcSet: `${baseName}-medium.${extension} 768w`,
+        type: `image/${extension}`,
+      },
+      {
+        media: '(min-width: 480px)',
+        srcSet: `${baseName}-small.${extension} 480w`,
+        type: `image/${extension}`,
+      },
+    ];
+  };
+
+  // تحميل الصورة
+  const loadImage = useRef(() => {
+    if (!src) return;
+
+    const img = new Image();
+    img.src = src;
+
+    img.onload = () => {
+      setImageSrc(src);
+      setIsLoaded(true);
+      onLoad?.();
     };
+
+    img.onerror = () => {
+      setImageSrc(fallback);
+      setHasError(true);
+      onError?.();
+    };
+  }).current;
+
+  // Intersection Observer للتحميل الكسول
+  useEffect(() => {
+    if (!imageRef.current || priority) {
+      setIsInView(true);
+      loadImage();
+      return;
+    }
 
     observerRef.current = new IntersectionObserver(
       (entries) => {
@@ -60,83 +107,121 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
         });
       },
       {
-        rootMargin: '150px',
+        rootMargin: '100px',
         threshold: 0.01,
       }
     );
 
-    observerRef.current.observe(imageRef);
+    observerRef.current.observe(imageRef.current);
 
     return () => {
       if (observerRef.current) {
         observerRef.current.disconnect();
       }
     };
-  }, [src, imageRef, onLoad, onError, fallback, priority]);
+  }, [src, priority, loadImage]);
 
-  // تحميل فوري للصور المهمة
+  // تنظيف عند تغيير المصدر
   useEffect(() => {
-    if (priority) {
-      const img = new Image();
-      img.src = src;
-      img.onload = () => {
-        setImageSrc(src);
-        setIsLoaded(true);
-        onLoad?.();
-      };
-      img.onerror = () => {
-        setImageSrc(fallback);
-        setHasError(true);
-        onError?.();
-      };
+    if (isInView && src) {
+      loadImage();
     }
-  }, [src, priority, fallback, onLoad, onError]);
+  }, [src, isInView, loadImage]);
+
+  const sources = getOptimizedSources();
+  const shouldUsePicture = sources.length > 0 && !hasError;
 
   return (
-    <motion.div
-      className={`relative overflow-hidden ${className}`}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
-      <img
-        ref={setImageRef}
-        src={imageSrc}
-        alt={alt}
-        className={`w-full h-full object-cover transition-opacity duration-300 ${
-          isLoaded ? 'opacity-100' : 'opacity-60'
-        }`}
-        loading={priority ? 'eager' : 'lazy'}
-        sizes={sizes}
-        decoding="async"
-      />
+    <div className={`relative overflow-hidden ${className}`}>
+      <AnimatePresence>
+        {!isLoaded && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-gray-200 animate-pulse"
+          />
+        )}
+      </AnimatePresence>
 
-      {/* Loading overlay */}
-      {!isLoaded && !hasError && (
-        <motion.div
-          className="absolute inset-0 bg-neutral-100 flex items-center justify-center"
-          initial={{ opacity: 1 }}
-          animate={{ opacity: 0 }}
-          transition={{ duration: 0.3, delay: 0.5 }}
-        >
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-        </motion.div>
+      {shouldUsePicture ? (
+        <picture>
+          {sources.map((source, index) => (
+            <source
+              key={index}
+              media={source.media}
+              srcSet={source.srcSet}
+              type={source.type}
+            />
+          ))}
+          <motion.img
+            ref={imageRef}
+            src={imageSrc}
+            alt={alt}
+            sizes={sizes}
+            loading={loading}
+            className={`w-full h-full object-cover transition-opacity duration-300 ${
+              isLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
+            onLoad={() => setIsLoaded(true)}
+            onError={() => {
+              setImageSrc(fallback);
+              setHasError(true);
+              onError?.();
+            }}
+            style={{
+              willChange: 'opacity',
+            }}
+          />
+        </picture>
+      ) : (
+        <motion.img
+          ref={imageRef}
+          src={imageSrc}
+          alt={alt}
+          loading={loading}
+          className={`w-full h-full object-cover transition-opacity duration-300 ${
+            isLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+          onLoad={() => setIsLoaded(true)}
+          onError={() => {
+            setImageSrc(fallback);
+            setHasError(true);
+            onError?.();
+          }}
+          style={{
+            willChange: 'opacity',
+          }}
+        />
       )}
 
-      {/* Error overlay */}
+      {/* مؤشر التحميل */}
+      {!isLoaded && !hasError && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin" />
+        </div>
+      )}
+
+      {/* مؤشر الخطأ */}
       {hasError && (
-        <div className="absolute inset-0 bg-error-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-error-500 text-sm font-medium">
-              Image not available
-            </div>
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+          <div className="text-center text-gray-500">
+            <svg
+              className="w-12 h-12 mx-auto mb-2"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <p className="text-sm">فشل في تحميل الصورة</p>
           </div>
         </div>
       )}
-    </motion.div>
+    </div>
   );
 };
 
 export default OptimizedImage;
-
-

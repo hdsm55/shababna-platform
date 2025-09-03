@@ -26,7 +26,8 @@ import { Card } from '../components/ui/Card/Card';
 import { Alert } from '../components/common/DesignSystem';
 
 const EventRegistration: React.FC = () => {
-  const { eventId } = useParams<{ eventId: string }>();
+  const { id } = useParams<{ id: string }>();
+  const eventId = id;
   const navigate = useNavigate();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -80,18 +81,38 @@ const EventRegistration: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        console.error('❌ Invalid date string:', dateString);
+        return 'تاريخ غير صحيح';
+      }
+      return date.toLocaleDateString('ar-SA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    } catch (error) {
+      console.error('❌ Error formatting date:', error);
+      return 'تاريخ غير صحيح';
+    }
   };
 
   const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('ar-SA', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        console.error('❌ Invalid time string:', dateString);
+        return 'وقت غير صحيح';
+      }
+      return date.toLocaleTimeString('ar-SA', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch (error) {
+      console.error('❌ Error formatting time:', error);
+      return 'وقت غير صحيح';
+    }
   };
 
   const getEventIcon = (category: string) => {

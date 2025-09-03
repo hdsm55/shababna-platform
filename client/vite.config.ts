@@ -1,117 +1,170 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-  ],
-  optimizeDeps: {
-    exclude: ['lucide-react'],
-    include: [
-      'react',
-      'react-dom',
-      'react-router-dom',
-      '@tanstack/react-query',
-      'framer-motion',
-      'zustand',
-      'react-hook-form',
-      'i18next',
-      'react-i18next',
-      'i18next-browser-languagedetector',
-      'clsx',
-      'dompurify'
-    ],
-    // تحسين التبعيات
-    force: false,
-  },
-  define: {
-    // Expose environment variables to the client
-    'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL || 'https://shababna-backend.onrender.com/api'),
-  },
-  esbuild: {
-    // Ignore TypeScript errors during build
-    logOverride: { 'this-is-undefined-in-esm': 'silent' },
-    // تحسين البناء
-    target: 'es2020',
-  },
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        secure: false,
-      },
-    },
-    headers: {
-      'Content-Security-Policy': [
-        "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-        "font-src 'self' https://fonts.gstatic.com",
-        "img-src 'self' data: https: blob:",
-        "connect-src 'self' http://localhost:5000 http://127.0.0.1:5000 https://shababna-backend.onrender.com https://*.onrender.com https://*.render.com",
-        "object-src 'none'",
-        "base-uri 'self'",
-        "form-action 'self'",
-        "frame-ancestors 'none'"
-      ].join('; ')
-    },
-    // تحسين سرعة التطوير
-    hmr: {
-      overlay: false, // إزالة overlay الأخطاء لتحسين الأداء
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src'),
+      '@components': resolve(__dirname, 'src/components'),
+      '@pages': resolve(__dirname, 'src/pages'),
+      '@services': resolve(__dirname, 'src/services'),
+      '@utils': resolve(__dirname, 'src/utils'),
+      '@types': resolve(__dirname, 'src/types'),
+      '@store': resolve(__dirname, 'src/store'),
+      '@i18n': resolve(__dirname, 'src/i18n'),
+      '@styles': resolve(__dirname, 'src/styles'),
+      '@images': resolve(__dirname, 'public/images'),
     },
   },
   build: {
+    // تحسين حجم الباندل
+    target: 'es2015',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.debug'],
+      },
+    },
+
+    // تقسيم الباندل
     rollupOptions: {
       output: {
-        // تحسين تقسيم الباندل
         manualChunks: {
+          // المكتبات الأساسية
           vendor: ['react', 'react-dom'],
-          router: ['react-router-dom'],
+
+          // التوجيه
+          router: ['react-router-dom', 'react-router'],
+
+          // واجهة المستخدم والحركات
           ui: ['framer-motion', 'lucide-react'],
-          utils: ['@tanstack/react-query', 'zustand'],
-          forms: ['react-hook-form'],
+
+          // إدارة الحالة والاستعلامات
+          state: ['@tanstack/react-query', 'zustand'],
+
+          // الترجمة
           i18n: ['react-i18next', 'i18next', 'i18next-browser-languagedetector'],
-          dom: ['dompurify', 'clsx'],
+
+          // SEO
+          seo: ['react-helmet-async'],
+
+          // الأدوات المساعدة
+          utils: ['date-fns', 'clsx', 'tailwind-merge'],
         },
-        // Ensure proper asset naming for Render
+
+        // تحسين أسماء الملفات
+        chunkFileNames: (chunkInfo) => {
+          const facadeModuleId = chunkInfo.facadeModuleId
+            ? chunkInfo.facadeModuleId.split('/').pop()?.replace('.tsx', '')
+            : 'chunk'
+          return `js/${facadeModuleId}-[hash].js`
+        },
+
+        entryFileNames: 'js/[name]-[hash].js',
         assetFileNames: (assetInfo) => {
-          const info = assetInfo.name.split('.')
+          const info = assetInfo.name?.split('.') || []
           const ext = info[info.length - 1]
-          if (/\.(css)$/.test(assetInfo.name)) {
-            return `assets/[name]-[hash].${ext}`
+          if (/\.(css)$/.test(assetInfo.name || '')) {
+            return `css/[name]-[hash].${ext}`
           }
-          if (/\.(png|jpe?g|gif|svg|ico|webp)$/.test(assetInfo.name)) {
+          if (/\.(png|jpe?g|gif|svg|webp|ico)$/.test(assetInfo.name || '')) {
             return `images/[name]-[hash].${ext}`
           }
-          if (/\.(woff|woff2|eot|ttf|otf)$/.test(assetInfo.name)) {
+          if (/\.(woff2?|eot|ttf|otf)$/.test(assetInfo.name || '')) {
             return `fonts/[name]-[hash].${ext}`
           }
           return `assets/[name]-[hash].${ext}`
         },
-        chunkFileNames: 'assets/[name]-[hash].js',
-        entryFileNames: 'assets/[name]-[hash].js',
       },
     },
-    // تحسين إعدادات البناء
-    outDir: 'dist',
-    assetsDir: 'assets',
-    // إزالة source maps للإنتاج
+
+    // تحسين CSS
+    cssCodeSplit: true,
+
+    // تحسين Source Maps
     sourcemap: false,
-    // تحسين حجم الباندل
+
+    // تحسين Assets
+    assetsInlineLimit: 4096,
+
+    // تحسين Chunk Size
     chunkSizeWarningLimit: 1000,
-    // تحسين الأمان
-    minify: 'esbuild',
-    target: 'es2015',
-    // تحسين الأداء
-    reportCompressedSize: false, // تسريع البناء
-    emptyOutDir: true,
   },
-  base: '/',
-  // Add preview configuration for SPA routing
-  preview: {
+
+  // تحسينات التطوير
+  server: {
     port: 5173,
     host: true,
+    open: true,
+
+    // تحسين Hot Module Replacement
+    hmr: {
+      overlay: false,
+    },
+  },
+
+  // تحسينات Preview
+  preview: {
+    port: 4173,
+    host: true,
+    open: true,
+  },
+
+  // تحسينات CSS
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@import "@/styles/variables.scss";`,
+      },
+    },
+  },
+
+  // تحسينات الأداء
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      'framer-motion',
+      'lucide-react',
+      '@tanstack/react-query',
+      'react-i18next',
+      'i18next',
+      'zustand',
+    ],
+
+    exclude: ['@tanstack/react-query-devtools'],
+  },
+
+  // تحسينات PWA
+  define: {
+    __PWA_ENABLED__: JSON.stringify(true),
+    __PWA_VERSION__: JSON.stringify('1.0.0'),
+  },
+
+  // تحسينات Worker
+  worker: {
+    format: 'es',
+  },
+
+  // تحسينات Legacy
+  legacy: {
+    // buildSsrCjsExternalHeuristics: true, // غير مدعوم في الإصدار الحالي
+  },
+
+  // تحسينات Experimental
+  experimental: {
+    renderBuiltUrl(filename, { hostType }) {
+      if (hostType === 'js') {
+        return { js: `/${filename}` }
+      } else {
+        return { relative: true }
+      }
+    },
   },
 })

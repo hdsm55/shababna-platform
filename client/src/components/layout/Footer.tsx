@@ -124,9 +124,11 @@ const Footer: React.FC = () => {
           {/* Brand Section */}
           <div className="space-y-6">
             <div className="flex items-center space-x-3 rtl:space-x-reverse">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-lg">SG</span>
-              </div>
+              <img
+                src="/images/logo.jpg"
+                alt="شبابنا"
+                className="h-12 w-12 object-cover rounded-xl shadow-lg"
+              />
               <div>
                 <span className="text-xl font-bold">Shababna Global</span>
                 <div className="text-sm text-neutral-400 font-medium">

@@ -150,11 +150,21 @@ const Programs: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        console.error('❌ Invalid date string:', dateString);
+        return 'تاريخ غير صحيح';
+      }
+      return date.toLocaleDateString('ar-SA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    } catch (error) {
+      console.error('❌ Error formatting date:', error);
+      return 'تاريخ غير صحيح';
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -245,7 +255,7 @@ const Programs: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-orange-50/30">
+    <div className="page-container bg-gradient-to-br from-slate-50 via-blue-50/30 to-orange-50/30">
       <SEO
         title={t('programs.pageTitle', 'البرامج - منصة شبابنا')}
         description={t(
@@ -462,24 +472,19 @@ const Programs: React.FC = () => {
                       className="h-full overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500"
                     >
                       {/* Program Image/Header */}
-                      <div className="relative h-56 bg-gradient-to-br from-slate-600 via-blue-600 to-slate-700 overflow-hidden">
-                        {/* Background Pattern */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-slate-600/50 via-blue-600/50 to-slate-700/50"></div>
-
-                        {/* Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-
-                        {/* Category Icon */}
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="text-center text-white">
-                            <div className="text-6xl mb-3 drop-shadow-lg">
-                              {getCategoryIcon(program.category)}
-                            </div>
-                            <p className="text-lg font-medium drop-shadow-md">
-                              {program.category || 'برنامج'}
-                            </p>
-                          </div>
-                        </div>
+                      <div className="relative h-56 overflow-hidden">
+                        <img
+                          src={
+                            program.image_url || '/images/programs-default.jpg'
+                          }
+                          alt={program.title}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          onError={(e) => {
+                            e.currentTarget.src =
+                              '/images/programs-default.jpg';
+                          }}
+                        />
 
                         {/* Status Badge */}
                         <div className="absolute top-4 right-4">

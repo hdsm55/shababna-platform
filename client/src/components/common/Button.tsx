@@ -26,8 +26,10 @@ const baseStyles =
   'inline-flex items-center justify-center font-semibold transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed rounded-md';
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: 'bg-primary-600 text-white hover:bg-primary-700 shadow-md',
-  secondary: 'bg-secondary-600 text-white hover:bg-secondary-700',
+  primary:
+    'bg-primary-600 text-white hover:bg-primary-700 shadow-brand-md hover:shadow-brand-hover transition-shadow duration-300',
+  secondary:
+    'bg-secondary-600 text-white hover:bg-secondary-700 shadow-secondary-md hover:shadow-secondary-hover transition-shadow duration-300',
   ghost: 'bg-transparent text-primary-600 hover:bg-primary-50',
   icon: 'bg-transparent text-primary-600 p-2 rounded-full hover:bg-primary-50',
   outline:

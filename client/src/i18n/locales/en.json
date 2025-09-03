@@ -1,6 +1,7 @@
 {
   "nav": {
     "home": "Home",
+    "about": "About Us",
     "events": "Events",
     "programs": "Programs",
     "blogs": "Blogs",
@@ -43,79 +44,29 @@
       "logout": "Logout"
     }
   },
-  "home": {
+  "about": {
+    "pageTitle": "About Us - Shababna Platform",
+    "pageDescription": "Learn about Shababna platform and our vision for building the future of Muslim youth",
+    "title": "About Us",
+    "subtitle": "Shababna Global Platform - From the heart of Istanbul, we work together to build the future of Muslim youth in the world",
     "hero": {
-      "badge": "Empowering Youth Worldwide",
-      "title": "Empowering Youth, Building Tomorrow",
-      "subtitle": "Join Shababna Global in creating positive change through innovative programs and community engagement.",
-      "cta": "Get Involved",
-      "learn": "Learn More"
+      "title": "About Us",
+      "subtitle": "Shababna Global Platform - From the heart of Istanbul, we work together to build the future of Muslim youth in the world"
     },
-    "stats": {
-      "members": "Active Members",
-      "events": "Events Hosted",
-      "countries": "Countries Reached",
-      "programs": "Active Programs",
-      "membersNumber": "1240",
-      "eventsNumber": "87",
-      "countriesNumber": "18",
-      "programsNumber": "12"
+    "mission": {
+      "title": "Our Mission",
+      "description": "Empowering Muslim youth through development programs and inspiring events to build a better future"
     },
-    "features": {
-      "title": "What We Do",
-      "subtitle": "Discover our comprehensive approach to youth development and community building",
-      "events": {
-        "title": "Events & Workshops",
-        "description": "Interactive sessions, workshops, and networking events designed to develop skills and build connections."
-      },
-      "programs": {
-        "title": "Development Programs",
-        "description": "Long-term programs focused on leadership development, skill building, and community impact."
-      },
-      "community": {
-        "title": "Global Community",
-        "description": "Connect with like-minded youth from around the world and make lasting friendships."
-      }
+    "vision": {
+      "title": "Our Vision",
+      "description": "To be the leading global platform in developing Muslim youth and empowering them to make positive impact in society"
     },
-    "latest": {
-      "title": "Latest Updates",
-      "subtitle": "Stay updated with our latest events and programs",
-      "events": "Latest Events",
-      "programs": "Latest Programs",
-      "noEvents": "No upcoming events at the moment.",
-      "noPrograms": "No active programs at the moment.",
-      "viewAll": "View All",
-      "explore": "Explore Programs"
-    },
-    "testimonials": {
-      "title": "What Our Members Say",
-      "subtitle": "Hear from our community members about their experiences",
-      "role1": "Community Member",
-      "role2": "Program Participant",
-      "role3": "Event Organizer",
-      "content1": "Shababna Global has transformed my perspective on community service and leadership. The programs are truly life-changing.",
-      "content2": "I've met incredible people from around the world and learned skills that I use every day in my career and personal life.",
-      "content3": "The events and workshops are well-organized and provide valuable networking opportunities for young professionals."
-    },
-    "newsletter": {
-      "title": "Stay Connected",
-      "subtitle": "Subscribe to our newsletter for the latest updates on events, programs, and community news",
-      "placeholder": "Enter your email address",
-      "cta": "Subscribe",
-      "success": "Thank you for subscribing! We'll keep you updated.",
-      "error": "Something went wrong. Please try again.",
-      "privacy": "We respect your privacy. Unsubscribe at any time.",
-      "badge": "Subscribe to the Newsletter"
-    },
-    "cta": {
-      "title": "Ready to Make a Difference?",
-      "subtitle": "Join thousands of young people who are already making positive changes in their communities",
-      "join": "Join Our Community",
-      "explore": "Explore Events"
-    },
-    "modal": {
-      "title": "Welcome to Shababna Global",
-      "content": "Thank you for your interest in our community. We're excited to have you join us on this journey of growth and positive change."
+    "values": {
+      "title": "Our Values",
+      "excellence": "Excellence",
+      "innovation": "Innovation",
+      "community": "Community",
+      "leadership": "Leadership"
     }
   },
   "events": {
@@ -123,7 +74,7 @@
     "subtitle": "Discover exciting events and workshops designed for youth development",
     "hero": {
       "title": "Our Diverse Events",
-      "subtitle": "Discover our diverse activities in the fields of education, spirituality, and professional development. Join us in making positive change."
+      "subtitle": "Discover a variety of activities in education, spirituality, and professional development. Join us in creating positive change."
     },
     "search": {
       "placeholder": "Search events..."
@@ -135,203 +86,217 @@
       "networking": "Networking",
       "seminar": "Seminars",
       "training": "Training",
-      "competition": "Competitions",
-      "cultural": "Cultural Events"
+      "other": "Other"
     },
-    "advancedFilters": {
-      "title": "Advanced Filters",
-      "dateRange": "Date Range",
+    "details": {
+      "date": "Date",
+      "time": "Time",
       "location": "Location",
-      "price": "Price",
-      "status": "Status",
-      "capacity": "Capacity",
-      "duration": "Duration",
-      "organizer": "Organizer",
-      "tags": "Tags",
-      "apply": "Apply Filters",
-      "clear": "Clear Filters",
-      "showMore": "Show More",
-      "showLess": "Show Less"
-    },
-    "filters": {
-      "status": "Status",
       "category": "Category",
-      "location": "Location",
-      "date": "Date",
-      "price": "Price",
-      "allStatus": "All Status",
-      "upcoming": "Upcoming",
-      "ongoing": "Ongoing",
-      "completed": "Completed",
-      "cancelled": "Cancelled",
-      "allCategories": "All Categories",
-      "allLocations": "All Locations",
-      "allPrices": "All Prices",
-      "free": "Free",
-      "paid": "Paid",
-      "donation": "Optional Donation",
-      "lowPrice": "Low Price",
-      "mediumPrice": "Medium Price",
-      "highPrice": "High Price"
+      "attendees": "Attendees",
+      "maxAttendees": "Max Attendees",
+      "status": "Status",
+      "description": "Description",
+      "register": "Register Now",
+      "full": "Full",
+      "available": "Available",
+      "cancelled": "Cancelled"
     },
-    "sort": {
-      "title": "Sort by",
-      "date": "Date",
-      "title": "Title",
-      "price": "Price",
-      "popularity": "Popularity",
-      "newest": "Newest",
-      "oldest": "Oldest",
-      "priceLow": "Price: Low to High",
-      "priceHigh": "Price: High to Low"
-    },
-    "results": "Found {{count}} events",
-    "noResults": "No events found matching your search criteria",
-    "noResultsDesc": "Try adjusting your filters or search terms",
-    "register": "Register Now",
-    "completed": "Completed",
-    "full": "Full",
-    "learnMore": "Learn More",
     "registration": {
-      "title": "Register for Event",
-      "firstName": "First Name",
-      "lastName": "Last Name",
-      "email": "Email",
-      "phone": "Phone Number",
-      "submit": "Confirm Registration",
-      "success": "Registration Successful!",
-      "successMessage": "Thank you! You have been successfully registered for the event. You will receive a confirmation email shortly.",
-      "registerAnother": "Register Another",
-      "unavailable": "Registration Unavailable",
-      "completedMessage": "Cannot register for a completed event",
-      "fullMessage": "Event is full and registration is not available"
-    },
-    "date": "Date",
-    "location": "Location",
-    "category": "Category",
-    "notFound": "Sorry, this event could not be found.",
-    "viewDetails": "View Details",
-    "seo": {
-      "title": "Events - Shababna Global Platform",
-      "description": "Discover our diverse activities in the fields of education, spirituality, and professional development."
-    },
-    "cta": {
-      "title": "Join Us in Making Change",
-      "subtitle": "Be part of a global Islamic youth community that innovates and impacts the world",
-      "join": "Join Us Now",
-      "contact": "Contact Us"
+      "title": "Event Registration",
+      "success": "Registration successful!",
+      "error": "Registration error occurred",
+      "alreadyRegistered": "You are already registered for this event"
     }
   },
   "programs": {
-    "title": "Our Programs",
-    "subtitle": "Comprehensive programs designed to develop the next generation of leaders",
+    "title": "Programs",
+    "subtitle": "Discover our long-term development programs",
+    "pageTitle": "Programs - Shababna Platform",
     "filter": {
       "all": "All Programs",
       "education": "Education",
-      "technology": "Technology",
-      "entrepreneurship": "Entrepreneurship",
-      "volunteering": "Volunteering"
+      "health": "Health",
+      "environment": "Environment",
+      "community": "Community",
+      "technology": "Technology"
     },
-    "results": "Found {{count}} programs",
-    "support": "Support This Program",
-    "sponsor": "Become a Sponsor",
-    "volunteer": "Volunteer",
-    "notFound": "Sorry, this program could not be found."
+    "donation": {
+      "title": "Donate to Program",
+      "amount": "Donation Amount",
+      "name": "Name",
+      "email": "Email",
+      "message": "Message (Optional)",
+      "submit": "Confirm Donation"
+    },
+    "error": "Error loading programs"
   },
-  "joinUs": {
-    "title": "Join Our Community",
-    "subtitle": "Become part of a global network of young changemakers",
-    "form": {
-      "firstName": "First Name",
-      "lastName": "Last Name",
-      "email": "Email Address",
-      "phone": "Phone Number",
-      "country": "Country",
-      "age": "Age",
-      "interests": "Areas of Interest",
-      "motivation": "Why do you want to join us?",
-      "submit": "Submit Application",
-      "send": "Send Application"
-    }
+  "blogs": {
+    "title": "Blog",
+    "subtitle": "Latest articles and blog posts from Shababna",
+    "search": {
+      "placeholder": "Search articles..."
+    },
+    "empty": "No blog posts available at the moment.",
+    "by": "By",
+    "date": "Publication Date",
+    "readMore": "Read More",
+    "back": "Back to Blog",
+    "error": "An error occurred or the blog post was not found.",
+    "related": "Related Articles",
+    "categories": "Categories",
+    "tags": "Tags"
   },
   "contact": {
-    "title": "Get in Touch",
-    "subtitle": "We'd love to hear from you. Send us a message and we'll respond as soon as possible.",
+    "title": "Contact Us",
+    "subtitle": "We are here to answer your inquiries and help you with everything you need",
     "form": {
-      "name": "Full Name",
-      "email": "Email Address",
-      "subject": "Subject",
-      "message": "Message",
-      "send": "Send Message"
-    },
-    "info": {
-      "address": "123 Youth Street, Global City",
-      "phone": "+1 (555) 123-4567",
-      "email": "info@shababnaglobal.org"
-    }
-  },
-  "auth": {
-    "login": {
-      "title": "Welcome Back",
-      "subtitle": "Sign in to your account",
-      "email": "Email Address",
-      "password": "Password",
-      "submit": "Sign In",
-      "noAccount": "Don't have an account?",
-      "register": "Register here"
-    },
-    "register": {
-      "title": "Create Account",
-      "subtitle": "Join our community",
+      "title": "Send us a message",
+      "subtitle": "We will reply to you as soon as possible",
       "firstName": "First Name",
       "lastName": "Last Name",
       "email": "Email Address",
-      "password": "Password",
-      "confirmPassword": "Confirm Password",
-      "submit": "Create Account",
-      "hasAccount": "Already have an account?",
-      "login": "Sign in here"
-    }
-  },
-  "dashboard": {
-    "title": "Dashboard",
-    "welcome": "Welcome back",
-    "stats": {
-      "events": "Total Events",
-      "programs": "Active Programs",
-      "members": "Community Members"
+      "phone": "Phone Number (Optional)",
+      "subject": "Subject",
+      "message": "Message",
+      "submit": "Send Message",
+      "success": "Your message has been sent successfully!",
+      "error": "An error occurred while sending the message"
     },
-    "menu": {
-      "overview": "Overview",
-      "events": "Manage Events",
-      "programs": "Manage Programs",
-      "users": "Users",
-      "donations": "Donations",
-      "settings": "Settings"
+    "info": {
+      "title": "Contact Information",
+      "address": "Istanbul, Turkey",
+      "email": "info@shababna.org",
+      "phone": "+90 212 XXX XX XX"
     }
   },
   "common": {
-    "loading": "Loading...",
+    "search": "Search",
     "learnMore": "Learn More",
-    "close": "Close",
-    "error": {
-      "title": "An error occurred",
-      "message": "An unexpected error occurred. Please try again later."
-    },
-    "retry": "Try Again",
+    "retry": "Retry",
     "cancel": "Cancel",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
     "save": "Save",
-    "delete": "Delete",
     "edit": "Edit",
+    "delete": "Delete",
     "view": "View",
     "back": "Back",
-    "backToEvents": "Back to Events",
-    "backToPrograms": "Back to Programs",
     "next": "Next",
-    "previous": "Previous",
-    "search": "Search",
-    "filter": "Filter",
-    "clear": "Clear",
-    "apply": "Apply"
+    "previous": "Previous"
+  },
+  "buttons": {
+    "subscribe": "Subscribe",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous"
+  },
+  "footer": {
+    "quickLinks": "Quick Links",
+    "contactInfo": "Contact Information",
+    "address": "Istanbul, Turkey",
+    "stayUpdated": "Stay Updated",
+    "privacyPolicy": "Privacy Policy",
+    "terms": "Terms & Conditions",
+    "copyright": "© {{year}} Shababna Platform. All rights reserved."
+  },
+  "home": {
+    "hero": {
+      "badge": "Muslim Youth Making Change",
+      "title": "Together We Build the Future of Muslim Youth in the World",
+      "subtitle": "Join us at Shababna Global from the heart of Istanbul, and be part of a leading Islamic youth community that innovates and impacts the world.",
+      "cta": "Start Your Journey With Us",
+      "learn": "Discover More"
+    },
+    "stats": {
+      "members": "Active Members",
+      "events": "Inspiring Events",
+      "countries": "Represented Countries",
+      "programs": "Active Programs",
+      "membersNumber": "1240",
+      "eventsNumber": "87",
+      "countriesNumber": "18",
+      "programsNumber": "12"
+    },
+    "features": {
+      "title": "What We Offer",
+      "subtitle": "Modern Islamic youth programs and events",
+      "events": {
+        "title": "Workshops & Events",
+        "description": "Interactive meetings and workshops that enhance values and leadership skills for Muslim youth.",
+        "features": {
+          "regular": "Regular Events",
+          "interactive": "Interactive Workshops",
+          "networks": "Professional Networks"
+        }
+      },
+      "programs": {
+        "title": "Development Programs",
+        "description": "Long-term programs focused on building character, leadership, and community impact.",
+        "features": {
+          "leadership": "Leadership Programs",
+          "skills": "Skill Development",
+          "success": "Continuous Success"
+        }
+      },
+      "community": {
+        "title": "Global Community",
+        "description": "Connect with youth from different Islamic and world countries, and participate in an inspiring environment.",
+        "features": {
+          "members": "Youth from 18 Countries",
+          "services": "Continuous Services",
+          "programs": "Skilled Programs"
+        }
+      }
+    },
+    "testimonials": {
+      "title": "What Youth Say About Us",
+      "subtitle": "Listen to success stories and impact from our youth around the world",
+      "name1": "Ahmed Mohamed",
+      "role1": "Engineering Student - Egypt",
+      "content1": "Shababna platform completely changed my life. I learned new leadership skills and made friends from all over the world.",
+      "name2": "Fatima Ali",
+      "role2": "Software Developer - Turkey",
+      "content2": "The development programs helped me develop my technical and leadership skills. I recommend everyone to join.",
+      "name3": "Mohamed Hassan",
+      "role3": "Medical Student - Malaysia",
+      "content3": "The events and workshops were an amazing experience. I learned a lot about leadership and community impact."
+    },
+    "latest": {
+      "title": "Latest Updates",
+      "subtitle": "Stay updated with our latest events and programs",
+      "events": "Latest Events",
+      "programs": "Latest Programs",
+      "noEvents": "No upcoming events at the moment.",
+      "noPrograms": "No active programs at the moment.",
+      "viewAll": "View All",
+      "explore": "Explore Programs",
+      "latestPrograms": "Latest Programs"
+    },
+    "newsletter": {
+      "title": "Stay Connected",
+      "subtitle": "Subscribe to our newsletter for the latest updates on events, programs, and community news",
+      "placeholder": "Enter your email",
+      "subscribe": "Subscribe",
+      "success": "Thank you for subscribing! We'll keep you updated.",
+      "error": "Something went wrong. Please try again.",
+      "privacy": "We respect your privacy. You can unsubscribe at any time.",
+      "badge": "Subscribe to Newsletter"
+    },
+    "meta": {
+      "title": "Shababna - Global Youth Platform for Development and Growth",
+      "description": "Join Shababna Global in Istanbul and be part of a leading Islamic youth community that innovates and impacts the world",
+      "keywords": "Shababna, Muslim youth, development, growth, Istanbul, youth community, events, programs"
+    }
   }
 }

@@ -11,7 +11,7 @@ const NotFound: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-primary-50 via-white to-accent-50 px-4"
+      className="page-container flex flex-col items-center justify-center bg-gradient-to-br from-primary-50 via-white to-accent-50 px-4"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <motion.div
@@ -20,6 +20,11 @@ const NotFound: React.FC = () => {
         transition={{ duration: 0.6 }}
         className="text-center"
       >
+                  <img
+            src="/images/logo.jpg"
+            alt="شبابنا"
+            className="h-20 w-20 object-cover rounded-2xl mb-6 shadow-lg"
+          />
         <div className="text-[7rem] font-extrabold text-primary-600 mb-2 select-none">
           404
         </div>

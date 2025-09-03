@@ -65,18 +65,38 @@ const EventDetail: React.FC = () => {
   const event = eventData?.data || eventData;
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ar-SA', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        console.error('❌ Invalid date string:', dateString);
+        return 'تاريخ غير صحيح';
+      }
+      return date.toLocaleDateString('ar-SA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    } catch (error) {
+      console.error('❌ Error formatting date:', error);
+      return 'تاريخ غير صحيح';
+    }
   };
 
   const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('ar-SA', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        console.error('❌ Invalid time string:', dateString);
+        return 'وقت غير صحيح';
+      }
+      return date.toLocaleTimeString('ar-SA', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch (error) {
+      console.error('❌ Error formatting time:', error);
+      return 'وقت غير صحيح';
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -265,17 +285,17 @@ const EventDetail: React.FC = () => {
               transition={{ duration: 0.6 }}
               className="relative"
             >
-              <div className="relative h-96 bg-gradient-to-br from-slate-700 via-blue-700 to-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+              <div className="relative h-96 rounded-2xl shadow-2xl overflow-hidden">
+                <img
+                  src={event.image_url || '/images/events-default.jpg'}
+                  alt={event.title}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.src = '/images/events-default.jpg';
+                  }}
+                />
                 <div className="absolute inset-0 bg-black bg-opacity-30"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center text-white">
-                    <div className="text-8xl mb-4">
-                      {getCategoryIcon(event.category)}
-                    </div>
-                    <h1 className="text-3xl font-bold mb-2">{event.title}</h1>
-                    <p className="text-xl opacity-90">{event.category}</p>
-                  </div>
-                </div>
 
                 {/* Floating Action Buttons */}
                 <div className="absolute top-4 right-4 flex gap-2">

@@ -1,354 +1,212 @@
 // Service Worker for Shababna Platform
 const CACHE_NAME = 'shababna-v1';
 const STATIC_CACHE = 'shababna-static-v1';
-const DYNAMIC_CACHE = 'shababna-dynamic-v1';
+const DATA_CACHE = 'shababna-data-v1';
 
-// Files to cache immediately
+// الملفات المهمة للتخزين المؤقت
 const STATIC_FILES = [
     '/',
     '/index.html',
-    '/manifest.json',
-    '/favicon.ico',
-    '/apple-touch-icon.png',
-    '/favicon-32x32.png',
-    '/favicon-16x16.png',
+    '/static/js/bundle.js',
+    '/static/css/main.css',
+    '/images/logo.webp',
+    '/images/hero-bg.webp',
+    '/fonts/Inter-Regular.woff2',
+    '/fonts/NotoSansArabic-Regular.woff2',
 ];
 
-// API endpoints to cache
-const API_CACHE = [
-    '/api/events',
-    '/api/programs',
-    '/api/blogs',
-    '/api/contact',
-];
+// استراتيجيات التخزين المؤقت
+const CACHE_STRATEGIES = {
+    // Cache First للملفات الثابتة
+    STATIC: 'cache-first',
+    // Network First للبيانات
+    DATA: 'network-first',
+    // Stale While Revalidate للصفحات
+    PAGES: 'stale-while-revalidate',
+};
 
-// Install event - cache static files
+// تثبيت Service Worker
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(STATIC_CACHE)
-            .then((cache) => {
-                console.log('Caching static files');
+        Promise.all([
+            // إنشاء cache للملفات الثابتة
+            caches.open(STATIC_CACHE).then((cache) => {
                 return cache.addAll(STATIC_FILES);
-            })
-            .then(() => {
-                console.log('Static files cached successfully');
-                return self.skipWaiting();
-            })
-            .catch((error) => {
-                console.error('Error caching static files:', error);
-            })
+            }),
+            // إنشاء cache للبيانات
+            caches.open(DATA_CACHE).then((cache) => {
+                return cache.addAll([]);
+            }),
+        ])
     );
+    self.skipWaiting();
 });
 
-// Activate event - clean up old caches
+// تفعيل Service Worker
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys()
-            .then((cacheNames) => {
+        Promise.all([
+            // تنظيف الـ caches القديمة
+            caches.keys().then((cacheNames) => {
                 return Promise.all(
                     cacheNames.map((cacheName) => {
-                        if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
-                            console.log('Deleting old cache:', cacheName);
+                        if (cacheName !== CACHE_NAME &&
+                            cacheName !== STATIC_CACHE &&
+                            cacheName !== DATA_CACHE) {
                             return caches.delete(cacheName);
                         }
                     })
                 );
-            })
-            .then(() => {
-                console.log('Service Worker activated');
-                return self.clients.claim();
-            })
+            }),
+            // السيطرة على جميع الصفحات
+            self.clients.claim(),
+        ])
     );
 });
 
-// Fetch event - serve from cache or network
+// اعتراض الطلبات
 self.addEventListener('fetch', (event) => {
     const { request } = event;
     const url = new URL(request.url);
 
-    // Handle API requests
-    if (url.pathname.startsWith('/api/')) {
-        event.respondWith(handleApiRequest(request));
+    // تجاهل الطلبات غير GET
+    if (request.method !== 'GET') {
         return;
     }
 
-    // Handle static assets
-    if (request.destination === 'script' ||
-        request.destination === 'style' ||
-        request.destination === 'image' ||
-        request.destination === 'font') {
-        event.respondWith(handleStaticAsset(request));
+    // تجاهل الطلبات الخارجية
+    if (url.origin !== self.location.origin) {
         return;
     }
 
-    // Handle navigation requests
-    if (request.mode === 'navigate') {
-        event.respondWith(handleNavigation(request));
-        return;
+    // تطبيق استراتيجيات التخزين المؤقت
+    if (isStaticFile(request)) {
+        event.respondWith(cacheFirst(request, STATIC_CACHE));
+    } else if (isDataRequest(request)) {
+        event.respondWith(networkFirst(request, DATA_CACHE));
+    } else if (isPageRequest(request)) {
+        event.respondWith(staleWhileRevalidate(request));
+    } else {
+        event.respondWith(networkOnly(request));
     }
-
-    // Default: network first, fallback to cache
-    event.respondWith(
-        fetch(request)
-            .catch(() => {
-                return caches.match(request);
-            })
-    );
 });
 
-// Handle API requests with cache strategy
-async function handleApiRequest(request) {
-    try {
-        // Try network first
-        const networkResponse = await fetch(request);
-
-        // Clone response for caching
-        const responseClone = networkResponse.clone();
-
-        // Cache successful responses
-        if (networkResponse.ok) {
-            const cache = await caches.open(DYNAMIC_CACHE);
-            cache.put(request, responseClone);
-        }
-
-        return networkResponse;
-    } catch (error) {
-        // Fallback to cache
-        const cachedResponse = await caches.match(request);
-        if (cachedResponse) {
-            return cachedResponse;
-        }
-
-        // Return offline response
-        return new Response(
-            JSON.stringify({
-                error: 'No internet connection',
-                message: 'يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى'
-            }),
-            {
-                status: 503,
-                statusText: 'Service Unavailable',
-                headers: { 'Content-Type': 'application/json' }
-            }
-        );
-    }
+// فحص نوع الملف
+function isStaticFile(request) {
+    const url = new URL(request.url);
+    return url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|webp|woff|woff2|ttf|otf)$/);
 }
 
-// Handle static assets with cache first strategy
-async function handleStaticAsset(request) {
-    const cachedResponse = await caches.match(request);
+// فحص طلب البيانات
+function isDataRequest(request) {
+    const url = new URL(request.url);
+    return url.pathname.startsWith('/api/');
+}
+
+// فحص طلب الصفحة
+function isPageRequest(request) {
+    const url = new URL(request.url);
+    return url.pathname === '/' ||
+        url.pathname.startsWith('/about') ||
+        url.pathname.startsWith('/events') ||
+        url.pathname.startsWith('/programs') ||
+        url.pathname.startsWith('/blogs') ||
+        url.pathname.startsWith('/contact');
+}
+
+// استراتيجية Cache First
+async function cacheFirst(request, cacheName) {
+    const cache = await caches.open(cacheName);
+    const cachedResponse = await cache.match(request);
 
     if (cachedResponse) {
-        // Update cache in background
-        fetch(request)
-            .then((response) => {
-                if (response.ok) {
-                    caches.open(STATIC_CACHE)
-                        .then((cache) => cache.put(request, response));
-                }
-            })
-            .catch(() => {
-                // Ignore fetch errors for background updates
-            });
-
         return cachedResponse;
     }
 
-    // Try network
     try {
-        const response = await fetch(request);
-        if (response.ok) {
-            const cache = await caches.open(STATIC_CACHE);
-            cache.put(request, response.clone());
+        const networkResponse = await fetch(request);
+        if (networkResponse.ok) {
+            cache.put(request, networkResponse.clone());
         }
-        return response;
+        return networkResponse;
     } catch (error) {
-        return new Response('', { status: 404 });
+        // إرجاع صفحة offline إذا فشل الطلب
+        if (request.destination === 'document') {
+            return cache.match('/offline.html');
+        }
+        throw error;
     }
 }
 
-// Handle navigation requests
-async function handleNavigation(request) {
+// استراتيجية Network First
+async function networkFirst(request, cacheName) {
+    const cache = await caches.open(cacheName);
+
     try {
-        // Try network first
-        const response = await fetch(request);
-        return response;
+        const networkResponse = await fetch(request);
+        if (networkResponse.ok) {
+            cache.put(request, networkResponse.clone());
+        }
+        return networkResponse;
     } catch (error) {
-        // Fallback to cached index.html for SPA
-        const cachedResponse = await caches.match('/index.html');
+        const cachedResponse = await cache.match(request);
         if (cachedResponse) {
             return cachedResponse;
         }
-
-        // Return offline page
-        return new Response(
-            `
-      <!DOCTYPE html>
-      <html lang="ar" dir="rtl">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>شبابنا العالمية - غير متصل</title>
-          <style>
-            body {
-              font-family: 'Tajawal', sans-serif;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              margin: 0;
-              padding: 20px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              min-height: 100vh;
-              color: white;
-              text-align: center;
-            }
-            .offline-container {
-              background: rgba(255, 255, 255, 0.1);
-              padding: 40px;
-              border-radius: 20px;
-              backdrop-filter: blur(10px);
-              max-width: 500px;
-            }
-            h1 { margin-bottom: 20px; }
-            p { margin-bottom: 30px; opacity: 0.9; }
-            button {
-              background: rgba(255, 255, 255, 0.2);
-              border: 1px solid rgba(255, 255, 255, 0.3);
-              color: white;
-              padding: 12px 24px;
-              border-radius: 8px;
-              cursor: pointer;
-              font-size: 16px;
-            }
-            button:hover {
-              background: rgba(255, 255, 255, 0.3);
-            }
-          </style>
-        </head>
-        <body>
-          <div class="offline-container">
-            <h1>🔌 غير متصل بالإنترنت</h1>
-            <p>عذراً، لا يمكن الوصول إلى الموقع حالياً. يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.</p>
-            <button onclick="window.location.reload()">إعادة المحاولة</button>
-          </div>
-        </body>
-      </html>
-      `,
-            {
-                status: 200,
-                statusText: 'OK',
-                headers: { 'Content-Type': 'text/html' }
-            }
-        );
+        throw error;
     }
 }
 
-// Background sync for offline actions
-self.addEventListener('sync', (event) => {
-    if (event.tag === 'background-sync') {
-        event.waitUntil(doBackgroundSync());
-    }
-});
+// استراتيجية Stale While Revalidate
+async function staleWhileRevalidate(request) {
+    const cache = await caches.open(CACHE_NAME);
+    const cachedResponse = await cache.match(request);
 
-// Handle background sync
-async function doBackgroundSync() {
-    try {
-        // Sync any pending requests
-        const requests = await getPendingRequests();
-
-        for (const request of requests) {
-            try {
-                await fetch(request);
-                await removePendingRequest(request);
-            } catch (error) {
-                console.error('Background sync failed:', error);
-            }
+    // إعادة التحقق من الشبكة في الخلفية
+    const networkResponsePromise = fetch(request).then((response) => {
+        if (response.ok) {
+            cache.put(request, response.clone());
         }
-    } catch (error) {
-        console.error('Background sync error:', error);
-    }
-}
-
-// Store pending requests for background sync
-async function storePendingRequest(request) {
-    const db = await openDB();
-    const tx = db.transaction('pending-requests', 'readwrite');
-    const store = tx.objectStore('pending-requests');
-    await store.add(request);
-}
-
-// Get pending requests
-async function getPendingRequests() {
-    const db = await openDB();
-    const tx = db.transaction('pending-requests', 'readonly');
-    const store = tx.objectStore('pending-requests');
-    return await store.getAll();
-}
-
-// Remove pending request
-async function removePendingRequest(request) {
-    const db = await openDB();
-    const tx = db.transaction('pending-requests', 'readwrite');
-    const store = tx.objectStore('pending-requests');
-    await store.delete(request);
-}
-
-// Open IndexedDB
-async function openDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open('shababna-sw', 1);
-
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve(request.result);
-
-        request.onupgradeneeded = () => {
-            const db = request.result;
-            if (!db.objectStoreNames.contains('pending-requests')) {
-                db.createObjectStore('pending-requests', { keyPath: 'url' });
-            }
-        };
+        return response;
     });
+
+    // إرجاع الاستجابة المخزنة مؤقتاً إذا كانت متوفرة
+    if (cachedResponse) {
+        return cachedResponse;
+    }
+
+    // انتظار استجابة الشبكة
+    return networkResponsePromise;
 }
 
-// Push notification handling
-self.addEventListener('push', (event) => {
-    const options = {
-        body: event.data ? event.data.text() : 'رسالة جديدة من شبابنا العالمية',
-        icon: '/favicon-192x192.png',
-        badge: '/favicon-192x192.png',
-        vibrate: [100, 50, 100],
-        data: {
-            dateOfArrival: Date.now(),
-            primaryKey: 1
-        },
-        actions: [
-            {
-                action: 'explore',
-                title: 'عرض',
-                icon: '/favicon-192x192.png'
-            },
-            {
-                action: 'close',
-                title: 'إغلاق',
-                icon: '/favicon-192x192.png'
-            }
-        ]
-    };
+// استراتيجية Network Only
+async function networkOnly(request) {
+    return fetch(request);
+}
 
-    event.waitUntil(
-        self.registration.showNotification('شبابنا العالمية', options)
-    );
-});
+// معالجة الرسائل
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 
-// Notification click handling
-self.addEventListener('notificationclick', (event) => {
-    event.notification.close();
-
-    if (event.action === 'explore') {
+    if (event.data && event.data.type === 'CACHE_CLEAR') {
         event.waitUntil(
-            clients.openWindow('/')
+            caches.keys().then((cacheNames) => {
+                return Promise.all(
+                    cacheNames.map((cacheName) => caches.delete(cacheName))
+                );
+            })
         );
     }
 });
 
-console.log('Service Worker loaded successfully');
+// معالجة الأخطاء
+self.addEventListener('error', (event) => {
+    console.error('Service Worker error:', event.error);
+});
+
+// معالجة الرفض
+self.addEventListener('unhandledrejection', (event) => {
+    console.error('Service Worker unhandled rejection:', event.reason);
+});

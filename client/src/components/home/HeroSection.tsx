@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowRight,
   Sparkles,
@@ -13,6 +14,7 @@ import { Button } from '../ui/Button/ButtonSimple';
 
 const HeroSection: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const heroVariants = {
     hidden: { opacity: 0, y: 30 },
@@ -71,63 +73,57 @@ const HeroSection: React.FC = () => {
       {/* Main Content */}
       <div className="relative z-10 max-w-6xl mx-auto text-center px-6 py-20">
         <motion.div
-          variants={heroVariants}
+          variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          className="mb-12"
+          className="space-y-8"
         >
+          {/* Badge */}
           <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-            className="space-y-6"
+            variants={itemVariants}
+            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 text-sm font-medium"
           >
-            <motion.div variants={itemVariants} className="mb-6">
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
-                <Sparkles className="w-4 h-4 text-accent-400" />
-                <span className="text-sm font-medium text-white">
-                  منصة شبابنا العالمية
-                </span>
-              </div>
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-                شبابنا
-                <span className="block text-2xl md:text-3xl lg:text-4xl font-normal text-primary-200 mt-2">
-                  منصة شبابية إسلامية عالمية
-                </span>
-              </h1>
-              <p className="text-lg md:text-xl text-primary-100 max-w-3xl mx-auto leading-relaxed">
-                نربط شباب العالم الإسلامي من خلال برامج وفعاليات تطويرية مصممة
-                لبناء قادة المستقبل
-              </p>
-            </motion.div>
+            <Sparkles className="w-4 h-4 text-yellow-300" />
+            {t('home.hero.badge')}
+          </motion.div>
 
-            <motion.div
-              variants={itemVariants}
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+          {/* Main Title */}
+          <motion.div variants={itemVariants} className="space-y-4">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight">
+              {t('home.hero.title')}
+            </h1>
+            <p className="text-lg md:text-xl lg:text-2xl text-white/90 max-w-4xl mx-auto leading-relaxed">
+              {t('home.hero.subtitle')}
+            </p>
+          </motion.div>
+
+          {/* CTA Buttons */}
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+          >
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={() => navigate('/programs')}
+              className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-8 py-4 text-lg font-semibold shadow-lg"
             >
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={() => navigate('/programs')}
-                className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-8 py-4 text-lg font-semibold shadow-lg"
-              >
-                <span className="flex items-center gap-2">
-                  اكتشف البرامج
-                  <ArrowRight className="w-5 h-5" />
-                </span>
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => navigate('/events')}
-                className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 text-lg font-semibold backdrop-blur-sm"
-              >
-                <span className="flex items-center gap-2">
-                  الفعاليات
-                  <Calendar className="w-5 h-5" />
-                </span>
-              </Button>
-            </motion.div>
+              <span className="flex items-center gap-2">
+                {t('home.hero.cta')}
+                <ArrowRight className="w-5 h-5" />
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => navigate('/events')}
+              className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 text-lg font-semibold backdrop-blur-sm"
+            >
+              <span className="flex items-center gap-2">
+                {t('nav.events')}
+                <Calendar className="w-5 h-5" />
+              </span>
+            </Button>
           </motion.div>
         </motion.div>
       </div>

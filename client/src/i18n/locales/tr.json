@@ -1,6 +1,7 @@
 {
   "nav": {
     "home": "Ana Sayfa",
+    "about": "Hakkımızda",
     "events": "Etkinlikler",
     "programs": "Programlar",
     "blogs": "Bloglar",
@@ -10,18 +11,217 @@
     "dashboard": "Kontrol Paneli",
     "logout": "Çıkış Yap"
   },
+  "dashboard": {
+    "title": "Kontrol Paneli",
+    "breadcrumb": "Kontrol Paneli",
+    "sidebar": {
+      "main": "Ana",
+      "overview": "Genel Bakış",
+      "overviewDesc": "Sistem genel bakışı ve istatistikleri",
+      "content": "İçerik Yönetimi",
+      "programs": "Programlar",
+      "programsDesc": "Program ve projeleri yönet",
+      "events": "Etkinlikler",
+      "eventsDesc": "Etkinlik ve atölyeleri yönet",
+      "blogs": "Bloglar",
+      "blogsDesc": "Makale ve içeriği yönet",
+      "users": "Kullanıcılar",
+      "usersDesc": "Kullanıcı ve izinleri yönet",
+      "registrants": "Kayıt Olanlar",
+      "registrantsDesc": "Program ve etkinlik kayıtlarını görüntüle",
+      "communication": "İletişim",
+      "contactForms": "İletişim Formları",
+      "contactFormsDesc": "İletişim mesajları ve sorgularını yönet",
+      "analytics": "Analitik ve Raporlar",
+      "analyticsDesc": "Kapsamlı sistem analitiği",
+      "reports": "Raporlar",
+      "reportsDesc": "Detaylı raporlar ve istatistikler",
+      "activities": "Aktiviteler",
+      "activitiesDesc": "Aktivite günlüğü ve etkinlikler",
+      "system": "Sistem",
+      "settings": "Ayarlar",
+      "settingsDesc": "Sistem ve hesap ayarları",
+      "logout": "Çıkış Yap"
+    }
+  },
+  "about": {
+    "pageTitle": "Hakkımızda - Shababna Platformu",
+    "pageDescription": "Shababna platformu ve Müslüman gençliğin geleceğini inşa etme vizyonumuz hakkında bilgi edinin",
+    "title": "Hakkımızda",
+    "subtitle": "Shababna Global Platformu - İstanbul'un kalbinden, dünyada Müslüman gençliğin geleceğini birlikte inşa etmek için çalışıyoruz",
+    "hero": {
+      "title": "Hakkımızda",
+      "subtitle": "Shababna Global Platformu - İstanbul'un kalbinden, dünyada Müslüman gençliğin geleceğini birlikte inşa etmek için çalışıyoruz"
+    },
+    "mission": {
+      "title": "Misyonumuz",
+      "description": "Gelişim programları ve ilham verici etkinliklerle Müslüman gençliği güçlendirerek daha iyi bir gelecek inşa etmek"
+    },
+    "vision": {
+      "title": "Vizyonumuz",
+      "description": "Müslüman gençliği geliştiren ve toplumda olumlu etki yapmalarını sağlayan önde gelen küresel platform olmak"
+    },
+    "values": {
+      "title": "Değerlerimiz",
+      "excellence": "Mükemmellik",
+      "innovation": "Yenilik",
+      "community": "Topluluk",
+      "leadership": "Liderlik"
+    }
+  },
+  "events": {
+    "title": "Yaklaşan Etkinlikler",
+    "subtitle": "Gençlik gelişimi için tasarlanmış heyecan verici etkinlikler ve atölyeler keşfedin",
+    "hero": {
+      "title": "Çeşitli Etkinliklerimiz",
+      "subtitle": "Eğitim, maneviyat ve mesleki gelişim alanlarındaki çeşitli faaliyetlerimizi keşfedin. Pozitif değişim yaratmada bize katılın."
+    },
+    "search": {
+      "placeholder": "Etkinliklerde ara..."
+    },
+    "filter": {
+      "all": "Tüm Etkinlikler",
+      "workshop": "Atölyeler",
+      "conference": "Konferanslar",
+      "networking": "Ağ Oluşturma",
+      "seminar": "Seminerler",
+      "training": "Eğitim",
+      "other": "Diğer"
+    },
+    "details": {
+      "date": "Tarih",
+      "time": "Saat",
+      "location": "Konum",
+      "category": "Kategori",
+      "attendees": "Katılımcılar",
+      "maxAttendees": "Maksimum Katılımcı",
+      "status": "Durum",
+      "description": "Açıklama",
+      "register": "Şimdi Kayıt Ol",
+      "full": "Dolu",
+      "available": "Mevcut",
+      "cancelled": "İptal Edildi"
+    },
+    "registration": {
+      "title": "Etkinlik Kaydı",
+      "success": "Kayıt başarılı!",
+      "error": "Kayıt hatası oluştu",
+      "alreadyRegistered": "Bu etkinliğe zaten kayıtlısınız"
+    }
+  },
+  "programs": {
+    "title": "Programlar",
+    "subtitle": "Uzun vadeli gelişim programlarımızı keşfedin",
+    "pageTitle": "Programlar - Shababna Platformu",
+    "filter": {
+      "all": "Tüm Programlar",
+      "education": "Eğitim",
+      "health": "Sağlık",
+      "environment": "Çevre",
+      "community": "Topluluk",
+      "technology": "Teknoloji"
+    },
+    "donation": {
+      "title": "Programa Bağış Yap",
+      "amount": "Bağış Miktarı",
+      "name": "İsim",
+      "email": "E-posta",
+      "message": "Mesaj (İsteğe Bağlı)",
+      "submit": "Bağışı Onayla"
+    },
+    "error": "Programlar yüklenirken hata oluştu"
+  },
+  "blogs": {
+    "title": "Blog",
+    "subtitle": "Shababna'dan en son makaleler ve blog yazıları",
+    "search": {
+      "placeholder": "Makalelerde ara..."
+    },
+    "empty": "Şu anda blog yazısı mevcut değil.",
+    "by": "Yazar",
+    "date": "Yayın Tarihi",
+    "readMore": "Devamını Oku",
+    "back": "Bloga Dön",
+    "error": "Bir hata oluştu veya blog yazısı bulunamadı.",
+    "related": "İlgili Makaleler",
+    "categories": "Kategoriler",
+    "tags": "Etiketler"
+  },
+  "contact": {
+    "title": "Bizimle İletişime Geçin",
+    "subtitle": "Sorularınızı yanıtlamak ve ihtiyacınız olan her konuda size yardımcı olmak için buradayız",
+    "form": {
+      "title": "Bize mesaj gönderin",
+      "subtitle": "En kısa sürede size yanıt vereceğiz",
+      "firstName": "Ad",
+      "lastName": "Soyad",
+      "email": "E-posta Adresi",
+      "phone": "Telefon Numarası (İsteğe Bağlı)",
+      "subject": "Konu",
+      "message": "Mesaj",
+      "submit": "Mesaj Gönder",
+      "success": "Mesajınız başarıyla gönderildi!",
+      "error": "Mesaj gönderilirken bir hata oluştu"
+    },
+    "info": {
+      "title": "İletişim Bilgileri",
+      "address": "İstanbul, Türkiye",
+      "email": "info@shababna.org",
+      "phone": "+90 212 XXX XX XX"
+    }
+  },
+  "common": {
+    "search": "Ara",
+    "learnMore": "Daha Fazla Bilgi",
+    "retry": "Tekrar Dene",
+    "cancel": "İptal",
+    "loading": "Yükleniyor...",
+    "error": "Bir hata oluştu",
+    "success": "Başarılı",
+    "save": "Kaydet",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "view": "Görüntüle",
+    "back": "Geri",
+    "next": "Sonraki",
+    "previous": "Önceki"
+  },
+  "buttons": {
+    "subscribe": "Abone Ol",
+    "login": "Giriş Yap",
+    "register": "Kayıt Ol",
+    "logout": "Çıkış Yap",
+    "submit": "Gönder",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "view": "Görüntüle",
+    "back": "Geri",
+    "next": "Sonraki",
+    "previous": "Önceki"
+  },
+  "footer": {
+    "quickLinks": "Hızlı Bağlantılar",
+    "contactInfo": "İletişim Bilgileri",
+    "address": "İstanbul, Türkiye",
+    "stayUpdated": "Güncel Kalın",
+    "privacyPolicy": "Gizlilik Politikası",
+    "terms": "Şartlar ve Koşullar",
+    "copyright": "© {{year}} Shababna Platformu. Tüm hakları saklıdır."
+  },
   "home": {
     "hero": {
-      "badge": "Dünya Çapında Gençleri Güçlendirme",
-      "title": "Gençleri Güçlendirmek, Geleceği İnşa Etmek",
-      "subtitle": "Yenilikçi programlar ve toplum katılımı ile pozitif değişim yaratmak için Shababna Global'e katılın.",
-      "cta": "Dahil Ol",
-      "learn": "Daha Fazla Öğren"
+      "badge": "Değişim Yapan Müslüman Gençlik",
+      "title": "Birlikte Dünyada Müslüman Gençliğin Geleceğini İnşa Ediyoruz",
+      "subtitle": "İstanbul'un kalbinden Shababna Global'e katılın ve dünyayı yenileyen ve etkileyen önde gelen İslami gençlik topluluğunun bir parçası olun.",
+      "cta": "Bizimle Yolculuğunuza Başlayın",
+      "learn": "Daha Fazla Keşfedin"
     },
     "stats": {
       "members": "Aktif Üyeler",
-      "events": "Düzenlenen Etkinlikler",
-      "countries": "Ulaşılan Ülkeler",
+      "events": "İlham Verici Etkinlikler",
+      "countries": "Temsil Edilen Ülkeler",
       "programs": "Aktif Programlar",
       "membersNumber": "1240",
       "eventsNumber": "87",
@@ -29,20 +229,48 @@
       "programsNumber": "12"
     },
     "features": {
-      "title": "Ne Yapıyoruz",
-      "subtitle": "Gençlik gelişimi ve toplum inşası için kapsamlı yaklaşımımızı keşfedin",
+      "title": "Ne Sunuyoruz",
+      "subtitle": "Modern İslami gençlik programları ve etkinlikleri",
       "events": {
-        "title": "Etkinlikler ve Atölyeler",
-        "description": "Beceri geliştirme ve bağlantı kurma için tasarlanmış interaktif oturumlar, atölyeler ve networking etkinlikleri."
+        "title": "Atölyeler ve Etkinlikler",
+        "description": "Müslüman gençliğin değerlerini ve liderlik becerilerini geliştiren interaktif toplantılar ve atölyeler.",
+        "features": {
+          "regular": "Düzenli Etkinlikler",
+          "interactive": "İnteraktif Atölyeler",
+          "networks": "Profesyonel Ağlar"
+        }
       },
       "programs": {
-        "title": "Geliştirme Programları",
-        "description": "Liderlik geliştirme, beceri kazanma ve toplumsal etki odaklı uzun vadeli programlar."
+        "title": "Gelişim Programları",
+        "description": "Karakter, liderlik ve toplumsal etki oluşturmaya odaklanan uzun vadeli programlar.",
+        "features": {
+          "leadership": "Liderlik Programları",
+          "skills": "Beceri Geliştirme",
+          "success": "Sürekli Başarı"
+        }
       },
       "community": {
         "title": "Küresel Topluluk",
-        "description": "Dünya çapında benzer düşünceli gençlerle bağlantı kurun ve kalıcı dostluklar edinin."
+        "description": "Farklı İslami ve dünya ülkelerinden gençlerle bağlantı kurun ve ilham verici bir ortamda yer alın.",
+        "features": {
+          "members": "18 Ülkeden Gençler",
+          "services": "Sürekli Hizmetler",
+          "programs": "Uzman Programlar"
+        }
       }
+    },
+    "testimonials": {
+      "title": "Gençler Bizim Hakkımızda Ne Diyor",
+      "subtitle": "Dünya çapındaki gençlerimizden başarı hikayelerini ve etkiyi dinleyin",
+      "name1": "Ahmed Muhammed",
+      "role1": "Mühendislik Öğrencisi - Mısır",
+      "content1": "Shababna platformu hayatımı tamamen değiştirdi. Yeni liderlik becerileri öğrendim ve dünyanın her yerinden arkadaşlar edindim.",
+      "name2": "Fatma Ali",
+      "role2": "Yazılım Geliştirici - Türkiye",
+      "content2": "Gelişim programları teknik ve liderlik becerilerimi geliştirmeme yardımcı oldu. Herkese katılmalarını öneriyorum.",
+      "name3": "Muhammed Hasan",
+      "role3": "Tıp Öğrencisi - Malezya",
+      "content3": "Etkinlikler ve atölyeler harika bir deneyimdi. Liderlik ve toplumsal etki hakkında çok şey öğrendim."
     },
     "latest": {
       "title": "Son Güncellemeler",
@@ -64,227 +292,11 @@
       "error": "Bir şeyler yanlış gitti. Lütfen tekrar deneyin.",
       "privacy": "Gizliliğinize saygı duyuyoruz. İstediğiniz zaman abonelikten çıkabilirsiniz.",
       "badge": "Bültene Abone Ol"
+    },
+    "meta": {
+      "title": "Shababna - Gelişim ve Büyüme için Küresel Gençlik Platformu",
+      "description": "İstanbul'da Shababna Global'e katılın ve dünyayı yenileyen ve etkileyen önde gelen İslami gençlik topluluğunun bir parçası olun",
+      "keywords": "Shababna, Müslüman gençlik, gelişim, büyüme, İstanbul, gençlik topluluğu, etkinlikler, programlar"
     }
-  },
-  "events": {
-    "title": "Yaklaşan Etkinlikler",
-    "subtitle": "Gençlik gelişimi için tasarlanmış heyecan verici etkinlikler ve atölyeler keşfedin",
-    "hero": {
-      "title": "Çeşitli Etkinliklerimiz",
-      "subtitle": "Eğitim, maneviyat ve mesleki gelişim alanlarındaki çeşitli faaliyetlerimizi keşfedin. Pozitif değişim yaratmada bize katılın."
-    },
-    "search": {
-      "placeholder": "Etkinliklerde ara..."
-    },
-    "filter": {
-      "all": "Tüm Etkinlikler",
-      "workshop": "Atölyeler",
-      "conference": "Konferanslar",
-      "networking": "Ağ Oluşturma",
-      "seminar": "Seminerler",
-      "training": "Eğitim",
-      "competition": "Yarışmalar",
-      "cultural": "Kültürel Etkinlikler"
-    },
-    "advancedFilters": {
-      "title": "Gelişmiş Filtreler",
-      "dateRange": "Tarih Aralığı",
-      "location": "Konum",
-      "price": "Fiyat",
-      "status": "Durum",
-      "capacity": "Kapasite",
-      "duration": "Süre",
-      "organizer": "Organizatör",
-      "tags": "Etiketler",
-      "apply": "Filtreleri Uygula",
-      "clear": "Filtreleri Temizle",
-      "showMore": "Daha Fazla Göster",
-      "showLess": "Daha Az Göster"
-    },
-    "filters": {
-      "status": "Durum",
-      "category": "Kategori",
-      "location": "Konum",
-      "date": "Tarih",
-      "price": "Fiyat",
-      "allStatus": "Tüm Durumlar",
-      "upcoming": "Yaklaşan",
-      "ongoing": "Devam Eden",
-      "completed": "Tamamlanan",
-      "cancelled": "İptal Edilen",
-      "allCategories": "Tüm Kategoriler",
-      "allLocations": "Tüm Konumlar",
-      "allPrices": "Tüm Fiyatlar",
-      "free": "Ücretsiz",
-      "paid": "Ücretli",
-      "donation": "İsteğe Bağlı Bağış",
-      "lowPrice": "Düşük Fiyat",
-      "mediumPrice": "Orta Fiyat",
-      "highPrice": "Yüksek Fiyat"
-    },
-    "sort": {
-      "title": "Sırala",
-      "date": "Tarih",
-      "title": "Başlık",
-      "price": "Fiyat",
-      "popularity": "Popülerlik",
-      "newest": "En Yeni",
-      "oldest": "En Eski",
-      "priceLow": "Fiyat: Düşükten Yükseğe",
-      "priceHigh": "Fiyat: Yüksekten Düşüğe"
-    },
-    "results": "{{count}} etkinlik bulundu",
-    "noResults": "Arama kriterlerinize uygun etkinlik bulunamadı",
-    "noResultsDesc": "Filtrelerinizi veya arama terimlerinizi ayarlamayı deneyin",
-    "register": "Şimdi Kayıt Ol",
-    "completed": "Tamamlandı",
-    "full": "Dolu",
-    "learnMore": "Daha Fazla Bilgi",
-    "date": "Tarih",
-    "location": "Konum",
-    "category": "Kategori",
-    "notFound": "Üzgünüz, bu etkinlik bulunamadı.",
-    "viewDetails": "Detayları Görüntüle",
-    "seo": {
-      "title": "Etkinlikler - Shababna Global Platform",
-      "description": "Eğitim, maneviyat ve mesleki gelişim alanlarındaki çeşitli faaliyetlerimizi keşfedin."
-    },
-    "cta": {
-      "title": "Değişim Yaratmada Bize Katılın",
-      "subtitle": "Dünyada yenilik yapan ve etki yaratan küresel İslami gençlik topluluğunun bir parçası olun",
-      "join": "Şimdi Bize Katılın",
-      "contact": "Bizimle İletişime Geçin"
-    }
-  },
-  "programs": {
-    "title": "Programlarımız",
-    "subtitle": "Gelecek nesil liderleri geliştirmek için tasarlanmış kapsamlı programlar",
-    "filter": {
-      "all": "Tüm Programlar",
-      "education": "Eğitim",
-      "technology": "Teknoloji",
-      "entrepreneurship": "Girişimcilik",
-      "volunteering": "Gönüllülük"
-    },
-    "results": "{{count}} program bulundu",
-    "support": "Bu Programı Destekle",
-    "sponsor": "Sponsor Ol",
-    "volunteer": "Gönüllü Ol",
-    "notFound": "Üzgünüz, bu program bulunamadı.",
-    "donationSuccess": "Bağış başarıyla tamamlandı!",
-    "donationError": "Bağış sırasında bir hata oluştu. Lütfen tekrar deneyin."
-  },
-  "joinUs": {
-    "title": "Topluluğumuza Katıl",
-    "subtitle": "Genç değişim yaratıcılarının küresel ağının bir parçası ol",
-    "form": {
-      "firstName": "Ad",
-      "lastName": "Soyad",
-      "email": "E-posta Adresi",
-      "phone": "Telefon Numarası",
-      "country": "Ülke",
-      "age": "Yaş",
-      "interests": "İlgi Alanları",
-      "motivation": "Neden bize katılmak istiyorsun?",
-      "submit": "Başvuruyu Gönder"
-    }
-  },
-  "contact": {
-    "title": "İletişime Geç",
-    "subtitle": "Sizden haber almayı seviyoruz. Bize mesaj gönderin, en kısa sürede yanıtlayalım.",
-    "form": {
-      "name": "Ad Soyad",
-      "email": "E-posta Adresi",
-      "subject": "Konu",
-      "message": "Mesaj",
-      "send": "Mesaj Gönder"
-    },
-    "info": {
-      "address": "123 Gençlik Sokağı, Küresel Şehir",
-      "phone": "+1 (555) 123-4567",
-      "email": "info@shababnaglobal.org"
-    }
-  },
-  "auth": {
-    "login": {
-      "title": "Tekrar Hoşgeldin",
-      "subtitle": "Hesabınıza giriş yapın",
-      "email": "E-posta Adresi",
-      "password": "Şifre",
-      "submit": "Giriş Yap",
-      "noAccount": "Hesabınız yok mu?",
-      "register": "Buradan kayıt olun"
-    },
-    "register": {
-      "title": "Hesap Oluştur",
-      "subtitle": "Topluluğumuza katıl",
-      "firstName": "Ad",
-      "lastName": "Soyad",
-      "email": "E-posta Adresi",
-      "password": "Şifre",
-      "confirmPassword": "Şifre Tekrar",
-      "submit": "Hesap Oluştur",
-      "hasAccount": "Zaten hesabınız var mı?",
-      "login": "Buradan giriş yapın"
-    }
-  },
-  "dashboard": {
-    "title": "Kontrol Paneli",
-    "welcome": "Tekrar hoşgeldin",
-    "stats": {
-      "events": "Toplam Etkinlik",
-      "programs": "Aktif Programlar",
-      "members": "Topluluk Üyeleri",
-      "donations": "Toplam Bağışlar"
-    },
-    "menu": {
-      "overview": "Genel Bakış",
-      "events": "Etkinlik Yönetimi",
-      "programs": "Program Yönetimi",
-      "users": "Kullanıcılar",
-      "donations": "Bağışlar",
-      "settings": "Ayarlar",
-      "main": "Ana Sayfa",
-      "management": "İçerik Yönetimi",
-      "settingsSection": "Ayarlar"
-    }
-  },
-  "common": {
-    "loading": "Yükleniyor...",
-    "learnMore": "Daha Fazla Öğren",
-    "close": "Kapat",
-    "error": {
-      "title": "Hata",
-      "message": "Beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin."
-    },
-    "retry": "Tekrar Dene",
-    "cancel": "İptal",
-    "save": "Kaydet",
-    "delete": "Sil",
-    "edit": "Düzenle",
-    "view": "Görüntüle",
-    "back": "Geri",
-    "next": "İleri",
-    "previous": "Önceki",
-    "search": "Ara",
-    "filter": "Filtrele",
-    "clear": "Temizle",
-    "apply": "Uygula",
-    "backToPrograms": "Programlara Geri Dön",
-    "backToEvents": "Etkinliklere Geri Dön"
-  },
-  "registration": {
-    "title": "Etkinliğe Kayıt Ol",
-    "firstName": "Ad",
-    "lastName": "Soyad",
-    "email": "E-posta",
-    "phone": "Telefon Numarası",
-    "submit": "Kayıt Onayla",
-    "success": "Kayıt Başarılı!",
-    "successMessage": "Teşekkürler! Etkinliğe başarıyla kayıt oldunuz. Yakında e-posta ile onay alacaksınız.",
-    "registerAnother": "Başka Kayıt",
-    "unavailable": "Kayıt Mevcut Değil",
-    "completedMessage": "Tamamlanmış bir etkinliğe kayıt olamazsınız",
-    "fullMessage": "Etkinlik dolu ve kayıt mevcut değil"
   }
 }
