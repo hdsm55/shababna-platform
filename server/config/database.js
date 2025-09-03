@@ -4,21 +4,37 @@ import dotenv from 'dotenv';
 // تحميل متغيرات البيئة
 dotenv.config();
 
-// إنشاء pool للاتصال بقاعدة البيانات
-const pool = new Pool({
+// إعدادات قاعدة البيانات المحلية للتطوير
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+const dbConfig = isDevelopment ? {
+    // إعدادات قاعدة البيانات المحلية
+    host: 'localhost',
+    port: 5432,
+    database: 'shababna_dev',
+    user: 'postgres',
+    password: 'postgres',
+    ssl: false
+} : {
+    // إعدادات قاعدة البيانات على Render للإنتاج
     host: process.env.DB_HOST || 'dpg-d2lhhgh5pdvs73anravg-a.oregon-postgres.render.com',
     port: process.env.DB_PORT || 5432,
     database: process.env.DB_NAME || 'shababna',
     user: process.env.DB_USER || 'shababna_user',
     password: process.env.DB_PASSWORD || 'mWiirXAZ4L7jZNoG1TQOGePRaVkEZgL8',
+    ssl: {
+        rejectUnauthorized: false,
+        require: true
+    }
+};
+
+// إنشاء pool للاتصال بقاعدة البيانات
+const pool = new Pool({
+    ...dbConfig,
     max: 20, // زيادة الحد الأقصى لعدد الاتصالات
     min: 5, // زيادة الحد الأدنى لعدد الاتصالات
     idleTimeoutMillis: 30000000, // 5 دقائق - زيادة وقت الانتظار قبل إغلاق الاتصال
     connectionTimeoutMillis: 6000000, // دقيقة واحدة - زيادة وقت الانتظار للاتصال
-    ssl: {
-        rejectUnauthorized: false,
-        require: true
-    },
     // إعدادات إضافية لتحسين الاستقرار
     keepAlive: true,
     keepAliveInitialDelayMillis: 30000, // 30 ثانية
@@ -40,9 +56,11 @@ export const testConnection = async () => {
         const result = await client.query('SELECT NOW()');
         client.release();
         console.log('✅ تم الاتصال بقاعدة البيانات PostgreSQL بنجاح:', result.rows[0]);
+        console.log(`🌐 البيئة: ${isDevelopment ? 'تطوير محلي' : 'إنتاج'}`);
         return true;
     } catch (error) {
         console.error('❌ خطأ في الاتصال بقاعدة البيانات PostgreSQL:', error.message);
+        console.log(`💡 النصيحة: تأكد من تشغيل قاعدة البيانات المحلية أو تحديث إعدادات Render`);
         return false;
     }
 };

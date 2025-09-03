@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { Button } from '../components/ui/Button/ButtonSimple';
 import { Card } from '../components/ui/Card/Card';
-import { Input } from '../components/ui/Input/InputSimple';
 import { Alert } from '../components/common/AlertSimple';
 import SEO from '../components/common/SEO';
 import { submitContactForm, ContactFormData } from '../services/formsApi';
@@ -141,21 +140,23 @@ const ContactForm = memo(() => {
               >
                 {t('contact.form.firstName', 'الاسم الأول')} *
               </label>
-              <Input
+              <input
                 type="text"
                 placeholder={t(
                   'contact.form.firstNamePlaceholder',
                   'أدخل اسمك الأول'
                 )}
-                {...(() => {
-                  const { ref, ...rest } = register('first_name', {
-                    required: t(
-                      'contact.form.firstNameRequired',
-                      'الاسم الأول مطلوب'
-                    ),
-                  });
-                  return rest;
-                })()}
+                {...register('first_name', {
+                  required: t(
+                    'contact.form.firstNameRequired',
+                    'الاسم الأول مطلوب'
+                  ),
+                })}
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 font-arabic ${
+                  errors.first_name
+                    ? 'border-error-500'
+                    : 'border-secondary-200'
+                }`}
               />
               {errors.first_name && (
                 <p className="mt-1 text-sm text-error-500 font-arabic">
@@ -171,21 +172,21 @@ const ContactForm = memo(() => {
               >
                 {t('contact.form.lastName', 'اسم العائلة')} *
               </label>
-              <Input
+              <input
                 type="text"
                 placeholder={t(
                   'contact.form.lastNamePlaceholder',
                   'أدخل اسم عائلتك'
                 )}
-                {...(() => {
-                  const { ref, ...rest } = register('last_name', {
-                    required: t(
-                      'contact.form.lastNameRequired',
-                      'اسم العائلة مطلوب'
-                    ),
-                  });
-                  return rest;
-                })()}
+                {...register('last_name', {
+                  required: t(
+                    'contact.form.lastNameRequired',
+                    'اسم العائلة مطلوب'
+                  ),
+                })}
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 font-arabic ${
+                  errors.last_name ? 'border-error-500' : 'border-secondary-200'
+                }`}
               />
               {errors.last_name && (
                 <p className="mt-1 text-sm text-error-500 font-arabic">
@@ -202,28 +203,28 @@ const ContactForm = memo(() => {
             >
               {t('contact.form.email', 'البريد الإلكتروني')} *
             </label>
-            <Input
+            <input
               type="email"
               placeholder={t(
                 'contact.form.emailPlaceholder',
                 'أدخل بريدك الإلكتروني'
               )}
-              {...(() => {
-                const { ref, ...rest } = register('email', {
-                  required: t(
-                    'contact.form.emailRequired',
-                    'البريد الإلكتروني مطلوب'
+              {...register('email', {
+                required: t(
+                  'contact.form.emailRequired',
+                  'البريد الإلكتروني مطلوب'
+                ),
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: t(
+                    'contact.form.emailInvalid',
+                    'البريد الإلكتروني غير صحيح'
                   ),
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: t(
-                      'contact.form.emailInvalid',
-                      'البريد الإلكتروني غير صحيح'
-                    ),
-                  },
-                });
-                return rest;
-              })()}
+                },
+              })}
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 font-arabic ${
+                errors.email ? 'border-error-500' : 'border-secondary-200'
+              }`}
             />
             {errors.email && (
               <p className="mt-1 text-sm text-error-500 font-arabic">
@@ -239,16 +240,14 @@ const ContactForm = memo(() => {
             >
               {t('contact.form.phone', 'رقم الهاتف')}
             </label>
-            <Input
+            <input
               type="tel"
               placeholder={t(
                 'contact.form.phonePlaceholder',
                 'أدخل رقم هاتفك (اختياري)'
               )}
-              {...(() => {
-                const { ref, ...rest } = register('phone');
-                return rest;
-              })()}
+              {...register('phone')}
+              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 font-arabic border-secondary-200"
             />
           </div>
 
@@ -259,18 +258,18 @@ const ContactForm = memo(() => {
             >
               {t('contact.form.subject', 'الموضوع')} *
             </label>
-            <Input
+            <input
               type="text"
               placeholder={t(
                 'contact.form.subjectPlaceholder',
                 'أدخل موضوع رسالتك'
               )}
-              {...(() => {
-                const { ref, ...rest } = register('subject', {
-                  required: t('contact.form.subjectRequired', 'الموضوع مطلوب'),
-                });
-                return rest;
-              })()}
+              {...register('subject', {
+                required: t('contact.form.subjectRequired', 'الموضوع مطلوب'),
+              })}
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 font-arabic ${
+                errors.subject ? 'border-error-500' : 'border-secondary-200'
+              }`}
             />
             {errors.subject && (
               <p className="mt-1 text-sm text-error-500 font-arabic">

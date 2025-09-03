@@ -4,21 +4,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface PageLoaderProps {
   message?: string;
   showProgress?: boolean;
-  estimatedTime?: number; // بالثواني
-  variant?: 'default' | 'minimal' | 'skeleton' | 'wave';
+  variant?: 'default' | 'minimal' | 'brand';
 }
 
 const PageLoader: React.FC<PageLoaderProps> = ({
   message = 'جاري تحميل الصفحة...',
   showProgress = true,
-  estimatedTime = 3,
   variant = 'default',
 }) => {
   const [progress, setProgress] = useState(0);
-  const [dots, setDots] = useState('');
 
   useEffect(() => {
-    // محاكاة تقدم التحميل
     if (showProgress) {
       const interval = setInterval(() => {
         setProgress((prev) => {
@@ -31,31 +27,14 @@ const PageLoader: React.FC<PageLoaderProps> = ({
     }
   }, [showProgress]);
 
-  useEffect(() => {
-    // تأثير النقاط المتحركة
-    const interval = setInterval(() => {
-      setDots((prev) => {
-        if (prev.length >= 3) return '';
-        return prev + '.';
-      });
-    }, 500);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // مكونات التحميل المختلفة
   const renderLoader = () => {
     switch (variant) {
       case 'minimal':
-        return <MinimalLoader message={message} dots={dots} />;
-      case 'skeleton':
-        return <SkeletonLoader message={message} />;
-      case 'wave':
-        return <WaveLoader message={message} />;
+        return <MinimalLoader message={message} />;
+      case 'brand':
+        return <BrandLoader message={message} progress={progress} />;
       default:
-        return (
-          <DefaultLoader message={message} progress={progress} dots={dots} />
-        );
+        return <DefaultLoader message={message} progress={progress} />;
     }
   };
 
@@ -66,7 +45,7 @@ const PageLoader: React.FC<PageLoaderProps> = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="fixed inset-0 bg-gradient-to-br from-white via-blue-50/30 to-indigo-100/50 backdrop-blur-sm flex items-center justify-center z-50"
+        className="fixed inset-0 bg-gradient-to-br from-primary-50 via-white to-secondary-50 backdrop-blur-sm flex items-center justify-center z-50 font-arabic"
       >
         {renderLoader()}
       </motion.div>
@@ -78,8 +57,7 @@ const PageLoader: React.FC<PageLoaderProps> = ({
 const DefaultLoader: React.FC<{
   message: string;
   progress: number;
-  dots: string;
-}> = ({ message, progress, dots }) => (
+}> = ({ message, progress }) => (
   <div className="text-center max-w-md mx-auto px-6">
     {/* شعار متحرك */}
     <motion.div
@@ -90,11 +68,11 @@ const DefaultLoader: React.FC<{
     >
       <div className="relative mx-auto w-20 h-20">
         {/* دائرة خارجية */}
-        <div className="absolute inset-0 w-20 h-20 border-4 border-blue-100 rounded-full"></div>
+        <div className="absolute inset-0 w-20 h-20 border-4 border-primary-200 rounded-full"></div>
 
         {/* دائرة داخلية متحركة */}
         <motion.div
-          className="absolute inset-2 w-16 h-16 border-4 border-transparent border-t-blue-500 rounded-full"
+          className="absolute inset-2 w-16 h-16 border-4 border-transparent border-t-primary-500 rounded-full"
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
         />
@@ -104,7 +82,7 @@ const DefaultLoader: React.FC<{
           <motion.div
             animate={{ scale: [1, 1.1, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center"
+            className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center"
           >
             <svg
               className="w-4 h-4 text-white"
@@ -129,8 +107,10 @@ const DefaultLoader: React.FC<{
       transition={{ delay: 0.2, duration: 0.5 }}
       className="mb-6"
     >
-      <h3 className="text-xl font-semibold text-gray-800 mb-2">{message}</h3>
-      <p className="text-gray-600 text-sm">يرجى الانتظار قليلاً{dots}</p>
+      <h3 className="text-xl font-semibold text-dark-500 mb-2 font-arabic">
+        {message}
+      </h3>
+      <p className="text-dark-400 text-sm font-arabic">يرجى الانتظار قليلاً</p>
     </motion.div>
 
     {/* شريط التقدم */}
@@ -141,16 +121,18 @@ const DefaultLoader: React.FC<{
         transition={{ delay: 0.3, duration: 0.5 }}
         className="mb-4"
       >
-        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+        <div className="w-full bg-secondary-200 rounded-full h-2 overflow-hidden">
           <motion.div
-            className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"
+            className="h-full bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.3 }}
           />
         </div>
         <div className="text-right mt-1">
-          <span className="text-xs text-gray-500">{Math.round(progress)}%</span>
+          <span className="text-xs text-dark-400 font-arabic">
+            {Math.round(progress)}%
+          </span>
         </div>
       </motion.div>
     )}
@@ -160,12 +142,12 @@ const DefaultLoader: React.FC<{
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.4, duration: 0.5 }}
-      className="flex justify-center space-x-2"
+      className="flex justify-center space-x-2 rtl:space-x-reverse"
     >
       {[0, 1, 2, 3].map((i) => (
         <motion.div
           key={i}
-          className="w-2 h-2 bg-blue-400 rounded-full"
+          className="w-2 h-2 bg-primary-400 rounded-full"
           animate={{
             scale: [1, 1.5, 1],
             opacity: [0.5, 1, 0.5],
@@ -182,82 +164,88 @@ const DefaultLoader: React.FC<{
 );
 
 // مكون التحميل البسيط
-const MinimalLoader: React.FC<{ message: string; dots: string }> = ({
-  message,
-  dots,
-}) => (
+const MinimalLoader: React.FC<{ message: string }> = ({ message }) => (
   <div className="text-center max-w-sm mx-auto px-6">
     {/* دائرة بسيطة */}
     <motion.div
       animate={{ rotate: 360 }}
       transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-      className="mx-auto mb-6 w-12 h-12 border-3 border-transparent border-t-blue-500 rounded-full"
+      className="mx-auto mb-6 w-12 h-12 border-3 border-transparent border-t-primary-500 rounded-full"
     />
 
     {/* الرسالة */}
-    <p className="text-gray-700 text-lg font-medium">
-      {message}
-      {dots}
-    </p>
+    <p className="text-dark-500 text-lg font-medium font-arabic">{message}</p>
   </div>
 );
 
-// مكون التحميل الهيكلي
-const SkeletonLoader: React.FC<{ message: string }> = ({ message }) => (
+// مكون التحميل بالهوية التجارية
+const BrandLoader: React.FC<{
+  message: string;
+  progress: number;
+}> = ({ message, progress }) => (
   <div className="text-center max-w-md mx-auto px-6">
-    {/* رسالة */}
-    <h3 className="text-xl font-semibold text-gray-800 mb-6">{message}</h3>
-
-    {/* هيكل عظمي متحرك */}
-    <div className="space-y-4">
-      {[1, 2, 3].map((i) => (
-        <motion.div
-          key={i}
-          className="h-4 bg-gray-200 rounded"
-          initial={{ opacity: 0.5 }}
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{
-            duration: 1.5,
-            repeat: Infinity,
-            delay: i * 0.2,
-          }}
-        />
-      ))}
-    </div>
-
-    {/* دائرة في الأسفل */}
+    {/* شعار شبابنا */}
     <motion.div
-      animate={{ rotate: 360 }}
-      transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-      className="mx-auto mt-6 w-8 h-8 border-2 border-transparent border-t-blue-500 rounded-full"
-    />
-  </div>
-);
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="mb-8"
+    >
+      <div className="relative mx-auto w-24 h-24">
+        {/* خلفية متدرجة */}
+        <div className="absolute inset-0 w-24 h-24 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl shadow-lg"></div>
 
-// مكون التحميل الموجي
-const WaveLoader: React.FC<{ message: string }> = ({ message }) => (
-  <div className="text-center max-w-sm mx-auto px-6">
+        {/* أيقونة الشباب */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <motion.div
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="text-white text-2xl font-bold"
+          >
+            شبابنا
+          </motion.div>
+        </div>
+      </div>
+    </motion.div>
+
     {/* الرسالة */}
-    <h3 className="text-xl font-semibold text-gray-800 mb-8">{message}</h3>
+    <motion.div
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ delay: 0.2, duration: 0.5 }}
+      className="mb-6"
+    >
+      <h3 className="text-xl font-semibold text-dark-500 mb-2 font-arabic">
+        {message}
+      </h3>
+      <p className="text-dark-400 text-sm font-arabic">
+        نحن نبني مستقبلاً أفضل معاً
+      </p>
+    </motion.div>
 
-    {/* موجات متحركة */}
-    <div className="flex justify-center space-x-1">
-      {[0, 1, 2, 3, 4].map((i) => (
-        <motion.div
-          key={i}
-          className="w-2 h-8 bg-blue-500 rounded-full"
-          animate={{
-            height: [8, 32, 8],
-            opacity: [0.5, 1, 0.5],
-          }}
-          transition={{
-            duration: 1,
-            repeat: Infinity,
-            delay: i * 0.1,
-          }}
-        />
-      ))}
-    </div>
+    {/* شريط التقدم */}
+    {progress > 0 && (
+      <motion.div
+        initial={{ width: 0 }}
+        animate={{ width: '100%' }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+        className="mb-4"
+      >
+        <div className="w-full bg-secondary-200 rounded-full h-2 overflow-hidden">
+          <motion.div
+            className="h-full bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full"
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.3 }}
+          />
+        </div>
+        <div className="text-right mt-1">
+          <span className="text-xs text-dark-400 font-arabic">
+            {Math.round(progress)}%
+          </span>
+        </div>
+      </motion.div>
+    )}
   </div>
 );
 
