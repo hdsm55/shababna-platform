@@ -118,9 +118,8 @@ const ProgramDetail: React.FC = () => {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('ar-SA', {
-      year: 'numeric',
-      month: 'long',
       day: 'numeric',
+      month: 'short',
     });
   };
 
@@ -303,16 +302,16 @@ const ProgramDetail: React.FC = () => {
                     <Calendar className="w-5 h-5 mr-3" />
                     <div>
                       <div className="font-medium">
-                        {formatDate(program.start_date)}
+                        من {formatDate(program.start_date)}
                         {program.end_date !== program.start_date &&
-                          ` - ${formatDate(program.end_date)}`}
+                          ` إلى ${formatDate(program.end_date)}`}
                       </div>
                     </div>
                   </div>
 
                   <div className="flex items-center text-gray-600">
                     <TrendingUp className="w-5 h-5 mr-3" />
-                    <span>{program.category}</span>
+                    <span>{t(`programs.categories.${program.category}`, program.category)}</span>
                   </div>
 
                   {program.goal_amount && program.current_amount && (

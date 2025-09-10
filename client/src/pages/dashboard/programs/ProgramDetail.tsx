@@ -137,9 +137,8 @@ const DashboardProgramDetail: React.FC = () => {
     if (!dateString) return 'غير محدد';
     try {
       return new Date(dateString).toLocaleDateString('ar-SA', {
-        year: 'numeric',
-        month: 'long',
         day: 'numeric',
+        month: 'short',
       });
     } catch (error) {
       return 'غير محدد';

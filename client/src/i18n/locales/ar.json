@@ -152,6 +152,15 @@
       "community": "المجتمع",
       "technology": "التكنولوجيا"
     },
+    "categories": {
+      "education": "التعليم",
+      "health": "الصحة",
+      "environment": "البيئة",
+      "community": "المجتمع",
+      "technology": "التكنولوجيا",
+      "entrepreneurship": "ريادة الأعمال",
+      "volunteering": "التطوع"
+    },
     "donation": {
       "title": "تبرع للبرنامج",
       "amount": "مبلغ التبرع",
