@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { getInputClasses } from '../../common/DesignSystem';
 
 interface InputProps {
@@ -19,76 +19,86 @@ interface InputProps {
   iconPosition?: 'left' | 'right';
 }
 
-export const Input: React.FC<InputProps> = ({
-  type = 'text',
-  placeholder,
-  value,
-  onChange,
-  error = false,
-  disabled = false,
-  className = '',
-  name,
-  required = false,
-  min,
-  accept,
-  label,
-  helperText,
-  icon,
-  iconPosition = 'left',
-}) => {
-  return (
-    <div className="w-full">
-      {label && (
-        <label className="block text-sm font-medium text-neutral-700 mb-2">
-          {label}
-          {required && <span className="text-error-500 ml-1">*</span>}
-        </label>
-      )}
-
-      <div className="relative">
-        {icon && iconPosition === 'left' && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span className="text-neutral-400">{icon}</span>
-          </div>
+export const Input = forwardRef<HTMLInputElement, InputProps>(
+  (
+    {
+      type = 'text',
+      placeholder,
+      value,
+      onChange,
+      error = false,
+      disabled = false,
+      className = '',
+      name,
+      required = false,
+      min,
+      accept,
+      label,
+      helperText,
+      icon,
+      iconPosition = 'left',
+      ...props
+    },
+    ref
+  ) => {
+    return (
+      <div className="w-full">
+        {label && (
+          <label className="block text-sm font-medium text-neutral-700 mb-2">
+            {label}
+            {required && <span className="text-error-500 ml-1">*</span>}
+          </label>
         )}
 
-        <input
-          type={type}
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          name={name}
-          required={required}
-          min={min}
-          accept={accept}
-          className={`
+        <div className="relative">
+          {icon && iconPosition === 'left' && (
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span className="text-neutral-400">{icon}</span>
+            </div>
+          )}
+
+          <input
+            ref={ref}
+            type={type}
+            placeholder={placeholder}
+            value={value}
+            onChange={onChange}
+            name={name}
+            required={required}
+            min={min}
+            accept={accept}
+            className={`
             ${getInputClasses(error, disabled)}
             ${icon && iconPosition === 'left' ? 'pl-10' : ''}
             ${icon && iconPosition === 'right' ? 'pr-10' : ''}
             ${className}
           `}
-          disabled={disabled}
-        />
+            disabled={disabled}
+            {...props}
+          />
 
-        {icon && iconPosition === 'right' && (
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <span className="text-neutral-400">{icon}</span>
-          </div>
+          {icon && iconPosition === 'right' && (
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <span className="text-neutral-400">{icon}</span>
+            </div>
+          )}
+        </div>
+
+        {helperText && (
+          <p
+            className={`mt-1 text-sm ${
+              error ? 'text-error-600' : 'text-neutral-500'
+            }`}
+          >
+            {helperText}
+          </p>
         )}
       </div>
+    );
+  }
+);
 
-      {helperText && (
-        <p
-          className={`mt-1 text-sm ${
-            error ? 'text-error-600' : 'text-neutral-500'
-          }`}
-        >
-          {helperText}
-        </p>
-      )}
-    </div>
-  );
-};
+Input.displayName = 'Input';
 
 // إضافة Textarea component
 export const Textarea: React.FC<

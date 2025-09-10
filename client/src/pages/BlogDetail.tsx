@@ -133,7 +133,9 @@ const BlogDetail: React.FC = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
             </div>
             <div className="flex items-center justify-center gap-2 text-blue-200 mb-4">
-              <span className="text-sm font-medium">مقال</span>
+              <span className="text-sm font-medium">
+                {t('blogs.type', 'مقال')}
+              </span>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold leading-tight">
               {blog.title}
@@ -143,7 +145,9 @@ const BlogDetail: React.FC = () => {
                 <span className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-sm font-bold">
                   {blog.author?.charAt(0) || 'ش'}
                 </span>
-                <span>{blog.author || 'فريق شبابنا'}</span>
+                <span>
+                  {blog.author || t('blogs.defaultAuthor', 'فريق شبابنا')}
+                </span>
               </div>
               <span>•</span>
               <span>
@@ -177,7 +181,7 @@ const BlogDetail: React.FC = () => {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm">مشاهدات</span>
+                  <span className="text-sm">{t('blogs.views', 'مشاهدات')}</span>
                 </div>
               </div>
 
@@ -199,7 +203,9 @@ const BlogDetail: React.FC = () => {
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-600">مفيد</span>
+                      <span className="text-sm text-gray-600">
+                        {t('blogs.helpful', 'مفيد')}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-gray-600">تعليقات</span>
@@ -258,34 +264,33 @@ const BlogDetail: React.FC = () => {
                         size="md"
                       />
                     </div>
-                      <div className="p-6">
-                        <h3 className="font-bold text-lg mb-2 text-gray-900 hover:text-blue-600 transition-colors">
-                          {relatedBlog.title}
-                        </h3>
-                        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                          {relatedBlog.content?.slice(0, 100)}...
-                        </p>
-                        <div className="flex items-center justify-between text-sm text-gray-500">
-                          <span>{relatedBlog.author || 'فريق شبابنا'}</span>
-                          <span>
-                            {relatedBlog.created_at
-                              ? new Date(
-                                  relatedBlog.created_at
-                                ).toLocaleDateString(
-                                  i18n.language === 'ar' ? 'ar-EG' : 'en-US',
-                                  {
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric',
-                                  }
-                                )
-                              : ''}
-                          </span>
-                        </div>
+                    <div className="p-6">
+                      <h3 className="font-bold text-lg mb-2 text-gray-900 hover:text-blue-600 transition-colors">
+                        {relatedBlog.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                        {relatedBlog.content?.slice(0, 100)}...
+                      </p>
+                      <div className="flex items-center justify-between text-sm text-gray-500">
+                        <span>{relatedBlog.author || 'فريق شبابنا'}</span>
+                        <span>
+                          {relatedBlog.created_at
+                            ? new Date(
+                                relatedBlog.created_at
+                              ).toLocaleDateString(
+                                i18n.language === 'ar' ? 'ar-EG' : 'en-US',
+                                {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric',
+                                }
+                              )
+                            : ''}
+                        </span>
                       </div>
-                    </Link>
-                  );
-                })}
+                    </div>
+                  </Link>
+                ))}
               </div>
             ) : (
               <div className="text-center text-gray-500 py-8">
@@ -352,21 +357,7 @@ const BlogDetail: React.FC = () => {
               <button
                 onClick={() => {
                   window.open(
-                    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                      window.location.href
-                    )}`,
-                    '_blank'
-                  );
-                  setShowShareModal(false);
-                }}
-                className="share-btn share-btn-facebook w-full"
-              >
-                مشاركة على فيسبوك
-              </button>
-              <button
-                onClick={() => {
-                  window.open(
-                    `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                    `https://x.com/intent/tweet?text=${encodeURIComponent(
                       blog?.title
                     )}&url=${encodeURIComponent(window.location.href)}`,
                     '_blank'
@@ -375,21 +366,7 @@ const BlogDetail: React.FC = () => {
                 }}
                 className="share-btn share-btn-twitter w-full"
               >
-                مشاركة على تويتر
-              </button>
-              <button
-                onClick={() => {
-                  window.open(
-                    `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-                      window.location.href
-                    )}`,
-                    '_blank'
-                  );
-                  setShowShareModal(false);
-                }}
-                className="share-btn share-btn-linkedin w-full"
-              >
-                مشاركة على لينكد إن
+                مشاركة على X (تويتر)
               </button>
               <button
                 onClick={() => {

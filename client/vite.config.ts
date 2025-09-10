@@ -22,14 +22,7 @@ export default defineConfig({
   build: {
     // تحسين حجم الباندل
     target: 'es2015',
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug'],
-      },
-    },
+    minify: 'esbuild',
 
     // تقسيم الباندل
     rollupOptions: {
@@ -54,7 +47,7 @@ export default defineConfig({
           seo: ['react-helmet-async'],
 
           // الأدوات المساعدة
-          utils: ['date-fns', 'clsx', 'tailwind-merge'],
+          utils: ['clsx'],
         },
 
         // تحسين أسماء الملفات

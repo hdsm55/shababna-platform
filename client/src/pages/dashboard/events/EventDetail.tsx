@@ -122,9 +122,8 @@ const DashboardEventDetail: React.FC = () => {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('ar-SA', {
-      year: 'numeric',
-      month: 'long',
       day: 'numeric',
+      month: 'short',
     });
   };
 
@@ -132,6 +131,7 @@ const DashboardEventDetail: React.FC = () => {
     return new Date(dateString).toLocaleTimeString('ar-SA', {
       hour: '2-digit',
       minute: '2-digit',
+      hour12: false,
     });
   };
 

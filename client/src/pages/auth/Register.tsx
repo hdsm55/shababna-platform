@@ -60,7 +60,7 @@ const Register: React.FC = () => {
     watch,
     formState: { errors, isSubmitting, isValid },
   } = useForm<RegisterFormData>({
-    mode: 'onSubmit',
+    mode: 'onChange',
     reValidateMode: 'onChange',
     defaultValues: {
       first_name: '',
@@ -110,6 +110,7 @@ const Register: React.FC = () => {
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
         // تسجيل الدخول تلقائياً
+        // ملاحظة: لإنشاء مستخدم مدير للاختبار، غيّر role إلى 'admin'
         const mockUser = {
           id: 2,
           first_name: data.first_name,
@@ -124,6 +125,7 @@ const Register: React.FC = () => {
         login(mockUser, mockToken);
         localStorage.setItem('token', mockToken);
 
+        // توجيه المستخدمين العاديين إلى الصفحة الرئيسية
         navigate('/');
       } else {
         setRegisterError(response.message || 'فشل في إنشاء الحساب');
@@ -430,7 +432,10 @@ const Register: React.FC = () => {
                   >
                     <Alert type="success" className="flex items-center">
                       <CheckCircle className="w-5 h-5 mr-2" />
-                      {t('auth.register.success', 'تم إنشاء الحساب بنجاح!')}
+                      {t(
+                        'auth.register.success',
+                        'تم إنشاء الحساب بنجاح! جاري توجيهك إلى الصفحة الرئيسية...'
+                      )}
                     </Alert>
                   </motion.div>
                 )}
@@ -462,7 +467,7 @@ const Register: React.FC = () => {
                 className="space-y-6"
               >
                 {/* Name Fields */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <motion.div variants={itemVariants}>
                     <label
                       htmlFor="first_name"
@@ -480,11 +485,18 @@ const Register: React.FC = () => {
                             'auth.register.firstName.required',
                             'الاسم الأول مطلوب'
                           ),
+                          minLength: {
+                            value: 2,
+                            message: t(
+                              'auth.register.firstName.minLength',
+                              'الاسم الأول يجب أن يكون حرفين على الأقل'
+                            ),
+                          },
                         })}
                         className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary-500"
                         placeholder={t(
                           'auth.register.firstName.placeholder',
-                          'الاسم الأول'
+                          'أدخل اسمك الأول'
                         )}
                       />
                     </div>
@@ -520,11 +532,18 @@ const Register: React.FC = () => {
                             'auth.register.lastName.required',
                             'اسم العائلة مطلوب'
                           ),
+                          minLength: {
+                            value: 2,
+                            message: t(
+                              'auth.register.lastName.minLength',
+                              'اسم العائلة يجب أن يكون حرفين على الأقل'
+                            ),
+                          },
                         })}
                         className="pl-10 transition-all duration-200 focus:ring-2 focus:ring-primary-500"
                         placeholder={t(
                           'auth.register.lastName.placeholder',
-                          'اسم العائلة'
+                          'أدخل اسم العائلة'
                         )}
                       />
                     </div>

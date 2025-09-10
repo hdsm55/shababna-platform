@@ -21,7 +21,7 @@ import { Button } from '../components/ui/Button/ButtonSimple';
 import { Card } from '../components/ui/Card/Card';
 import { Input } from '../components/ui/Input/InputSimple';
 import { Alert } from '../components/common/DesignSystem';
-import EventsLoader from '../components/common/EventsLoader';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 import { useDebounce } from '../hooks/useDebounce';
 
 // تحسين الأداء - مكونات منفصلة
@@ -86,21 +86,27 @@ const EventsHero = memo(({ events }: { events: Event[] }) => {
               <div className="text-2xl font-bold text-white mb-1">
                 {events?.length || 0}
               </div>
-              <div className="text-primary-200 text-sm">فعالية متاحة</div>
+              <div className="text-primary-200 text-sm">
+                {t('events.stats.available', 'فعالية متاحة')}
+              </div>
             </div>
             <div className="w-px h-8 bg-white/20"></div>
             <div className="text-center">
               <div className="text-2xl font-bold text-white mb-1">
                 {events?.filter((e) => e.status === 'upcoming').length || 0}
               </div>
-              <div className="text-primary-200 text-sm">قادمة</div>
+              <div className="text-primary-200 text-sm">
+                {t('events.stats.upcoming', 'قادمة')}
+              </div>
             </div>
             <div className="w-px h-8 bg-white/20"></div>
             <div className="text-center">
               <div className="text-2xl font-bold text-white mb-1">
                 {events?.filter((e) => e.status === 'active').length || 0}
               </div>
-              <div className="text-primary-200 text-sm">نشطة</div>
+              <div className="text-primary-200 text-sm">
+                {t('events.stats.active', 'نشطة')}
+              </div>
             </div>
           </motion.div>
         </motion.div>
@@ -266,9 +272,8 @@ const EventCard = memo(
           return 'تاريخ غير صحيح';
         }
         return date.toLocaleDateString('ar-SA', {
-          year: 'numeric',
-          month: 'long',
           day: 'numeric',
+          month: 'short',
         });
       } catch (error) {
         console.error('❌ Error formatting date:', error);
@@ -286,6 +291,7 @@ const EventCard = memo(
         return date.toLocaleTimeString('ar-SA', {
           hour: '2-digit',
           minute: '2-digit',
+          hour12: false,
         });
       } catch (error) {
         console.error('❌ Error formatting time:', error);
@@ -384,7 +390,7 @@ const EventCard = memo(
                   event.status
                 )}`}
               >
-                {getStatusText(event.status)}
+                {t(`events.status.${event.status}`, getStatusText(event.status))}
               </span>
             </div>
 
@@ -395,14 +401,14 @@ const EventCard = memo(
                   event.category
                 )}`}
               >
-                {getCategoryIcon(event.category)} {event.category}
+                {getCategoryIcon(event.category)} {t(`events.categories.${event.category}`, event.category)}
               </span>
             </div>
           </div>
 
           {/* Event Content */}
           <div className="p-6">
-            <h3 className="text-xl font-bold text-dark-500 mb-3 group-hover:text-primary-600 transition-colors">
+            <h3 className="text-lg font-semibold text-dark-500 mb-3 group-hover:text-primary-600 transition-colors line-clamp-2">
               {event.title}
             </h3>
 
@@ -414,12 +420,9 @@ const EventCard = memo(
             <div className="space-y-2 mb-4">
               <div className="flex items-center gap-2 text-sm text-dark-400">
                 <Calendar className="w-4 h-4 text-primary-500" />
-                <span>{formatDate(event.start_date)}</span>
-              </div>
-
-              <div className="flex items-center gap-2 text-sm text-dark-400">
-                <Clock className="w-4 h-4 text-secondary-500" />
-                <span>{formatTime(event.start_date)}</span>
+                <span className="font-medium">
+                  {formatDate(event.start_date)} في {formatTime(event.start_date)}
+                </span>
               </div>
 
               <div className="flex items-center gap-2 text-sm text-dark-400">
@@ -431,7 +434,7 @@ const EventCard = memo(
                 <div className="flex items-center gap-2 text-sm text-dark-400">
                   <Users className="w-4 h-4 text-primary-500" />
                   <span>
-                    {event.attendees || 0} / {event.max_attendees} مشارك
+                    {event.attendees || 0} / {event.max_attendees} {t('events.attendees', 'مشارك')}
                   </span>
                 </div>
               )}
@@ -442,8 +445,8 @@ const EventCard = memo(
               <div className="mb-4 p-2 bg-primary-50 rounded-lg">
                 <p className="text-sm text-primary-600 font-medium">
                   {calculateDaysUntil(event.start_date) > 0
-                    ? `${calculateDaysUntil(event.start_date)} يوم متبقي`
-                    : 'اليوم!'}
+                    ? t('events.daysRemaining', { count: calculateDaysUntil(event.start_date) })
+                    : t('events.today', 'اليوم!')}
                 </p>
               </div>
             )}
@@ -459,18 +462,18 @@ const EventCard = memo(
                 }
               >
                 {event.status === 'completed'
-                  ? 'مكتملة'
+                  ? t('events.actions.completed', 'مكتملة')
                   : event.status === 'cancelled'
-                  ? 'ملغية'
-                  : 'سجل الآن'}
+                  ? t('events.actions.cancelled', 'ملغية')
+                  : t('events.actions.register', 'سجل الآن')}
               </Button>
 
               <Button
                 variant="outline"
                 onClick={() => navigate(`/events/${event.id}`)}
-                className="border-primary-200 text-primary-600 hover:bg-primary-50"
+                className="border-primary-200 text-primary-600 hover:bg-primary-50 text-sm"
               >
-                <Eye className="w-4 h-4" />
+                {t('events.actions.viewDetails', 'عرض التفاصيل')}
               </Button>
             </div>
           </div>
@@ -586,7 +589,7 @@ const Events: React.FC = () => {
         {/* Loading State */}
         {isLoading && (
           <div className="flex justify-center items-center py-12">
-            <EventsLoader />
+            <LoadingSpinner />
           </div>
         )}
 

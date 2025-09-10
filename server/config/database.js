@@ -4,19 +4,9 @@ import dotenv from 'dotenv';
 // تحميل متغيرات البيئة
 dotenv.config();
 
-// إعدادات قاعدة البيانات المحلية للتطوير
-const isDevelopment = process.env.NODE_ENV === 'development';
-
-const dbConfig = isDevelopment ? {
-    // إعدادات قاعدة البيانات المحلية
-    host: 'localhost',
-    port: 5432,
-    database: 'shababna_dev',
-    user: 'postgres',
-    password: 'postgres',
-    ssl: false
-} : {
-    // إعدادات قاعدة البيانات على Render للإنتاج
+// استخدام قاعدة البيانات على Render للتطوير والإنتاج
+const dbConfig = {
+    // إعدادات قاعدة البيانات على Render
     host: process.env.DB_HOST || 'dpg-d2lhhgh5pdvs73anravg-a.oregon-postgres.render.com',
     port: process.env.DB_PORT || 5432,
     database: process.env.DB_NAME || 'shababna',
@@ -31,36 +21,37 @@ const dbConfig = isDevelopment ? {
 // إنشاء pool للاتصال بقاعدة البيانات
 const pool = new Pool({
     ...dbConfig,
-    max: 20, // زيادة الحد الأقصى لعدد الاتصالات
-    min: 5, // زيادة الحد الأدنى لعدد الاتصالات
-    idleTimeoutMillis: 30000000, // 5 دقائق - زيادة وقت الانتظار قبل إغلاق الاتصال
-    connectionTimeoutMillis: 6000000, // دقيقة واحدة - زيادة وقت الانتظار للاتصال
+    max: 10, // تقليل الحد الأقصى لعدد الاتصالات
+    min: 2, // تقليل الحد الأدنى لعدد الاتصالات
+    idleTimeoutMillis: 30000, // 30 ثانية
+    connectionTimeoutMillis: 10000, // 10 ثواني
     // إعدادات إضافية لتحسين الاستقرار
     keepAlive: true,
-    keepAliveInitialDelayMillis: 30000, // 30 ثانية
-    // إعدادات إضافية لتحسين الاستقرار
-    statement_timeout: 300000, // 5 دقائق للاستعلامات
-    query_timeout: 300000, // 5 دقائق للاستعلامات
+    keepAliveInitialDelayMillis: 10000, // 10 ثواني
     // إعدادات إضافية للاستقرار
-    application_name: 'shababna-platform',
-    // إعدادات إضافية للاتصال
-    tcp_keepalives_idle: 300, // 5 دقائق
-    tcp_keepalives_interval: 60, // دقيقة واحدة
-    tcp_keepalives_count: 3
+    application_name: 'shababna-platform'
 });
 
 // دالة لاختبار الاتصال
 export const testConnection = async () => {
     try {
+        console.log('🔄 محاولة الاتصال بقاعدة البيانات...');
+        console.log(`📍 Host: ${dbConfig.host}`);
+        console.log(`📍 Port: ${dbConfig.port}`);
+        console.log(`📍 Database: ${dbConfig.database}`);
+        console.log(`📍 User: ${dbConfig.user}`);
+        console.log(`📍 SSL: ${dbConfig.ssl ? 'مفعل' : 'معطل'}`);
+
         const client = await pool.connect();
         const result = await client.query('SELECT NOW()');
         client.release();
         console.log('✅ تم الاتصال بقاعدة البيانات PostgreSQL بنجاح:', result.rows[0]);
-        console.log(`🌐 البيئة: ${isDevelopment ? 'تطوير محلي' : 'إنتاج'}`);
+        console.log(`🌐 البيئة: ${process.env.NODE_ENV || 'development'}`);
         return true;
     } catch (error) {
         console.error('❌ خطأ في الاتصال بقاعدة البيانات PostgreSQL:', error.message);
-        console.log(`💡 النصيحة: تأكد من تشغيل قاعدة البيانات المحلية أو تحديث إعدادات Render`);
+        console.error('🔍 تفاصيل الخطأ:', error);
+        console.log(`💡 النصيحة: تأكد من صحة بيانات الاتصال أو تحقق من حالة قاعدة البيانات على Render`);
         return false;
     }
 };

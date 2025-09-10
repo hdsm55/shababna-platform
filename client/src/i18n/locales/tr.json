@@ -9,7 +9,10 @@
     "contact": "İletişim",
     "login": "Giriş Yap",
     "dashboard": "Kontrol Paneli",
-    "logout": "Çıkış Yap"
+    "logout": "Çıkış Yap",
+    "lang_ar": "العربية",
+    "lang_en": "English",
+    "lang_tr": "Türkçe"
   },
   "dashboard": {
     "title": "Kontrol Paneli",
@@ -72,6 +75,11 @@
   "events": {
     "title": "Yaklaşan Etkinlikler",
     "subtitle": "Gençlik gelişimi için tasarlanmış heyecan verici etkinlikler ve atölyeler keşfedin",
+    "stats": {
+      "available": "Mevcut Etkinlikler",
+      "upcoming": "Yaklaşan",
+      "active": "Aktif"
+    },
     "hero": {
       "title": "Çeşitli Etkinliklerimiz",
       "subtitle": "Eğitim, maneviyat ve mesleki gelişim alanlarındaki çeşitli faaliyetlerimizi keşfedin. Pozitif değişim yaratmada bize katılın."
@@ -134,6 +142,10 @@
   "blogs": {
     "title": "Blog",
     "subtitle": "Shababna'dan en son makaleler ve blog yazıları",
+    "type": "Makale",
+    "defaultAuthor": "Shababna Ekibi",
+    "views": "Görüntülenme",
+    "helpful": "Faydalı",
     "search": {
       "placeholder": "Makalelerde ara..."
     },
@@ -167,7 +179,7 @@
       "title": "İletişim Bilgileri",
       "address": "İstanbul, Türkiye",
       "email": "info@shababna.org",
-      "phone": "+90 212 XXX XX XX"
+      "phone": "+905050505645"
     }
   },
   "common": {
@@ -291,12 +303,73 @@
       "success": "Abone olduğunuz için teşekkürler! Sizi güncel tutacağız.",
       "error": "Bir şeyler yanlış gitti. Lütfen tekrar deneyin.",
       "privacy": "Gizliliğinize saygı duyuyoruz. İstediğiniz zaman abonelikten çıkabilirsiniz.",
-      "badge": "Bültene Abone Ol"
+      "badge": "Bültene Abone Ol",
+      "loading": "Gönderiliyor..."
     },
     "meta": {
       "title": "Shababna - Gelişim ve Büyüme için Küresel Gençlik Platformu",
       "description": "İstanbul'da Shababna Global'e katılın ve dünyayı yenileyen ve etkileyen önde gelen İslami gençlik topluluğunun bir parçası olun",
       "keywords": "Shababna, Müslüman gençlik, gelişim, büyüme, İstanbul, gençlik topluluğu, etkinlikler, programlar"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Giriş Yap",
+      "subtitle": "Topluluğumuza katılmak için bilgilerinizi girin.",
+      "email": "E-posta",
+      "password": "Şifre",
+      "submit": "Giriş Yap",
+      "noAccount": "Hesabınız yok mu?",
+      "register": "Şimdi Kayıt Ol"
+    },
+    "register": {
+      "title": "Yeni Hesap Oluştur",
+      "subtitle": "İstanbul'daki topluluğumuza katılın.",
+      "firstName": {
+        "label": "Ad",
+        "placeholder": "Adınızı girin",
+        "required": "Ad gereklidir",
+        "minLength": "Ad en az 2 karakter olmalıdır"
+      },
+      "lastName": {
+        "label": "Soyad",
+        "placeholder": "Soyadınızı girin",
+        "required": "Soyad gereklidir",
+        "minLength": "Soyad en az 2 karakter olmalıdır"
+      },
+      "email": {
+        "label": "E-posta",
+        "placeholder": "E-posta adresinizi girin",
+        "required": "E-posta gereklidir",
+        "invalid": "Geçersiz e-posta adresi"
+      },
+      "password": {
+        "label": "Şifre",
+        "placeholder": "Şifrenizi girin",
+        "required": "Şifre gereklidir",
+        "minLength": "Şifre en az 6 karakter olmalıdır",
+        "show": "Şifreyi göster",
+        "hide": "Şifreyi gizle"
+      },
+      "confirmPassword": {
+        "label": "Şifreyi Onayla",
+        "placeholder": "Şifrenizi onaylayın",
+        "required": "Şifre onayı gereklidir",
+        "mismatch": "Şifreler eşleşmiyor"
+      },
+      "submit": "Hesap Oluştur",
+      "hasAccount": "Zaten hesabınız var mı?",
+      "login": "Giriş Yap",
+      "success": "Hesap başarıyla oluşturuldu!",
+      "error": "Hesap oluşturulamadı. Lütfen verilerinizi kontrol edin ve tekrar deneyin.",
+      "hero": {
+        "title": "Topluluğumuza Katılın",
+        "subtitle": "Hesabınızı oluşturun ve bizimle pozitif değişime katkıda bulunun"
+      },
+      "seo": {
+        "title": "Hesap Oluştur - Shababna Global Platformu",
+        "description": "Shababna Global Platformunda hesabınızı oluşturun ve topluluğumuza katılın"
+      }
     }
   }
 }

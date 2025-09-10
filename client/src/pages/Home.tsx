@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
 import {
   Calendar,
   MapPin,
@@ -10,6 +11,7 @@ import {
   Star,
   Users2,
   ArrowRight,
+  X,
 } from 'lucide-react';
 
 import SEO from '../components/common/SEO';
@@ -559,7 +561,9 @@ const LoadingFallback = () => (
 const Home: React.FC = () => {
   const { t, i18n } = useTranslation();
   const location = useLocation();
+  const { user, isAuthenticated } = useAuthStore();
   const isRTL = i18n.dir() === 'rtl';
+  const [showWelcomeMessage, setShowWelcomeMessage] = useState(true);
 
   // تحسين التمرير - استخدام useCallback
   const scrollToPrograms = useCallback(() => {
@@ -576,6 +580,16 @@ const Home: React.FC = () => {
     scrollToPrograms();
   }, [scrollToPrograms]);
 
+  // إخفاء رسالة الترحيب بعد 5 ثوانٍ
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const timer = setTimeout(() => {
+        setShowWelcomeMessage(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated, user]);
+
   return (
     <>
       <SEO
@@ -586,6 +600,46 @@ const Home: React.FC = () => {
       />
 
       <main className="page-container">
+        {/* رسالة ترحيب للمستخدمين المسجلين */}
+        <AnimatePresence>
+          {isAuthenticated && user && showWelcomeMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="bg-gradient-to-r from-primary-50 to-accent-50 border-l-4 border-primary-500 p-4 mb-6 mx-4 rounded-r-lg"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                      <span className="text-primary-600 text-sm font-semibold">
+                        {user.first_name.charAt(0)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mr-3">
+                    <h3 className="text-sm font-medium text-primary-800">
+                      مرحباً بك مرة أخرى، {user.first_name}!
+                    </h3>
+                    <p className="text-sm text-primary-600">
+                      شكراً لانضمامك إلى مجتمع شبابنا
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowWelcomeMessage(false)}
+                  className="text-primary-400 hover:text-primary-600 transition-colors"
+                  aria-label="إغلاق الرسالة"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Hero Section */}
         <Suspense fallback={<LoadingFallback />}>
           <HeroSection />

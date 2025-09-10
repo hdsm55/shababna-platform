@@ -9,7 +9,10 @@
     "contact": "Contact",
     "login": "Login",
     "dashboard": "Dashboard",
-    "logout": "Logout"
+    "logout": "Logout",
+    "lang_ar": "العربية",
+    "lang_en": "English",
+    "lang_tr": "Türkçe"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -72,6 +75,11 @@
   "events": {
     "title": "Upcoming Events",
     "subtitle": "Discover exciting events and workshops designed for youth development",
+    "stats": {
+      "available": "Available Events",
+      "upcoming": "Upcoming",
+      "active": "Active"
+    },
     "hero": {
       "title": "Our Diverse Events",
       "subtitle": "Discover a variety of activities in education, spirituality, and professional development. Join us in creating positive change."
@@ -134,6 +142,10 @@
   "blogs": {
     "title": "Blog",
     "subtitle": "Latest articles and blog posts from Shababna",
+    "type": "Article",
+    "defaultAuthor": "Shababna Team",
+    "views": "Views",
+    "helpful": "Helpful",
     "search": {
       "placeholder": "Search articles..."
     },
@@ -167,7 +179,7 @@
       "title": "Contact Information",
       "address": "Istanbul, Turkey",
       "email": "info@shababna.org",
-      "phone": "+90 212 XXX XX XX"
+      "phone": "+905050505645"
     }
   },
   "common": {
@@ -291,12 +303,73 @@
       "success": "Thank you for subscribing! We'll keep you updated.",
       "error": "Something went wrong. Please try again.",
       "privacy": "We respect your privacy. You can unsubscribe at any time.",
-      "badge": "Subscribe to Newsletter"
+      "badge": "Subscribe to Newsletter",
+      "loading": "Sending..."
     },
     "meta": {
       "title": "Shababna - Global Youth Platform for Development and Growth",
       "description": "Join Shababna Global in Istanbul and be part of a leading Islamic youth community that innovates and impacts the world",
       "keywords": "Shababna, Muslim youth, development, growth, Istanbul, youth community, events, programs"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "subtitle": "Enter your credentials to join our community.",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Login",
+      "noAccount": "Don't have an account?",
+      "register": "Register Now"
+    },
+    "register": {
+      "title": "Create New Account",
+      "subtitle": "Join our community in Istanbul.",
+      "firstName": {
+        "label": "First Name",
+        "placeholder": "Enter your first name",
+        "required": "First name is required",
+        "minLength": "First name must be at least 2 characters"
+      },
+      "lastName": {
+        "label": "Last Name",
+        "placeholder": "Enter your last name",
+        "required": "Last name is required",
+        "minLength": "Last name must be at least 2 characters"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Enter your email",
+        "required": "Email is required",
+        "invalid": "Invalid email address"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "Enter your password",
+        "required": "Password is required",
+        "minLength": "Password must be at least 6 characters",
+        "show": "Show password",
+        "hide": "Hide password"
+      },
+      "confirmPassword": {
+        "label": "Confirm Password",
+        "placeholder": "Confirm your password",
+        "required": "Password confirmation is required",
+        "mismatch": "Passwords do not match"
+      },
+      "submit": "Create Account",
+      "hasAccount": "Already have an account?",
+      "login": "Login",
+      "success": "Account created successfully!",
+      "error": "Failed to create account. Please check your data and try again.",
+      "hero": {
+        "title": "Join Our Community",
+        "subtitle": "Create your account and contribute to positive change with us"
+      },
+      "seo": {
+        "title": "Create Account - Shababna Global Platform",
+        "description": "Create your account on Shababna Global Platform and join our community"
+      }
     }
   }
 }

@@ -50,7 +50,13 @@ const Login: React.FC = () => {
         login(authUser, token);
         localStorage.setItem('token', token);
         console.log('🔍 تم تسجيل الدخول بنجاح:', { user: authUser, token });
-        navigate('/dashboard');
+
+        // توجيه المستخدمين حسب دورهم
+        if (authUser.role === 'admin') {
+          navigate('/dashboard');
+        } else {
+          navigate('/');
+        }
       } else {
         setError(response.message || 'فشل في تسجيل الدخول');
       }

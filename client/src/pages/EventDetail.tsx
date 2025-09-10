@@ -72,9 +72,8 @@ const EventDetail: React.FC = () => {
         return 'تاريخ غير صحيح';
       }
       return date.toLocaleDateString('ar-SA', {
-        year: 'numeric',
-        month: 'long',
         day: 'numeric',
+        month: 'short',
       });
     } catch (error) {
       console.error('❌ Error formatting date:', error);
@@ -92,6 +91,7 @@ const EventDetail: React.FC = () => {
       return date.toLocaleTimeString('ar-SA', {
         hour: '2-digit',
         minute: '2-digit',
+        hour12: false,
       });
     } catch (error) {
       console.error('❌ Error formatting time:', error);

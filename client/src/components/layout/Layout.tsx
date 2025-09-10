@@ -4,7 +4,6 @@ import { useLanguageStore } from '../../store/languageStore';
 import Header from './Header';
 import Footer from './Footer';
 import { Outlet } from 'react-router-dom';
-import InstantLoader from '../common/InstantLoader';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -35,9 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className={`fix-layout ${isRTL ? 'font-arabic' : 'font-sans'}`}>
       <Header />
       <main className="fix-content">
-        <div className="page-container">
-          <InstantLoader>{children || <Outlet />}</InstantLoader>
-        </div>
+        <div className="page-container">{children || <Outlet />}</div>
       </main>
       {showFooter && (
         <div className="fix-footer">

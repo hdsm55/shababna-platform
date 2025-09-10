@@ -16,7 +16,7 @@ import { Button } from '../ui/Button/ButtonSimple';
 const FeatureCard = memo(
   ({ feature, index }: { feature: any; index: number }) => {
     const navigate = useNavigate();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const itemVariants = {
       hidden: { opacity: 0, y: 20 },
@@ -67,7 +67,9 @@ const FeatureCard = memo(
             className="mt-4 w-full py-2 text-xs font-semibold border-2 border-dark-300 hover:bg-dark-50 text-dark-700"
             onClick={() => navigate('/programs')}
           >
-            {t('common.learnMore')}
+            {i18n.isInitialized
+              ? t('common.learnMore', 'اعرف المزيد')
+              : 'اعرف المزيد'}
             <ArrowRight className="w-3 h-3 mr-1" />
           </Button>
         </Card>

@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Facebook,
   Twitter,
   Instagram,
-  Linkedin,
   Mail,
   Phone,
   MapPin,
@@ -67,23 +65,16 @@ const Footer: React.FC = () => {
 
   const socialLinks = [
     {
-      icon: Facebook,
-      href: '#',
-      label: 'Facebook',
-      color: 'hover:text-blue-600',
+      icon: Twitter,
+      href: 'https://x.com/shaababna',
+      label: 'X (Twitter)',
+      color: 'hover:text-sky-500',
     },
-    { icon: Twitter, href: '#', label: 'Twitter', color: 'hover:text-sky-500' },
     {
       icon: Instagram,
-      href: '#',
+      href: 'https://www.instagram.com/shaababna',
       label: 'Instagram',
       color: 'hover:text-pink-600',
-    },
-    {
-      icon: Linkedin,
-      href: '#',
-      label: 'LinkedIn',
-      color: 'hover:text-blue-700',
     },
   ];
 

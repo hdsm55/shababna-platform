@@ -403,6 +403,14 @@ const DashboardOverview: React.FC = () => {
             <p className="text-gray-500 text-sm">
               {t('dashboard.subtitle', 'نظرة شاملة على أداء النظام')}
             </p>
+            {/* رسالة ترحيب للمستخدمين الجدد */}
+            {user?.id === 2 && (
+              <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-green-800 text-sm">
+                  🎉 مرحباً بك في منصة شبابنا! تم إنشاء حسابك بنجاح.
+                </p>
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <Button
