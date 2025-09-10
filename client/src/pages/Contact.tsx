@@ -395,7 +395,7 @@ const ContactInfo = memo(() => {
               {t('contact.info.email', 'البريد الإلكتروني')}
             </h3>
             <p className="text-xs text-dark-400 font-arabic">
-              info@shaababna.com
+              info@shababna.com
             </p>
           </div>
         </motion.div>
@@ -435,12 +435,12 @@ const ContactInfo = memo(() => {
               {t('contact.info.website', 'الموقع')}
             </h3>
             <a
-              href="https://shaababna.com/"
+              href="https://shababna.com/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-primary-600 hover:text-primary-700 hover:underline transition-colors font-arabic"
             >
-              shaababna.com
+              shababna.com
             </a>
           </div>
         </motion.div>

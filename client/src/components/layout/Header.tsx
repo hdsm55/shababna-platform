@@ -36,6 +36,7 @@ const Header: React.FC = () => {
     { key: 'blogs', path: '/blogs' },
     { key: 'joinUs', path: '/join-us' },
     { key: 'contact', path: '/contact' },
+    { key: 'translationDemo', path: '/translation-demo' },
   ];
 
   const languages = [

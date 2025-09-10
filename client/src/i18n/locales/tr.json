@@ -7,6 +7,7 @@
     "blogs": "Bloglar",
     "joinUs": "Bize Katıl",
     "contact": "İletişim",
+    "translationDemo": "Çeviri Örneği",
     "login": "Giriş Yap",
     "dashboard": "Kontrol Paneli",
     "logout": "Çıkış Yap",
@@ -70,6 +71,20 @@
       "innovation": "Yenilik",
       "community": "Topluluk",
       "leadership": "Liderlik"
+    },
+    "president": {
+      "title": "Başkan Mesajı",
+      "name": "Mahmoud Al-Hasanat",
+      "position": "Shababna Global Platform Başkanı",
+      "greeting": "Rahman ve Rahim olan Allah'ın adıyla",
+      "welcome": "Shababna Global Organizasyonu'nun resmi web sitesine hoş geldiniz. Bu platform, Ümmet'in endişelerinden ve gençliğinin umutlarından doğarak, hayalleri gerçeğe, bilinci eyleme ve hırsı uzun süreli bir rönesansa dönüştürmek için kurulmuştur.",
+      "vision": "İlk andan itibaren, gençliğin değişimin enerjisi olduğuna ve ülkelerin üzerine inşa edildiği, medeniyetlerin şekillendirildiği umut olduğuna inandım. Buradan, kalpleri ve zihinleri bir araya getirmek, enerjileri Allah'ın insanlara şahit olmasını istediği bir ümmete yakışır bir yolda birleştirmek için bu bağımsız küresel gençlik kurumunu kurmak gerekliydi.",
+      "mission": "Shababna Global Organizasyonu'nda, mesajına inanan, değerlerinde sağlam, veriminde yaratıcı ve toplumunda ve Ümmet'te etki yaratabilen bilinçli bir nesil inşa etmeye çalışıyoruz. Vizyonumuz açık: gençlik güçlendirmede küresel liderlik. Misyonumuz sağlam: iman mesajını taşıyan, bilinç savaşına giren ve olumlu değişime katkıda bulunan bağlı gençlik yetiştirmek.",
+      "commitment": "Bugün, fikirlerin gücüne, aidiyetin büyüklüğüne ve reformun bizden başladığına inanan her genç erkek ve kadınla birlikte, eğitim, medya, kalkınma, kimlik ve İslami konularda kaliteli programlar sunmak için ilerliyoruz, birlikte daha güzel bir yarın, daha geniş bir gelecek ve daha yüksek bir Ümmet yaratmak için.",
+      "invitation": "Bu yüzden evinize hoş geldiniz ve sınır tanımayan küresel bir gençlik yolculuğuna katılmaya hoş geldiniz, sloganı: iman, bilinç, eylem ve etki.",
+      "signature": "Saygılarımla,",
+      "signatureName": "Mahmoud Al-Hasanat",
+      "signaturePosition": "Shababna Global Platform Başkanı"
     }
   },
   "events": {
@@ -115,7 +130,30 @@
       "success": "Kayıt başarılı!",
       "error": "Kayıt hatası oluştu",
       "alreadyRegistered": "Bu etkinliğe zaten kayıtlısınız"
-    }
+    },
+    "categories": {
+      "workshop": "Atölye",
+      "conference": "Konferans",
+      "networking": "Ağ Oluşturma",
+      "seminar": "Seminer",
+      "training": "Eğitim",
+      "other": "Diğer"
+    },
+    "status": {
+      "upcoming": "Yaklaşan",
+      "active": "Aktif",
+      "completed": "Tamamlandı",
+      "cancelled": "İptal Edildi"
+    },
+    "actions": {
+      "register": "Şimdi Kayıt Ol",
+      "viewDetails": "Detayları Görüntüle",
+      "completed": "Tamamlandı",
+      "cancelled": "İptal Edildi"
+    },
+    "daysRemaining": "{{count}} gün kaldı",
+    "today": "Bugün!",
+    "attendees": "katılımcı"
   },
   "programs": {
     "title": "Programlar",
@@ -128,6 +166,15 @@
       "environment": "Çevre",
       "community": "Topluluk",
       "technology": "Teknoloji"
+    },
+    "categories": {
+      "education": "Eğitim",
+      "health": "Sağlık",
+      "environment": "Çevre",
+      "community": "Topluluk",
+      "technology": "Teknoloji",
+      "entrepreneurship": "Girişimcilik",
+      "volunteering": "Gönüllülük"
     },
     "donation": {
       "title": "Programa Bağış Yap",
@@ -310,7 +357,55 @@
       "title": "Shababna - Gelişim ve Büyüme için Küresel Gençlik Platformu",
       "description": "İstanbul'da Shababna Global'e katılın ve dünyayı yenileyen ve etkileyen önde gelen İslami gençlik topluluğunun bir parçası olun",
       "keywords": "Shababna, Müslüman gençlik, gelişim, büyüme, İstanbul, gençlik topluluğu, etkinlikler, programlar"
-    }
+    },
+    "latest": {
+      "title": "Son Güncellemeler",
+      "subtitle": "Son etkinlikler ve programlarımızla güncel kalın",
+      "events": "Son Etkinlikler",
+      "programs": "Son Programlar",
+      "noEvents": "Şu anda yaklaşan etkinlik bulunmuyor.",
+      "noPrograms": "Şu anda aktif program bulunmuyor.",
+      "viewAll": "Tümünü Görüntüle",
+      "explore": "Programları Keşfet",
+      "latestPrograms": "En Son Programlar"
+    },
+    "latestPrograms": "En Son Programlar",
+    "latestEvents": "En Son Etkinlikler",
+    "testimonials": {
+      "title": "Gençlerimiz Ne Diyor",
+      "subtitle": "Dünya çapındaki gençlerimizden başarı hikayeleri ve ilham verici deneyimler",
+      "name1": "Ahmed Muhammed",
+      "role1": "Üniversite Öğrencisi",
+      "content1": "Shababna, liderlik becerilerimi geliştirmeme ve farklı ülkelerden gençlerle bağlantı kurmama yardımcı olan harika bir organizasyon",
+      "name2": "Fatma Ali",
+      "role2": "Mühendis",
+      "content2": "Gelişim programları mükemmel ve dünyanın her yerinden Müslüman gençlerle güçlü bir ağ kurmama yardımcı oldu",
+      "name3": "Muhammed Hasan",
+      "role3": "Doktor",
+      "content3": "İnteraktif etkinlikler ve atölyeler, kişiliğimi ve becerilerimi geliştirmeme yardımcı olan harika bir deneyimdi"
+    },
+    "newsletter": {
+      "title": "Bültenimize Abone Olun",
+      "subtitle": "Yeni etkinliklerimiz ve programlarımız hakkında ilk siz haberdar olun. Topluluğumuz sizi bekliyor!",
+      "placeholder": "E-posta adresiniz",
+      "cta": "Şimdi Abone Olun",
+      "success": "Başarıyla abone oldunuz! Sizi tüm son haberlerle güncel tutacağız.",
+      "error": "Abonelik sırasında bir hata oluştu. Lütfen tekrar deneyin.",
+      "privacy": "Gizliliğinize saygı duyuyoruz. İstediğiniz zaman abonelikten çıkabilirsiniz.",
+      "badge": "Bültene Katılın",
+      "loading": "Gönderiliyor..."
+    },
+    "cta": {
+      "title": "Etki Yaratmaya Hazır mısınız?",
+      "subtitle": "Değişim yaratan küresel İslami gençlik topluluğuna katılın.",
+      "join": "Şimdi Katılın",
+      "explore": "Etkinlikleri Keşfedin"
+    },
+    "modal": {
+      "title": "Shababna Global'e Hoş Geldiniz",
+      "content": "İstanbul'un kalbinden bu değişim ve yenilik yolculuğunda bize katıldığınız için mutluyuz."
+    },
+    "viewDetails": "Detayları Görüntüle"
   },
   "auth": {
     "login": {

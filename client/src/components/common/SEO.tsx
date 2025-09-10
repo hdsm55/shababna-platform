@@ -206,8 +206,8 @@ const SEO: React.FC<SEOProps> = ({
           },
           contactPoint: {
             '@type': 'ContactPoint',
-            telephone: '+966501234567',
-            email: 'info@shababnaglobal.org',
+            telephone: '+905050505645',
+            email: 'info@shababna.com',
             contactType: 'customer service',
           },
           sameAs: [

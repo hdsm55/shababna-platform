@@ -29,6 +29,7 @@ const Contact = lazy(() => import('./pages/Contact'));
 const Donations = lazy(() => import('./pages/Donations'));
 const JoinUs = lazy(() => import('./pages/JoinUs'));
 const Volunteers = lazy(() => import('./pages/Volunteers'));
+const TranslationDemo = lazy(() => import('./pages/TranslationDemo'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Auth Pages
@@ -198,6 +199,14 @@ function App() {
                               element={
                                 <Suspense fallback={<LoadingFallback />}>
                                   <Volunteers />
+                                </Suspense>
+                              }
+                            />
+                            <Route
+                              path="/translation-demo"
+                              element={
+                                <Suspense fallback={<LoadingFallback />}>
+                                  <TranslationDemo />
                                 </Suspense>
                               }
                             />

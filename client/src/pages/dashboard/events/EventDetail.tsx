@@ -587,7 +587,7 @@ const DashboardEventDetail: React.FC = () => {
                           <div className="flex items-center">
                             <Phone className="w-4 h-4 text-gray-400 mr-3" />
                             <span className="text-sm text-gray-600">
-                              +966 50 123 4567
+                              +90 505 050 56 45
                             </span>
                           </div>
                           <div className="flex items-center">

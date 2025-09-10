@@ -450,12 +450,12 @@ const EventDetail: React.FC = () => {
                       </span>
                     </a>
                     <a
-                      href="mailto:info@shaababna.com"
+                      href="mailto:info@shababna.com"
                       className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors duration-200"
                     >
                       <Mail className="w-4 h-4 mr-2 text-blue-500" />
                       <span className="text-blue-600 hover:text-blue-800">
-                        info@shaababna.com
+                        info@shababna.com
                       </span>
                     </a>
                     <a
@@ -470,14 +470,14 @@ const EventDetail: React.FC = () => {
                       </span>
                     </a>
                     <a
-                      href="https://shaababna.com"
+                      href="https://shababna.com"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors duration-200"
                     >
                       <Globe className="w-4 h-4 mr-2 text-purple-500" />
                       <span className="text-blue-600 hover:text-blue-800">
-                        www.shaababna.com
+                        www.shababna.com
                       </span>
                     </a>
                   </div>

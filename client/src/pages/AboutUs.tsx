@@ -82,6 +82,8 @@ const HeroSection = memo(() => {
 });
 
 const PresidentMessage = memo(() => {
+  const { t } = useTranslation();
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
@@ -96,7 +98,7 @@ const PresidentMessage = memo(() => {
             <div className="w-16 h-16 mx-auto mb-4 rounded-full overflow-hidden border-2 border-primary-200">
               <img
                 src="/images/team/president.jpg"
-                alt="رئيس المنظمة"
+                alt={t('about.president.title')}
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   e.currentTarget.src = '/images/fallback.svg';
@@ -104,56 +106,32 @@ const PresidentMessage = memo(() => {
               />
             </div>
             <h2 className="text-2xl font-bold text-dark-500 mb-1">
-              كلمة رئيس المنظمة
+              {t('about.president.title')}
             </h2>
             <p className="text-sm text-primary-500">
-              محمود الحسنات - رئيس منصة شبابنا العالمية
+              {t('about.president.name')} - {t('about.president.position')}
             </p>
           </div>
 
           <div className="text-dark-400 space-y-4 text-sm leading-relaxed">
-            <p>بسم الله الرحمن الرحيم</p>
+            <p>{t('about.president.greeting')}</p>
 
-            <p>
-              مرحباً بكم في الموقع الرسمي لـ منظمة شبابنا العالمية، المنصة التي
-              انطلقت من هموم الأمة وآمال شبابها، لتصنع من الحلم واقعاً، ومن
-              الوعي عملاً، ومن الطموح نهضةً ممتدة.
-            </p>
+            <p>{t('about.president.welcome')}</p>
 
-            <p>
-              لقد آمنتُ منذ اللحظة الأولى أن الشباب هم طاقة التغيير، وهم الأمل
-              الذي تُبنى عليه الأوطان وتُصاغ به الحضارات. ومن هنا، كان لا بد من
-              إنشاء هذا الصرح الشبابي العالمي المستقل، ليجمع القلوب والعقول،
-              ويوحّد الطاقات في مسارٍ يليق بأمة أراد الله لها أن تكون شاهدةً على
-              الناس.
-            </p>
+            <p>{t('about.president.vision')}</p>
 
-            <p>
-              في منظمة شبابنا العالمية، نسعى إلى بناء جيلٍ واعٍ، مؤمن برسالته،
-              راسخ في قيمه، مبدع في عطائه، وقادر على صناعة الأثر في مجتمعه
-              وأمته. رؤيتنا واضحة: الريادة العالمية في تمكين الشباب. ورسالتنا
-              راسخة: إعداد شبابٍ ملتزمٍ يحمل رسالة الإيمان، ويخوض معركة الوعي،
-              ويسهم في صناعة التغيير الإيجابي.
-            </p>
+            <p>{t('about.president.mission')}</p>
 
-            <p>
-              إننا اليوم، مع كل شابٍ وشابةٍ يؤمنون بقوة الفكرة، وبعظمة الانتماء،
-              وبأن الإصلاح يبدأ منّا نحن، نمضي لنقدّم برامج نوعية في التربية
-              والإعلام والتنمية والهوية والقضايا الإسلامية، لنصنع معاً غداً
-              أجمل، ومستقبلاً أوسع، وأمةً أرفع.
-            </p>
+            <p>{t('about.president.commitment')}</p>
 
-            <p>
-              فأهلاً بكم في بيتكم، ومرحبا بانضمامكم إلى مسيرةٍ شبابيةٍ عالميةٍ
-              لا تعرف الحدود، شعارها: إيمان، وعي، عمل، وتأثير.
-            </p>
+            <p>{t('about.president.invitation')}</p>
 
             <p className="font-medium">
-              مع تحياتي،
+              {t('about.president.signature')}
               <br />
-              محمود الحسنات
+              {t('about.president.signatureName')}
               <br />
-              رئيس منصة شبابنا العالمية
+              {t('about.president.signaturePosition')}
             </p>
           </div>
         </Card>

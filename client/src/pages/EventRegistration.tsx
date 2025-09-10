@@ -434,7 +434,7 @@ const EventRegistration: React.FC = () => {
                     value={registrationForm.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
                     required
-                    placeholder="+966 50 123 4567"
+                    placeholder="+90 505 050 56 45"
                     icon={<Phone className="w-4 h-4" />}
                     className="focus:border-primary-500 focus:ring-primary-500"
                   />

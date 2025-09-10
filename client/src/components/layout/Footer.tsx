@@ -196,14 +196,14 @@ const Footer: React.FC = () => {
                 </span>
               </a>
               <a
-                href="mailto:info@shaababna.com"
+                href="mailto:info@shababna.com"
                 className="flex items-center space-x-3 rtl:space-x-reverse group cursor-pointer"
               >
                 <div className="w-8 h-8 bg-primary-600/20 rounded-lg flex items-center justify-center group-hover:bg-primary-600 transition-all duration-300">
                   <Mail className="w-4 h-4 text-primary-400 group-hover:text-white transition-colors duration-300" />
                 </div>
                 <span className="text-neutral-300 text-sm group-hover:text-white transition-colors duration-300">
-                  info@shaababna.com
+                  info@shababna.com
                 </span>
               </a>
             </div>

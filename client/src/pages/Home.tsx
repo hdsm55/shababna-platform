@@ -142,6 +142,40 @@ TestimonialsSection.displayName = 'TestimonialsSection';
 
 const LatestEventsSection = memo(() => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  // دالة تنسيق التاريخ
+  const formatDate = useCallback((dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return 'تاريخ غير صحيح';
+      }
+      return date.toLocaleDateString('ar-SA', {
+        day: 'numeric',
+        month: 'short',
+      });
+    } catch (error) {
+      return 'تاريخ غير صحيح';
+    }
+  }, []);
+
+  // دالة تنسيق الوقت
+  const formatTime = useCallback((dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return 'وقت غير صحيح';
+      }
+      return date.toLocaleTimeString('ar-SA', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+    } catch (error) {
+      return 'وقت غير صحيح';
+    }
+  }, []);
 
   // تحسين الاستعلام - تقليل البيانات المطلوبة
   const {
@@ -193,10 +227,13 @@ const LatestEventsSection = memo(() => {
           className="text-center mb-12"
         >
           <h2 className="text-2xl md:text-3xl font-bold text-dark-500 mb-4">
-            شبابنا
+            {t('home.latestEvents.title', 'أحدث الفعاليات')}
           </h2>
           <p className="text-base md:text-lg text-dark-600 max-w-3xl mx-auto leading-relaxed">
-            الفعاليات
+            {t(
+              'home.latestEvents.subtitle',
+              'اكتشف الفعاليات القادمة وانضم إلينا'
+            )}
           </p>
         </motion.div>
 
@@ -244,7 +281,10 @@ const LatestEventsSection = memo(() => {
                 <div className="space-y-1 mb-3">
                   <div className="flex items-center gap-2 text-xs text-dark-600">
                     <Clock className="w-3 h-3" />
-                    <span>{event.start_date}</span>
+                    <span className="font-medium">
+                      {formatDate(event.start_date)} في{' '}
+                      {formatTime(event.start_date)}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-dark-600">
                     <MapPin className="w-3 h-3" />
@@ -258,7 +298,7 @@ const LatestEventsSection = memo(() => {
                   onClick={() => navigate(`/events/${event.id}`)}
                 >
                   <span className="flex items-center justify-center gap-2">
-                    عرض التفاصيل
+                    {t('events.actions.viewDetails', 'عرض التفاصيل')}
                     <ArrowRight className="w-3 h-3" />
                   </span>
                 </Button>
@@ -280,7 +320,7 @@ const LatestEventsSection = memo(() => {
             onClick={() => navigate('/events')}
             className="px-6 py-3 text-sm font-semibold border-2 border-dark-300 hover:bg-dark-50 text-dark-700"
           >
-            عرض جميع الفعاليات
+            {t('home.latestEvents.viewAll', 'عرض جميع الفعاليات')}
             <ArrowRight className="w-4 h-4" />
           </Button>
         </motion.div>

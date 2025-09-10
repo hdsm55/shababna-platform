@@ -311,7 +311,12 @@ const ProgramDetail: React.FC = () => {
 
                   <div className="flex items-center text-gray-600">
                     <TrendingUp className="w-5 h-5 mr-3" />
-                    <span>{t(`programs.categories.${program.category}`, program.category)}</span>
+                    <span>
+                      {t(
+                        `programs.categories.${program.category}`,
+                        program.category
+                      )}
+                    </span>
                   </div>
 
                   {program.goal_amount && program.current_amount && (
@@ -369,16 +374,16 @@ const ProgramDetail: React.FC = () => {
                     >
                       <Phone className="w-4 h-4 mr-2 text-green-500" />
                       <span className="text-blue-600 hover:text-blue-800">
-                        +966 50 123 4567
+                        +90 505 050 56 45
                       </span>
                     </a>
                     <a
-                      href="mailto:programs@shaababna.com"
+                      href="mailto:info@shababna.com"
                       className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors duration-200"
                     >
                       <Mail className="w-4 h-4 mr-2 text-blue-500" />
                       <span className="text-blue-600 hover:text-blue-800">
-                        programs@shaababna.com
+                        info@shababna.com
                       </span>
                     </a>
                     <a
@@ -393,14 +398,14 @@ const ProgramDetail: React.FC = () => {
                       </span>
                     </a>
                     <a
-                      href="https://shaababna.com"
+                      href="https://shababna.com"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors duration-200"
                     >
                       <Globe className="w-4 h-4 mr-2 text-purple-500" />
                       <span className="text-blue-600 hover:text-blue-800">
-                        www.shaababna.com
+                        www.shababna.com
                       </span>
                     </a>
                   </div>
