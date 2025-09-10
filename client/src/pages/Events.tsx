@@ -390,7 +390,10 @@ const EventCard = memo(
                   event.status
                 )}`}
               >
-                {t(`events.status.${event.status}`, getStatusText(event.status))}
+                {t(
+                  `events.status.${event.status}`,
+                  getStatusText(event.status)
+                )}
               </span>
             </div>
 
@@ -401,7 +404,8 @@ const EventCard = memo(
                   event.category
                 )}`}
               >
-                {getCategoryIcon(event.category)} {t(`events.categories.${event.category}`, event.category)}
+                {getCategoryIcon(event.category)}{' '}
+                {t(`events.categories.${event.category}`, event.category)}
               </span>
             </div>
           </div>
@@ -421,7 +425,8 @@ const EventCard = memo(
               <div className="flex items-center gap-2 text-sm text-dark-400">
                 <Calendar className="w-4 h-4 text-primary-500" />
                 <span className="font-medium">
-                  {formatDate(event.start_date)} في {formatTime(event.start_date)}
+                  {formatDate(event.start_date)} في{' '}
+                  {formatTime(event.start_date)}
                 </span>
               </div>
 
@@ -434,7 +439,8 @@ const EventCard = memo(
                 <div className="flex items-center gap-2 text-sm text-dark-400">
                   <Users className="w-4 h-4 text-primary-500" />
                   <span>
-                    {event.attendees || 0} / {event.max_attendees} {t('events.attendees', 'مشارك')}
+                    {event.attendees || 0} / {event.max_attendees}{' '}
+                    {t('events.attendees', 'مشارك')}
                   </span>
                 </div>
               )}
@@ -445,7 +451,9 @@ const EventCard = memo(
               <div className="mb-4 p-2 bg-primary-50 rounded-lg">
                 <p className="text-sm text-primary-600 font-medium">
                   {calculateDaysUntil(event.start_date) > 0
-                    ? t('events.daysRemaining', { count: calculateDaysUntil(event.start_date) })
+                    ? t('events.daysRemaining', {
+                        count: calculateDaysUntil(event.start_date),
+                      })
                     : t('events.today', 'اليوم!')}
                 </p>
               </div>
