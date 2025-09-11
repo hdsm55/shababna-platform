@@ -1,6 +1,7 @@
-import React, { memo, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import React, { memo, useCallback, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import {
   Users,
   Target,
@@ -25,12 +26,89 @@ import {
   TrendingUp,
   UserCheck,
   BookOpen,
-  Handshake,
+  Users2,
+  ChevronDown,
+  ChevronUp,
+  Play,
+  Pause,
 } from 'lucide-react';
 
 import SEO from '../components/common/SEO';
 import { Button } from '../components/ui/Button/ButtonSimple';
 import { Card } from '../components/ui/Card/Card';
+
+// مكون التنقل السريع
+const QuickNavigation = memo(() => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const { t } = useTranslation();
+
+  const sections = [
+    { id: 'president', label: 'رسالة الرئيس', icon: Quote },
+    { id: 'ceo', label: 'المدير التنفيذي', icon: Zap },
+    { id: 'vision', label: 'الرؤية والرسالة', icon: Target },
+    { id: 'values', label: 'القيم الأساسية', icon: Star },
+    { id: 'achievements', label: 'الإنجازات', icon: Award },
+    { id: 'cta', label: 'انضم إلينا', icon: Users2 },
+  ];
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    setIsExpanded(false);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.5, duration: 0.6 }}
+      className="fixed top-1/2 right-4 transform -translate-y-1/2 z-50"
+    >
+      <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-primary-200 overflow-hidden">
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-12 h-12 flex items-center justify-center bg-primary-500 text-white hover:bg-primary-600 transition-colors"
+        >
+          {isExpanded ? (
+            <ChevronUp className="w-5 h-5" />
+          ) : (
+            <ChevronDown className="w-5 h-5" />
+          )}
+        </button>
+
+        <AnimatePresence>
+          {isExpanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden"
+            >
+              <div className="p-2 space-y-1">
+                {sections.map((section, index) => (
+                  <motion.button
+                    key={section.id}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    onClick={() => scrollToSection(section.id)}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-dark-600 hover:bg-primary-50 hover:text-primary-600 rounded-lg transition-colors"
+                  >
+                    <section.icon className="w-4 h-4" />
+                    <span>{section.label}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.div>
+  );
+});
 
 // تحسين الأداء - مكونات منفصلة
 const HeroSection = memo(() => {
@@ -93,7 +171,7 @@ const HeroSection = memo(() => {
             className="relative"
           >
             <motion.img
-              src="/images/logo.jpg"
+              src="/images/logo.svg"
               alt="شبابنا العالمية"
               className="h-20 w-20 object-contain mx-auto mb-6 logo"
               style={{ backgroundColor: 'transparent' }}
@@ -159,9 +237,11 @@ const HeroSection = memo(() => {
 
 const PresidentMessage = memo(() => {
   const { t } = useTranslation();
+  const [isReading, setIsReading] = useState(false);
 
   return (
     <motion.section
+      id="president"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
@@ -191,7 +271,7 @@ const PresidentMessage = memo(() => {
                 >
                   <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden border-4 border-primary-200 shadow-lg">
                     <img
-                      src="/images/team/president.jpg"
+                      src="/images/team/رئيس المنظمة.jpg"
                       alt={t('about.president.title')}
                       className="w-full h-full object-cover"
                       onError={(e) => {
@@ -211,9 +291,25 @@ const PresidentMessage = memo(() => {
                 <h2 className="text-3xl font-bold text-dark-500 mb-2">
                   {t('about.president.title')}
                 </h2>
-                <p className="text-primary-600 font-medium">
+                <p className="text-primary-600 font-medium mb-4">
                   {t('about.president.name')} - {t('about.president.position')}
                 </p>
+
+                <motion.button
+                  onClick={() => setIsReading(!isReading)}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 hover:bg-primary-200 text-primary-700 rounded-lg transition-colors"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {isReading ? (
+                    <Pause className="w-4 h-4" />
+                  ) : (
+                    <Play className="w-4 h-4" />
+                  )}
+                  <span className="text-sm font-medium">
+                    {isReading ? 'إيقاف القراءة' : 'قراءة الرسالة'}
+                  </span>
+                </motion.button>
               </div>
 
               <div className="text-dark-400 space-y-6 text-base leading-relaxed">
@@ -302,9 +398,11 @@ const PresidentMessage = memo(() => {
 // قسم المدير التنفيذي
 const ExecutiveDirectorSection = memo(() => {
   const { t } = useTranslation();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <motion.section
+      id="ceo"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
@@ -334,7 +432,7 @@ const ExecutiveDirectorSection = memo(() => {
                 >
                   <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden border-4 border-accent-200 shadow-lg">
                     <img
-                      src="/images/team/ceo.jpg"
+                      src="/images/team/المدير التنفيذي.jpeg"
                       alt={t('about.ceo.title')}
                       className="w-full h-full object-cover"
                       onError={(e) => {
@@ -354,44 +452,68 @@ const ExecutiveDirectorSection = memo(() => {
                 <h2 className="text-3xl font-bold text-dark-500 mb-2">
                   {t('about.ceo.title')}
                 </h2>
-                <p className="text-accent-600 font-medium">
+                <p className="text-accent-600 font-medium mb-4">
                   {t('about.ceo.name')} - {t('about.ceo.position')}
                 </p>
+
+                <motion.button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-accent-100 hover:bg-accent-200 text-accent-700 rounded-lg transition-colors"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {isExpanded ? (
+                    <ChevronUp className="w-4 h-4" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4" />
+                  )}
+                  <span className="text-sm font-medium">
+                    {isExpanded ? 'طي الرسالة' : 'عرض الرسالة'}
+                  </span>
+                </motion.button>
               </div>
 
-              <div className="text-dark-400 space-y-6 text-base leading-relaxed">
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1, duration: 0.5 }}
-                  viewport={{ once: true }}
-                  className="bg-white/60 rounded-lg p-6 border border-accent-200"
-                >
-                  <p className="whitespace-pre-line">
-                    {t('about.ceo.message')}
-                  </p>
-                </motion.div>
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="text-dark-400 space-y-6 text-base leading-relaxed overflow-hidden"
+                  >
+                    <motion.div
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1, duration: 0.5 }}
+                      className="bg-white/60 rounded-lg p-6 border border-accent-200"
+                    >
+                      <p className="whitespace-pre-line">
+                        {t('about.ceo.message')}
+                      </p>
+                    </motion.div>
 
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.5 }}
-                  viewport={{ once: true }}
-                  className="bg-accent-50 rounded-lg p-4 border-r-4 border-accent-500"
-                >
-                  <p className="font-medium text-accent-700">
-                    {t('about.ceo.signature')}
-                    <br />
-                    <span className="text-accent-600">
-                      {t('about.ceo.signatureName')}
-                    </span>
-                    <br />
-                    <span className="text-sm text-accent-500">
-                      {t('about.ceo.signaturePosition')}
-                    </span>
-                  </p>
-                </motion.div>
-              </div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2, duration: 0.5 }}
+                      className="bg-accent-50 rounded-lg p-4 border-r-4 border-accent-500"
+                    >
+                      <p className="font-medium text-accent-700">
+                        {t('about.ceo.signature')}
+                        <br />
+                        <span className="text-accent-600">
+                          {t('about.ceo.signatureName')}
+                        </span>
+                        <br />
+                        <span className="text-sm text-accent-500">
+                          {t('about.ceo.signaturePosition')}
+                        </span>
+                      </p>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </Card>
         </motion.div>
@@ -410,6 +532,7 @@ const VisionMission = memo(() => {
 
   return (
     <motion.section
+      id="vision"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
@@ -555,6 +678,7 @@ const CoreValues = memo(() => {
 
   return (
     <motion.section
+      id="values"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
@@ -674,6 +798,7 @@ const Achievements = memo(() => {
 
   return (
     <motion.section
+      id="achievements"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
@@ -748,9 +873,11 @@ const Achievements = memo(() => {
 
 const CallToAction = memo(() => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   return (
     <motion.section
+      id="cta"
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
@@ -804,6 +931,7 @@ const CallToAction = memo(() => {
             <Button
               variant="secondary"
               size="lg"
+              onClick={() => navigate('/join')}
               className="bg-white text-primary-600 hover:bg-neutral-100 font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
             >
               انضم إلينا الآن
@@ -812,9 +940,11 @@ const CallToAction = memo(() => {
             <Button
               variant="outline"
               size="lg"
+              onClick={() => navigate('/programs')}
               className="border-2 border-white text-white hover:bg-white hover:text-primary-600 font-semibold px-8 py-3 rounded-xl transition-all duration-300"
             >
               تعرف على برامجنا
+              <ArrowRight className="w-5 h-5 mr-2" />
             </Button>
           </motion.div>
         </div>
@@ -838,6 +968,7 @@ const AboutUs: React.FC = () => {
       />
 
       <HeroSection />
+      <QuickNavigation />
 
       <div className="container mx-auto px-4 py-12 relative z-10">
         <PresidentMessage />

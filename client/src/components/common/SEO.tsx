@@ -197,7 +197,7 @@ const SEO: React.FC<SEOProps> = ({
           name: siteName,
           description: 'منصة شبابية عالمية للتنمية والتطوير',
           url: 'https://shababnaglobal.org',
-          logo: 'https://shababnaglobal.org/images/logo.jpg',
+          logo: 'https://shababnaglobal.org/images/logo.svg',
           address: {
             '@type': 'PostalAddress',
             addressLocality: 'Riyadh',

@@ -54,7 +54,7 @@ const Header: React.FC = () => {
             className="flex items-center space-x-3 rtl:space-x-reverse group"
           >
             <img
-              src="/images/logo.jpg"
+              src="/images/logo.svg"
               alt="شبابنا - الشعار"
               className="h-12 w-12 object-contain logo"
               style={{ backgroundColor: 'transparent' }}

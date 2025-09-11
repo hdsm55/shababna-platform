@@ -109,7 +109,7 @@ const Footer: React.FC = () => {
           <div className="space-y-6">
             <div className="flex items-center space-x-3 rtl:space-x-reverse">
               <img
-                src="/images/logo.jpg"
+                src="/images/logo.svg"
                 alt="شبابنا"
                 className="h-12 w-12 object-contain logo"
                 style={{ backgroundColor: 'transparent' }}

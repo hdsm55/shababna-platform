@@ -21,7 +21,7 @@ const NotFound: React.FC = () => {
         className="text-center"
       >
         <img
-          src="/images/logo.jpg"
+          src="/images/logo.svg"
           alt="شبابنا"
           className="h-20 w-20 object-contain mb-6 logo"
           style={{ backgroundColor: 'transparent' }}

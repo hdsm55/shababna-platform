@@ -2,6 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
+import {
+  Sparkles,
+  Zap,
+  Heart,
+  Star,
+  Globe,
+  Users,
+  Target,
+  Award,
+} from 'lucide-react';
 
 /**
  * Unified Loading Component - مكون التحميل الموحد
@@ -14,7 +24,7 @@ interface UnifiedLoaderProps {
   progress?: number;
 
   // التصميم والمظهر
-  variant?: 'default' | 'minimal' | 'brand' | 'modern' | 'elegant';
+  variant?: 'default' | 'minimal' | 'brand' | 'modern' | 'elegant' | 'premium';
   size?: 'sm' | 'md' | 'lg';
   color?: 'primary' | 'secondary' | 'accent' | 'neutral';
 
@@ -56,12 +66,31 @@ const UnifiedLoader: React.FC<UnifiedLoaderProps> = ({
   const finalProgress =
     externalProgress !== undefined ? externalProgress : internalProgress;
 
-  // نصائح التحميل
+  // نصائح التحميل المحسنة
   const loadingTips = [
-    t('loading.tip1', 'نحن نعمل على تحضير أفضل تجربة لك'),
-    t('loading.tip2', 'جاري تحميل المحتوى المطلوب'),
-    t('loading.tip3', 'شكراً لصبرك، سنكون جاهزين قريباً'),
-    t('loading.tip4', 'نحن نضمن لك تجربة سلسة ومريحة'),
+    {
+      text: t(
+        'loading.tip1',
+        '💡 نصيحة: يمكنك تصفح الفعاليات والبرامج أثناء التحميل'
+      ),
+      icon: Sparkles,
+    },
+    {
+      text: t('loading.tip2', '🌟 اكتشف برامجنا التطويرية المميزة'),
+      icon: Star,
+    },
+    {
+      text: t('loading.tip3', '📱 تابعنا على وسائل التواصل الاجتماعي'),
+      icon: Globe,
+    },
+    {
+      text: t('loading.tip4', '🎯 انضم إلى مجتمع شبابنا العالمي'),
+      icon: Users,
+    },
+    { text: t('loading.tip5', '⚡ استفد من فرص التطوير المهني'), icon: Zap },
+    { text: t('loading.tip6', '❤️ شارك في مبادراتنا الإنسانية'), icon: Heart },
+    { text: t('loading.tip7', '🏆 احصل على شهادات معتمدة'), icon: Award },
+    { text: t('loading.tip8', '🎯 حقق أهدافك مع شبابنا'), icon: Target },
   ];
 
   // محاكاة التقدم
@@ -83,7 +112,7 @@ const UnifiedLoader: React.FC<UnifiedLoaderProps> = ({
     if (showTips) {
       const tipInterval = setInterval(() => {
         setCurrentTip((prev) => (prev + 1) % loadingTips.length);
-      }, 3000);
+      }, 4000);
 
       return () => clearInterval(tipInterval);
     }
@@ -204,6 +233,38 @@ const UnifiedLoader: React.FC<UnifiedLoaderProps> = ({
           </div>
         );
 
+      case 'premium':
+        return (
+          <div className="relative">
+            <motion.div
+              className={clsx(
+                'rounded-full border-4 border-t-transparent',
+                spinnerSize,
+                'border-gradient-to-r from-primary-500 via-secondary-500 to-accent-500'
+              )}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
+            />
+            <motion.div
+              className="absolute inset-1 rounded-full border-2 border-transparent border-r-primary-300"
+              animate={{ rotate: -360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+            />
+            <motion.div
+              className="absolute inset-2 rounded-full bg-gradient-to-r from-primary-500/20 to-secondary-500/20"
+              animate={{
+                scale: [1, 1.1, 1],
+                opacity: [0.5, 1, 0.5],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            />
+          </div>
+        );
+
       default:
         return (
           <motion.div
@@ -249,18 +310,39 @@ const UnifiedLoader: React.FC<UnifiedLoaderProps> = ({
               className="mb-6"
             >
               {variant === 'brand' ? (
-                <div className="relative mx-auto w-16 h-16">
-                  <div className="absolute inset-0 w-16 h-16 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl shadow-lg"></div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <motion.div
-                      animate={{ scale: [1, 1.1, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="text-white text-xl font-bold"
-                    >
-                      شبابنا
-                    </motion.div>
-                  </div>
-                </div>
+                <motion.div
+                  className="relative mx-auto w-16 h-16"
+                  animate={{
+                    scale: [1, 1.05, 1],
+                    rotate: [0, 5, -5, 0],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                >
+                  <img
+                    src="/images/logo.svg"
+                    alt="شبابنا"
+                    className="w-16 h-16 object-contain logo"
+                    style={{ backgroundColor: 'transparent' }}
+                  />
+                  <motion.div
+                    className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center"
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      rotate: 360,
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                  >
+                    <Star className="w-2 h-2 text-white" />
+                  </motion.div>
+                </motion.div>
               ) : (
                 <div className="relative mx-auto w-12 h-12">
                   <div className="absolute inset-0 w-12 h-12 border-4 border-primary-200 rounded-full"></div>
@@ -293,31 +375,45 @@ const UnifiedLoader: React.FC<UnifiedLoaderProps> = ({
             )}
           </div>
 
-          {/* شريط التقدم */}
+          {/* شريط التقدم المحسن */}
           {showProgress && finalProgress > 0 && (
             <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: '100%' }}
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: '100%', opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
               className="mb-4"
             >
-              <div className="w-full bg-neutral-200 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-gradient-to-r from-neutral-100 to-neutral-200 rounded-full h-3 overflow-hidden shadow-inner">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full"
+                  className="h-full bg-gradient-to-r from-primary-500 via-primary-600 to-secondary-500 rounded-full relative"
                   initial={{ width: 0 }}
                   animate={{ width: `${finalProgress}%` }}
-                  transition={{ duration: 0.3 }}
-                />
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                >
+                  {/* تأثير اللمعان */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                    animate={{ x: ['-100%', '100%'] }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                  />
+                </motion.div>
               </div>
-              <div className="text-right mt-1">
-                <span className="text-xs text-dark-400 font-arabic">
+              <div className="flex justify-between items-center mt-2">
+                <span className="text-xs text-dark-500 font-medium">
+                  {t('loading.progress', 'جاري التحميل...')}
+                </span>
+                <span className="text-xs text-primary-600 font-bold font-arabic">
                   {Math.round(finalProgress)}%
                 </span>
               </div>
             </motion.div>
           )}
 
-          {/* نصائح التحميل */}
+          {/* نصائح التحميل المحسنة */}
           {showTips && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -325,18 +421,38 @@ const UnifiedLoader: React.FC<UnifiedLoaderProps> = ({
               transition={{ delay: 0.3, duration: 0.5 }}
               className="mb-4"
             >
-              <motion.div
-                key={currentTip}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.5 }}
-                className="bg-gradient-to-r from-primary-50 to-secondary-50 rounded-lg p-3 border border-primary-100"
-              >
-                <p className="text-dark-600 text-sm font-medium font-arabic">
-                  💡 {loadingTips[currentTip]}
-                </p>
-              </motion.div>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentTip}
+                  initial={{ opacity: 0, x: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: -20, scale: 0.95 }}
+                  transition={{ duration: 0.6, ease: 'easeInOut' }}
+                  className="bg-gradient-to-r from-primary-50 via-white to-secondary-50 rounded-xl p-4 border border-primary-100 shadow-sm"
+                >
+                  <div className="flex items-center gap-3">
+                    <motion.div
+                      className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center"
+                      animate={{
+                        rotate: [0, 360],
+                        scale: [1, 1.1, 1],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                      }}
+                    >
+                      {React.createElement(loadingTips[currentTip].icon, {
+                        className: 'w-4 h-4 text-white',
+                      })}
+                    </motion.div>
+                    <p className="text-dark-600 text-sm font-medium font-arabic leading-relaxed">
+                      {loadingTips[currentTip].text}
+                    </p>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             </motion.div>
           )}
 
