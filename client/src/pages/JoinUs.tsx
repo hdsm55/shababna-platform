@@ -8,6 +8,7 @@ import { Input } from '../components/ui/Input/InputSimple';
 import { Alert } from '../components/common/AlertSimple';
 import SEO from '../components/common/SEO';
 import { countries } from '../utils/countries';
+import { getApiUrl } from '../config/environment';
 
 interface JoinUsFormData {
   firstName: string;
@@ -40,7 +41,7 @@ const JoinUs: React.FC = () => {
     setShowAlert(false);
     try {
       // إرسال البيانات فعليًا إلى API
-      const res = await fetch('/api/forms/join-requests', {
+      const res = await fetch(`${getApiUrl()}/forms/join-requests`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -5,7 +5,7 @@ async function testJoinRequestsAPI() {
         console.log('🔍 فحص API طلبات الانضمام...');
 
         // محاكاة طلب من frontend
-        const response = await fetch('http://localhost:3000/api/forms/join-requests', {
+        const response = await fetch('http://localhost:5000/api/forms/join-requests', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
