@@ -867,7 +867,7 @@ const CallToAction = memo(() => {
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
             <button
-              onClick={() => navigate('/join')}
+              onClick={() => navigate('/join-us')}
               className="inline-flex items-center justify-center font-semibold px-8 py-3 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white text-primary-600 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary-600"
             >
               انضم إلينا الآن
