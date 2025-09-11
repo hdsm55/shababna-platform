@@ -21,7 +21,7 @@ import { Button } from '../components/ui/Button/ButtonSimple';
 import { Card } from '../components/ui/Card/Card';
 import { Input } from '../components/ui/Input/InputSimple';
 import { Alert } from '../components/common/DesignSystem';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import UnifiedLoader from '../components/common/UnifiedLoader';
 import { useDebounce } from '../hooks/useDebounce';
 
 // تحسين الأداء - مكونات منفصلة
@@ -597,7 +597,9 @@ const Events: React.FC = () => {
         {/* Loading State */}
         {isLoading && (
           <div className="flex justify-center items-center py-12">
-            <LoadingSpinner />
+            <UnifiedLoader
+              message={t('events.loading', 'جاري تحميل الفعاليات...')}
+            />
           </div>
         )}
 
@@ -606,8 +608,11 @@ const Events: React.FC = () => {
           <div className="text-center py-12">
             <Alert
               type="error"
-              title="خطأ في التحميل"
-              description={error?.message || 'حدث خطأ في تحميل الفعاليات'}
+              title={t('events.error.title', 'خطأ في التحميل')}
+              description={
+                error?.message ||
+                t('events.error.description', 'حدث خطأ في تحميل الفعاليات')
+              }
               className="max-w-md mx-auto"
             />
           </div>

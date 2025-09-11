@@ -7,7 +7,7 @@ import { Button } from '../components/ui/Button/Button';
 import { Card } from '../components/ui/Card/Card';
 import { Input } from '../components/ui/Input/Input';
 import Alert from '../components/common/Alert';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import UnifiedLoader from '../components/common/UnifiedLoader';
 import { fetchEventById } from '../services/eventsApi';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -229,7 +229,12 @@ const EventDetail: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50">
-        <LoadingSpinner size="lg" />
+        <UnifiedLoader
+          variant="brand"
+          size="lg"
+          fullScreen={true}
+          message="جاري تحميل تفاصيل الفعالية..."
+        />
       </div>
     );
   }
@@ -672,7 +677,11 @@ const EventDetail: React.FC = () => {
                     className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-sm sm:text-base py-2 sm:py-3"
                   >
                     {registrationStatus === 'loading' ? (
-                      <LoadingSpinner size="sm" />
+                      <UnifiedLoader
+                        variant="minimal"
+                        size="sm"
+                        showLogo={false}
+                      />
                     ) : (
                       t('eventDetail.submit', 'تأكيد التسجيل')
                     )}

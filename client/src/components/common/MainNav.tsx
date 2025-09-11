@@ -99,10 +99,10 @@ const MainNav: React.FC = () => {
           tabIndex={0}
         >
           <img
-            src="/images/logo.png"
+            src="/images/logo.jpg"
             alt="شبابنا - الشعار"
-            className="h-10 w-auto object-contain"
-            style={{ maxHeight: 40 }}
+            className="h-10 w-auto object-contain logo"
+            style={{ maxHeight: 40, backgroundColor: 'transparent' }}
           />
         </Link>
         <ul

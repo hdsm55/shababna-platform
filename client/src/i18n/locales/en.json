@@ -7,7 +7,6 @@
     "blogs": "Blogs",
     "joinUs": "Join Us",
     "contact": "Contact",
-    "translationDemo": "Translation Demo",
     "login": "Login",
     "dashboard": "Dashboard",
     "logout": "Logout",
@@ -75,7 +74,7 @@
     "president": {
       "title": "President's Message",
       "name": "Mahmoud Al-Hasanat",
-      "position": "President of Shababna Global Platform",
+      "position": "President of Shababna Organization",
       "greeting": "In the name of Allah, the Most Gracious, the Most Merciful",
       "welcome": "Welcome to the official website of Shababna Global Organization, the platform that emerged from the concerns of the Ummah and the hopes of its youth, to turn dreams into reality, awareness into action, and ambition into an extended renaissance.",
       "vision": "From the very first moment, I believed that youth are the energy of change, and they are the hope upon which nations are built and civilizations are shaped. Hence, it was necessary to establish this independent global youth institution, to gather hearts and minds, and unite energies in a path worthy of a nation that Allah has willed to be a witness to people.",
@@ -84,12 +83,50 @@
       "invitation": "So welcome to your home, and welcome to joining a global youth journey that knows no boundaries, its motto: faith, awareness, action, and impact.",
       "signature": "With my regards,",
       "signatureName": "Mahmoud Al-Hasanat",
-      "signaturePosition": "President of Shababna Global Platform"
+      "signaturePosition": "President of Shababna Organization"
+    },
+    "ceo": {
+      "title": "CEO's Message",
+      "name": "Zakaria Al-Qadi",
+      "position": "Executive Director – Shababna Global Organization",
+      "message": "We are a generation born in times of challenges, but we were not created to complain... we were born to make a difference.\n\nAt Shababna Global Organization, we didn't wait for someone to create our future, we decided to be its creators. We gathered from different countries, with diverse ideas, but with one purpose:\nFor youth to have a role, a voice, and an impact.\n\nWe don't just offer programs, we open doors to opportunities, and create an environment that restores your faith in yourself, connects you to your identity, and places you at the heart of your Ummah's issues.\n\nI dream to see every young person among us carrying their project, building their mark, and walking with steady steps towards positive change.\nAnd from here... from the heart of \"Shababna\" we say to every young person:\nBe the beginning. Don't wait for anyone, the world needs you.\n\nAlways your brother",
+      "signature": "Always your brother",
+      "signatureName": "Zakaria Al-Qadi",
+      "signaturePosition": "Executive Director – Shababna Global Organization"
     }
+  },
+  "common": {
+    "loading": "Loading...",
+    "pleaseWait": "Please wait a moment",
+    "error": "An error occurred",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "closeMessage": "Close message",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort"
+  },
+  "loading": {
+    "tip1": "We are preparing the best experience for you",
+    "tip2": "Loading the required content",
+    "tip3": "Thank you for your patience, we'll be ready soon",
+    "tip4": "We guarantee you a smooth and comfortable experience",
+    "backendIdle": "Free server is waking up from sleep"
   },
   "events": {
     "title": "Upcoming Events",
     "subtitle": "Discover exciting events and workshops designed for youth development",
+    "loading": "Loading events...",
+    "error": {
+      "title": "Loading Error",
+      "description": "An error occurred while loading events"
+    },
     "stats": {
       "available": "Available Events",
       "upcoming": "Upcoming",
@@ -159,6 +196,12 @@
     "title": "Programs",
     "subtitle": "Discover our long-term development programs",
     "pageTitle": "Programs - Shababna Platform",
+    "loading": "Loading programs...",
+    "participant": "participant",
+    "status": {
+      "available": "Available",
+      "closed": "Closed"
+    },
     "filter": {
       "all": "All Programs",
       "education": "Education",
@@ -358,6 +401,7 @@
       "description": "Join Shababna Global in Istanbul and be part of a leading Islamic youth community that innovates and impacts the world",
       "keywords": "Shababna, Muslim youth, development, growth, Istanbul, youth community, events, programs"
     },
+    "viewDetails": "View Details",
     "latest": {
       "title": "Latest Updates",
       "subtitle": "Stay updated with our latest events and programs",
@@ -369,7 +413,12 @@
       "explore": "Explore Programs",
       "latestPrograms": "Latest Programs"
     },
-    "latestPrograms": "Latest Programs",
+    "latestPrograms": {
+      "title": "Latest Programs",
+      "subtitle": "Discover our distinguished development programs designed to build future leaders",
+      "viewAll": "View All Programs",
+      "noPrograms": "No programs available at the moment"
+    },
     "latestEvents": "Latest Events",
     "testimonials": {
       "title": "What Our Youth Say",

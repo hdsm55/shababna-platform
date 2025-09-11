@@ -5,12 +5,13 @@ const ScrollToTop: React.FC = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    // Smooth scroll to top when pathname changes
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'smooth',
-    });
+    // تمرير فوري للأعلى عند تغيير الصفحة
+    window.scrollTo(0, 0);
+
+    // إزالة أي scroll restoration من المتصفح
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
   }, [pathname]);
 
   return null;

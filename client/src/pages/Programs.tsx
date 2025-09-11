@@ -28,7 +28,7 @@ import { Button } from '../components/ui/Button/ButtonSimple';
 import { Card } from '../components/ui/Card/Card';
 import { Input } from '../components/ui/Input/InputSimple';
 import { Modal } from '../components/ui/Modal/ModalSimple';
-import CenteredLoader from '../components/common/CenteredLoader';
+import UnifiedLoader from '../components/common/UnifiedLoader';
 import { useDebounce } from '../hooks/useDebounce';
 
 const Programs: React.FC = () => {
@@ -423,7 +423,9 @@ const Programs: React.FC = () => {
             animate={{ opacity: 1 }}
             className="flex justify-center py-20"
           >
-            <CenteredLoader />
+            <UnifiedLoader
+              message={t('programs.loading', 'جاري تحميل البرامج...')}
+            />
           </motion.div>
         )}
 

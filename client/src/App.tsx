@@ -8,7 +8,7 @@ import { ToastProvider } from './components/common/Toast';
 import { ThemeProvider } from './components/ThemeProvider';
 import Layout from './components/layout/Layout';
 import DashboardLayout from './layouts/DashboardLayout';
-import LoadingSpinner from './components/common/LoadingSpinner';
+import UnifiedLoader from './components/common/UnifiedLoader';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import PerformanceOptimizer from './components/common/PerformanceOptimizer';
 import FontOptimizer from './components/common/FontOptimizer';
@@ -29,7 +29,6 @@ const Contact = lazy(() => import('./pages/Contact'));
 const Donations = lazy(() => import('./pages/Donations'));
 const JoinUs = lazy(() => import('./pages/JoinUs'));
 const Volunteers = lazy(() => import('./pages/Volunteers'));
-const TranslationDemo = lazy(() => import('./pages/TranslationDemo'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Auth Pages
@@ -68,9 +67,14 @@ const queryClient = new QueryClient({
 
 // Simple loading component
 const LoadingFallback = () => (
-  <div className="flex justify-center items-center min-h-[400px]">
-    <LoadingSpinner />
-  </div>
+  <UnifiedLoader
+    variant="default"
+    size="md"
+    fullScreen={false}
+    showLogo={false}
+    showProgress={false}
+    message="جاري التحميل..."
+  />
 );
 
 function App() {
@@ -199,14 +203,6 @@ function App() {
                               element={
                                 <Suspense fallback={<LoadingFallback />}>
                                   <Volunteers />
-                                </Suspense>
-                              }
-                            />
-                            <Route
-                              path="/translation-demo"
-                              element={
-                                <Suspense fallback={<LoadingFallback />}>
-                                  <TranslationDemo />
                                 </Suspense>
                               }
                             />

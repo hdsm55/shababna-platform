@@ -5,7 +5,7 @@ import { Card } from '../components/ui/Card/Card';
 import Alert from '../components/common/Alert';
 import { Button } from '../components/ui/Button/ButtonSimple';
 import SEO from '../components/common/SEO';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import UnifiedLoader from '../components/common/UnifiedLoader';
 import { useTranslation } from 'react-i18next';
 import SmartImage from '../components/common/SmartImage';
 import { useDebounce } from '../hooks/useDebounce';
@@ -73,7 +73,7 @@ const Blogs: React.FC = () => {
             )}
             {isLoading && (
               <span className="absolute right-3 top-1/2 -translate-y-1/2 rtl:left-3 rtl:right-auto">
-                <LoadingSpinner size="sm" />
+                <UnifiedLoader variant="minimal" size="sm" showLogo={false} />
               </span>
             )}
           </motion.div>

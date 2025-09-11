@@ -320,7 +320,7 @@ const LatestEventsSection = memo(() => {
             onClick={() => navigate('/events')}
             className="px-6 py-3 text-sm font-semibold border-2 border-dark-300 hover:bg-dark-50 text-dark-700"
           >
-            {t('home.latestEvents.viewAll', 'عرض جميع الفعاليات')}
+            {t('home.latestPrograms.viewAll', 'عرض جميع البرامج')}
             <ArrowRight className="w-4 h-4" />
           </Button>
         </motion.div>
@@ -333,6 +333,7 @@ LatestEventsSection.displayName = 'LatestEventsSection';
 
 const LatestProgramsSection = memo(() => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // تحسين الاستعلام - تقليل البيانات المطلوبة
   const {
@@ -348,11 +349,7 @@ const LatestProgramsSection = memo(() => {
     refetchOnReconnect: false, // منع إعادة التحميل عند إعادة الاتصال
   });
 
-  const latestPrograms =
-    programsData?.data?.programs ||
-    programsData?.data?.items ||
-    programsData?.programs ||
-    [];
+  const latestPrograms = programsData?.data?.events || [];
 
   // معالجة الأخطاء
   if (programsError) {
@@ -393,10 +390,13 @@ const LatestProgramsSection = memo(() => {
           className="text-center mb-12"
         >
           <h2 className="text-2xl md:text-3xl font-bold text-dark-500 mb-4">
-            أحدث البرامج
+            {t('home.latestPrograms.title', 'أحدث البرامج')}
           </h2>
           <p className="text-base md:text-lg text-dark-600 max-w-3xl mx-auto leading-relaxed">
-            اكتشف برامجنا التطويرية المميزة المصممة لبناء قادة المستقبل
+            {t(
+              'home.latestPrograms.subtitle',
+              'اكتشف برامجنا التطويرية المميزة المصممة لبناء قادة المستقبل'
+            )}
           </p>
         </motion.div>
 
@@ -437,7 +437,8 @@ const LatestProgramsSection = memo(() => {
                   </p>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs text-dark-500">
-                      {program.participants_count || 0} مشارك
+                      {program.participants_count || 0}{' '}
+                      {t('programs.participant', 'مشارك')}
                     </span>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -446,7 +447,9 @@ const LatestProgramsSection = memo(() => {
                           : 'bg-dark-100 text-dark-700'
                       }`}
                     >
-                      {program.status === 'active' ? 'متاح' : 'مغلق'}
+                      {program.status === 'active'
+                        ? t('programs.status.available', 'متاح')
+                        : t('programs.status.closed', 'مغلق')}
                     </span>
                   </div>
                   <Button
@@ -456,7 +459,7 @@ const LatestProgramsSection = memo(() => {
                     onClick={() => navigate(`/programs/${program.id}`)}
                   >
                     <span className="flex items-center justify-center gap-2">
-                      عرض التفاصيل
+                      {t('home.viewDetails', 'عرض التفاصيل')}
                       <ArrowRight className="w-3 h-3" />
                     </span>
                   </Button>
@@ -465,7 +468,12 @@ const LatestProgramsSection = memo(() => {
             ))
           ) : (
             <div className="col-span-full text-center py-8">
-              <p className="text-dark-600">لا توجد برامج متاحة حالياً</p>
+              <p className="text-dark-600">
+                {t(
+                  'home.latestPrograms.noPrograms',
+                  'لا توجد برامج متاحة حالياً'
+                )}
+              </p>
             </div>
           )}
         </div>
@@ -495,6 +503,7 @@ const LatestProgramsSection = memo(() => {
 LatestProgramsSection.displayName = 'LatestProgramsSection';
 
 const NewsletterSection = memo(() => {
+  const { t } = useTranslation();
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<
     'idle' | 'loading' | 'success' | 'error'
@@ -542,17 +551,23 @@ const NewsletterSection = memo(() => {
         className="relative max-w-4xl mx-auto px-6 text-center"
       >
         <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-          ابق على اطلاع
+          {t('home.newsletter.title', 'ابق على اطلاع')}
         </h2>
         <p className="text-base md:text-lg text-primary-100 max-w-3xl mx-auto leading-relaxed mb-8">
-          اشترك في نشرتنا البريدية لتصلك آخر الأخبار والفعاليات والبرامج الجديدة
+          {t(
+            'home.newsletter.subtitle',
+            'اشترك في نشرتنا البريدية لتصلك آخر الأخبار والفعاليات والبرامج الجديدة'
+          )}
         </p>
 
         <form onSubmit={handleNewsletterSubmit} className="max-w-md mx-auto">
           <div className="flex gap-3">
             <Input
               type="email"
-              placeholder="أدخل بريدك الإلكتروني"
+              placeholder={t(
+                'home.newsletter.placeholder',
+                'أدخل بريدك الإلكتروني'
+              )}
               value={newsletterEmail}
               onChange={(e) => setNewsletterEmail(e.target.value)}
               required
@@ -564,7 +579,9 @@ const NewsletterSection = memo(() => {
               disabled={newsletterStatus === 'loading'}
               className="bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 py-2 px-4 text-sm font-semibold shadow-lg"
             >
-              {newsletterStatus === 'loading' ? 'جاري...' : 'اشتراك'}
+              {newsletterStatus === 'loading'
+                ? t('home.newsletter.loading', 'جاري...')
+                : t('home.newsletter.subscribe', 'اشتراك')}
             </Button>
           </div>
         </form>
@@ -671,7 +688,7 @@ const Home: React.FC = () => {
                 <button
                   onClick={() => setShowWelcomeMessage(false)}
                   className="text-primary-400 hover:text-primary-600 transition-colors"
-                  aria-label="إغلاق الرسالة"
+                  aria-label={t('common.closeMessage', 'إغلاق الرسالة')}
                 >
                   <X className="w-4 h-4" />
                 </button>

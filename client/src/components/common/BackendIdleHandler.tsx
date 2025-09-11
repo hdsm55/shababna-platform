@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import LoadingSpinner from './LoadingSpinner';
+import UnifiedLoader from './UnifiedLoader';
 import Alert from './Alert';
 
 interface BackendIdleHandlerProps {
@@ -65,28 +65,15 @@ const BackendIdleHandler: React.FC<BackendIdleHandlerProps> = ({
 
   if (isBackendIdle) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
-        <div className="text-center max-w-md mx-auto p-6">
-          <LoadingSpinner size="lg" isBackendIdle={true} text={lastError} />
-
-          <Alert type="info" title="الخادم المجاني يستيقظ" className="mt-6">
-            الخادم المجاني على Render يستيقظ من النوم بعد فترة من عدم النشاط.
-            هذا طبيعي ويستغرق بضع ثوانٍ.
-            {retryCount > 1 && (
-              <div className="mt-2 text-sm">المحاولة: {retryCount}</div>
-            )}
-          </Alert>
-
-          {retryCount > 2 && (
-            <button
-              onClick={handleRetry}
-              className="mt-4 px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors"
-            >
-              إعادة المحاولة
-            </button>
-          )}
-        </div>
-      </div>
+      <UnifiedLoader
+        variant="modern"
+        size="lg"
+        fullScreen={true}
+        isBackendIdle={true}
+        message={lastError}
+        showProgress={false}
+        showLogo={true}
+      />
     );
   }
 

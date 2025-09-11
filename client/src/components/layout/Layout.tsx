@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useLanguageStore } from '../../store/languageStore';
 import Header from './Header';
 import Footer from './Footer';
+import ScrollToTop from '../common/ScrollToTop';
 import { Outlet } from 'react-router-dom';
 
 interface LayoutProps {
@@ -25,13 +26,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     // تأخير قصير لإظهار الفوتر بعد تحميل المحتوى
     const timer = setTimeout(() => {
       setShowFooter(true);
-    }, 100);
+    }, 200);
 
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
+  // التأكد من التمرير للأعلى عند تغيير الصفحة
+  React.useEffect(() => {
+    // تمرير فوري للأعلى عند تغيير الصفحة
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   return (
     <div className={`fix-layout ${isRTL ? 'font-arabic' : 'font-sans'}`}>
+      <ScrollToTop />
       <Header />
       <main className="fix-content">
         <div className="page-container">{children || <Outlet />}</div>

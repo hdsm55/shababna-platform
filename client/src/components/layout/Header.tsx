@@ -36,7 +36,6 @@ const Header: React.FC = () => {
     { key: 'blogs', path: '/blogs' },
     { key: 'joinUs', path: '/join-us' },
     { key: 'contact', path: '/contact' },
-    { key: 'translationDemo', path: '/translation-demo' },
   ];
 
   const languages = [
@@ -57,7 +56,8 @@ const Header: React.FC = () => {
             <img
               src="/images/logo.jpg"
               alt="شبابنا - الشعار"
-              className="h-12 w-12 object-cover rounded-lg drop-shadow"
+              className="h-12 w-12 object-contain logo"
+              style={{ backgroundColor: 'transparent' }}
             />
           </Link>
 

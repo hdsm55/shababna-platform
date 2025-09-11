@@ -20,11 +20,12 @@ const NotFound: React.FC = () => {
         transition={{ duration: 0.6 }}
         className="text-center"
       >
-                  <img
-            src="/images/logo.jpg"
-            alt="شبابنا"
-            className="h-20 w-20 object-cover rounded-2xl mb-6 shadow-lg"
-          />
+        <img
+          src="/images/logo.jpg"
+          alt="شبابنا"
+          className="h-20 w-20 object-contain mb-6 logo"
+          style={{ backgroundColor: 'transparent' }}
+        />
         <div className="text-[7rem] font-extrabold text-primary-600 mb-2 select-none">
           404
         </div>

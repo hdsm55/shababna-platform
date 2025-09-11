@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  Twitter,
-  Instagram,
-  Mail,
-  Phone,
-  MapPin,
-  ArrowUp,
-} from 'lucide-react';
+import { Twitter, Instagram, Mail, Phone, MapPin, ArrowUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { subscribeToNewsletter } from '../../services/newsletterApi';
 
@@ -118,7 +111,8 @@ const Footer: React.FC = () => {
               <img
                 src="/images/logo.jpg"
                 alt="شبابنا"
-                className="h-12 w-12 object-cover rounded-xl shadow-lg"
+                className="h-12 w-12 object-contain logo"
+                style={{ backgroundColor: 'transparent' }}
               />
               <div>
                 <span className="text-xl font-bold">Shababna Global</span>

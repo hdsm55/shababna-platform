@@ -12,6 +12,8 @@
     scroll-padding-top: 80px;
     /* تسريع التمرير */
     -webkit-overflow-scrolling: touch;
+    /* منع scroll restoration التلقائي */
+    scroll-restoration: manual;
   }
 
   body {
@@ -58,6 +60,30 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+  }
+
+  /* إصلاح مشكلة الإطارات البيضاء في الصور */
+  img[src*="logo"] {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* إصلاح مشكلة الإطارات في الأيقونات */
+  .logo, .favicon, [class*="logo"] {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* إزالة جميع الإطارات من الشعارات */
+  img[alt*="شبابنا"], img[alt*="الشعار"] {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
   }
 
   /* إصلاح مشكلة Layout */

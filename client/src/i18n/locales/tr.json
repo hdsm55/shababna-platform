@@ -7,7 +7,6 @@
     "blogs": "Bloglar",
     "joinUs": "Bize Katıl",
     "contact": "İletişim",
-    "translationDemo": "Çeviri Örneği",
     "login": "Giriş Yap",
     "dashboard": "Kontrol Paneli",
     "logout": "Çıkış Yap",
@@ -75,7 +74,7 @@
     "president": {
       "title": "Başkan Mesajı",
       "name": "Mahmoud Al-Hasanat",
-      "position": "Shababna Global Platform Başkanı",
+      "position": "Shababna Organizasyonu Başkanı",
       "greeting": "Rahman ve Rahim olan Allah'ın adıyla",
       "welcome": "Shababna Global Organizasyonu'nun resmi web sitesine hoş geldiniz. Bu platform, Ümmet'in endişelerinden ve gençliğinin umutlarından doğarak, hayalleri gerçeğe, bilinci eyleme ve hırsı uzun süreli bir rönesansa dönüştürmek için kurulmuştur.",
       "vision": "İlk andan itibaren, gençliğin değişimin enerjisi olduğuna ve ülkelerin üzerine inşa edildiği, medeniyetlerin şekillendirildiği umut olduğuna inandım. Buradan, kalpleri ve zihinleri bir araya getirmek, enerjileri Allah'ın insanlara şahit olmasını istediği bir ümmete yakışır bir yolda birleştirmek için bu bağımsız küresel gençlik kurumunu kurmak gerekliydi.",
@@ -84,12 +83,50 @@
       "invitation": "Bu yüzden evinize hoş geldiniz ve sınır tanımayan küresel bir gençlik yolculuğuna katılmaya hoş geldiniz, sloganı: iman, bilinç, eylem ve etki.",
       "signature": "Saygılarımla,",
       "signatureName": "Mahmoud Al-Hasanat",
-      "signaturePosition": "Shababna Global Platform Başkanı"
+      "signaturePosition": "Shababna Organizasyonu Başkanı"
+    },
+    "ceo": {
+      "title": "Genel Müdür Mesajı",
+      "name": "Zakaria Al-Qadi",
+      "position": "Genel Müdür – Shababna Global Organizasyonu",
+      "message": "Zorluklar zamanında doğan bir nesiliz, ama şikayet etmek için yaratılmadık... fark yaratmak için doğduk.\n\nShababna Global Organizasyonu'nda, geleceğimizi bizim için yaratacak birini beklemedik, onun yaratıcıları olmaya karar verdik. Farklı ülkelerden, çeşitli fikirlerle, ama tek bir amaçla toplandık:\nGençliğin rolü, sesi ve etkisi olsun.\n\nSadece programlar sunmuyoruz, fırsatların kapılarını açıyoruz ve kendinize olan inancınızı yeniden kazandıran, sizi kimliğinize bağlayan ve sizi Ümmet'inizin sorunlarının kalbine yerleştiren bir ortam yaratıyoruz.\n\nAramızdaki her gencin projesini taşıdığını, izini bıraktığını ve olumlu değişime doğru kararlı adımlarla yürüdüğünü görmeyi hayal ediyorum.\nVe buradan... \"Shababna\"nın kalbinden her gence diyoruz ki:\nBaşlangıç sen ol. Kimseyi bekleme, dünya sana ihtiyaç duyuyor.\n\nHer zaman kardeşiniz",
+      "signature": "Her zaman kardeşiniz",
+      "signatureName": "Zakaria Al-Qadi",
+      "signaturePosition": "Genel Müdür – Shababna Global Organizasyonu"
     }
+  },
+  "common": {
+    "loading": "Yükleniyor...",
+    "pleaseWait": "Lütfen biraz bekleyin",
+    "error": "Bir hata oluştu",
+    "success": "Başarılı",
+    "cancel": "İptal",
+    "confirm": "Onayla",
+    "close": "Kapat",
+    "closeMessage": "Mesajı kapat",
+    "save": "Kaydet",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "view": "Görüntüle",
+    "search": "Ara",
+    "filter": "Filtrele",
+    "sort": "Sırala"
+  },
+  "loading": {
+    "tip1": "Sizin için en iyi deneyimi hazırlıyoruz",
+    "tip2": "Gerekli içerik yükleniyor",
+    "tip3": "Sabrınız için teşekkürler, yakında hazır olacağız",
+    "tip4": "Size sorunsuz ve rahat bir deneyim garanti ediyoruz",
+    "backendIdle": "Ücretsiz sunucu uykudan uyanıyor"
   },
   "events": {
     "title": "Yaklaşan Etkinlikler",
     "subtitle": "Gençlik gelişimi için tasarlanmış heyecan verici etkinlikler ve atölyeler keşfedin",
+    "loading": "Etkinlikler yükleniyor...",
+    "error": {
+      "title": "Yükleme Hatası",
+      "description": "Etkinlikler yüklenirken bir hata oluştu"
+    },
     "stats": {
       "available": "Mevcut Etkinlikler",
       "upcoming": "Yaklaşan",
@@ -159,6 +196,12 @@
     "title": "Programlar",
     "subtitle": "Uzun vadeli gelişim programlarımızı keşfedin",
     "pageTitle": "Programlar - Shababna Platformu",
+    "loading": "Programlar yükleniyor...",
+    "participant": "katılımcı",
+    "status": {
+      "available": "Mevcut",
+      "closed": "Kapalı"
+    },
     "filter": {
       "all": "Tüm Programlar",
       "education": "Eğitim",
@@ -358,6 +401,7 @@
       "description": "İstanbul'da Shababna Global'e katılın ve dünyayı yenileyen ve etkileyen önde gelen İslami gençlik topluluğunun bir parçası olun",
       "keywords": "Shababna, Müslüman gençlik, gelişim, büyüme, İstanbul, gençlik topluluğu, etkinlikler, programlar"
     },
+    "viewDetails": "Detayları Görüntüle",
     "latest": {
       "title": "Son Güncellemeler",
       "subtitle": "Son etkinlikler ve programlarımızla güncel kalın",
@@ -369,7 +413,12 @@
       "explore": "Programları Keşfet",
       "latestPrograms": "En Son Programlar"
     },
-    "latestPrograms": "En Son Programlar",
+    "latestPrograms": {
+      "title": "En Son Programlar",
+      "subtitle": "Geleceğin liderlerini inşa etmek için tasarlanmış seçkin gelişim programlarımızı keşfedin",
+      "viewAll": "Tüm Programları Görüntüle",
+      "noPrograms": "Şu anda mevcut program bulunmuyor"
+    },
     "latestEvents": "En Son Etkinlikler",
     "testimonials": {
       "title": "Gençlerimiz Ne Diyor",

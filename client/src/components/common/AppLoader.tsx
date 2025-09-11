@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import CenteredLoader from './CenteredLoader';
+import UnifiedLoader from './UnifiedLoader';
 
 interface AppLoaderProps {
   children: React.ReactNode;
@@ -21,10 +21,13 @@ const AppLoader: React.FC<AppLoaderProps> = ({ children }) => {
 
   if (isLoading) {
     return (
-      <CenteredLoader
-        message="جاري تحميل الموقع..."
+      <UnifiedLoader
+        variant="brand"
+        size="lg"
+        fullScreen={true}
+        showLogo={true}
         showProgress={false}
-        progress={0}
+        message="جاري تحميل الموقع..."
       />
     );
   }
