@@ -13,6 +13,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import PerformanceOptimizer from './components/common/PerformanceOptimizer';
 import FontOptimizer from './components/common/FontOptimizer';
 import CacheOptimizer from './components/common/CacheOptimizer';
+import ScrollToTop from './components/common/ScrollToTop';
 import { startPerformanceMonitoring } from './utils/web-vitals';
 
 // Lazy load pages for better performance
@@ -81,6 +82,18 @@ function App() {
   useEffect(() => {
     // Start performance monitoring
     startPerformanceMonitoring();
+
+    // ضمان التمرير للأعلى عند تحميل التطبيق
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'instant',
+    });
+
+    // إزالة أي scroll restoration من المتصفح
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
   }, []);
 
   return (
@@ -99,6 +112,7 @@ function App() {
                           v7_relativeSplatPath: true,
                         }}
                       >
+                        <ScrollToTop />
                         <Routes>
                           {/* Public Routes داخل Layout */}
                           <Route element={<Layout />}>

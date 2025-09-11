@@ -34,7 +34,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   // التأكد من التمرير للأعلى عند تغيير الصفحة
   React.useEffect(() => {
     // تمرير فوري للأعلى عند تغيير الصفحة
-    window.scrollTo(0, 0);
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'instant',
+    });
+
+    // التأكد من التمرير للأعلى حتى لو كان هناك تأخير في التحميل
+    const timeoutId = setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'instant',
+      });
+    }, 50);
+
+    return () => clearTimeout(timeoutId);
   }, [location.pathname]);
 
   return (

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation, Outlet } from 'react-router-dom';
 import { theme } from '../theme';
+import ScrollToTop from '../components/common/ScrollToTop';
 import {
   LayoutDashboard,
   Calendar,
@@ -52,6 +53,26 @@ interface DashboardLayoutProps {
 const DashboardLayout = ({ children }: { children?: React.ReactNode }) => {
   const { pathname } = useLocation();
 
+  // التأكد من التمرير للأعلى عند تغيير الصفحة في لوحة التحكم
+  React.useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'instant',
+    });
+
+    // التأكد من التمرير للأعلى حتى لو كان هناك تأخير في التحميل
+    const timeoutId = setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'instant',
+      });
+    }, 50);
+
+    return () => clearTimeout(timeoutId);
+  }, [pathname]);
+
   const navItems = [
     {
       to: '/dashboard',
@@ -92,6 +113,7 @@ const DashboardLayout = ({ children }: { children?: React.ReactNode }) => {
 
   return (
     <div className="min-h-screen flex bg-gray-50" dir="auto">
+      <ScrollToTop />
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200 h-screen sticky top-0">
         {/* Header */}

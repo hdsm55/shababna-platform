@@ -6,12 +6,27 @@ const ScrollToTop: React.FC = () => {
 
   useEffect(() => {
     // تمرير فوري للأعلى عند تغيير الصفحة
-    window.scrollTo(0, 0);
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'instant',
+    });
 
     // إزالة أي scroll restoration من المتصفح
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
     }
+
+    // التأكد من التمرير للأعلى حتى لو كان هناك تأخير في التحميل
+    const timeoutId = setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'instant',
+      });
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
   }, [pathname]);
 
   return null;
