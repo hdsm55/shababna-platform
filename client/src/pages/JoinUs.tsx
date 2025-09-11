@@ -40,6 +40,9 @@ const JoinUs: React.FC = () => {
     setFormMsg('');
     setShowAlert(false);
     try {
+      console.log('🚀 إرسال بيانات الانضمام:', data);
+      console.log('🌐 API URL:', `${getApiUrl()}/forms/join-requests`);
+
       // إرسال البيانات فعليًا إلى API
       const res = await fetch(`${getApiUrl()}/forms/join-requests`, {
         method: 'POST',
@@ -54,7 +57,19 @@ const JoinUs: React.FC = () => {
           motivation: data.motivation,
         }),
       });
-      if (!res.ok) throw new Error('فشل في إرسال الطلب');
+
+      console.log('📊 Response Status:', res.status);
+      console.log('📊 Response OK:', res.ok);
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('❌ Error Response:', errorText);
+        throw new Error(`فشل في إرسال الطلب: ${res.status}`);
+      }
+
+      const result = await res.json();
+      console.log('✅ Success Response:', result);
+
       setFormStatus('success');
       setFormMsg(
         t(
@@ -66,6 +81,7 @@ const JoinUs: React.FC = () => {
       setShowAlert(true);
       setTimeout(() => setShowAlert(false), 4000);
     } catch (error) {
+      console.error('❌ Join Form Error:', error);
       setFormStatus('error');
       setFormMsg(
         t(

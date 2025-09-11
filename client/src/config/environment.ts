@@ -2,7 +2,7 @@
 export const getApiUrl = () => {
   // في البيئة المحلية
   if (import.meta.env.DEV) {
-    return 'http://localhost:5000/api';
+    return 'http://127.0.0.1:5000/api';
   }
   // في البيئة الإنتاجية
   return 'https://shababna-backend.onrender.com/api';
