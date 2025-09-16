@@ -19,7 +19,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // إذا لم يكن المستخدم مسجل دخول
   if (!isAuthenticated || !user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
   // إذا كان المستخدم مسجل دخول ولكن ليس لديه الصلاحية المطلوبة

@@ -581,7 +581,7 @@ const ProgramDetail: React.FC = () => {
 
       {/* Donation Status Alert */}
       {donationStatus !== 'idle' && (
-        <div className="fixed bottom-4 right-4 z-50">
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-sm w-full px-4">
           <Alert
             type={donationStatus === 'success' ? 'success' : 'error'}
             onClose={() => setDonationStatus('idle')}

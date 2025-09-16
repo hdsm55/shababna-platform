@@ -6,6 +6,7 @@ import { authMiddleware } from '../middleware/authMiddleware.js';
 import { adminMiddleware } from '../middleware/adminMiddleware.js';
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
 
 const router = express.Router();
 
@@ -14,7 +15,6 @@ const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         const uploadDir = path.join(process.cwd(), 'server', 'public', 'uploads');
         // إنشاء المجلد إذا لم يكن موجوداً
-        const fs = require('fs');
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir, { recursive: true });
         }
@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = require('path').extname(file.originalname);
+        const ext = path.extname(file.originalname);
         cb(null, 'program-' + uniqueSuffix + ext);
     }
 });
@@ -41,7 +41,7 @@ router.get('/:id', getProgramById);
 router.post('/:id/register', registerForProgram);
 
 // Add a new program (admin only)
-router.post('/', authMiddleware, adminMiddleware, upload.single('image'), createProgram);
+router.post('/', authMiddleware, adminMiddleware, createProgram);
 
 // Update a program (admin only)
 router.put('/:id', authMiddleware, adminMiddleware, upload.single('image'), updateProgram);

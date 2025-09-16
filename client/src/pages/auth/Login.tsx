@@ -76,6 +76,17 @@ const Login: React.FC = () => {
       <div className="w-full max-w-md">
         {/* البطاقة الرئيسية */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
+          {/* العودة */}
+          <div className="mb-6">
+            <button
+              onClick={() => navigate('/auth')}
+              className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
+            >
+              <ArrowRight className="w-5 h-5 ml-2 rotate-180" />
+              العودة للصفحة الرئيسية
+            </button>
+          </div>
+
           {/* العنوان */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -185,6 +196,7 @@ const Login: React.FC = () => {
               </label>
               <button
                 type="button"
+                onClick={() => navigate('/forgot-password')}
                 className="text-sm text-blue-600 hover:text-blue-500"
               >
                 نسيت كلمة المرور؟

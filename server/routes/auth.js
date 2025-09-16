@@ -192,6 +192,58 @@ router.post('/login', validateLogin, async (req, res) => {
   }
 });
 
+// POST /forgot-password - Send password reset email
+router.post('/forgot-password', [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email address')
+], async (req, res) => {
+  try {
+    // Check for validation errors
+    if (handleValidationErrors(req, res)) return;
+
+    const { email } = req.body;
+
+    // Check if user exists
+    const userResult = await getRow('SELECT * FROM users WHERE email = $1', [email]);
+
+    if (!userResult) {
+      // For security reasons, don't reveal if email exists or not
+      return res.json({
+        success: true,
+        message: 'If an account with that email exists, we have sent a password reset link.'
+      });
+    }
+
+    const user = userResult;
+
+    // TODO: Generate password reset token and send email
+    // For now, we'll just return success
+    // In a real implementation, you would:
+    // 1. Generate a secure reset token
+    // 2. Store it in the database with expiration time
+    // 3. Send email with reset link
+
+    console.log(`Password reset requested for user: ${user.email}`);
+
+    // Simulate email sending delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    res.json({
+      success: true,
+      message: 'If an account with that email exists, we have sent a password reset link.'
+    });
+
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error during password reset request'
+    });
+  }
+});
+
 // GET /me - Get current user profile (protected route)
 router.get('/me', async (req, res) => {
   try {
@@ -213,7 +265,7 @@ router.get('/me', async (req, res) => {
     );
 
     // Get user from database
-            const user = await getRow('SELECT * FROM users WHERE id = $1', [decoded.id]);
+    const user = await getRow('SELECT * FROM users WHERE id = $1', [decoded.id]);
 
     if (user.rows.length === 0) {
       return res.status(401).json({

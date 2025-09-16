@@ -5,7 +5,7 @@ import DashboardLayout from '../../../layouts/DashboardLayout';
 import Button from '../../../components/common/Button';
 import Input from '../../../components/common/Input';
 import Alert from '../../../components/common/Alert';
-import { Upload, X, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const NewProgram: React.FC = () => {
@@ -17,8 +17,6 @@ const NewProgram: React.FC = () => {
     start_date: '',
     end_date: '',
   });
-  const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -30,27 +28,6 @@ const NewProgram: React.FC = () => {
     >
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // التحقق من حجم الملف (2MB)
-      if (file.size > 2 * 1024 * 1024) {
-        setError('حجم الصورة يجب أن يكون أقل من 2MB');
-        return;
-      }
-      setImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result as string);
-      reader.readAsDataURL(file);
-      setError(null);
-    }
-  };
-
-  const removeImage = () => {
-    setImage(null);
-    setImagePreview(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,19 +49,18 @@ const NewProgram: React.FC = () => {
     setError(null);
 
     try {
-      const formData = new FormData();
-      formData.append('title', form.title);
-      formData.append('description', form.description);
-      formData.append('category', form.category);
-      formData.append('goal_amount', form.goal_amount);
-      formData.append('start_date', form.start_date);
-      formData.append('end_date', form.end_date);
-
-      if (image) {
-        formData.append('image', image);
-      }
-
-      await createProgram(formData);
+      // بناء جسم الطلب كـ JSON فقط
+      const payload = {
+        title: form.title,
+        description: form.description,
+        category: form.category,
+        goal_amount: Number(form.goal_amount),
+        start_date: form.start_date,
+        end_date: form.end_date,
+        current_amount: 0,
+        status: 'active' as const,
+      };
+      await createProgram(payload);
       setSuccess(true);
       setTimeout(() => {
         navigate('/dashboard/programs');
@@ -115,7 +91,7 @@ const NewProgram: React.FC = () => {
         </div>
 
         {/* Form */}
-        <div className="bg-white rounded-xl shadow-sm border">
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 backdrop-blur-none">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {error && <Alert type="error">{error}</Alert>}
 
@@ -251,56 +227,6 @@ const NewProgram: React.FC = () => {
                     required
                   />
                 </div>
-              </div>
-            </div>
-
-            {/* Image Upload */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900">
-                صورة البرنامج
-              </h3>
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <input
-                    id="image"
-                    name="image"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
-                  <label
-                    htmlFor="image"
-                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-                  >
-                    <Upload className="w-4 h-4" />
-                    <span>اختر صورة</span>
-                  </label>
-                  {imagePreview && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={removeImage}
-                      icon={X}
-                    >
-                      إزالة
-                    </Button>
-                  )}
-                </div>
-                {imagePreview && (
-                  <div className="relative">
-                    <img
-                      src={imagePreview}
-                      alt="معاينة الصورة"
-                      className="w-32 h-32 object-cover rounded-lg border"
-                    />
-                  </div>
-                )}
-                <p className="text-xs text-gray-500">
-                  المقاس المفضل: 400×400 بكسل (مربع). الحد الأقصى: 2MB
-                </p>
               </div>
             </div>
 

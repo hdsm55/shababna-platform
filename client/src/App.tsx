@@ -33,8 +33,10 @@ const Volunteers = lazy(() => import('./pages/Volunteers'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Auth Pages
+const AuthWelcome = lazy(() => import('./pages/auth/AuthWelcome'));
 const Login = lazy(() => import('./pages/auth/Login'));
 const Register = lazy(() => import('./pages/auth/Register'));
+const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'));
 const CreateAdmin = lazy(() => import('./pages/auth/CreateAdmin'));
 
 // Dashboard Pages
@@ -232,6 +234,14 @@ function App() {
 
                           {/* Auth Routes */}
                           <Route
+                            path="/auth"
+                            element={
+                              <Suspense fallback={<LoadingFallback />}>
+                                <AuthWelcome />
+                              </Suspense>
+                            }
+                          />
+                          <Route
                             path="/login"
                             element={
                               <Suspense fallback={<LoadingFallback />}>
@@ -244,6 +254,14 @@ function App() {
                             element={
                               <Suspense fallback={<LoadingFallback />}>
                                 <Register />
+                              </Suspense>
+                            }
+                          />
+                          <Route
+                            path="/forgot-password"
+                            element={
+                              <Suspense fallback={<LoadingFallback />}>
+                                <ForgotPassword />
                               </Suspense>
                             }
                           />

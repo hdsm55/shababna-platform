@@ -5,8 +5,7 @@ import DashboardLayout from '../../../layouts/DashboardLayout';
 import Button from '../../../components/common/Button';
 import Input from '../../../components/common/Input';
 import Alert from '../../../components/common/Alert';
-import ImageUpload from '../../../components/common/ImageUpload';
-import { Upload, X, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const NewEvent: React.FC = () => {
@@ -18,7 +17,6 @@ const NewEvent: React.FC = () => {
     start_date: '',
     end_date: '',
     capacity: '1', // القيمة الافتراضية 1
-    image_url: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -69,7 +67,6 @@ const NewEvent: React.FC = () => {
         max_attendees: Number(form.capacity),
         attendees: 0,
         status: 'upcoming' as const,
-        image_url: form.image_url,
       };
       await createEvent(payload);
       setSuccess(true);
@@ -102,7 +99,7 @@ const NewEvent: React.FC = () => {
         </div>
 
         {/* Form */}
-        <div className="bg-white rounded-xl shadow-sm border">
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 backdrop-blur-none">
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {error && <Alert type="error">{error}</Alert>}
 
@@ -235,20 +232,6 @@ const NewEvent: React.FC = () => {
                   />
                 </div>
               </div>
-            </div>
-
-            {/* Event Image */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900">
-                صورة الفعالية
-              </h3>
-              <ImageUpload
-                value={form.image_url}
-                onChange={(url) => setForm({ ...form, image_url: url })}
-                onError={(error) => setError(error)}
-                label="صورة الفعالية"
-                placeholder="اختر صورة للفعالية..."
-              />
             </div>
 
             {/* Event Details */}

@@ -109,7 +109,7 @@ const ToastContainer: React.FC = () => {
   };
 
   return (
-    <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
+    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 space-y-2 max-w-sm w-full px-4">
       <AnimatePresence>
         {toasts.map((toast) => {
           const direction =
@@ -120,9 +120,9 @@ const ToastContainer: React.FC = () => {
           return (
             <motion.div
               key={toast.id}
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 40 }}
+              initial={{ opacity: 0, y: -50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -50 }}
               transition={{ duration: 0.35, type: 'spring' }}
               className={`border rounded-lg shadow-lg p-4 backdrop-blur-sm flex items-start gap-3 ${getClasses(
                 toast.type

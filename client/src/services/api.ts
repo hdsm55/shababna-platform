@@ -64,9 +64,14 @@ http.interceptors.response.use(
     }
 
     if (error.response?.status === 401) {
-      // Token expired or invalid, redirect to login
-      useAuthStore.getState().logout();
-      window.location.href = '/login';
+      // Token expired or invalid, redirect to auth welcome page
+      const currentPath = window.location.pathname;
+
+      // Only redirect if not already on auth pages
+      if (!currentPath.startsWith('/auth') && currentPath !== '/login' && currentPath !== '/register') {
+        useAuthStore.getState().logout();
+        window.location.href = '/auth';
+      }
     }
 
     return Promise.reject(error);
@@ -100,6 +105,20 @@ export const registerApi = async (data: {
     return res.data;
   } catch (error: any) {
     console.error('❌ Register API Error:', error);
+    throw error;
+  }
+};
+
+export const forgotPasswordApi = async (email: string) => {
+  console.log('🔍 API: إرسال طلب نسيان كلمة المرور إلى:', `${http.defaults.baseURL}/auth/forgot-password`);
+  console.log('🔍 API: البريد الإلكتروني:', email);
+
+  try {
+    const res = await http.post('/auth/forgot-password', { email });
+    console.log('🔍 API: استجابة الخادم:', res.data);
+    return res.data;
+  } catch (error: any) {
+    console.error('❌ Forgot Password API Error:', error);
     throw error;
   }
 };

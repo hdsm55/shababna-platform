@@ -385,6 +385,22 @@ const Register: React.FC = () => {
             className="w-full max-w-md"
           >
             <Card className="p-8 shadow-2xl rounded-2xl border-0 backdrop-blur-sm bg-white/95">
+              {/* Back Button */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mb-6"
+              >
+                <button
+                  onClick={() => navigate('/auth')}
+                  className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  <ArrowRight className="w-5 h-5 ml-2 rotate-180" />
+                  العودة للصفحة الرئيسية
+                </button>
+              </motion.div>
+
               {/* Header */}
               <motion.div
                 initial={{ opacity: 0, y: -20 }}

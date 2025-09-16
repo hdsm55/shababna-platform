@@ -135,25 +135,30 @@ export const createProgram = async (req, res) => {
             category,
             goal_amount,
             current_amount = 0,
-            participants_count = 0
+            status = 'active'
         } = req.body;
 
-        // معالجة الصورة المرفوعة
-        let image_url = null;
-        if (req.file) {
-            image_url = `/uploads/${req.file.filename}`;
-            console.log('📸 تم رفع الصورة:', image_url);
-        }
+        console.log('📋 بيانات البرنامج المستلمة:', {
+            title,
+            description,
+            start_date,
+            end_date,
+            category,
+            goal_amount,
+            current_amount,
+            status
+        });
 
         const result = await query(`
-      INSERT INTO programs (title, description, start_date, end_date, category, goal_amount, current_amount, participants_count, image_url)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-      RETURNING id, title, description, start_date, end_date, category, goal_amount, current_amount, participants_count, image_url, created_at
-    `, [title, description, start_date, end_date, category, goal_amount, current_amount, participants_count, image_url]);
+      INSERT INTO programs (title, description, start_date, end_date, category, goal_amount, current_amount, status)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING id, title, description, start_date, end_date, category, goal_amount, current_amount, status, created_at
+    `, [title, description, start_date, end_date, category, goal_amount, current_amount, status]);
 
+        console.log('✅ تم إنشاء البرنامج بنجاح:', result.rows[0]);
         return successResponse(res, result.rows[0], 'تم إضافة البرنامج بنجاح');
     } catch (error) {
-        console.error('Program creation error:', error);
+        console.error('❌ خطأ في إنشاء البرنامج:', error);
         return errorResponse(res, 'خطأ في إضافة البرنامج', 500, error);
     }
 };
