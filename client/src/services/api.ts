@@ -123,6 +123,32 @@ export const forgotPasswordApi = async (email: string) => {
   }
 };
 
+export const validateResetTokenApi = async (token: string) => {
+  console.log('🔍 API: التحقق من توكن إعادة تعيين كلمة المرور:', `${http.defaults.baseURL}/auth/reset-password`);
+
+  try {
+    const res = await http.get(`/auth/reset-password?token=${encodeURIComponent(token)}`);
+    console.log('🔍 API: استجابة الخادم:', res.data);
+    return res.data;
+  } catch (error: any) {
+    console.error('❌ Validate Reset Token API Error:', error);
+    throw error;
+  }
+};
+
+export const resetPasswordApi = async (token: string, password: string) => {
+  console.log('🔍 API: إعادة تعيين كلمة المرور:', `${http.defaults.baseURL}/auth/reset-password`);
+
+  try {
+    const res = await http.post('/auth/reset-password', { token, password });
+    console.log('🔍 API: استجابة الخادم:', res.data);
+    return res.data;
+  } catch (error: any) {
+    console.error('❌ Reset Password API Error:', error);
+    throw error;
+  }
+};
+
 // Enhanced retry wrapper for API calls
 export const withRetry = async <T>(
   apiCall: () => Promise<T>,

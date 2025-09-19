@@ -92,7 +92,7 @@ export const fetchContactForms = async (params?: {
 }) => {
   try {
     console.log('🔍 جلب رسائل التواصل...', params);
-    const { data } = await api.get('/forms/contact-forms', { params });
+    const { data } = await api.get('/contact-forms', { params });
     console.log('✅ استجابة رسائل التواصل:', data);
     return data;
   } catch (error) {
@@ -103,8 +103,15 @@ export const fetchContactForms = async (params?: {
 
 // تحديث حالة قراءة رسالة التواصل
 export const updateContactFormReadStatus = async (id: string, isRead: boolean) => {
-  const { data } = await api.patch(`/forms/contact-forms/${id}/read`, { is_read: isRead });
-  return data;
+  try {
+    console.log('🔄 تحديث حالة القراءة:', { id, isRead });
+    const { data } = await api.patch(`/contact-forms/${id}/read`, { is_read: isRead });
+    console.log('✅ تم تحديث حالة القراءة بنجاح:', data);
+    return data;
+  } catch (error) {
+    console.error('❌ خطأ في تحديث حالة القراءة:', error);
+    throw error;
+  }
 };
 
 // جلب طلبات الانضمام

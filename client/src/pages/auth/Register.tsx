@@ -19,12 +19,14 @@ import {
   Heart,
   Star,
   Globe,
+  Home,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { Button } from '../../components/ui/Button/Button';
 import { Card } from '../../components/ui/Card/Card';
 import { Input } from '../../components/ui/Input/Input';
-import Alert from '../../components/common/Alert';
+// تم استبدال التنبيهات المحلية بالتوست العالمي
+import { useToast } from '../../hooks/useToast';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import PasswordStrengthIndicator from '../../components/common/PasswordStrengthIndicator';
 import PasswordMatchIndicator from '../../components/common/PasswordMatchIndicator';
@@ -50,6 +52,7 @@ const Register: React.FC = () => {
   const [registerError, setRegisterError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const { showSuccess, showError } = useToast();
   const [formStep, setFormStep] = useState(0);
   const [progress, setProgress] = useState(0);
   const isRTL = i18n.dir() === 'rtl';
@@ -106,6 +109,14 @@ const Register: React.FC = () => {
         setIsSuccess(true);
         setFormStep(2);
 
+        // إشعار نجاح عالمي
+        showSuccess(
+          t(
+            'auth.register.successToast',
+            'تم إنشاء الحساب وجاري توجيهك إلى الصفحة الرئيسية'
+          )
+        );
+
         // تأخير قصير لإظهار رسالة النجاح
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
@@ -130,6 +141,13 @@ const Register: React.FC = () => {
       } else {
         setRegisterError(response.message || 'فشل في إنشاء الحساب');
         setFormStep(0);
+        showError(
+          response.message ||
+            t(
+              'auth.register.errorGeneric',
+              'يرجى التحقق من البيانات والمحاولة مجددًا.'
+            )
+        );
       }
     } catch (error: any) {
       setRegisterError(
@@ -139,6 +157,13 @@ const Register: React.FC = () => {
         )
       );
       setFormStep(0);
+      showError(
+        error?.message ||
+          t(
+            'auth.register.errorGeneric',
+            'يرجى التحقق من البيانات والمحاولة مجددًا.'
+          )
+      );
     } finally {
       setIsLoading(false);
     }
@@ -393,10 +418,10 @@ const Register: React.FC = () => {
                 className="mb-6"
               >
                 <button
-                  onClick={() => navigate('/auth')}
+                  onClick={() => navigate('/')}
                   className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
                 >
-                  <ArrowRight className="w-5 h-5 ml-2 rotate-180" />
+                  <Home className="w-5 h-5 ml-2" />
                   العودة للصفحة الرئيسية
                 </button>
               </motion.div>
@@ -437,42 +462,7 @@ const Register: React.FC = () => {
                 />
               </motion.div>
 
-              {/* Success Message */}
-              <AnimatePresence>
-                {isSuccess && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    className="mb-6"
-                  >
-                    <Alert type="success" className="flex items-center">
-                      <CheckCircle className="w-5 h-5 mr-2" />
-                      {t(
-                        'auth.register.success',
-                        'تم إنشاء الحساب بنجاح! جاري توجيهك إلى الصفحة الرئيسية...'
-                      )}
-                    </Alert>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Error Alert */}
-              <AnimatePresence>
-                {registerError && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="mb-6"
-                  >
-                    <Alert type="error" className="flex items-center">
-                      <AlertCircle className="w-5 h-5 mr-2" />
-                      {registerError}
-                    </Alert>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {/* تم نقل رسائل النجاح/الخطأ إلى التوست العالمي */}
 
               {/* Register Form */}
               <motion.form

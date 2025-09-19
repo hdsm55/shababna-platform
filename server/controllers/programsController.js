@@ -135,8 +135,12 @@ export const createProgram = async (req, res) => {
             category,
             goal_amount,
             current_amount = 0,
+            participants_count = 0,
             status = 'active'
         } = req.body;
+
+        // استخدام الصورة الافتراضية للبرامج
+        const image_url = '/images/programs-default.jpg';
 
         console.log('📋 بيانات البرنامج المستلمة:', {
             title,
@@ -146,14 +150,16 @@ export const createProgram = async (req, res) => {
             category,
             goal_amount,
             current_amount,
-            status
+            participants_count,
+            status,
+            image_url
         });
 
         const result = await query(`
-      INSERT INTO programs (title, description, start_date, end_date, category, goal_amount, current_amount, status)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-      RETURNING id, title, description, start_date, end_date, category, goal_amount, current_amount, status, created_at
-    `, [title, description, start_date, end_date, category, goal_amount, current_amount, status]);
+            INSERT INTO programs (title, description, start_date, end_date, category, goal_amount, current_amount, participants_count, status, image_url)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            RETURNING id, title, description, start_date, end_date, category, goal_amount, current_amount, participants_count, status, image_url, created_at
+        `, [title, description, start_date, end_date, category, goal_amount, current_amount, participants_count, status, image_url]);
 
         console.log('✅ تم إنشاء البرنامج بنجاح:', result.rows[0]);
         return successResponse(res, result.rows[0], 'تم إضافة البرنامج بنجاح');
@@ -178,26 +184,17 @@ export const updateProgram = async (req, res) => {
             participants_count
         } = req.body;
 
-        // معالجة الصورة المرفوعة
-        let image_url = null;
-        if (req.file) {
-            image_url = `/uploads/${req.file.filename}`;
-            console.log('📸 تم رفع الصورة الجديدة:', image_url);
-        }
+        // استخدام الصورة الافتراضية للبرامج
+        const image_url = '/images/programs-default.jpg';
 
         // بناء استعلام التحديث
-        let updateQuery = `
+        const updateQuery = `
             UPDATE programs
             SET title = $1, description = $2, start_date = $3, end_date = $4,
-                category = $5, goal_amount = $6, current_amount = $7, participants_count = $8
+                category = $5, goal_amount = $6, current_amount = $7, participants_count = $8,
+                image_url = $9
         `;
-        let queryParams = [title, description, start_date, end_date, category, goal_amount, current_amount, participants_count];
-
-        // إضافة الصورة إذا كانت موجودة
-        if (image_url) {
-            updateQuery += `, image_url = $${queryParams.length + 1}`;
-            queryParams.push(image_url);
-        }
+        const queryParams = [title, description, start_date, end_date, category, goal_amount, current_amount, participants_count, image_url];
 
         updateQuery += ` WHERE id = $${queryParams.length + 1} RETURNING *`;
         queryParams.push(id);

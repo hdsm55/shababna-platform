@@ -4,7 +4,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { Suspense, lazy, useEffect } from 'react';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import BackendIdleHandler from './components/common/BackendIdleHandler';
-import { ToastProvider } from './components/common/Toast';
+import AlertProvider from './components/common/AlertProvider';
 import { ThemeProvider } from './components/ThemeProvider';
 import Layout from './components/layout/Layout';
 import DashboardLayout from './layouts/DashboardLayout';
@@ -37,6 +37,7 @@ const AuthWelcome = lazy(() => import('./pages/auth/AuthWelcome'));
 const Login = lazy(() => import('./pages/auth/Login'));
 const Register = lazy(() => import('./pages/auth/Register'));
 const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/auth/ResetPassword'));
 const CreateAdmin = lazy(() => import('./pages/auth/CreateAdmin'));
 
 // Dashboard Pages
@@ -51,10 +52,12 @@ const DashboardRegistrants = lazy(
 const DashboardContactForms = lazy(
   () => import('./pages/dashboard/ContactForms')
 );
+const DashboardJoinRequests = lazy(
+  () => import('./pages/dashboard/JoinRequests')
+);
 const DashboardAnalytics = lazy(() => import('./pages/dashboard/Analytics'));
 const DashboardActivities = lazy(() => import('./pages/dashboard/Activities'));
 const DashboardReports = lazy(() => import('./pages/dashboard/Reports'));
-const DashboardSettings = lazy(() => import('./pages/dashboard/Settings'));
 
 // Create QueryClient with optimized settings
 const queryClient = new QueryClient({
@@ -106,7 +109,7 @@ function App() {
             <HelmetProvider>
               <QueryClientProvider client={queryClient}>
                 <ThemeProvider>
-                  <ToastProvider>
+                  <AlertProvider>
                     <BackendIdleHandler>
                       <HashRouter
                         future={{
@@ -266,6 +269,14 @@ function App() {
                             }
                           />
                           <Route
+                            path="/reset-password"
+                            element={
+                              <Suspense fallback={<LoadingFallback />}>
+                                <ResetPassword />
+                              </Suspense>
+                            }
+                          />
+                          <Route
                             path="/create-admin"
                             element={
                               <Suspense fallback={<LoadingFallback />}>
@@ -348,6 +359,16 @@ function App() {
                               }
                             />
                             <Route
+                              path="/dashboard/join-requests"
+                              element={
+                                <ProtectedRoute requiredRole="admin">
+                                  <Suspense fallback={<LoadingFallback />}>
+                                    <DashboardJoinRequests />
+                                  </Suspense>
+                                </ProtectedRoute>
+                              }
+                            />
+                            <Route
                               path="/dashboard/analytics"
                               element={
                                 <ProtectedRoute requiredRole="admin">
@@ -377,21 +398,11 @@ function App() {
                                 </ProtectedRoute>
                               }
                             />
-                            <Route
-                              path="/dashboard/settings"
-                              element={
-                                <ProtectedRoute requiredRole="admin">
-                                  <Suspense fallback={<LoadingFallback />}>
-                                    <DashboardSettings />
-                                  </Suspense>
-                                </ProtectedRoute>
-                              }
-                            />
                           </Route>
                         </Routes>
                       </HashRouter>
                     </BackendIdleHandler>
-                  </ToastProvider>
+                  </AlertProvider>
                 </ThemeProvider>
               </QueryClientProvider>
             </HelmetProvider>

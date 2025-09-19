@@ -1,34 +1,38 @@
+/* eslint-disable */
+// cspell:disable-file
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Users, Globe, Calendar, TrendingUp } from 'lucide-react';
+import { useSiteStats } from '../../hooks/useSiteStats';
 
 const StatsSection: React.FC = () => {
   const { t } = useTranslation();
 
-  // استخدام البيانات من الترجمة
+  const { data, loading, countriesCount, anyZero } = useSiteStats();
+
   const stats = [
     {
       icon: Users,
-      number: t('home.stats.membersNumber'),
+      number: data ? new Intl.NumberFormat('ar-SA').format(data.users) : '—',
       label: t('home.stats.members'),
       color: 'primary',
     },
     {
       icon: Globe,
-      number: t('home.stats.countriesNumber'),
+      number: new Intl.NumberFormat('ar-SA').format(countriesCount),
       label: t('home.stats.countries'),
       color: 'secondary',
     },
     {
       icon: Calendar,
-      number: t('home.stats.eventsNumber'),
+      number: data ? new Intl.NumberFormat('ar-SA').format(data.events) : '—',
       label: t('home.stats.events'),
       color: 'primary',
     },
     {
       icon: TrendingUp,
-      number: t('home.stats.programsNumber'),
+      number: data ? new Intl.NumberFormat('ar-SA').format(data.programs) : '—',
       label: t('home.stats.programs'),
       color: 'secondary',
     },
@@ -68,6 +72,14 @@ const StatsSection: React.FC = () => {
     <section className="py-16 bg-gradient-to-br from-neutral-50 to-white relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-primary-50/30 to-neutral-50/30" />
       <div className="relative max-w-6xl mx-auto px-6">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-dark-900">
+            {anyZero ? 'أهدافنا' : 'أرقامنا'}
+          </h2>
+          <p className="text-sm text-dark-500 mt-2">
+            نظرة سريعة على واقع المنصة اليوم.
+          </p>
+        </div>
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -89,11 +101,26 @@ const StatsSection: React.FC = () => {
                 <stat.icon className="w-8 h-8 text-white" />
               </div>
               <div className="text-2xl font-bold text-dark-900 mb-2">
-                {stat.number}
+                {loading ? '…' : stat.number}
               </div>
               <div className="text-sm text-dark-600 font-medium">
                 {stat.label}
               </div>
+              {!loading &&
+                data &&
+                index !== 1 &&
+                ((index === 0 && data.users === 0) ||
+                  (index === 2 && data.events === 0) ||
+                  (index === 3 && data.programs === 0)) && (
+                  <div className="text-xs text-dark-500 mt-1">
+                    {index === 0 &&
+                      t('home.stats.noMembers', 'لا يوجد أعضاء حالياً')}
+                    {index === 2 &&
+                      t('home.stats.noEvents', 'لا توجد فعاليات حالياً')}
+                    {index === 3 &&
+                      t('home.stats.noPrograms', 'لا توجد برامج حالياً')}
+                  </div>
+                )}
             </motion.div>
           ))}
         </motion.div>

@@ -1,3 +1,5 @@
+/* eslint-disable */
+// cspell:disable-file
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -6,7 +8,7 @@ import {
   HeartHandshake,
   Lightbulb,
   Globe,
-  CheckCircle,
+  Check,
   ArrowRight,
 } from 'lucide-react';
 import { Card } from '../ui/Card/Card';
@@ -27,6 +29,20 @@ const FeatureCard = memo(
       },
     };
 
+    // تحديد الروابط المناسبة لكل بطاقة
+    const getNavigationPath = () => {
+      switch (index) {
+        case 0: // مجتمع عالمي
+          return '/about';
+        case 1: // برامج تطويرية
+          return '/programs';
+        case 2: // ورش وفعاليات
+          return '/events';
+        default:
+          return '/programs';
+      }
+    };
+
     return (
       <motion.div
         variants={itemVariants}
@@ -37,40 +53,49 @@ const FeatureCard = memo(
       >
         <Card
           variant="elevated"
-          className="h-full p-6 text-center hover:transform hover:-translate-y-1 transition-all duration-200 border-0 shadow-md hover:shadow-lg"
+          className="h-full p-6 text-center hover:transform hover:-translate-y-1 transition-all duration-300 border-0 shadow-md hover:shadow-lg group"
         >
+          {/* الأيقونة */}
           <div
-            className={`w-16 h-16 bg-gradient-to-br ${feature.gradient} rounded-xl flex items-center justify-center mx-auto mb-4 shadow-md`}
+            className={`w-16 h-16 bg-gradient-to-br ${feature.gradient} rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg group-hover:scale-110 transition-all duration-300`}
           >
             <feature.icon className="w-8 h-8 text-white" />
           </div>
-          <h3 className="text-xl font-bold text-dark-500 mb-3">
+
+          {/* العنوان */}
+          <h3 className="text-xl font-bold text-dark-900 mb-4 leading-tight">
             {feature.title}
           </h3>
-          <p className="text-dark-600 mb-4 leading-relaxed text-sm">
+
+          {/* الوصف */}
+          <p className="text-dark-600 mb-5 leading-relaxed text-sm line-clamp-2">
             {feature.description}
           </p>
-          <ul className="space-y-2 mb-4">
-            {feature.features.map((item: string, idx: number) => (
+
+          {/* قائمة النقاط */}
+          <ul className="space-y-2.5 mb-6">
+            {feature.features.slice(0, 3).map((item: string, idx: number) => (
               <li
                 key={idx}
-                className="flex items-center justify-center gap-2 text-xs text-dark-600"
+                className="flex items-center gap-2.5 text-sm text-dark-600"
               >
-                <CheckCircle className="w-3 h-3 text-primary-500 flex-shrink-0" />
-                {item}
+                <Check className="w-4 h-4 text-primary-500 flex-shrink-0" />
+                <span className="text-right">{item}</span>
               </li>
             ))}
           </ul>
+
+          {/* الزر */}
           <Button
             variant="outline"
             size="sm"
-            className="mt-4 w-full py-2 text-xs font-semibold border-2 border-dark-300 hover:bg-dark-50 text-dark-700"
-            onClick={() => navigate('/programs')}
+            className="w-full py-2.5 text-sm font-semibold border-2 border-primary-300 hover:bg-primary-50 hover:border-primary-400 text-primary-700 transition-all duration-200"
+            onClick={() => navigate(getNavigationPath())}
           >
             {i18n.isInitialized
               ? t('common.learnMore', 'اعرف المزيد')
               : 'اعرف المزيد'}
-            <ArrowRight className="w-3 h-3 mr-1" />
+            <ArrowRight className="w-4 h-4 mr-1" />
           </Button>
         </Card>
       </motion.div>
@@ -128,30 +153,32 @@ const FeaturesSection: React.FC = () => {
   };
 
   return (
-    <section className="py-16 bg-white relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-primary-50/20 to-secondary-50/20" />
+    <section className="py-16 bg-gradient-to-br from-neutral-50 to-white relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-r from-primary-50/30 to-neutral-50/30" />
       <div className="relative max-w-6xl mx-auto px-6">
+        {/* العنوان والوصف - متناسق مع قسم الإحصائيات */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
           transition={{ duration: 0.3 }}
-          className="text-center mb-12"
+          className="text-center mb-8"
         >
-          <h2 className="text-2xl md:text-3xl font-bold text-dark-500 mb-4">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-dark-900">
             {t('home.features.title')}
           </h2>
-          <p className="text-base md:text-lg text-dark-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-sm text-dark-500 mt-2">
             {t('home.features.subtitle')}
           </p>
         </motion.div>
 
+        {/* البطاقات */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-50px' }}
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {features.map((feature, index) => (
             <FeatureCard key={index} feature={feature} index={index} />

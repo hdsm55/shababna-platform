@@ -1,7 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { UserPlus, LogIn, Heart, Star, Users, Lightbulb } from 'lucide-react';
+import {
+  UserPlus,
+  LogIn,
+  Heart,
+  Star,
+  Users,
+  Lightbulb,
+  Home,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const AuthWelcome: React.FC = () => {
@@ -10,93 +18,115 @@ const AuthWelcome: React.FC = () => {
 
   const features = [
     {
-      icon: <Users className="w-6 h-6" />,
+      icon: <Users className="w-5 h-5" />,
       title: 'مجتمع نشط',
       description: 'انضم إلى مجتمع من الشباب المتحمسين للتغيير',
     },
     {
-      icon: <Lightbulb className="w-6 h-6" />,
+      icon: <Lightbulb className="w-5 h-5" />,
       title: 'فرص التطوير',
       description: 'احصل على فرص تدريبية وتطويرية متنوعة',
     },
     {
-      icon: <Heart className="w-6 h-6" />,
+      icon: <Heart className="w-5 h-5" />,
       title: 'التطوع والعطاء',
       description: 'شارك في الأنشطة التطوعية وخدمة المجتمع',
     },
     {
-      icon: <Star className="w-6 h-6" />,
+      icon: <Star className="w-5 h-5" />,
       title: 'الإنجاز والتميز',
       description: 'احصل على شهادات تقدير ومكافآت معنوية',
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-8"
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
+      <div className="max-w-4xl w-full">
+        {/* زر العودة للصفحة الرئيسية */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-6"
+        >
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 text-primary-600 hover:text-primary-700 transition-colors text-sm font-medium"
           >
-            <img
-              src="/images/logo.svg"
-              alt="شبابنا"
-              className="h-20 w-20 object-contain mx-auto mb-6 logo"
-              style={{ backgroundColor: 'transparent' }}
-            />
-            <h1 className="text-4xl md:text-5xl font-bold text-primary-700 mb-4">
-              مرحباً بك في شبابنا
-            </h1>
-            <p className="text-xl text-neutral-600 max-w-2xl mx-auto">
-              منصة الشباب الأولى للتطوع والتطوير والانخراط في خدمة المجتمع
-            </p>
-          </motion.div>
-        </div>
+            <Home className="w-4 h-4" />
+            العودة للصفحة الرئيسية
+          </button>
+        </motion.div>
 
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12"
+        >
+          <img
+            src="/images/logo-shababna.png"
+            alt="شبابنا"
+            className="h-16 w-16 object-contain mx-auto mb-6"
+          />
+          <h1 className="text-3xl md:text-4xl font-bold text-primary-700 mb-4">
+            مرحباً بك في شبابنا
+          </h1>
+          <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
+            منصة الشباب الأولى للتطوع والتطوير والانخراط في خدمة المجتمع
+          </p>
+        </motion.div>
+
+        {/* Features Grid - مبسطة */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12"
+        >
           {features.map((feature, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow"
+              transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
+              className="bg-white border border-neutral-200 rounded-lg p-4 text-center hover:shadow-md transition-shadow"
             >
-              <div className="text-blue-600 mb-4">{feature.icon}</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <div className="text-primary-600 mb-3 flex justify-center">
+                {feature.icon}
+              </div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">
                 {feature.title}
               </h3>
-              <p className="text-gray-600 text-sm">{feature.description}</p>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                {feature.description}
+              </p>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        {/* Call to Action */}
+        {/* Call to Action - مبسط */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
           className="text-center"
         >
-          <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <div className="bg-white border border-neutral-200 rounded-xl p-8 max-w-md mx-auto">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
               انضم إلى مجتمعنا اليوم
             </h2>
-            <p className="text-gray-600 mb-8">
+            <p className="text-gray-600 mb-8 text-sm">
               ابدأ رحلتك معنا وكن جزءاً من التغيير الإيجابي
             </p>
 
             <div className="space-y-4">
               <button
                 onClick={() => navigate('/register')}
-                className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-primary-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2"
               >
-                <UserPlus className="w-5 h-5" />
+                <UserPlus className="w-4 h-4" />
                 إنشاء حساب جديد
               </button>
 
@@ -111,20 +141,19 @@ const AuthWelcome: React.FC = () => {
 
               <button
                 onClick={() => navigate('/login')}
-                className="w-full border-2 border-blue-600 text-blue-600 py-3 px-6 rounded-lg font-semibold hover:bg-blue-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2"
+                className="w-full text-primary-600 py-2 px-6 text-sm font-medium hover:text-primary-700 transition-colors"
               >
-                <LogIn className="w-5 h-5" />
                 تسجيل الدخول
               </button>
             </div>
 
-            <p className="text-sm text-gray-500 mt-6">
+            <p className="text-xs text-gray-500 mt-6">
               بالانضمام إلى شبابنا، فإنك توافق على{' '}
-              <a href="#" className="text-blue-600 hover:underline">
+              <a href="#" className="text-primary-600 hover:underline">
                 شروط الاستخدام
               </a>{' '}
               و{' '}
-              <a href="#" className="text-blue-600 hover:underline">
+              <a href="#" className="text-primary-600 hover:underline">
                 سياسة الخصوصية
               </a>
             </p>

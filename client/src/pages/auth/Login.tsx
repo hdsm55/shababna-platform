@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, ArrowRight, Home } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../store/authStore';
 import { loginApi } from '../../services/api';
@@ -79,10 +79,10 @@ const Login: React.FC = () => {
           {/* العودة */}
           <div className="mb-6">
             <button
-              onClick={() => navigate('/auth')}
+              onClick={() => navigate('/')}
               className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
             >
-              <ArrowRight className="w-5 h-5 ml-2 rotate-180" />
+              <Home className="w-5 h-5 ml-2" />
               العودة للصفحة الرئيسية
             </button>
           </div>

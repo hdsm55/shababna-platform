@@ -6,8 +6,12 @@ import SEO from '../components/common/SEO';
 import { Button } from '../components/ui/Button/Button';
 import { Card } from '../components/ui/Card/Card';
 import { Input } from '../components/ui/Input/Input';
-import Alert from '../components/common/Alert';
-import UnifiedLoader from '../components/common/UnifiedLoader';
+import { useAlert } from '../components/common/AlertProvider';
+import {
+  useUnifiedLoading,
+  PageLoader,
+} from '../components/common/UnifiedLoadingStates';
+import UnifiedAlert from '../components/common/UnifiedAlert';
 import { fetchEventById } from '../services/eventsApi';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -38,7 +42,6 @@ const EventDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const isRTL = i18n.dir() === 'rtl';
 
-  const [showRegistration, setShowRegistration] = useState(false);
   const [registrationForm, setRegistrationForm] = useState<RegistrationForm>({
     firstName: '',
     lastName: '',
@@ -46,10 +49,14 @@ const EventDetail: React.FC = () => {
     phone: '',
     message: '',
   });
-  const [registrationStatus, setRegistrationStatus] = useState<
-    'idle' | 'loading' | 'success' | 'error'
-  >('idle');
-  const [registrationMessage, setRegistrationMessage] = useState('');
+  const { success, error: showError } = useAlert();
+  const { withButtonLoading } = useUnifiedLoading();
+
+  // Local alert state for form notifications
+  const [localAlert, setLocalAlert] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
 
   // Fetch event details
   const {
@@ -166,55 +173,58 @@ const EventDetail: React.FC = () => {
 
   const handleRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
-    setRegistrationStatus('loading');
 
-    try {
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
-        }/events/${id}/register`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            first_name: registrationForm.firstName,
-            last_name: registrationForm.lastName,
-            email: registrationForm.email,
-            phone: registrationForm.phone,
-            message: registrationForm.message,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('فشل في التسجيل');
-      }
-
-      const result = await response.json();
-
-      if (result.success) {
-        setRegistrationStatus('success');
-        setRegistrationMessage(
-          'تم التسجيل بنجاح! ستتلقى تأكيداً عبر البريد الإلكتروني.'
+    await withButtonLoading(async () => {
+      try {
+        const response = await fetch(
+          `${
+            import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+          }/events/${id}/register`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              first_name: registrationForm.firstName,
+              last_name: registrationForm.lastName,
+              email: registrationForm.email,
+              phone: registrationForm.phone,
+              message: registrationForm.message,
+            }),
+          }
         );
-        setShowRegistration(false);
-        setRegistrationForm({
-          firstName: '',
-          lastName: '',
-          email: '',
-          phone: '',
-          message: '',
+
+        if (!response.ok) {
+          throw new Error('فشل في التسجيل');
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+          setLocalAlert({
+            type: 'success',
+            message:
+              'تم تسجيلك في الفعالية بنجاح! ستتلقى تأكيداً عبر البريد الإلكتروني.',
+          });
+          setRegistrationForm({
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+            message: '',
+          });
+        } else {
+          throw new Error(result.message || 'حدث خطأ أثناء التسجيل');
+        }
+      } catch (err) {
+        console.error('Registration error:', err);
+        setLocalAlert({
+          type: 'error',
+          message: 'حدث خطأ أثناء التسجيل. يرجى المحاولة مرة أخرى.',
         });
-      } else {
-        throw new Error(result.message || 'حدث خطأ أثناء التسجيل');
       }
-    } catch (error) {
-      console.error('Registration error:', error);
-      setRegistrationStatus('error');
-      setRegistrationMessage('حدث خطأ أثناء التسجيل. يرجى المحاولة مرة أخرى.');
-    }
+    });
   };
 
   const handleInputChange = (
@@ -228,23 +238,23 @@ const EventDetail: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50">
-        <UnifiedLoader
-          variant="brand"
-          size="lg"
-          fullScreen={true}
-          message="جاري تحميل تفاصيل الفعالية..."
-        />
-      </div>
+      <PageLoader
+        message="جاري تحميل تفاصيل الفعالية..."
+        fullScreen={true}
+        variant="brand"
+      />
     );
   }
 
   if (error || !event) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50">
-        <Alert type="error">
-          {t('eventDetail.error', 'حدث خطأ أثناء جلب تفاصيل الفعالية.')}
-        </Alert>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h3 className="text-red-800 font-semibold mb-2">خطأ في التحميل</h3>
+          <p className="text-red-700">
+            {t('eventDetail.error', 'حدث خطأ أثناء جلب تفاصيل الفعالية.')}
+          </p>
+        </div>
       </div>
     );
   }
@@ -260,8 +270,8 @@ const EventDetail: React.FC = () => {
         type="event"
       />
 
-      {/* Enhanced Back Button */}
-      <section className="container mx-auto px-4 py-6">
+      {/* Back Button */}
+      <section className="container mx-auto px-4 py-4">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -279,18 +289,19 @@ const EventDetail: React.FC = () => {
         </motion.div>
       </section>
 
-      {/* Enhanced Event Header */}
-      <section className="container mx-auto px-4 py-8">
+      {/* Main Content Layout */}
+      <div className="container mx-auto px-4 pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Enhanced Event Image */}
-          <div className="lg:col-span-2">
+          {/* Left Column - Event Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Event Image */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               className="relative"
             >
-              <div className="relative h-96 rounded-2xl shadow-2xl overflow-hidden">
+              <div className="relative h-80 md:h-96 rounded-2xl shadow-2xl overflow-hidden">
                 <img
                   src={event.image_url || '/images/events-default.jpg'}
                   alt={event.title}
@@ -302,7 +313,7 @@ const EventDetail: React.FC = () => {
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-30"></div>
 
-                {/* Floating Action Buttons */}
+                {/* Floating Elements */}
                 <div className="absolute top-4 right-4 flex gap-2">
                   <Button
                     variant="outline"
@@ -313,7 +324,6 @@ const EventDetail: React.FC = () => {
                   </Button>
                 </div>
 
-                {/* Status Badge */}
                 <div className="absolute top-4 left-4">
                   <span
                     className={`px-4 py-2 rounded-full text-sm font-medium border ${getStatusColor(
@@ -324,7 +334,6 @@ const EventDetail: React.FC = () => {
                   </span>
                 </div>
 
-                {/* Days Until Badge */}
                 {event.status === 'upcoming' && (
                   <div className="absolute bottom-4 left-4">
                     <span className="bg-white bg-opacity-95 text-gray-800 px-4 py-2 rounded-full text-sm font-medium">
@@ -334,57 +343,64 @@ const EventDetail: React.FC = () => {
                 )}
               </div>
             </motion.div>
-          </div>
 
-          {/* Enhanced Event Info Card */}
-          <div className="lg:col-span-1">
+            {/* Event Information Card */}
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <Card className="p-6 sticky top-6 shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-                {/* Category Badge */}
-                <div className="flex items-center justify-between mb-6">
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-medium ${getCategoryColor(
-                      event.category
-                    )}`}
-                  >
-                    {event.category}
-                  </span>
+              <Card className="p-8 shadow-xl border-0">
+                <div className="mb-8">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span
+                      className={`px-4 py-2 rounded-full text-sm font-medium ${getCategoryColor(
+                        event.category
+                      )}`}
+                    >
+                      {event.category}
+                    </span>
+                  </div>
+                  <h1 className="text-4xl font-bold text-gray-900 mb-6">
+                    {event.title}
+                  </h1>
                 </div>
 
-                {/* Event Details */}
-                <div className="space-y-4 mb-6">
-                  <div className="flex items-center text-gray-600 p-3 bg-blue-50 rounded-lg">
-                    <Calendar className="w-5 h-5 mr-3 text-blue-500" />
+                {/* Event Details Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                  <div className="flex items-center p-6 bg-blue-50 rounded-2xl">
+                    <Calendar className="w-6 h-6 mr-4 text-blue-500" />
                     <div>
-                      <div className="font-medium text-gray-900">
+                      <div className="font-bold text-gray-900 text-lg">
                         {formatDate(event.start_date)}
                         {event.end_date !== event.start_date &&
                           ` - ${formatDate(event.end_date)}`}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-gray-600">
                         {formatTime(event.start_date)}
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center text-gray-600 p-3 bg-green-50 rounded-lg">
-                    <MapPin className="w-5 h-5 mr-3 text-green-500" />
-                    <span className="font-medium">{event.location}</span>
+                  <div className="flex items-center p-6 bg-green-50 rounded-2xl">
+                    <MapPin className="w-6 h-6 mr-4 text-green-500" />
+                    <div>
+                      <div className="font-bold text-gray-900 text-lg">
+                        الموقع
+                      </div>
+                      <div className="text-gray-600">{event.location}</div>
+                    </div>
                   </div>
 
-                  <div className="flex items-center text-gray-600 p-3 bg-purple-50 rounded-lg">
-                    <Users className="w-5 h-5 mr-3 text-purple-500" />
+                  <div className="flex items-center p-6 bg-purple-50 rounded-2xl">
+                    <Users className="w-6 h-6 mr-4 text-purple-500" />
                     <div>
-                      <div className="font-medium text-gray-900">
+                      <div className="font-bold text-gray-900 text-lg">
                         {event.attendees} من {event.max_attendees || 'غير محدد'}{' '}
                         مشارك
                       </div>
                       {event.max_attendees && (
-                        <div className="text-sm text-gray-500">
+                        <div className="text-gray-600">
                           {Math.round(
                             ((event.attendees || 0) / event.max_attendees) * 100
                           )}
@@ -394,72 +410,123 @@ const EventDetail: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center text-gray-600 p-3 bg-orange-50 rounded-lg">
-                    <Clock className="w-5 h-5 mr-3 text-orange-500" />
-                    <span className="font-medium">{event.category}</span>
+                  <div className="flex items-center p-6 bg-orange-50 rounded-2xl">
+                    <Clock className="w-6 h-6 mr-4 text-orange-500" />
+                    <div>
+                      <div className="font-bold text-gray-900 text-lg">
+                        نوع الفعالية
+                      </div>
+                      <div className="text-gray-600">{event.category}</div>
+                    </div>
                   </div>
                 </div>
 
                 {/* Registration Progress */}
                 {event.max_attendees && (
-                  <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm font-medium text-gray-700">
-                        التسجيل
+                  <div className="p-6 bg-gray-50 rounded-2xl mb-8">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="font-bold text-gray-900 text-lg">
+                        حالة التسجيل
                       </span>
-                      <span className="text-sm text-gray-500">
+                      <span className="text-gray-600">
                         {calculateRegistrationProgress()}%
                       </span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div className="w-full bg-gray-200 rounded-full h-4">
                       <div
-                        className="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-300"
+                        className="bg-gradient-to-r from-blue-500 to-purple-500 h-4 rounded-full transition-all duration-300"
                         style={{ width: `${calculateRegistrationProgress()}%` }}
                       ></div>
                     </div>
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <div className="flex justify-between text-gray-600 mt-3">
                       <span>{event.attendees || 0} مسجل</span>
-                      <span>{event.max_attendees} مقعد</span>
+                      <span>{event.max_attendees} مقعد متاح</span>
                     </div>
                   </div>
                 )}
 
-                {/* Registration Button */}
-                <Button
-                  className="w-full mb-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3"
-                  onClick={() => setShowRegistration(true)}
-                  disabled={
-                    event.status === 'completed' || event.status === 'cancelled'
-                  }
-                >
-                  {event.status === 'completed'
-                    ? 'انتهت الفعالية'
-                    : event.status === 'cancelled'
-                    ? 'ألغيت الفعالية'
-                    : 'سجل الآن'}
-                </Button>
+                {/* Event Description */}
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <Award className="w-6 h-6 text-blue-500" />
+                    {t('eventDetail.about', 'عن الفعالية')}
+                  </h2>
+                  <p className="text-gray-700 leading-relaxed text-lg">
+                    {event.description}
+                  </p>
 
-                {/* Contact Info */}
-                <div className="border-t pt-4">
-                  <h3 className="font-semibold mb-3 text-gray-900">
-                    {t('eventDetail.contactInfo', 'معلومات التواصل')}
+                  {/* Enhanced Additional Details */}
+                  <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-gradient-to-br from-green-50 to-blue-50 p-6 rounded-2xl">
+                      <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-green-800">
+                        <CheckCircle className="w-6 h-6" />
+                        {t('eventDetail.whatToExpect', 'ما يمكن توقعه')}
+                      </h3>
+                      <ul className="space-y-3 text-gray-700">
+                        <li className="flex items-center">
+                          <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                          <span>محاضرات قيمة ومفيدة من خبراء في المجال</span>
+                        </li>
+                        <li className="flex items-center">
+                          <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                          <span>فرص للتواصل مع الشباب والمهنيين</span>
+                        </li>
+                        <li className="flex items-center">
+                          <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                          <span>شهادات مشاركة معتمدة</span>
+                        </li>
+                        <li className="flex items-center">
+                          <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
+                          <span>مواد تعليمية مجانية</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-2xl">
+                      <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-orange-800">
+                        <Tag className="w-6 h-6" />
+                        {t('eventDetail.requirements', 'المتطلبات')}
+                      </h3>
+                      <ul className="space-y-3 text-gray-700">
+                        <li className="flex items-center">
+                          <CheckCircle className="w-5 h-5 text-orange-500 mr-3" />
+                          <span>التسجيل المسبق مطلوب</span>
+                        </li>
+                        <li className="flex items-center">
+                          <CheckCircle className="w-5 h-5 text-orange-500 mr-3" />
+                          <span>الحضور في الوقت المحدد</span>
+                        </li>
+                        <li className="flex items-center">
+                          <CheckCircle className="w-5 h-5 text-orange-500 mr-3" />
+                          <span>الالتزام بآداب الحضور</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contact Information */}
+                <div className="border-t pt-8">
+                  <h3 className="font-bold text-gray-900 mb-6 flex items-center gap-2 text-xl">
+                    <Phone className="w-6 h-6 text-blue-500" />
+                    معلومات التواصل
                   </h3>
-                  <div className="space-y-2 text-sm text-gray-600">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <a
                       href="tel:+905050505645"
-                      className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors duration-200"
+                      className="flex items-center p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors"
                     >
-                      <Phone className="w-4 h-4 mr-2 text-green-500" />
-                      <span className="text-blue-600 hover:text-blue-800">
+                      <Phone className="w-5 h-5 mr-3 text-green-500" />
+                      <span className="font-semibold text-green-700">
                         +905050505645
                       </span>
                     </a>
                     <a
                       href="mailto:info@shababna.com"
-                      className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors duration-200"
+                      className="flex items-center p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors"
                     >
-                      <Mail className="w-4 h-4 mr-2 text-blue-500" />
-                      <span className="text-blue-600 hover:text-blue-800">
+                      <Mail className="w-5 h-5 mr-3 text-blue-500" />
+                      <span className="font-semibold text-blue-700">
                         info@shababna.com
                       </span>
                     </a>
@@ -467,10 +534,10 @@ const EventDetail: React.FC = () => {
                       href="https://maps.app.goo.gl/yz4Nc1RmLt6CuTh47"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors duration-200"
+                      className="flex items-center p-4 bg-red-50 rounded-xl hover:bg-red-100 transition-colors"
                     >
-                      <MapPin className="w-4 h-4 mr-2 text-red-500" />
-                      <span className="text-blue-600 hover:text-blue-800">
+                      <MapPin className="w-5 h-5 mr-3 text-red-500" />
+                      <span className="font-semibold text-red-700">
                         موقعنا على الخريطة
                       </span>
                     </a>
@@ -478,10 +545,10 @@ const EventDetail: React.FC = () => {
                       href="https://shababna.com"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors duration-200"
+                      className="flex items-center p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors"
                     >
-                      <Globe className="w-4 h-4 mr-2 text-purple-500" />
-                      <span className="text-blue-600 hover:text-blue-800">
+                      <Globe className="w-5 h-5 mr-3 text-purple-500" />
+                      <span className="font-semibold text-purple-700">
                         www.shababna.com
                       </span>
                     </a>
@@ -490,227 +557,145 @@ const EventDetail: React.FC = () => {
               </Card>
             </motion.div>
           </div>
-        </div>
-      </section>
 
-      {/* Enhanced Event Description */}
-      <section className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          <Card className="p-8 shadow-lg border-0">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <Award className="w-8 h-8 text-blue-500" />
-              {t('eventDetail.about', 'عن الفعالية')}
-            </h2>
-            <div className="prose prose-lg max-w-none">
-              <p className="text-gray-700 leading-relaxed text-lg">
-                {event.description}
-              </p>
-
-              {/* Enhanced Additional Details */}
-              <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-gradient-to-br from-green-50 to-blue-50 p-6 rounded-xl">
-                  <h3 className="text-xl font-semibold mb-4 flex items-center gap-2 text-green-800">
-                    <CheckCircle className="w-6 h-6" />
-                    {t('eventDetail.whatToExpect', 'ما يمكن توقعه')}
-                  </h3>
-                  <ul className="space-y-3 text-gray-700">
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                      <span>محاضرات قيمة ومفيدة من خبراء في المجال</span>
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                      <span>فرص للتواصل مع الشباب والمهنيين</span>
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                      <span>شهادات مشاركة معتمدة</span>
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                      <span>مواد تعليمية مجانية</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-xl">
-                  <h3 className="text-xl font-semibold mb-4 flex items-center gap-2 text-orange-800">
-                    <Tag className="w-6 h-6" />
-                    {t('eventDetail.requirements', 'المتطلبات')}
-                  </h3>
-                  <ul className="space-y-3 text-gray-700">
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-orange-500 mr-3" />
-                      <span>التسجيل المسبق مطلوب</span>
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-orange-500 mr-3" />
-                      <span>الحضور في الوقت المحدد</span>
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircle className="w-5 h-5 text-orange-500 mr-3" />
-                      <span>الالتزام بآداب الحضور</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </Card>
-        </motion.div>
-      </section>
-
-      {/* Enhanced Registration Modal */}
-      <AnimatePresence>
-        {showRegistration && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-          >
+          {/* Right Column - Registration Form */}
+          <div className="lg:col-span-1">
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white rounded-2xl p-4 sm:p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
             >
-              <div className="flex items-center justify-between mb-4 sm:mb-6">
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-900">
-                  {t('eventDetail.register', 'تسجيل في الفعالية')}
-                </h3>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowRegistration(false)}
-                  className="rounded-full w-8 h-8 p-0 flex-shrink-0"
-                >
-                  ×
-                </Button>
-              </div>
-
-              {/* Event Summary - Compact for Mobile */}
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6 border border-blue-200">
-                <h4 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">
-                  {event.title}
-                </h4>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
-                    <span>{formatDate(event.start_date)}</span>
+              <Card className="p-6 shadow-2xl border-0 bg-gradient-to-br from-blue-50 to-purple-50 sticky top-6">
+                <div className="text-center mb-6">
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Users className="w-10 h-10 text-white" />
                   </div>
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-red-500" />
-                    <span className="truncate">{event.location}</span>
-                  </div>
-                </div>
-              </div>
-
-              <form
-                onSubmit={handleRegistration}
-                className="space-y-3 sm:space-y-4"
-              >
-                {/* Name Fields - Stack on Mobile */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <Input
-                    name="firstName"
-                    placeholder={t('eventDetail.firstName', 'الاسم الأول')}
-                    value={registrationForm.firstName}
-                    onChange={handleInputChange}
-                    required
-                    className="text-sm sm:text-base"
-                  />
-                  <Input
-                    name="lastName"
-                    placeholder={t('eventDetail.lastName', 'اسم العائلة')}
-                    value={registrationForm.lastName}
-                    onChange={handleInputChange}
-                    required
-                    className="text-sm sm:text-base"
-                  />
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    تسجيل في الفعالية
+                  </h2>
+                  <p className="text-gray-600">أكمل البيانات التالية للتسجيل</p>
                 </div>
 
-                <Input
-                  name="email"
-                  type="email"
-                  placeholder={t('eventDetail.email', 'البريد الإلكتروني')}
-                  value={registrationForm.email}
-                  onChange={handleInputChange}
-                  required
-                  className="text-sm sm:text-base"
-                />
+                {/* Event Summary */}
+                <div className="bg-white p-4 rounded-xl mb-6 border border-blue-200 shadow-sm">
+                  <h3 className="font-bold text-gray-900 mb-3 text-lg">
+                    {event.title}
+                  </h3>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-blue-500" />
+                      <span>{formatDate(event.start_date)}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-red-500" />
+                      <span className="truncate">{event.location}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-green-500" />
+                      <span>{formatTime(event.start_date)}</span>
+                    </div>
+                  </div>
+                </div>
 
-                <Input
-                  name="phone"
-                  placeholder={t('eventDetail.phone', 'رقم الجوال')}
-                  value={registrationForm.phone}
-                  onChange={handleInputChange}
-                  required
-                  className="text-sm sm:text-base"
-                />
+                <form onSubmit={handleRegistration} className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        الاسم الأول <span className="text-red-500">*</span>
+                      </label>
+                      <Input
+                        name="firstName"
+                        placeholder="أدخل اسمك الأول"
+                        value={registrationForm.firstName}
+                        onChange={handleInputChange}
+                        required
+                        className="h-12"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        اسم العائلة <span className="text-red-500">*</span>
+                      </label>
+                      <Input
+                        name="lastName"
+                        placeholder="أدخل اسم العائلة"
+                        value={registrationForm.lastName}
+                        onChange={handleInputChange}
+                        required
+                        className="h-12"
+                      />
+                    </div>
+                  </div>
 
-                <textarea
-                  name="message"
-                  placeholder={t('eventDetail.message', 'رسالة (اختياري)')}
-                  value={registrationForm.message}
-                  onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm sm:text-base"
-                  rows={2}
-                />
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      البريد الإلكتروني <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      name="email"
+                      type="email"
+                      placeholder="example@email.com"
+                      value={registrationForm.email}
+                      onChange={handleInputChange}
+                      required
+                      className="h-12"
+                    />
+                  </div>
 
-                {/* Buttons - Stack on Mobile */}
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowRegistration(false)}
-                    className="flex-1 text-sm sm:text-base py-2 sm:py-3"
-                  >
-                    {t('eventDetail.cancel', 'إلغاء')}
-                  </Button>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      رقم الجوال <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      name="phone"
+                      placeholder="+90 505 050 56 45"
+                      value={registrationForm.phone}
+                      onChange={handleInputChange}
+                      required
+                      className="h-12"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      رسالة (اختياري)
+                    </label>
+                    <textarea
+                      name="message"
+                      placeholder="اكتب أي رسالة إضافية..."
+                      value={registrationForm.message}
+                      onChange={handleInputChange}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none h-24"
+                      rows={3}
+                    />
+                  </div>
+
                   <Button
                     type="submit"
-                    disabled={registrationStatus === 'loading'}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-sm sm:text-base py-2 sm:py-3"
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-4 h-14 shadow-lg"
                   >
-                    {registrationStatus === 'loading' ? (
-                      <UnifiedLoader
-                        variant="minimal"
-                        size="sm"
-                        showLogo={false}
-                      />
-                    ) : (
-                      t('eventDetail.submit', 'تأكيد التسجيل')
-                    )}
+                    <div className="flex items-center justify-center gap-2">
+                      <CheckCircle className="w-5 h-5" />
+                      <span>تأكيد التسجيل</span>
+                    </div>
                   </Button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
-      {/* Enhanced Registration Status Alert */}
-      <AnimatePresence>
-        {registrationStatus !== 'idle' && (
-          <motion.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-sm w-full px-4"
-          >
-            <Alert
-              type={registrationStatus === 'success' ? 'success' : 'error'}
-              onClose={() => setRegistrationStatus('idle')}
-            >
-              {registrationMessage}
-            </Alert>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                  {/* Local Alert */}
+                  {localAlert.type && (
+                    <UnifiedAlert
+                      type={localAlert.type}
+                      message={localAlert.message}
+                      position="button-bottom"
+                      duration={5000}
+                      onClose={() => setLocalAlert({ type: null, message: '' })}
+                    />
+                  )}
+                </form>
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -319,6 +319,35 @@ const DashboardOverview: React.FC = () => {
     return changeType === 'increase' ? ArrowUpRight : ArrowDownRight;
   };
 
+  const getStatIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'Calendar':
+        return Calendar;
+      case 'TrendingUp':
+        return TrendingUp;
+      case 'Users':
+        return Users;
+      case 'Heart':
+        return Heart;
+      case 'MessageCircle':
+        return MessageCircle;
+      case 'DollarSign':
+        return DollarSign;
+      case 'Target':
+        return Target;
+      case 'UserPlus':
+        return UserPlus;
+      case 'FileText':
+        return FileText;
+      case 'Shield':
+        return Shield;
+      case 'Activity':
+        return Activity;
+      default:
+        return Activity;
+    }
+  };
+
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'event_registration':
@@ -398,7 +427,10 @@ const DashboardOverview: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-800 mb-1">
-              {t('dashboard.welcome', 'مرحباً')} {user?.first_name}
+              {t('dashboard.welcome', 'مرحباً')}{' '}
+              {user?.first_name && user?.last_name
+                ? `${user.first_name} ${user.last_name}`
+                : user?.first_name || user?.email || 'مستخدم'}
             </h1>
             <p className="text-gray-500 text-sm">
               {t('dashboard.subtitle', 'نظرة شاملة على أداء النظام')}
@@ -413,6 +445,12 @@ const DashboardOverview: React.FC = () => {
             )}
           </div>
           <div className="flex items-center gap-2">
+            <Link to="/">
+              <Button variant="outline" size="sm" className="text-xs">
+                <Home className="w-3 h-3 mr-1" />
+                {t('dashboard.goToHome', 'الرئيسية')}
+              </Button>
+            </Link>
             <Button
               variant="outline"
               size="sm"
@@ -441,7 +479,11 @@ const DashboardOverview: React.FC = () => {
                 <div
                   className={`w-8 h-8 rounded-lg bg-${stat.color}-50 flex items-center justify-center`}
                 >
-                  <stat.icon className={`w-4 h-4 text-${stat.color}-500`} />
+                  <img
+                    src="/images/logo.jpg"
+                    alt="شعار شبابنا"
+                    className="w-5 h-5 object-contain"
+                  />
                 </div>
                 <div className="flex items-center gap-1">
                   {(() => {
@@ -525,8 +567,10 @@ const DashboardOverview: React.FC = () => {
                       <div
                         className={`w-8 h-8 rounded-lg bg-${metric.color}-50 flex items-center justify-center`}
                       >
-                        <metric.icon
-                          className={`w-4 h-4 text-${metric.color}-500`}
+                        <img
+                          src="/images/logo.jpg"
+                          alt="شعار شبابنا"
+                          className="w-5 h-5 object-contain"
                         />
                       </div>
                       <div>
@@ -597,8 +641,10 @@ const DashboardOverview: React.FC = () => {
                     <div
                       className={`w-6 h-6 rounded-lg bg-${activity.color}-50 flex items-center justify-center flex-shrink-0`}
                     >
-                      <activity.icon
-                        className={`w-3 h-3 text-${activity.color}-500`}
+                      <img
+                        src="/images/logo.jpg"
+                        alt="شعار شبابنا"
+                        className="w-4 h-4 object-contain"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -642,42 +688,48 @@ const DashboardOverview: React.FC = () => {
             {t('dashboard.quickActions.title', 'إجراءات سريعة')}
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Button
-              variant="outline"
-              className="flex flex-col items-center gap-2 p-3 h-auto text-xs"
-              onClick={() => handleUnavailable()}
-            >
-              <Plus className="w-4 h-4" />
-              <span>
-                {t('dashboard.quickActions.newEvent', 'فعالية جديدة')}
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              className="flex flex-col items-center gap-2 p-3 h-auto text-xs"
-              onClick={() => handleUnavailable()}
-            >
-              <Target className="w-4 h-4" />
-              <span>
-                {t('dashboard.quickActions.newProgram', 'برنامج جديد')}
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              className="flex flex-col items-center gap-2 p-3 h-auto text-xs"
-              onClick={() => handleUnavailable()}
-            >
-              <UserPlus className="w-4 h-4" />
-              <span>{t('dashboard.quickActions.newUser', 'مستخدم جديد')}</span>
-            </Button>
-            <Button
-              variant="outline"
-              className="flex flex-col items-center gap-2 p-3 h-auto text-xs"
-              onClick={() => handleUnavailable()}
-            >
-              <FileText className="w-4 h-4" />
-              <span>{t('dashboard.quickActions.newBlog', 'مقال جديد')}</span>
-            </Button>
+            <Link to="/dashboard/events">
+              <Button
+                variant="outline"
+                className="flex flex-col items-center gap-2 p-3 h-auto text-xs w-full"
+              >
+                <Plus className="w-4 h-4" />
+                <span>
+                  {t('dashboard.quickActions.newEvent', 'فعالية جديدة')}
+                </span>
+              </Button>
+            </Link>
+            <Link to="/dashboard/programs">
+              <Button
+                variant="outline"
+                className="flex flex-col items-center gap-2 p-3 h-auto text-xs w-full"
+              >
+                <Target className="w-4 h-4" />
+                <span>
+                  {t('dashboard.quickActions.newProgram', 'برنامج جديد')}
+                </span>
+              </Button>
+            </Link>
+            <Link to="/dashboard/users">
+              <Button
+                variant="outline"
+                className="flex flex-col items-center gap-2 p-3 h-auto text-xs w-full"
+              >
+                <UserPlus className="w-4 h-4" />
+                <span>
+                  {t('dashboard.quickActions.newUser', 'مستخدم جديد')}
+                </span>
+              </Button>
+            </Link>
+            <Link to="/dashboard/blogs">
+              <Button
+                variant="outline"
+                className="flex flex-col items-center gap-2 p-3 h-auto text-xs w-full"
+              >
+                <FileText className="w-4 h-4" />
+                <span>{t('dashboard.quickActions.newBlog', 'مقال جديد')}</span>
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

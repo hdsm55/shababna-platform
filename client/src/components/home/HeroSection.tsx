@@ -70,62 +70,87 @@ const HeroSection: React.FC = () => {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent-400/5 rounded-full blur-3xl" />
       </div>
 
-      {/* Main Content */}
-      <div className="relative z-10 max-w-6xl mx-auto text-center px-6 py-20">
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          className="space-y-8"
-        >
-          {/* Badge */}
+      {/* Main Content - Two Column Layout */}
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[70vh]">
+          {/* Left Column - Text Content */}
           <motion.div
-            variants={itemVariants}
-            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 text-sm font-medium"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="text-center lg:text-right space-y-6"
           >
-            <Sparkles className="w-4 h-4 text-yellow-300" />
-            {t('home.hero.badge')}
+            {/* Badge */}
+            <motion.div
+              variants={itemVariants}
+              className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1.5 text-xs font-medium"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
+              {t('home.hero.badge')}
+            </motion.div>
+
+            {/* Main Title */}
+            <motion.div variants={itemVariants} className="space-y-4">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight">
+                {t('home.hero.title')}
+              </h1>
+              <p className="text-base md:text-lg lg:text-xl text-white/90 leading-relaxed max-w-lg mx-auto lg:mx-0">
+                {t('home.hero.subtitle')}
+              </p>
+            </motion.div>
+
+            {/* CTA Buttons */}
+            <motion.div
+              variants={itemVariants}
+              className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start items-center pt-2"
+            >
+              <Button
+                variant="primary"
+                size="md"
+                onClick={() => navigate('/auth')}
+                className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-6 py-3 text-base font-semibold shadow-lg"
+              >
+                <span className="flex items-center gap-2">
+                  إنشاء حساب
+                  <ArrowRight className="w-4 h-4" />
+                </span>
+              </Button>
+              <Button
+                variant="outline"
+                size="md"
+                onClick={() => navigate('/events')}
+                className="border-2 border-white/30 text-white hover:bg-white/10 px-6 py-3 text-base font-semibold backdrop-blur-sm"
+              >
+                <span className="flex items-center gap-2">
+                  {t('nav.events')}
+                  <Calendar className="w-4 h-4" />
+                </span>
+              </Button>
+            </motion.div>
           </motion.div>
 
-          {/* Main Title */}
-          <motion.div variants={itemVariants} className="space-y-4">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight">
-              {t('home.hero.title')}
-            </h1>
-            <p className="text-lg md:text-xl lg:text-2xl text-white/90 max-w-4xl mx-auto leading-relaxed">
-              {t('home.hero.subtitle')}
-            </p>
-          </motion.div>
-
-          {/* CTA Buttons */}
+          {/* Right Column - Logo */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            initial="hidden"
+            animate="visible"
+            className="flex items-center justify-center lg:justify-end"
           >
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={() => navigate('/programs')}
-              className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white px-8 py-4 text-lg font-semibold shadow-lg"
-            >
-              <span className="flex items-center gap-2">
-                {t('home.hero.cta')}
-                <ArrowRight className="w-5 h-5" />
-              </span>
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => navigate('/events')}
-              className="border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 text-lg font-semibold backdrop-blur-sm"
-            >
-              <span className="flex items-center gap-2">
-                {t('nav.events')}
-                <Calendar className="w-5 h-5" />
-              </span>
-            </Button>
+            <div className="relative">
+              <motion.img
+                src="/images/logo-shababna.png"
+                alt="شعار شبابنا"
+                className="w-64 h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 xl:w-96 xl:h-96 object-contain drop-shadow-2xl"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+                loading="eager"
+              />
+              {/* Subtle glow effect behind logo */}
+              <div className="absolute inset-0 bg-white/5 rounded-full blur-3xl scale-110" />
+            </div>
           </motion.div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

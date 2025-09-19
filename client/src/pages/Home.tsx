@@ -18,7 +18,8 @@ import SEO from '../components/common/SEO';
 import { Button } from '../components/ui/Button/ButtonSimple';
 import { Card } from '../components/ui/Card/Card';
 import { Input } from '../components/ui/Input/InputSimple';
-import { Alert } from '../components/common/AlertSimple';
+import { useAlert } from '../components/common/AlertProvider';
+import UnifiedAlert from '../components/common/UnifiedAlert';
 import { fetchEvents } from '../services/eventsApi';
 import { fetchPrograms } from '../services/programsApi';
 import { subscribeToNewsletter } from '../services/newsletterApi';
@@ -504,35 +505,36 @@ LatestProgramsSection.displayName = 'LatestProgramsSection';
 
 const NewsletterSection = memo(() => {
   const { t } = useTranslation();
+  const { success, error: showError } = useAlert();
   const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [newsletterStatus, setNewsletterStatus] = useState<
-    'idle' | 'loading' | 'success' | 'error'
-  >('idle');
-  const [newsletterMsg, setNewsletterMsg] = useState('');
+
+  // Local alert state for newsletter notifications
+  const [localAlert, setLocalAlert] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
 
   const handleNewsletterSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      setNewsletterStatus('loading');
-      setNewsletterMsg('');
 
       try {
         const result = await subscribeToNewsletter({ email: newsletterEmail });
-        setNewsletterStatus('success');
-        setNewsletterMsg(
-          result.message || 'تم الاشتراك في النشرة البريدية بنجاح!'
-        );
+        setLocalAlert({
+          type: 'success',
+          message: result.message || 'تم الاشتراك في النشرة البريدية بنجاح!',
+        });
         setNewsletterEmail('');
-      } catch (error: any) {
-        setNewsletterStatus('error');
-        setNewsletterMsg(
-          error.response?.data?.message ||
-            'حدث خطأ أثناء الاشتراك في النشرة البريدية'
-        );
+      } catch (err: any) {
+        setLocalAlert({
+          type: 'error',
+          message:
+            err.response?.data?.message ||
+            'حدث خطأ أثناء الاشتراك في النشرة البريدية',
+        });
       }
-      setTimeout(() => setNewsletterStatus('idle'), 4000);
     },
-    [newsletterEmail]
+    [newsletterEmail, success, showError]
   );
 
   return (
@@ -576,28 +578,23 @@ const NewsletterSection = memo(() => {
             <Button
               type="submit"
               size="sm"
-              disabled={newsletterStatus === 'loading'}
               className="bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 py-2 px-4 text-sm font-semibold shadow-lg"
             >
-              {newsletterStatus === 'loading'
-                ? t('home.newsletter.loading', 'جاري...')
-                : t('home.newsletter.subscribe', 'اشتراك')}
+              {t('home.newsletter.subscribe', 'اشتراك')}
             </Button>
           </div>
-        </form>
 
-        {newsletterStatus !== 'idle' && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-4"
-          >
-            <Alert
-              type={newsletterStatus === 'success' ? 'success' : 'error'}
-              message={newsletterMsg}
+          {/* Local Alert */}
+          {localAlert.type && (
+            <UnifiedAlert
+              type={localAlert.type}
+              message={localAlert.message}
+              position="button-bottom"
+              duration={5000}
+              onClose={() => setLocalAlert({ type: null, message: '' })}
             />
-          </motion.div>
-        )}
+          )}
+        </form>
       </motion.div>
     </section>
   );
@@ -657,7 +654,7 @@ const Home: React.FC = () => {
       />
 
       <main className="page-container">
-        {/* رسالة ترحيب للمستخدمين المسجلين */}
+        {/* رسالة ترحيب للمستخدمين المسجلين - طبقة فوق الهيرو */}
         <AnimatePresence>
           {isAuthenticated && user && showWelcomeMessage && (
             <motion.div
@@ -665,7 +662,7 @@ const Home: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="bg-gradient-to-r from-primary-50 to-accent-50 border-l-4 border-primary-500 p-4 mb-6 mx-4 rounded-r-lg"
+              className="fixed top-20 left-4 right-4 z-50 bg-gradient-to-r from-primary-50 to-accent-50 border-l-4 border-primary-500 p-4 rounded-r-lg shadow-lg backdrop-blur-sm"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center">

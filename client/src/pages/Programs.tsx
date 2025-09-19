@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import {
@@ -27,27 +27,20 @@ import SEO from '../components/common/SEO';
 import { Button } from '../components/ui/Button/ButtonSimple';
 import { Card } from '../components/ui/Card/Card';
 import { Input } from '../components/ui/Input/InputSimple';
-import { Modal } from '../components/ui/Modal/ModalSimple';
+// تم إلغاء استخدام Modal هنا
 import UnifiedLoader from '../components/common/UnifiedLoader';
 import { useDebounce } from '../hooks/useDebounce';
 
 const Programs: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  // أزيلت الحاجة إلى queryClient بعد نقل التبرع لصفحة التفاصيل
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const debouncedSearch = useDebounce(searchTerm, 500);
   const [currentPage, setCurrentPage] = useState(1);
-  const [showDonationModal, setShowDonationModal] = useState(false);
-  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
-  const [donationForm, setDonationForm] = useState({
-    amount: '',
-    name: '',
-    email: '',
-    message: '',
-  });
+  // تم إلغاء حالة نافذة التبرع؛ سيتم التبرع من صفحة التفاصيل
 
   const filters = [
     {
@@ -116,38 +109,12 @@ const Programs: React.FC = () => {
   const pagination = programsData?.data?.pagination;
 
   const handleDonationClick = (program: Program) => {
-    setSelectedProgram(program);
-    setShowDonationModal(true);
+    navigate(`/programs/${program.id}`);
   };
 
-  const handleDonationSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      setShowDonationModal(false);
-      setDonationForm({
-        amount: '',
-        name: '',
-        email: '',
-        message: '',
-      });
-      setSelectedProgram(null);
+  // تم نقل إرسال التبرع لصفحة التفاصيل
 
-      await refetch();
-      queryClient.invalidateQueries({ queryKey: ['programs'] });
-
-      alert('تم التبرع بنجاح!');
-    } catch (error) {
-      console.error('خطأ في التبرع:', error);
-      alert('حدث خطأ في التبرع. حاول مرة أخرى.');
-    }
-  };
-
-  const handleInputChange = (field: string, value: string) => {
-    setDonationForm((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
+  // لا حاجة لإدارة حقول التبرع هنا
 
   const formatDate = (dateString: string) => {
     try {
@@ -608,8 +575,8 @@ const Programs: React.FC = () => {
                           </div>
                         )}
 
-                        {/* Action Buttons */}
-                        <div className="pt-4 space-y-3">
+                        {/* Action Button - موحّد: تبرع الآن → صفحة التفاصيل */}
+                        <div className="pt-4">
                           <Button
                             variant="primary"
                             className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium py-3"
@@ -617,16 +584,6 @@ const Programs: React.FC = () => {
                           >
                             <DollarSign className="w-4 h-4 mr-2" />
                             تبرع الآن
-                          </Button>
-
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full flex items-center justify-center gap-2 group-hover:border-blue-500 group-hover:text-blue-600 transition-all duration-300"
-                            onClick={() => navigate(`/programs/${program.id}`)}
-                          >
-                            <Info className="w-4 h-4" />
-                            التفاصيل الكاملة
                           </Button>
                         </div>
                       </div>
@@ -722,110 +679,6 @@ const Programs: React.FC = () => {
           </motion.div>
         )}
       </div>
-
-      {/* Donation Modal */}
-      <Modal
-        open={showDonationModal}
-        onClose={() => {
-          setShowDonationModal(false);
-          setSelectedProgram(null);
-          setDonationForm({
-            amount: '',
-            name: '',
-            email: '',
-            message: '',
-          });
-        }}
-        title={t('programs.donation.title', 'تبرع للبرنامج')}
-      >
-        {selectedProgram && (
-          <div className="space-y-6">
-            {/* Program Info */}
-            <Card className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200">
-              <h3 className="font-bold text-xl mb-3 text-gray-900">
-                {selectedProgram.title}
-              </h3>
-              <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-                {selectedProgram.description}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 text-sm text-gray-600">
-                <div className="flex items-center gap-2">
-                  <Target className="w-4 h-4 text-green-500" />
-                  <span className="font-medium">
-                    الهدف: {formatCurrency(selectedProgram.goal_amount || 0)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-blue-500" />
-                  <span className="font-medium">
-                    المحقق:{' '}
-                    {formatCurrency(selectedProgram.current_amount || 0)}
-                  </span>
-                </div>
-              </div>
-            </Card>
-
-            {/* Donation Form */}
-            <form onSubmit={handleDonationSubmit} className="space-y-4">
-              <Input
-                label={t('programs.donation.amount', 'مبلغ التبرع')}
-                type="number"
-                value={donationForm.amount}
-                onChange={(e) => handleInputChange('amount', e.target.value)}
-                required
-                min="1"
-                step="0.01"
-              />
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  label={t('programs.donation.name', 'الاسم')}
-                  value={donationForm.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  required
-                />
-                <Input
-                  label={t('programs.donation.email', 'البريد الإلكتروني')}
-                  type="email"
-                  value={donationForm.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  required
-                />
-              </div>
-
-              <Input
-                label={t('programs.donation.message', 'رسالة (اختياري)')}
-                value={donationForm.message}
-                onChange={(e) => handleInputChange('message', e.target.value)}
-                multiline
-                rows={3}
-              />
-
-              <div className="flex gap-3 pt-4">
-                <Button type="submit" variant="primary" className="flex-1">
-                  {t('programs.donation.submit', 'تأكيد التبرع')}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setShowDonationModal(false);
-                    setSelectedProgram(null);
-                    setDonationForm({
-                      amount: '',
-                      name: '',
-                      email: '',
-                      message: '',
-                    });
-                  }}
-                >
-                  {t('common.cancel', 'إلغاء')}
-                </Button>
-              </div>
-            </form>
-          </div>
-        )}
-      </Modal>
     </div>
   );
 };

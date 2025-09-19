@@ -459,12 +459,12 @@ const EventCard = memo(
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="flex gap-2">
+            {/* Action Button - unified */}
+            <div className="flex">
               <Button
                 variant="primary"
-                onClick={() => onRegisterClick(event)}
-                className="flex-1 bg-primary-500 hover:bg-primary-600 text-white"
+                onClick={() => navigate(`/events/${event.id}`)}
+                className="w-full bg-primary-500 hover:bg-primary-600 text-white"
                 disabled={
                   event.status === 'completed' || event.status === 'cancelled'
                 }
@@ -474,14 +474,6 @@ const EventCard = memo(
                   : event.status === 'cancelled'
                   ? t('events.actions.cancelled', 'ملغية')
                   : t('events.actions.register', 'سجل الآن')}
-              </Button>
-
-              <Button
-                variant="outline"
-                onClick={() => navigate(`/events/${event.id}`)}
-                className="border-primary-200 text-primary-600 hover:bg-primary-50 text-sm"
-              >
-                {t('events.actions.viewDetails', 'عرض التفاصيل')}
               </Button>
             </div>
           </div>

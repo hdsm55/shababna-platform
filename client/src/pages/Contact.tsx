@@ -4,7 +4,10 @@ import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { Button } from '../components/ui/Button/ButtonSimple';
 import { Card } from '../components/ui/Card/Card';
-import { Alert } from '../components/common/AlertSimple';
+// استخدام نظام الإشعارات الموحد
+import { useAlert } from '../components/common/AlertProvider';
+import { useUnifiedLoading } from '../hooks/useUnifiedLoading';
+import UnifiedAlert from '../components/common/UnifiedAlert';
 import SEO from '../components/common/SEO';
 import { submitContactForm, ContactFormData } from '../services/formsApi';
 
@@ -46,11 +49,14 @@ const ContactHeader = memo(() => {
 
 const ContactForm = memo(() => {
   const { t, i18n } = useTranslation();
-  const [formStatus, setFormStatus] = useState<
-    'idle' | 'submitting' | 'success' | 'error'
-  >('idle');
-  const [formMsg, setFormMsg] = useState('');
-  const [showAlert, setShowAlert] = useState(false);
+  const { formSuccess, formError } = useAlert();
+  const { withButtonLoading } = useUnifiedLoading();
+
+  // Local alert state for form notifications
+  const [localAlert, setLocalAlert] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
   const {
     register,
     handleSubmit,
@@ -61,45 +67,23 @@ const ContactForm = memo(() => {
 
   const onSubmit = useCallback(
     async (data: ContactFormData) => {
-      if (formStatus === 'submitting') return;
-
-      setFormStatus('submitting');
-      setFormMsg('');
-      setShowAlert(false);
-
-      try {
-        const response = await submitContactForm(data);
-        setFormStatus('success');
-        setFormMsg(
-          response.message ||
-            t(
-              'contact.form.success',
-              'تم إرسال رسالتك بنجاح! سنرد عليك في أقرب وقت ممكن.'
-            )
-        );
-        reset();
-        setShowAlert(true);
-        setTimeout(() => {
-          setShowAlert(false);
-          setFormStatus('idle');
-        }, 5000);
-      } catch (error: any) {
-        setFormStatus('error');
-        setFormMsg(
-          error?.response?.data?.message ||
-            t(
-              'contact.form.error',
-              'حدث خطأ أثناء إرسال الرسالة. يرجى المحاولة مرة أخرى.'
-            )
-        );
-        setShowAlert(true);
-        setTimeout(() => {
-          setShowAlert(false);
-          setFormStatus('idle');
-        }, 5000);
-      }
+      await withButtonLoading(async () => {
+        try {
+          const response = await submitContactForm(data);
+          setLocalAlert({
+            type: 'success',
+            message: 'تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.',
+          });
+          reset();
+        } catch (error: any) {
+          setLocalAlert({
+            type: 'error',
+            message: 'حدث خطأ أثناء إرسال الرسالة. يرجى المحاولة مرة أخرى.',
+          });
+        }
+      });
     },
-    [formStatus, t, reset]
+    [withButtonLoading, formSuccess, formError, t, reset]
   );
 
   return (
@@ -122,14 +106,7 @@ const ContactForm = memo(() => {
           </p>
         </div>
 
-        {showAlert && (
-          <Alert
-            type={formStatus === 'success' ? 'success' : 'error'}
-            message={formMsg}
-            onClose={() => setShowAlert(false)}
-            className="mb-6"
-          />
-        )}
+        {/* تم نقل رسائل النجاح/الخطأ إلى التوست العالمي */}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -316,19 +293,22 @@ const ContactForm = memo(() => {
           <div className="text-center">
             <Button
               type="submit"
-              disabled={formStatus === 'submitting'}
               className="w-full md:w-auto px-8 py-3 text-lg font-semibold font-arabic"
             >
-              {formStatus === 'submitting' ? (
-                <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>{t('contact.form.sending', 'جاري الإرسال...')}</span>
-                </div>
-              ) : (
-                t('contact.form.send', 'إرسال الرسالة')
-              )}
+              {t('contact.form.send', 'إرسال الرسالة')}
             </Button>
           </div>
+
+          {/* Local Alert */}
+          {localAlert.type && (
+            <UnifiedAlert
+              type={localAlert.type}
+              message={localAlert.message}
+              position="button-bottom"
+              duration={5000}
+              onClose={() => setLocalAlert({ type: null, message: '' })}
+            />
+          )}
         </form>
       </Card>
     </motion.section>

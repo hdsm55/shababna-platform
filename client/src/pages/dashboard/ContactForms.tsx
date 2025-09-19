@@ -25,6 +25,7 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
+  Home,
 } from 'lucide-react';
 import Modal from '../../components/common/Modal';
 import { Link } from 'react-router-dom';
@@ -58,21 +59,88 @@ const ContactForms: React.FC = () => {
   const updateReadStatusMutation = useMutation({
     mutationFn: ({ id, isRead }: { id: string; isRead: boolean }) =>
       updateContactFormReadStatus(id, isRead),
+    onMutate: async ({ id, isRead }) => {
+      // إلغاء أي استعلامات قيد التنفيذ
+      await queryClient.cancelQueries({ queryKey: ['contact-forms'] });
+
+      // حفظ البيانات السابقة
+      const previousData = queryClient.getQueryData(['contact-forms', filters]);
+
+      // تحديث البيانات بشكل مؤقت (optimistic update)
+      queryClient.setQueryData(['contact-forms', filters], (old: any) => {
+        if (!old?.data?.forms) return old;
+
+        return {
+          ...old,
+          data: {
+            ...old.data,
+            forms: old.data.forms.map((form: any) =>
+              form.id === parseInt(id) ? { ...form, is_read: isRead } : form
+            ),
+          },
+        };
+      });
+
+      return { previousData };
+    },
     onSuccess: () => {
+      console.log('✅ تم تحديث حالة القراءة بنجاح');
+    },
+    onError: (error, variables, context) => {
+      console.error('❌ خطأ في تحديث حالة القراءة:', error);
+
+      // استعادة البيانات السابقة في حالة الخطأ
+      if (context?.previousData) {
+        queryClient.setQueryData(
+          ['contact-forms', filters],
+          context.previousData
+        );
+      }
+
+      setModalMsg(
+        '❌ حدث خطأ أثناء تحديث حالة القراءة. يرجى المحاولة مرة أخرى.'
+      );
+    },
+    onSettled: () => {
+      // إعادة جلب البيانات للتأكد من التزامن
       queryClient.invalidateQueries({ queryKey: ['contact-forms'] });
     },
   });
 
   const handleReadStatusToggle = (id: string, currentStatus: boolean) => {
-    updateReadStatusMutation.mutate({ id, isRead: !currentStatus });
-    setModalMsg(
-      currentStatus
-        ? `✅ تم تمييز الرسالة كغير مقروءة! 📧\n\n📅 التاريخ: ${new Date().toLocaleDateString(
-            'ar-SA'
-          )}`
-        : `✅ تم تمييز الرسالة كمقروءة! ✅\n\n📅 التاريخ: ${new Date().toLocaleDateString(
-            'ar-SA'
-          )}`
+    console.log('🔄 تغيير حالة القراءة:', {
+      id,
+      currentStatus,
+      newStatus: !currentStatus,
+    });
+
+    // منع الطلبات المتعددة
+    if (updateReadStatusMutation.isPending) {
+      console.log('⚠️ طلب تحديث قيد التنفيذ، يرجى الانتظار...');
+      return;
+    }
+
+    updateReadStatusMutation.mutate(
+      { id, isRead: !currentStatus },
+      {
+        onSuccess: () => {
+          setModalMsg(
+            currentStatus
+              ? `✅ تم تمييز الرسالة كغير مقروءة! 📧\n\n📅 التاريخ: ${new Date().toLocaleDateString(
+                  'ar-SA'
+                )}`
+              : `✅ تم تمييز الرسالة كمقروءة! ✅\n\n📅 التاريخ: ${new Date().toLocaleDateString(
+                  'ar-SA'
+                )}`
+          );
+        },
+        onError: (error) => {
+          console.error('❌ خطأ في تحديث حالة القراءة:', error);
+          setModalMsg(
+            '❌ حدث خطأ أثناء تحديث حالة القراءة. يرجى المحاولة مرة أخرى.'
+          );
+        },
+      }
     );
   };
 
@@ -202,17 +270,28 @@ const ContactForms: React.FC = () => {
             <h1 className="text-2xl font-bold">
               {t('dashboard.contactForms.title', 'رسائل التواصل')}
             </h1>
-            <Button
-              variant="outline"
-              className="font-bold text-primary-600 border-primary-300"
-              as={Link}
-              to="/contact"
-            >
-              {t(
-                'dashboard.contactForms.goToContact',
-                'اذهب إلى صفحة تواصل معنا'
-              )}
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                className="font-bold text-primary-600 border-primary-300"
+                as={Link}
+                to="/contact"
+              >
+                {t(
+                  'dashboard.contactForms.goToContact',
+                  'اذهب إلى صفحة تواصل معنا'
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                className="font-bold text-gray-600 border-gray-300"
+                as={Link}
+                to="/"
+              >
+                <Home className="w-4 h-4 mr-2" />
+                {t('dashboard.contactForms.goToHome', 'الرئيسية')}
+              </Button>
+            </div>
           </div>
 
           {/* Filters and Search */}
@@ -351,8 +430,14 @@ const ContactForms: React.FC = () => {
                           onClick={() =>
                             handleReadStatusToggle(form.id, form.is_read)
                           }
+                          disabled={updateReadStatusMutation.isPending}
+                          title={
+                            form.is_read ? 'تمييز كغير مقروءة' : 'تمييز كمقروءة'
+                          }
                         >
-                          {form.is_read ? (
+                          {updateReadStatusMutation.isPending ? (
+                            <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+                          ) : form.is_read ? (
                             <EyeOff className="w-4 h-4" />
                           ) : (
                             <Eye className="w-4 h-4" />

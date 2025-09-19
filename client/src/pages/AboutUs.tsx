@@ -1,5 +1,7 @@
-import React, { memo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+/* eslint-disable */
+// cspell:disable-file
+import React, { memo } from 'react';
+import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -17,89 +19,121 @@ import {
   Zap,
   TrendingUp,
   Users2,
-  ChevronDown,
-  ChevronUp,
 } from 'lucide-react';
 
 import SEO from '../components/common/SEO';
 import { Button } from '../components/ui/Button/ButtonSimple';
 import { Card } from '../components/ui/Card/Card';
+import { useQuery } from '@tanstack/react-query';
+import { fetchEvents } from '../services/eventsApi';
+import { fetchBlogs } from '../services/blogsApi';
+import { Link } from 'react-router-dom';
+import { useSiteStats } from '../hooks/useSiteStats';
 
-// مكون التنقل السريع
-const QuickNavigation = memo(() => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  const sections = [
-    { id: 'president', label: 'رسالة الرئيس', icon: Quote },
-    { id: 'ceo', label: 'المدير التنفيذي', icon: Zap },
-    { id: 'vision', label: 'الرؤية والرسالة', icon: Target },
-    { id: 'values', label: 'القيم الأساسية', icon: Star },
-    { id: 'achievements', label: 'الإنجازات', icon: Award },
-    { id: 'cta', label: 'انضم إلينا', icon: Users2 },
-  ];
-
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-    setIsExpanded(false);
-  };
+// قسم من نحن - تصميم مبسط
+const AboutUsSection = memo(() => {
+  const { t } = useTranslation();
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5, duration: 0.6 }}
-      className="fixed top-1/2 right-4 transform -translate-y-1/2 z-50"
+    <motion.section
+      id="about-us"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      viewport={{ once: true }}
+      className="mb-16"
     >
-      <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-primary-200 overflow-hidden">
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="w-12 h-12 flex items-center justify-center bg-primary-500 text-white hover:bg-primary-600 transition-colors"
+      <div className="container mx-auto px-4">
+        {/* العنوان الرئيسي */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
         >
-          {isExpanded ? (
-            <ChevronUp className="w-5 h-5" />
-          ) : (
-            <ChevronDown className="w-5 h-5" />
-          )}
-        </button>
+          <h2 className="text-4xl md:text-5xl font-bold text-dark-500 mb-4">
+            من نحن
+          </h2>
+          <p className="text-xl text-primary-600 font-medium">
+            منظمة شبابنا العالمية
+          </p>
+        </motion.div>
 
-        <AnimatePresence>
-          {isExpanded && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="overflow-hidden"
-            >
-              <div className="p-2 space-y-1">
-                {sections.map((section, index) => (
-                  <motion.button
-                    key={section.id}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    onClick={() => scrollToSection(section.id)}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-dark-600 hover:bg-primary-50 hover:text-primary-600 rounded-lg transition-colors"
-                  >
-                    <section.icon className="w-4 h-4" />
-                    <span>{section.label}</span>
-                  </motion.button>
-                ))}
+        {/* المحتوى الرئيسي */}
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="bg-white rounded-2xl p-8 shadow-lg border border-neutral-200"
+          >
+            <div className="space-y-6">
+              <p className="text-lg leading-relaxed text-dark-500 text-center">
+                منظمة شبابنا العالمية هي منصة شبابية عالمية مستقلة، تُعنى ببناء
+                جيل شبابي فاعل ومؤثر، يحمل همّ أمّته، ويتسلّح بالعلم والوعي
+                والقيم، ويشارك بفعالية في نهضة مجتمعه وأمّته.
+              </p>
+
+              <p className="text-lg leading-relaxed text-dark-500 text-center">
+                ننطلق من رؤية شمولية تعزز التواصل بين الشباب حول العالم، وننفّذ
+                برامج نوعية في مجالات التربية، والإعلام، والتنمية، والهوية،
+                والقضايا الإسلامية، ضمن منظومة قيادية وكوادر مؤمنة برسالة
+                التغيير الإيجابي.
+              </p>
+            </div>
+          </motion.div>
+
+          {/* النقاط الرئيسية */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8"
+          >
+            <div className="text-center">
+              <div className="w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Globe className="w-8 h-8 text-white" />
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <h3 className="text-lg font-semibold text-dark-500 mb-2">
+                عالمية
+              </h3>
+              <p className="text-dark-400">نشاطنا يمتد عبر القارات</p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-secondary-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Heart className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-dark-500 mb-2">
+                مستقلة
+              </h3>
+              <p className="text-dark-400">نعمل بحرية وشفافية</p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-accent-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Target className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-dark-500 mb-2">
+                متخصصة
+              </h3>
+              <p className="text-dark-400">برامج نوعية ومؤثرة</p>
+            </div>
+          </motion.div>
+        </div>
       </div>
-    </motion.div>
+    </motion.section>
   );
 });
 
 // تحسين الأداء - مكونات منفصلة
 const HeroSection = memo(() => {
   const { t } = useTranslation();
+  const { data, loading, countriesCount } = useSiteStats();
+  const format = (n: number) => new Intl.NumberFormat('ar-SA').format(n);
 
   const heroVariants = {
     hidden: { opacity: 0, y: 30 },
@@ -204,15 +238,21 @@ const HeroSection = memo(() => {
             >
               <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
                 <Users className="w-5 h-5 text-yellow-300" />
-                <span className="text-sm font-medium">+10,000 شاب</span>
+                <span className="text-sm font-medium">
+                  {loading || !data ? '…' : `${format(data.users)} شاب`}
+                </span>
               </div>
               <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
                 <Globe className="w-5 h-5 text-yellow-300" />
-                <span className="text-sm font-medium">50+ دولة</span>
+                <span className="text-sm font-medium">{`${format(
+                  countriesCount
+                )} دولة`}</span>
               </div>
               <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
                 <Award className="w-5 h-5 text-yellow-300" />
-                <span className="text-sm font-medium">100+ برنامج</span>
+                <span className="text-sm font-medium">
+                  {loading || !data ? '…' : `${format(data.programs)} برنامج`}
+                </span>
               </div>
             </motion.div>
           </motion.div>
@@ -234,138 +274,93 @@ const PresidentMessage = memo(() => {
       viewport={{ once: true }}
       className="mb-16"
     >
-      <div className="max-w-4xl mx-auto">
+      <div className="container mx-auto px-4">
+        {/* العنوان */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
+          className="text-center mb-12"
         >
-          <Card className="p-8 bg-gradient-to-br from-white to-primary-50 border border-primary-200 shadow-brand-lg relative overflow-hidden">
-            {/* خلفية زخرفية */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary-100 rounded-full -translate-y-16 translate-x-16 opacity-50"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-secondary-100 rounded-full translate-y-12 -translate-x-12 opacity-50"></div>
+          <h2 className="text-4xl md:text-5xl font-bold text-dark-500 mb-4">
+            كلمة الرئيس
+          </h2>
+        </motion.div>
 
-            <div className="relative z-10">
-              <div className="text-center mb-8">
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  whileInView={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                  viewport={{ once: true }}
-                  className="relative inline-block"
-                >
-                  <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden border-4 border-primary-200 shadow-lg">
-                    <img
-                      src="/images/team/رئيس المنظمة.jpg"
-                      alt={t('about.president.title')}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = '/images/fallback.svg';
-                      }}
-                    />
-                  </div>
-                  <motion.div
-                    className="absolute -top-1 -right-1 w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center"
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    <Quote className="w-3 h-3 text-white" />
-                  </motion.div>
-                </motion.div>
-
-                <h2 className="text-3xl font-bold text-dark-500 mb-2">
-                  {t('about.president.title')}
-                </h2>
+        {/* المحتوى */}
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            {/* صورة الرئيس */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="lg:col-span-1"
+            >
+              <div className="text-center">
+                <div className="w-48 h-48 mx-auto rounded-2xl overflow-hidden shadow-lg border-4 border-white mb-6">
+                  <img
+                    src="/images/team/رئيس المنظمة.jpg"
+                    alt="رئيس المنظمة"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = '/images/fallback.svg';
+                    }}
+                  />
+                </div>
+                <h3 className="text-xl font-bold text-dark-500 mb-1">
+                  {t('about.president.name')}
+                </h3>
                 <p className="text-primary-600 font-medium">
-                  {t('about.president.name')} - {t('about.president.position')}
+                  {t('about.president.position')}
                 </p>
               </div>
+            </motion.div>
 
-              <div className="text-dark-400 space-y-6 text-base leading-relaxed">
-                <motion.p
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1, duration: 0.5 }}
-                  viewport={{ once: true }}
-                >
-                  {t('about.president.greeting')}
-                </motion.p>
+            {/* النص */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              viewport={{ once: true }}
+              className="lg:col-span-2"
+            >
+              <div className="bg-white rounded-2xl p-8 shadow-lg border border-neutral-200">
+                <div className="space-y-6 text-dark-500 leading-relaxed">
+                  <p>{t('about.president.greeting')}</p>
+                  <p>{t('about.president.welcome')}</p>
+                  <p>{t('about.president.vision')}</p>
+                  <p>{t('about.president.mission')}</p>
+                  <p>{t('about.president.commitment')}</p>
+                  <p>{t('about.president.invitation')}</p>
+                </div>
 
-                <motion.p
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.2, duration: 0.5 }}
-                  viewport={{ once: true }}
-                >
-                  {t('about.president.welcome')}
-                </motion.p>
-
-                <motion.p
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3, duration: 0.5 }}
-                  viewport={{ once: true }}
-                >
-                  {t('about.president.vision')}
-                </motion.p>
-
-                <motion.p
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4, duration: 0.5 }}
-                  viewport={{ once: true }}
-                >
-                  {t('about.president.mission')}
-                </motion.p>
-
-                <motion.p
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5, duration: 0.5 }}
-                  viewport={{ once: true }}
-                >
-                  {t('about.president.commitment')}
-                </motion.p>
-
-                <motion.p
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6, duration: 0.5 }}
-                  viewport={{ once: true }}
-                >
-                  {t('about.president.invitation')}
-                </motion.p>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7, duration: 0.5 }}
-                  viewport={{ once: true }}
-                  className="bg-primary-50 rounded-lg p-4 border-r-4 border-primary-500"
-                >
-                  <p className="font-medium text-primary-700">
-                    {t('about.president.signature')}
-                    <br />
-                    <span className="text-primary-600">
+                {/* التوقيع */}
+                <div className="mt-8 pt-6 border-t border-neutral-200">
+                  <div className="text-center">
+                    <p className="text-lg font-semibold text-primary-700 mb-2">
+                      {t('about.president.signature')}
+                    </p>
+                    <p className="text-xl font-bold text-primary-600 mb-1">
                       {t('about.president.signatureName')}
-                    </span>
-                    <br />
-                    <span className="text-sm text-primary-500">
+                    </p>
+                    <p className="text-primary-500">
                       {t('about.president.signaturePosition')}
-                    </span>
-                  </p>
-                </motion.div>
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
-          </Card>
-        </motion.div>
+            </motion.div>
+          </div>
+        </div>
       </div>
     </motion.section>
   );
 });
 
-// قسم المدير التنفيذي
+// قسم المدير التنفيذي - تصميم مبسط
 const ExecutiveDirectorSection = memo(() => {
   const { t } = useTranslation();
 
@@ -378,90 +373,82 @@ const ExecutiveDirectorSection = memo(() => {
       viewport={{ once: true }}
       className="mb-16"
     >
-      <div className="max-w-4xl mx-auto">
+      <div className="container mx-auto px-4">
+        {/* العنوان */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
+          className="text-center mb-12"
         >
-          <Card className="p-8 bg-gradient-to-br from-accent-50 to-secondary-50 border border-accent-200 shadow-brand-lg relative overflow-hidden">
-            {/* خلفية زخرفية */}
-            <div className="absolute top-0 left-0 w-32 h-32 bg-accent-100 rounded-full -translate-y-16 -translate-x-16 opacity-50"></div>
-            <div className="absolute bottom-0 right-0 w-24 h-24 bg-secondary-100 rounded-full translate-y-12 translate-x-12 opacity-50"></div>
+          <h2 className="text-4xl md:text-5xl font-bold text-dark-500 mb-4">
+            كلمة المدير التنفيذي
+          </h2>
+        </motion.div>
 
-            <div className="relative z-10">
-              <div className="text-center mb-8">
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  whileInView={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                  viewport={{ once: true }}
-                  className="relative inline-block"
-                >
-                  <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden border-4 border-accent-200 shadow-lg">
-                    <img
-                      src="/images/team/المدير التنفيذي.jpeg"
-                      alt={t('about.ceo.title')}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = '/images/fallback.svg';
-                      }}
-                    />
+        {/* المحتوى */}
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            {/* النص */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="lg:col-span-2"
+            >
+              <div className="bg-white rounded-2xl p-8 shadow-lg border border-neutral-200">
+                <div className="space-y-6 text-dark-500 leading-relaxed whitespace-pre-line">
+                  {t('about.ceo.message')}
+                </div>
+
+                {/* التوقيع */}
+                <div className="mt-8 pt-6 border-t border-neutral-200">
+                  <div className="text-center">
+                    <p className="text-lg font-semibold text-accent-700 mb-2">
+                      {t('about.ceo.signature')}
+                    </p>
+                    <p className="text-xl font-bold text-accent-600 mb-1">
+                      {t('about.ceo.signatureName')}
+                    </p>
+                    <p className="text-accent-500">
+                      {t('about.ceo.signaturePosition')}
+                    </p>
                   </div>
-                  <motion.div
-                    className="absolute -top-1 -right-1 w-6 h-6 bg-accent-500 rounded-full flex items-center justify-center"
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-                  >
-                    <Zap className="w-3 h-3 text-white" />
-                  </motion.div>
-                </motion.div>
+                </div>
+              </div>
+            </motion.div>
 
-                <h2 className="text-3xl font-bold text-dark-500 mb-2">
-                  {t('about.ceo.title')}
-                </h2>
+            {/* صورة المدير */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              viewport={{ once: true }}
+              className="lg:col-span-1"
+            >
+              <div className="text-center">
+                <div className="w-48 h-48 mx-auto rounded-2xl overflow-hidden shadow-lg border-4 border-white mb-6">
+                  <img
+                    src="/images/team/المدير التنفيذي.jpeg"
+                    alt="المدير التنفيذي"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = '/images/fallback.svg';
+                    }}
+                  />
+                </div>
+                <h3 className="text-xl font-bold text-dark-500 mb-1">
+                  {t('about.ceo.name')}
+                </h3>
                 <p className="text-accent-600 font-medium">
-                  {t('about.ceo.name')} - {t('about.ceo.position')}
+                  {t('about.ceo.position')}
                 </p>
               </div>
-
-              <div className="text-dark-400 space-y-6 text-base leading-relaxed">
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1, duration: 0.5 }}
-                  viewport={{ once: true }}
-                  className="bg-white/60 rounded-lg p-6 border border-accent-200"
-                >
-                  <p className="whitespace-pre-line">
-                    {t('about.ceo.message')}
-                  </p>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.5 }}
-                  viewport={{ once: true }}
-                  className="bg-accent-50 rounded-lg p-4 border-r-4 border-accent-500"
-                >
-                  <p className="font-medium text-accent-700">
-                    {t('about.ceo.signature')}
-                    <br />
-                    <span className="text-accent-600">
-                      {t('about.ceo.signatureName')}
-                    </span>
-                    <br />
-                    <span className="text-sm text-accent-500">
-                      {t('about.ceo.signaturePosition')}
-                    </span>
-                  </p>
-                </motion.div>
-              </div>
-            </div>
-          </Card>
-        </motion.div>
+            </motion.div>
+          </div>
+        </div>
       </div>
     </motion.section>
   );
@@ -497,7 +484,7 @@ const VisionMission = memo(() => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.5 }}
           viewport={{ once: true }}
-          className="text-dark-400 max-w-2xl mx-auto"
+          className="text-dark-400 max-w-2xl mx-auto text-lg"
         >
           نسعى لبناء مستقبل أفضل للشباب المسلم من خلال رؤية واضحة ورسالة ملهمة
         </motion.p>
@@ -526,7 +513,7 @@ const VisionMission = memo(() => {
               </motion.div>
               <h3 className="text-2xl font-bold text-dark-500 mb-3">رؤيتنا</h3>
             </div>
-            <p className="text-dark-400 text-center leading-relaxed relative z-10">
+            <p className="text-dark-400 text-center leading-relaxed relative z-10 text-base">
               نسعى لأن نكون المنصة الرائدة عالمياً في تطوير وتمكين الشباب
               المسلم، وإعدادهم ليكونوا قادة الغد المؤثرين في مجتمعاتهم والعالم.
             </p>
@@ -555,7 +542,7 @@ const VisionMission = memo(() => {
               </motion.div>
               <h3 className="text-2xl font-bold text-dark-500 mb-3">رسالتنا</h3>
             </div>
-            <p className="text-dark-400 text-center leading-relaxed relative z-10">
+            <p className="text-dark-400 text-center leading-relaxed relative z-10 text-base">
               تمكين الشباب المسلم من خلال البرامج التطويرية والفعاليات الملهمة،
               وبناء جيل واعٍ قادر على صناعة التغيير الإيجابي في المجتمع.
             </p>
@@ -689,34 +676,47 @@ const CoreValues = memo(() => {
 });
 
 const Achievements = memo(() => {
+  const { data, loading, countriesCount, anyZero } = useSiteStats();
+
+  const format = (n: number) => new Intl.NumberFormat('ar-SA').format(n);
+
   const achievements = [
     {
       icon: Users,
-      number: '10,000+',
-      label: 'شاب وشابة',
-      description: 'انضموا لبرامجنا',
+      number: loading || !data ? '…' : format(data.users),
+      label: 'أعضاء',
+      description:
+        data && data.users === 0 ? 'لا يوجد أعضاء حالياً' : 'مجتمعنا يكبر',
       color: 'from-blue-500 to-blue-600',
+      isZero: data ? data.users === 0 : false,
     },
     {
       icon: Globe,
-      number: '50+',
-      label: 'دولة',
-      description: 'حول العالم',
+      number: format(countriesCount),
+      label: 'دول',
+      description: 'قائمة ثابتة للدول العربية والإسلامية',
       color: 'from-green-500 to-green-600',
+      isZero: false,
     },
     {
       icon: Award,
-      number: '100+',
-      label: 'برنامج',
-      description: 'تطويري ومؤثر',
+      number: loading || !data ? '…' : format(data.programs),
+      label: 'برامج',
+      description:
+        data && data.programs === 0
+          ? 'لا توجد برامج حالياً'
+          : 'برامج نوعية ومؤثرة',
       color: 'from-purple-500 to-purple-600',
+      isZero: data ? data.programs === 0 : false,
     },
     {
       icon: TrendingUp,
-      number: '95%',
-      label: 'رضا',
-      description: 'من المشاركين',
+      number: loading || !data ? '…' : format(data.events),
+      label: 'فعاليات',
+      description:
+        data && data.events === 0 ? 'لا توجد فعاليات حالياً' : 'فعاليات مستمرة',
       color: 'from-orange-500 to-orange-600',
+      isZero: data ? data.events === 0 : false,
     },
   ];
 
@@ -752,7 +752,7 @@ const Achievements = memo(() => {
           viewport={{ once: true }}
           className="text-3xl md:text-4xl font-bold text-dark-500 mb-4"
         >
-          إنجازاتنا بالأرقام
+          {anyZero ? 'أهدافنا' : 'أرقامنا'}
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -761,7 +761,7 @@ const Achievements = memo(() => {
           viewport={{ once: true }}
           className="text-dark-400 max-w-2xl mx-auto"
         >
-          أرقام تتحدث عن تأثيرنا الإيجابي في حياة الشباب حول العالم
+          المصدر: بيانات مباشرة من قاعدة البيانات + قائمة ثابتة للدول
         </motion.p>
       </div>
 
@@ -806,6 +806,368 @@ const Achievements = memo(() => {
           </motion.div>
         ))}
       </motion.div>
+    </motion.section>
+  );
+});
+
+// أحدث الفعاليات - محسن
+const AboutLatestEvents = memo(() => {
+  const { t } = useTranslation();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['about-latest-events'],
+    queryFn: () => fetchEvents({ page: 1, limit: 6 }),
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const events = data?.data?.events || [];
+
+  return (
+    <motion.section
+      id="latest-events"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      viewport={{ once: true }}
+      className="mb-16"
+    >
+      <div className="container mx-auto px-4">
+        {/* العنوان الرئيسي */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold text-dark-500 mb-4">
+            الفعاليات والأنشطة
+          </h2>
+          <p className="text-xl text-primary-600 font-medium mb-2">
+            فعاليات ملهمة تواكب تطلعات الشباب
+          </p>
+          <p className="text-dark-400 max-w-2xl mx-auto">
+            ننظم فعاليات متنوعة تهدف إلى تطوير مهارات الشباب وبناء شخصياتهم
+            القيادية
+          </p>
+        </motion.div>
+
+        {/* إحصائيات سريعة */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          viewport={{ once: true }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+        >
+          <div className="text-center p-6 bg-white rounded-2xl shadow-brand-sm border border-neutral-200">
+            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <Award className="w-6 h-6 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-dark-500 mb-1">
+              {isLoading ? '...' : events.length}
+            </h3>
+            <p className="text-primary-600 font-medium">فعاليات نشطة</p>
+          </div>
+          <div className="text-center p-6 bg-white rounded-2xl shadow-brand-sm border border-neutral-200">
+            <div className="w-12 h-12 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <Users className="w-6 h-6 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-dark-500 mb-1">مفتوحة</h3>
+            <p className="text-secondary-600 font-medium">للجميع</p>
+          </div>
+          <div className="text-center p-6 bg-white rounded-2xl shadow-brand-sm border border-neutral-200">
+            <div className="w-12 h-12 bg-gradient-to-br from-accent-500 to-accent-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <Globe className="w-6 h-6 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-dark-500 mb-1">عالمية</h3>
+            <p className="text-accent-600 font-medium">التغطية</p>
+          </div>
+        </motion.div>
+
+        {/* قائمة الفعاليات */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          viewport={{ once: true }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          {(isLoading ? [1, 2, 3, 4, 5, 6] : events).map(
+            (evt: any, i: number) => (
+              <motion.div
+                key={evt?.id || i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                viewport={{ once: true }}
+                className="group"
+              >
+                <Card className="h-full p-6 bg-white border border-neutral-200 shadow-brand-sm hover:shadow-brand-lg transition-all duration-300 relative overflow-hidden">
+                  {/* شريط علوي ملون */}
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-500 to-secondary-500"></div>
+
+                  {isLoading ? (
+                    <div className="animate-pulse">
+                      <div className="h-4 bg-neutral-200 rounded mb-3"></div>
+                      <div className="h-3 bg-neutral-200 w-3/4 mb-2 rounded"></div>
+                      <div className="h-3 bg-neutral-200 w-1/2 mb-4 rounded"></div>
+                      <div className="h-8 bg-neutral-200 rounded"></div>
+                    </div>
+                  ) : (
+                    <>
+                      {/* أيقونة الفعالية */}
+                      <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <Lightbulb className="w-6 h-6 text-white" />
+                      </div>
+
+                      {/* عنوان الفعالية */}
+                      <h3 className="text-lg font-bold text-dark-500 mb-3 line-clamp-2">
+                        {evt.title}
+                      </h3>
+
+                      {/* وصف الفعالية */}
+                      <p className="text-sm text-dark-400 line-clamp-3 mb-4 leading-relaxed">
+                        {evt.description}
+                      </p>
+
+                      {/* تفاصيل إضافية */}
+                      <div className="space-y-2 mb-4">
+                        {evt.location && (
+                          <div className="flex items-center text-xs text-dark-400">
+                            <Globe className="w-4 h-4 ml-2" />
+                            <span>{evt.location}</span>
+                          </div>
+                        )}
+                        {evt.event_date && (
+                          <div className="flex items-center text-xs text-dark-400">
+                            <Star className="w-4 h-4 ml-2" />
+                            <span>
+                              {new Date(evt.event_date).toLocaleDateString(
+                                'ar-SA'
+                              )}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* رابط التفاصيل */}
+                      <Link
+                        to={`/events/${evt.id}`}
+                        className="inline-flex items-center text-primary-600 text-sm font-semibold hover:text-primary-700 transition-colors duration-300"
+                      >
+                        تفاصيل الفعالية
+                        <ArrowRight className="w-4 h-4 mr-2 group-hover:translate-x-1 transition-transform duration-300" />
+                      </Link>
+                    </>
+                  )}
+                </Card>
+              </motion.div>
+            )
+          )}
+        </motion.div>
+
+        {/* زر عرض المزيد */}
+        {!isLoading && events.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mt-8"
+          >
+            <Link
+              to="/events"
+              className="inline-flex items-center justify-center font-semibold px-8 py-3 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+            >
+              عرض جميع الفعاليات
+              <ArrowRight className="w-5 h-5 mr-2" />
+            </Link>
+          </motion.div>
+        )}
+      </div>
+    </motion.section>
+  );
+});
+
+// أحدث المقالات - محسن
+const AboutLatestBlogs = memo(() => {
+  const { t } = useTranslation();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['about-latest-blogs'],
+    queryFn: () => fetchBlogs({}),
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const blogs = data || [];
+
+  return (
+    <motion.section
+      id="latest-blogs"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      viewport={{ once: true }}
+      className="mb-16"
+    >
+      <div className="container mx-auto px-4">
+        {/* العنوان الرئيسي */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold text-dark-500 mb-4">
+            المقالات والمدونة
+          </h2>
+          <p className="text-xl text-secondary-600 font-medium mb-2">
+            محتوى إثرائي يثري فكر الشباب
+          </p>
+          <p className="text-dark-400 max-w-2xl mx-auto">
+            مقالات متنوعة تغطي قضايا الشباب المعاصرة وتقدم رؤى ملهمة للتطوير
+            والتميز
+          </p>
+        </motion.div>
+
+        {/* إحصائيات سريعة */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          viewport={{ once: true }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+        >
+          <div className="text-center p-6 bg-white rounded-2xl shadow-brand-sm border border-neutral-200">
+            <div className="w-12 h-12 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <Lightbulb className="w-6 h-6 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-dark-500 mb-1">
+              {isLoading ? '...' : blogs.length}
+            </h3>
+            <p className="text-secondary-600 font-medium">مقال منشور</p>
+          </div>
+          <div className="text-center p-6 bg-white rounded-2xl shadow-brand-sm border border-neutral-200">
+            <div className="w-12 h-12 bg-gradient-to-br from-accent-500 to-accent-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <Target className="w-6 h-6 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-dark-500 mb-1">متنوعة</h3>
+            <p className="text-accent-600 font-medium">المواضيع</p>
+          </div>
+          <div className="text-center p-6 bg-white rounded-2xl shadow-brand-sm border border-neutral-200">
+            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <Users2 className="w-6 h-6 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-dark-500 mb-1">محدثة</h3>
+            <p className="text-primary-600 font-medium">بشكل دوري</p>
+          </div>
+        </motion.div>
+
+        {/* قائمة المقالات */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          viewport={{ once: true }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          {(isLoading ? [1, 2, 3, 4, 5, 6] : blogs.slice(0, 6)).map(
+            (blog: any, i: number) => (
+              <motion.div
+                key={blog?.id || i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                viewport={{ once: true }}
+                className="group"
+              >
+                <Card className="h-full p-6 bg-white border border-neutral-200 shadow-brand-sm hover:shadow-brand-lg transition-all duration-300 relative overflow-hidden">
+                  {/* شريط علوي ملون */}
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-secondary-500 to-accent-500"></div>
+
+                  {isLoading ? (
+                    <div className="animate-pulse">
+                      <div className="h-4 bg-neutral-200 rounded mb-3"></div>
+                      <div className="h-3 bg-neutral-200 w-3/4 mb-2 rounded"></div>
+                      <div className="h-3 bg-neutral-200 w-1/2 mb-4 rounded"></div>
+                      <div className="h-8 bg-neutral-200 rounded"></div>
+                    </div>
+                  ) : (
+                    <>
+                      {/* أيقونة المقال */}
+                      <div className="w-12 h-12 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <Quote className="w-6 h-6 text-white" />
+                      </div>
+
+                      {/* عنوان المقال */}
+                      <h3 className="text-lg font-bold text-dark-500 mb-3 line-clamp-2">
+                        {blog.title}
+                      </h3>
+
+                      {/* ملخص المقال */}
+                      <p className="text-sm text-dark-400 line-clamp-3 mb-4 leading-relaxed">
+                        {blog.excerpt ||
+                          blog.description ||
+                          'مقال مثير للاهتمام من فريق شبابنا'}
+                      </p>
+
+                      {/* تفاصيل إضافية */}
+                      <div className="space-y-2 mb-4">
+                        {blog.category && (
+                          <div className="flex items-center text-xs text-dark-400">
+                            <Target className="w-4 h-4 ml-2" />
+                            <span>{blog.category}</span>
+                          </div>
+                        )}
+                        {blog.created_at && (
+                          <div className="flex items-center text-xs text-dark-400">
+                            <Star className="w-4 h-4 ml-2" />
+                            <span>
+                              {new Date(blog.created_at).toLocaleDateString(
+                                'ar-SA'
+                              )}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* رابط القراءة */}
+                      <Link
+                        to={`/blogs/${blog.id || blog.slug}`}
+                        className="inline-flex items-center text-secondary-600 text-sm font-semibold hover:text-secondary-700 transition-colors duration-300"
+                      >
+                        اقرأ المقال
+                        <ArrowRight className="w-4 h-4 mr-2 group-hover:translate-x-1 transition-transform duration-300" />
+                      </Link>
+                    </>
+                  )}
+                </Card>
+              </motion.div>
+            )
+          )}
+        </motion.div>
+
+        {/* زر عرض المزيد */}
+        {!isLoading && blogs.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mt-8"
+          >
+            <Link
+              to="/blogs"
+              className="inline-flex items-center justify-center font-semibold px-8 py-3 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-secondary-500 to-secondary-600 text-white hover:from-secondary-600 hover:to-secondary-700 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2"
+            >
+              عرض جميع المقالات
+              <ArrowRight className="w-5 h-5 mr-2" />
+            </Link>
+          </motion.div>
+        )}
+      </div>
     </motion.section>
   );
 });
@@ -902,14 +1264,16 @@ const AboutUs: React.FC = () => {
       />
 
       <HeroSection />
-      <QuickNavigation />
 
       <div className="container mx-auto px-4 py-12 relative z-10">
+        <AboutUsSection />
         <PresidentMessage />
         <ExecutiveDirectorSection />
         <VisionMission />
         <CoreValues />
         <Achievements />
+        <AboutLatestEvents />
+        <AboutLatestBlogs />
         <CallToAction />
       </div>
     </div>

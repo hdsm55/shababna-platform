@@ -574,6 +574,16 @@ const EventsDashboard: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <Link to="/events">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <Eye className="w-4 h-4" />
+                {t('events.viewFrontend', 'عرض في الموقع')}
+              </Button>
+            </Link>
             <Button
               variant="outline"
               size="sm"
@@ -1136,39 +1146,6 @@ const EventsDashboard: React.FC = () => {
                 disabled={modalType === 'view'}
                 min="0"
               />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('events.form.image', 'صورة الفعالية')}
-            </label>
-            <div className="space-y-2">
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                disabled={modalType === 'view'}
-              />
-              {imagePreview && (
-                <div className="relative inline-block">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-32 h-32 object-cover rounded-lg"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={removeImage}
-                    className="absolute top-0 right-0 p-1 bg-red-500 text-white rounded-full"
-                    disabled={modalType === 'view'}
-                  >
-                    <X className="w-3 h-3" />
-                  </Button>
-                </div>
-              )}
             </div>
           </div>
 

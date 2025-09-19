@@ -3,6 +3,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
 import { getRow, getRows, query } from '../config/database.js';
+import { sendPasswordResetEmail, sendAdminNotification } from '../services/emailService.js';
+import { createPasswordResetToken, validatePasswordResetToken, markTokenAsUsed } from '../services/tokenService.js';
+import rateLimitService from '../services/rateLimitService.js';
 
 const router = express.Router();
 
@@ -110,6 +113,25 @@ router.post('/register', validateRegistration, async (req, res) => {
     // Generate JWT token
     const token = generateToken(newUser);
 
+    // إرسال إشعار للإدارة عند تسجيل عضو جديد (عدا المدير الأول)
+    if (role !== 'admin') {
+      try {
+        const adminNotificationData = {
+          form_type: 'new_user_registration',
+          name: `${first_name} ${last_name}`,
+          email: email,
+          phone: 'غير محدد',
+          subject: 'تسجيل عضو جديد',
+          message: `تم تسجيل عضو جديد في المنصة:\n\nالاسم: ${first_name} ${last_name}\nالبريد الإلكتروني: ${email}\nتاريخ التسجيل: ${new Date().toLocaleString('ar-SA')}`
+        };
+        await sendAdminNotification(adminNotificationData);
+        console.log('✅ تم إرسال إشعار تسجيل عضو جديد للإدارة');
+      } catch (emailError) {
+        console.error('❌ خطأ في إرسال إشعار تسجيل عضو جديد:', emailError);
+        // لا نعيد خطأ للمستخدم لأن التسجيل تم بنجاح
+      }
+    }
+
     // Return success response
     res.status(201).json({
       success: true,
@@ -199,47 +221,209 @@ router.post('/forgot-password', [
     .normalizeEmail()
     .withMessage('Please provide a valid email address')
 ], async (req, res) => {
+  const clientIP = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'] || 'unknown';
+  const userAgent = req.headers['user-agent'] || 'unknown';
+
   try {
     // Check for validation errors
     if (handleValidationErrors(req, res)) return;
 
     const { email } = req.body;
 
+    // Rate limiting check
+    const rateLimitResult = await rateLimitService.checkRateLimit(clientIP, 'forgotPassword');
+
+    if (!rateLimitResult.allowed) {
+      console.log(`🚫 تم حظر طلب إعادة تعيين كلمة المرور من IP: ${clientIP}`);
+      await rateLimitService.recordAttempt(clientIP, 'forgotPassword', clientIP, userAgent, false);
+
+      return res.status(429).json({
+        success: false,
+        message: 'تم تجاوز الحد المسموح من المحاولات. يرجى المحاولة مرة أخرى لاحقاً.',
+        retryAfter: rateLimitResult.resetTime
+      });
+    }
+
     // Check if user exists
     const userResult = await getRow('SELECT * FROM users WHERE email = $1', [email]);
 
     if (!userResult) {
       // For security reasons, don't reveal if email exists or not
+      console.log(`🔍 طلب إعادة تعيين كلمة المرور لبريد غير مسجل: ${email}`);
+      await rateLimitService.recordAttempt(clientIP, 'forgotPassword', clientIP, userAgent, true);
+
       return res.json({
         success: true,
-        message: 'If an account with that email exists, we have sent a password reset link.'
+        message: 'إن كان بريدك مسجّلًا لدينا، فستصلك رسالة لإعادة تعيين كلمة المرور.'
       });
     }
 
     const user = userResult;
 
-    // TODO: Generate password reset token and send email
-    // For now, we'll just return success
-    // In a real implementation, you would:
-    // 1. Generate a secure reset token
-    // 2. Store it in the database with expiration time
-    // 3. Send email with reset link
+    // Create password reset token
+    const token = await createPasswordResetToken(user.id, clientIP, userAgent);
 
-    console.log(`Password reset requested for user: ${user.email}`);
+    if (!token) {
+      console.error('❌ فشل في إنشاء توكن إعادة تعيين كلمة المرور');
+      await rateLimitService.recordAttempt(clientIP, 'forgotPassword', clientIP, userAgent, false);
 
-    // Simulate email sending delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+      return res.status(500).json({
+        success: false,
+        message: 'حدث خطأ أثناء معالجة طلبك. يرجى المحاولة مرة أخرى.'
+      });
+    }
 
+    // Send password reset email
+    const emailSent = await sendPasswordResetEmail(
+      user.email,
+      token,
+      user.first_name
+    );
+
+    if (emailSent) {
+      console.log(`✅ تم إرسال بريد إعادة تعيين كلمة المرور للمستخدم: ${user.email}`);
+      await rateLimitService.recordAttempt(clientIP, 'forgotPassword', clientIP, userAgent, true);
+
+      res.json({
+        success: true,
+        message: 'إن كان بريدك مسجّلًا لدينا، فستصلك رسالة لإعادة تعيين كلمة المرور.'
+      });
+    } else {
+      console.error('❌ فشل في إرسال بريد إعادة تعيين كلمة المرور');
+      await rateLimitService.recordAttempt(clientIP, 'forgotPassword', clientIP, userAgent, false);
+
+      res.status(500).json({
+        success: false,
+        message: 'حدث خطأ أثناء إرسال البريد الإلكتروني. يرجى المحاولة مرة أخرى.'
+      });
+    }
+
+  } catch (error) {
+    console.error('❌ خطأ في طلب إعادة تعيين كلمة المرور:', error);
+    await rateLimitService.recordAttempt(clientIP, 'forgotPassword', clientIP, userAgent, false);
+
+    res.status(500).json({
+      success: false,
+      message: 'حدث خطأ داخلي أثناء معالجة طلبك. يرجى المحاولة مرة أخرى.'
+    });
+  }
+});
+
+// GET /reset-password - Validate reset token
+router.get('/reset-password', async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: 'توكن إعادة تعيين كلمة المرور مطلوب'
+      });
+    }
+
+    // Validate token
+    const tokenData = await validatePasswordResetToken(token);
+
+    if (!tokenData) {
+      return res.status(400).json({
+        success: false,
+        message: 'توكن إعادة تعيين كلمة المرور غير صالح أو منتهي الصلاحية'
+      });
+    }
+
+    // Return token validation success
     res.json({
       success: true,
-      message: 'If an account with that email exists, we have sent a password reset link.'
+      message: 'توكن إعادة تعيين كلمة المرور صالح',
+      data: {
+        email: tokenData.email,
+        firstName: tokenData.first_name,
+        lastName: tokenData.last_name
+      }
     });
 
   } catch (error) {
-    console.error('Forgot password error:', error);
+    console.error('❌ خطأ في التحقق من توكن إعادة تعيين كلمة المرور:', error);
     res.status(500).json({
       success: false,
-      message: 'Internal server error during password reset request'
+      message: 'حدث خطأ أثناء التحقق من التوكن'
+    });
+  }
+});
+
+// POST /reset-password - Reset password with token
+router.post('/reset-password', [
+  body('token')
+    .notEmpty()
+    .withMessage('توكن إعادة تعيين كلمة المرور مطلوب'),
+  body('password')
+    .isLength({ min: 6 })
+    .withMessage('كلمة المرور يجب أن تكون 6 أحرف على الأقل')
+], async (req, res) => {
+  const clientIP = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'] || 'unknown';
+  const userAgent = req.headers['user-agent'] || 'unknown';
+
+  try {
+    // Check for validation errors
+    if (handleValidationErrors(req, res)) return;
+
+    const { token, password } = req.body;
+
+    // Rate limiting check
+    const rateLimitResult = await rateLimitService.checkRateLimit(clientIP, 'resetPassword');
+
+    if (!rateLimitResult.allowed) {
+      console.log(`🚫 تم حظر طلب إعادة تعيين كلمة المرور من IP: ${clientIP}`);
+      await rateLimitService.recordAttempt(clientIP, 'resetPassword', clientIP, userAgent, false);
+
+      return res.status(429).json({
+        success: false,
+        message: 'تم تجاوز الحد المسموح من المحاولات. يرجى المحاولة مرة أخرى لاحقاً.',
+        retryAfter: rateLimitResult.resetTime
+      });
+    }
+
+    // Validate token
+    const tokenData = await validatePasswordResetToken(token);
+
+    if (!tokenData) {
+      console.log(`❌ محاولة استخدام توكن غير صالح: ${token}`);
+      await rateLimitService.recordAttempt(clientIP, 'resetPassword', clientIP, userAgent, false);
+
+      return res.status(400).json({
+        success: false,
+        message: 'توكن إعادة تعيين كلمة المرور غير صالح أو منتهي الصلاحية'
+      });
+    }
+
+    // Hash new password
+    const saltRounds = 12;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Update user password
+    await query(
+      'UPDATE users SET password = $1 WHERE id = $2',
+      [hashedPassword, tokenData.user_id]
+    );
+
+    // Mark token as used
+    await markTokenAsUsed(token);
+
+    console.log(`✅ تم تحديث كلمة المرور للمستخدم: ${tokenData.email}`);
+    await rateLimitService.recordAttempt(clientIP, 'resetPassword', clientIP, userAgent, true);
+
+    res.json({
+      success: true,
+      message: 'تم تحديث كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.'
+    });
+
+  } catch (error) {
+    console.error('❌ خطأ في إعادة تعيين كلمة المرور:', error);
+    await rateLimitService.recordAttempt(clientIP, 'resetPassword', clientIP, userAgent, false);
+
+    res.status(500).json({
+      success: false,
+      message: 'حدث خطأ أثناء تحديث كلمة المرور. يرجى المحاولة مرة أخرى.'
     });
   }
 });

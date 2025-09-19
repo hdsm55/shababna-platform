@@ -23,7 +23,9 @@ import SEO from '../components/common/SEO';
 import { Button } from '../components/ui/Button/ButtonSimple';
 import { Input } from '../components/ui/Input/InputSimple';
 import { Card } from '../components/ui/Card/Card';
-import { Alert } from '../components/common/DesignSystem';
+import { useAlert } from '../components/common/AlertProvider';
+import { useUnifiedLoading } from '../hooks/useUnifiedLoading';
+import UnifiedAlert from '../components/common/UnifiedAlert';
 
 const EventRegistration: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -39,7 +41,14 @@ const EventRegistration: React.FC = () => {
     phone: '',
   });
 
-  const [isSuccess, setIsSuccess] = useState(false);
+  const { success, error: showError } = useAlert();
+  const { withButtonLoading } = useUnifiedLoading();
+
+  // Local alert state for form notifications
+  const [localAlert, setLocalAlert] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
 
   // جلب بيانات الفعالية
   const {
@@ -55,11 +64,54 @@ const EventRegistration: React.FC = () => {
 
   // تسجيل في الفعالية
   const registerMutation = useMutation({
-    mutationFn: registerForEvent,
+    mutationFn: (data: any) => registerForEvent(eventId!, data),
     onSuccess: () => {
-      setIsSuccess(true);
+      setLocalAlert({
+        type: 'success',
+        message:
+          'تم تسجيلك في الفعالية بنجاح! ستتلقى تأكيداً عبر البريد الإلكتروني.',
+      });
       queryClient.invalidateQueries({ queryKey: ['events'] });
       queryClient.invalidateQueries({ queryKey: ['event', eventId] });
+      // إعادة تعيين النموذج
+      setRegistrationForm({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+      });
+    },
+    onError: (error: any) => {
+      console.error('❌ خطأ في التسجيل:', error);
+
+      let errorMessage = 'حدث خطأ أثناء التسجيل. يرجى المحاولة مرة أخرى.';
+
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      // رسائل خطأ محددة
+      if (
+        error.response?.status === 409 ||
+        errorMessage.includes('مسجل مسبقاً')
+      ) {
+        errorMessage = '✅ أنت مسجل مسبقاً في هذه الفعالية!';
+      } else if (errorMessage.includes('ممتلئة')) {
+        errorMessage = '❌ الفعالية ممتلئة ولا يمكن التسجيل فيها';
+      } else if (errorMessage.includes('مكتملة')) {
+        errorMessage = '❌ لا يمكن التسجيل في فعالية مكتملة';
+      } else if (errorMessage.includes('غير موجودة')) {
+        errorMessage = '❌ الفعالية غير موجودة';
+      } else if (errorMessage.includes('يجب إدخال')) {
+        errorMessage = '❌ يرجى ملء جميع الحقول المطلوبة';
+      }
+
+      setLocalAlert({
+        type: 'error',
+        message: errorMessage,
+      });
     },
   });
 
@@ -74,9 +126,13 @@ const EventRegistration: React.FC = () => {
     e.preventDefault();
     if (!eventId) return;
 
-    registerMutation.mutate({
-      eventId,
-      ...registrationForm,
+    await withButtonLoading(async () => {
+      registerMutation.mutate({
+        first_name: registrationForm.firstName,
+        last_name: registrationForm.lastName,
+        email: registrationForm.email,
+        phone: registrationForm.phone,
+      });
     });
   };
 
@@ -442,21 +498,24 @@ const EventRegistration: React.FC = () => {
                   <Button
                     type="submit"
                     variant="primary"
-                    disabled={registerMutation.isPending}
-                    className="w-full bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl shadow-lg"
+                    className="w-full bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white font-semibold py-3 rounded-xl shadow-lg"
                   >
-                    {registerMutation.isPending ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        جاري التسجيل...
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4" />
-                        تأكيد التسجيل
-                      </div>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4" />
+                      تأكيد التسجيل
+                    </div>
                   </Button>
+
+                  {/* Local Alert */}
+                  {localAlert.type && (
+                    <UnifiedAlert
+                      type={localAlert.type}
+                      message={localAlert.message}
+                      position="button-bottom"
+                      duration={5000}
+                      onClose={() => setLocalAlert({ type: null, message: '' })}
+                    />
+                  )}
                 </form>
               </Card>
             </div>

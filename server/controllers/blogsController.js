@@ -3,7 +3,19 @@ import { successResponse, errorResponse } from '../utils/response.js';
 
 export const getAllBlogs = async (req, res) => {
     try {
-        const result = await query('SELECT * FROM blogs ORDER BY created_at DESC');
+        const { search } = req.query;
+
+        let queryText = 'SELECT * FROM blogs';
+        const params = [];
+
+        if (search) {
+            queryText += ' WHERE title ILIKE $1 OR content ILIKE $1';
+            params.push(`%${search}%`);
+        }
+
+        queryText += ' ORDER BY created_at DESC';
+
+        const result = await query(queryText, params);
         return successResponse(res, result.rows, 'تم جلب جميع التدوينات بنجاح');
     } catch (error) {
         return errorResponse(res, error, 'حدث خطأ أثناء جلب التدوينات');
@@ -25,10 +37,12 @@ export const getBlogById = async (req, res) => {
 
 export const createBlog = async (req, res) => {
     try {
-        const { title, content, image_url, author_id } = req.body;
+        const { title, content, author, image_url } = req.body;
+        // استخدام الصورة الافتراضية للمقالات
+        const finalImageUrl = image_url && image_url.trim() !== '' ? image_url : '/images/blog-default.jpg';
         const result = await query(
-            'INSERT INTO blogs (title, content, image_url, author_id) VALUES ($1, $2, $3, $4) RETURNING *',
-            [title, content, image_url, author_id]
+            'INSERT INTO blogs (title, content, author, image_url) VALUES ($1, $2, $3, $4) RETURNING *',
+            [title, content, author, finalImageUrl]
         );
         return successResponse(res, result.rows[0], 'تم إنشاء التدوينة بنجاح');
     } catch (error) {
@@ -39,10 +53,12 @@ export const createBlog = async (req, res) => {
 export const updateBlog = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, content, image_url, author_id } = req.body;
+        const { title, content, author, image_url } = req.body;
+        // استخدام الصورة الافتراضية للمقالات
+        const finalImageUrl = image_url && image_url.trim() !== '' ? image_url : '/images/blog-default.jpg';
         const result = await query(
-            'UPDATE blogs SET title = $1, content = $2, image_url = $3, author_id = $4, updated_at = NOW() WHERE id = $5 RETURNING *',
-            [title, content, image_url, author_id, id]
+            'UPDATE blogs SET title = $1, content = $2, author = $3, image_url = $4, updated_at = NOW() WHERE id = $5 RETURNING *',
+            [title, content, author, finalImageUrl, id]
         );
         if (result.rows.length === 0) {
             return res.status(404).json({ message: 'لم يتم العثور على التدوينة' });

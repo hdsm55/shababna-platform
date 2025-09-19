@@ -19,6 +19,9 @@ import bodyParser from 'body-parser';
 import './config/database.js';
 import { testConnection } from './config/database.js';
 
+// Import cleanup service
+import cleanupService from './services/cleanupService.js';
+
 // Import routes
 import authRoutes from './routes/auth.js';
 import eventsRoutes from './routes/events.js';
@@ -34,6 +37,8 @@ import newsletterRoutes from './routes/newsletter.js';
 import paymentsRoutes from './routes/payments.js';
 import volunteersRoutes from './routes/volunteers.js';
 import uploadRoutes from './routes/upload.js';
+import statsRoutes from './routes/stats.js';
+import contactFormsRoutes from './routes/contactForms.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -69,7 +74,7 @@ app.use((req, res, next) => {
 
   // Add CORS headers for better compatibility
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   // Set timeout for requests (5 minutes)
@@ -154,7 +159,7 @@ const corsOptions = {
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 };
 
@@ -180,12 +185,11 @@ app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/payments', paymentsRoutes);
 app.use('/api/volunteers', volunteersRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api/contact-forms', contactFormsRoutes);
 
 // Additional routes for dashboard data
-app.use('/api/contact-forms', formsRoutes);
-app.use('/api/join-requests', formsRoutes);
-app.use('/api/program-registrations', formsRoutes);
-app.use('/api/event-registrations', formsRoutes);
+app.use('/api/forms', formsRoutes);
 
 // Timeout handling middleware
 app.use((req, res, next) => {
@@ -228,14 +232,10 @@ app.use(express.static(path.join(process.cwd())));
 
 // Handle React routing, return all requests to React app
 // This must be the LAST route handler
-app.get('*', async (req, res) => {
-  // Skip API routes
+app.get('*', async (req, res, next) => {
+  // Skip API routes - let them pass through to other handlers
   if (req.path.startsWith('/api/')) {
-    return res.status(404).json({
-      success: false,
-      message: 'API endpoint not found',
-      path: req.path
-    });
+    return next();
   }
 
   // Skip static assets that should be served directly
@@ -377,6 +377,10 @@ app.listen(PORT, async () => {
     const dbConnected = await testConnection();
     if (dbConnected) {
       console.log('✅ Database connection successful');
+
+      // بدء خدمة التنظيف الدوري
+      cleanupService.start(60); // تنظيف كل 60 دقيقة
+      console.log('🧹 تم بدء خدمة التنظيف الدوري');
     } else {
       console.log('⚠️ Database connection failed, but server is running');
     }

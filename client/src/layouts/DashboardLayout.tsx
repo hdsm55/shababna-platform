@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation, Outlet } from 'react-router-dom';
 import { theme } from '../theme';
 import ScrollToTop from '../components/common/ScrollToTop';
+import { useAuthStore } from '../store/authStore';
 import {
   LayoutDashboard,
   Calendar,
@@ -13,6 +14,8 @@ import {
   User,
   Bell,
   UserCheck,
+  MessageCircle,
+  UserPlus,
 } from 'lucide-react';
 
 interface DashboardNavItemProps {
@@ -52,6 +55,7 @@ interface DashboardLayoutProps {
 
 const DashboardLayout = ({ children }: { children?: React.ReactNode }) => {
   const { pathname } = useLocation();
+  const { user } = useAuthStore();
 
   // التأكد من التمرير للأعلى عند تغيير الصفحة في لوحة التحكم
   React.useEffect(() => {
@@ -77,37 +81,42 @@ const DashboardLayout = ({ children }: { children?: React.ReactNode }) => {
     {
       to: '/dashboard',
       icon: <LayoutDashboard className="w-4 h-4" />,
-      label: 'لوحة التحكم',
+      label: 'لوحة التحكم الرئيسية',
     },
     {
       to: '/dashboard/events',
       icon: <Calendar className="w-4 h-4" />,
-      label: 'الفعاليات',
+      label: 'إدارة الفعاليات',
     },
     {
       to: '/dashboard/programs',
       icon: <Target className="w-4 h-4" />,
-      label: 'البرامج',
-    },
-    {
-      to: '/dashboard/registrants',
-      icon: <UserCheck className="w-4 h-4" />,
-      label: 'المسجلون',
+      label: 'إدارة البرامج',
     },
     {
       to: '/dashboard/users',
       icon: <Users className="w-4 h-4" />,
-      label: 'المستخدمين',
+      label: 'إدارة المستخدمين',
+    },
+    {
+      to: '/dashboard/registrants',
+      icon: <UserPlus className="w-4 h-4" />,
+      label: 'المسجلون',
+    },
+    {
+      to: '/dashboard/blogs',
+      icon: <FileText className="w-4 h-4" />,
+      label: 'إدارة المقالات',
     },
     {
       to: '/dashboard/contact-forms',
-      icon: <FileText className="w-4 h-4" />,
+      icon: <MessageCircle className="w-4 h-4" />,
       label: 'رسائل التواصل',
     },
     {
-      to: '/dashboard/settings',
-      icon: <Settings className="w-4 h-4" />,
-      label: 'الإعدادات',
+      to: '/dashboard/join-requests',
+      icon: <UserPlus className="w-4 h-4" />,
+      label: 'طلبات الانضمام',
     },
   ];
 
@@ -119,8 +128,12 @@ const DashboardLayout = ({ children }: { children?: React.ReactNode }) => {
         {/* Header */}
         <div className="p-4 border-b border-gray-200">
           <Link to="/dashboard" className="flex items-center">
-            <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center mr-2">
-              <span className="text-white font-bold text-sm">ش</span>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center mr-2">
+              <img
+                src="/images/logo.jpg"
+                alt="شعار شبابنا"
+                className="w-8 h-8 object-contain rounded-lg"
+              />
             </div>
             <span className="text-lg font-bold text-gray-900">شبابنا</span>
           </Link>
@@ -128,9 +141,9 @@ const DashboardLayout = ({ children }: { children?: React.ReactNode }) => {
 
         {/* Navigation */}
         <nav className="p-2 space-y-1">
-          {navItems.map((item) => (
+          {navItems.map((item, index) => (
             <DashboardNavItem
-              key={item.to}
+              key={`nav-${index}-${item.to}`}
               to={item.to}
               icon={item.icon}
               label={item.label}
@@ -141,25 +154,42 @@ const DashboardLayout = ({ children }: { children?: React.ReactNode }) => {
 
         {/* User Profile */}
         <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-gray-200 bg-white">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-2">
                 <User className="w-4 h-4 text-gray-600" />
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-900">حسام الضاهر</p>
-                <p className="text-xs text-gray-500">مدير</p>
+                <p className="text-xs font-medium text-gray-900">
+                  {user?.first_name && user?.last_name
+                    ? `${user.first_name} ${user.last_name}`
+                    : user?.first_name || user?.email || 'مستخدم'}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {user?.role === 'admin'
+                    ? 'مدير'
+                    : user?.role === 'user'
+                    ? 'مستخدم'
+                    : 'عضو'}
+                </p>
               </div>
             </div>
-            <div className="flex items-center gap-1">
-              <button className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors">
-                <Bell className="w-4 h-4" />
-              </button>
-              <button className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors">
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
+            <button className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors">
+              <Bell className="w-4 h-4" />
+            </button>
           </div>
+
+          {/* Logout Button */}
+          <button
+            onClick={() => {
+              localStorage.removeItem('token');
+              window.location.href = '/login';
+            }}
+            className="w-full flex items-center justify-center gap-2 p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors border border-red-200"
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="text-sm font-medium">تسجيل الخروج</span>
+          </button>
         </div>
       </aside>
 

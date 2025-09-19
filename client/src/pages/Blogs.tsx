@@ -24,13 +24,16 @@ const Blogs: React.FC = () => {
     queryKey: ['blogs', debouncedSearch],
     queryFn: () =>
       fetchBlogs(debouncedSearch ? { search: debouncedSearch } : {}),
+    enabled: true,
+    retry: 2,
+    staleTime: 5 * 60 * 1000, // 5 دقائق
   });
   const blogs = data || [];
   const isRTL = i18n.dir() === 'rtl';
 
   return (
     <section
-      className="page-container py-12 bg-neutral-50"
+      className="page-container py-12 bg-gradient-to-br from-neutral-50 via-white to-primary-50"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <SEO
@@ -52,7 +55,7 @@ const Blogs: React.FC = () => {
             className="relative w-full max-w-md"
           >
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-primary-400" />
+              <Search className="h-5 w-5 text-primary-600" />
             </div>
             <Input
               ref={inputRef}
@@ -60,7 +63,7 @@ const Blogs: React.FC = () => {
               placeholder={t('common.search', 'بحث عن مقال...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 pr-10 py-3 bg-white border-primary-200 focus:border-primary-500 focus:ring-primary-500 shadow-sm"
+              className="pl-12 pr-10 py-3 bg-white border-primary-300 focus:border-primary-500 focus:ring-primary-500 shadow-sm"
               fullWidth
             />
             {searchTerm && (
@@ -105,7 +108,12 @@ const Blogs: React.FC = () => {
           </Alert>
         ) : blogs.length === 0 ? (
           <Alert type="info">
-            {t('blogs.empty', 'لا توجد تدوينات متاحة حالياً.')}
+            {searchTerm
+              ? t(
+                  'blogs.noSearchResults',
+                  `لا توجد نتائج للبحث عن "${searchTerm}"`
+                )
+              : t('blogs.empty', 'لا توجد تدوينات متاحة حالياً.')}
           </Alert>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -134,7 +142,7 @@ const Blogs: React.FC = () => {
                     />
                   )}
                 </div>
-                <h2 className="text-xl font-bold text-primary-800 mb-2 line-clamp-2">
+                <h2 className="text-xl font-bold text-primary-700 mb-2 line-clamp-2">
                   {blog.title}
                 </h2>
                 <div className="text-sm text-neutral-600 mb-2 line-clamp-3">
@@ -154,7 +162,11 @@ const Blogs: React.FC = () => {
                   </span>
                 </div>
                 <Link to={`/blogs/${blog.id}`} className="mt-4">
-                  <Button size="sm" variant="primary" className="w-full">
+                  <Button
+                    size="sm"
+                    variant="primary"
+                    className="w-full bg-primary-600 hover:bg-primary-700"
+                  >
                     {t('blogs.readMore', 'اقرأ المزيد')}
                   </Button>
                 </Link>

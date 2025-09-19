@@ -62,26 +62,44 @@ const CacheOptimizer: React.FC<CacheOptimizerProps> = ({ children }) => {
 
     // تحسين التخزين المؤقت للملفات الثابتة
     const optimizeStaticCache = () => {
-      const staticFiles = [
-        '/images/logo.webp',
-        '/images/hero-bg.webp',
+      // التحقق من وجود الصور قبل إضافة preload
+      const checkAndPreloadImage = (src: string) => {
+        const img = new Image();
+        img.onload = () => {
+          // إضافة preload فقط إذا كانت الصورة موجودة ومستخدمة
+          const link = document.createElement('link');
+          link.rel = 'preload';
+          link.href = src;
+          link.as = 'image';
+          document.head.appendChild(link);
+        };
+        img.onerror = () => {
+          console.warn(`Image not found: ${src}`);
+        };
+        img.src = src;
+      };
+
+      // التحقق من الصور المهمة فقط
+      const importantImages = [
+        '/images/logo.svg', // استخدام SVG بدلاً من webp
+        '/images/logo.png', // fallback
+      ];
+
+      importantImages.forEach(checkAndPreloadImage);
+
+      // إضافة preload للخطوط فقط
+      const fontFiles = [
         '/fonts/Inter-Regular.woff2',
         '/fonts/NotoSansArabic-Regular.woff2',
       ];
 
-      staticFiles.forEach((file) => {
+      fontFiles.forEach((file) => {
         const link = document.createElement('link');
         link.rel = 'preload';
         link.href = file;
-
-        if (file.includes('.webp')) {
-          link.as = 'image';
-        } else if (file.includes('.woff2')) {
-          link.as = 'font';
-          link.type = 'font/woff2';
-          link.crossOrigin = 'anonymous';
-        }
-
+        link.as = 'font';
+        link.type = 'font/woff2';
+        link.crossOrigin = 'anonymous';
         document.head.appendChild(link);
       });
     };

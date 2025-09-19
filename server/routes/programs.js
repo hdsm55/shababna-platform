@@ -40,8 +40,8 @@ router.get('/:id', getProgramById);
 // تسجيل مستخدم في برنامج
 router.post('/:id/register', registerForProgram);
 
-// Add a new program (admin only)
-router.post('/', authMiddleware, adminMiddleware, createProgram);
+// Add a new program (admin only) - مع دعم رفع الصور
+router.post('/', authMiddleware, adminMiddleware, upload.single('image'), createProgram);
 
 // Update a program (admin only)
 router.put('/:id', authMiddleware, adminMiddleware, upload.single('image'), updateProgram);

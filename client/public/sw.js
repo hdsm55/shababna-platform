@@ -168,6 +168,12 @@ async function staleWhileRevalidate(request) {
             cache.put(request, response.clone());
         }
         return response;
+    }).catch((error) => {
+        console.warn('Network request failed in staleWhileRevalidate:', request.url, error);
+        return new Response('Network error', {
+            status: 503,
+            statusText: 'Service Unavailable'
+        });
     });
 
     // إرجاع الاستجابة المخزنة مؤقتاً إذا كانت متوفرة
@@ -181,7 +187,16 @@ async function staleWhileRevalidate(request) {
 
 // استراتيجية Network Only
 async function networkOnly(request) {
-    return fetch(request);
+    try {
+        return await fetch(request);
+    } catch (error) {
+        console.warn('Network request failed:', request.url, error);
+        // إرجاع استجابة خطأ بدلاً من رفض الـ promise
+        return new Response('Network error', {
+            status: 503,
+            statusText: 'Service Unavailable'
+        });
+    }
 }
 
 // معالجة الرسائل

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import {
   fetchUsers,
   deleteUser,
@@ -523,6 +524,16 @@ const UsersDashboard: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <Link to="/join">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <Eye className="w-4 h-4" />
+                {t('users.viewFrontend', 'عرض في الموقع')}
+              </Button>
+            </Link>
             <Button
               variant="outline"
               size="sm"

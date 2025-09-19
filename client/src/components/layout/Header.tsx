@@ -160,10 +160,10 @@ const Header: React.FC = () => {
               </div>
             ) : (
               <Link
-                to="/login"
+                to="/auth"
                 className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
               >
-                {t('nav.login')}
+                إنشاء حساب
               </Link>
             )}
 

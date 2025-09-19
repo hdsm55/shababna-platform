@@ -30,6 +30,16 @@ services:
         value: https://shababna-frontend.onrender.com
       - key: FRONTEND_URL
         value: https://shababna-frontend.onrender.com
+      - key: RESEND_API_KEY
+        value: re_RBySDSii_3rcPzpJodg8F65TVknmkSWE6
+      - key: SENDER_EMAIL
+        value: info@shaababna.com
+      - key: SENDER_NAME
+        value: منظمة شبابنا العالمية
+      - key: RESET_LINK_BASE
+        value: https://shababna-frontend.onrender.com/reset-password
+      - key: TOKEN_TTL_MINUTES
+        value: 60
 
   # Frontend Service
   - type: web

@@ -4,8 +4,9 @@ import { motion } from 'framer-motion';
 import { Card } from '../components/ui/Card/Card';
 import { Button } from '../components/ui/Button/Button';
 import { Input } from '../components/ui/Input/Input';
-import Alert from '../components/common/Alert';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import { useAlert } from '../components/common/AlertProvider';
+import { useUnifiedLoading } from '../hooks/useUnifiedLoading';
+import UnifiedAlert from '../components/common/UnifiedAlert';
 import {
   Users,
   Clock,
@@ -17,12 +18,15 @@ import {
 
 const Volunteers: React.FC = () => {
   const { t } = useTranslation();
-  const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<'success' | 'error'>(
-    'success'
-  );
+  const { formSuccess, formError } = useAlert();
+  const { withButtonLoading } = useUnifiedLoading();
   const [showForm, setShowForm] = useState(false);
+
+  // Local alert state for form notifications
+  const [localAlert, setLocalAlert] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
 
   const [formData, setFormData] = useState({
     first_name: '',
@@ -51,47 +55,52 @@ const Volunteers: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
 
-    try {
-      const response = await fetch('/api/volunteers/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setMessage('تم تسجيل طلب التطوع بنجاح! سنتواصل معك قريباً.');
-        setMessageType('success');
-        setShowForm(false);
-        setFormData({
-          first_name: '',
-          last_name: '',
-          email: '',
-          phone: '',
-          country: '',
-          city: '',
-          age: '',
-          skills: '',
-          interests: '',
-          availability: '',
-          motivation: '',
-          experience: '',
+    await withButtonLoading(async () => {
+      try {
+        const response = await fetch('/api/volunteers/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
         });
-      } else {
-        setMessage(data.message || 'حدث خطأ أثناء التسجيل');
-        setMessageType('error');
+
+        const data = await response.json();
+
+        if (data.success) {
+          setLocalAlert({
+            type: 'success',
+            message: 'تم إرسال طلب التطوع بنجاح! سنتواصل معك قريباً.',
+          });
+          setShowForm(false);
+          setFormData({
+            first_name: '',
+            last_name: '',
+            email: '',
+            phone: '',
+            country: '',
+            city: '',
+            age: '',
+            skills: '',
+            interests: '',
+            availability: '',
+            motivation: '',
+            experience: '',
+          });
+        } else {
+          setLocalAlert({
+            type: 'error',
+            message: 'حدث خطأ أثناء إرسال طلب التطوع. يرجى المحاولة مرة أخرى.',
+          });
+        }
+      } catch (error) {
+        setLocalAlert({
+          type: 'error',
+          message: 'حدث خطأ أثناء إرسال طلب التطوع. يرجى المحاولة مرة أخرى.',
+        });
       }
-    } catch (error) {
-      setMessage('حدث خطأ في الاتصال بالخادم');
-      setMessageType('error');
-    } finally {
-      setIsLoading(false);
-    }
+    });
   };
 
   const containerVariants = {
@@ -208,16 +217,6 @@ const Volunteers: React.FC = () => {
                     <CheckCircle className="w-5 h-5" />
                   </Button>
                 </div>
-
-                {message && (
-                  <Alert
-                    type={messageType}
-                    onClose={() => setMessage('')}
-                    className="mb-6"
-                  >
-                    {message}
-                  </Alert>
-                )}
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-6">
@@ -398,25 +397,30 @@ const Volunteers: React.FC = () => {
                       type="button"
                       variant="outline"
                       onClick={() => setShowForm(false)}
-                      disabled={isLoading}
                     >
                       إلغاء
                     </Button>
                     <Button
                       type="submit"
-                      disabled={isLoading}
                       className="bg-blue-600 hover:bg-blue-700 text-white"
                     >
-                      {isLoading ? (
-                        <LoadingSpinner size="sm" />
-                      ) : (
-                        <>
-                          <CheckCircle className="w-4 h-4 mr-2" />
-                          إرسال الطلب
-                        </>
-                      )}
+                      <>
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                        إرسال الطلب
+                      </>
                     </Button>
                   </div>
+
+                  {/* Local Alert */}
+                  {localAlert.type && (
+                    <UnifiedAlert
+                      type={localAlert.type}
+                      message={localAlert.message}
+                      position="button-bottom"
+                      duration={5000}
+                      onClose={() => setLocalAlert({ type: null, message: '' })}
+                    />
+                  )}
                 </form>
               </Card>
             </motion.div>

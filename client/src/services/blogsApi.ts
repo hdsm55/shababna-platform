@@ -1,8 +1,14 @@
 import { http } from './api';
 import { Blog } from '../types';
 
-export const fetchBlogs = async (): Promise<Blog[]> => {
-  const res = await http.get('/blogs');
+export const fetchBlogs = async (params?: { search?: string }): Promise<Blog[]> => {
+  const queryParams = new URLSearchParams();
+  if (params?.search) {
+    queryParams.append('search', params.search);
+  }
+
+  const url = `/blogs${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+  const res = await http.get(url);
   console.log('API Response:', res);
   return res.data.data || res.data;
 };
@@ -11,7 +17,8 @@ export const fetchBlogById = async (id: string | number): Promise<Blog> => {
   console.log('🔍 جلب المدونة برقم:', id);
   const res = await http.get(`/blogs/${id}`);
   console.log('📊 استجابة API المدونة:', res.data);
-  return res.data;
+  console.log('📊 البيانات المرجعة:', res.data.data);
+  return res.data.data || res.data;
 };
 
 export const createBlog = async (data: Partial<Blog>) => {

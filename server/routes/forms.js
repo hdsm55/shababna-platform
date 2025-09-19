@@ -1,5 +1,17 @@
 import express from 'express';
-import emailService from '../services/emailService.js';
+import {
+    sendPasswordResetEmail,
+    testEmailConfiguration,
+    EMAIL_CONFIG,
+    saveFormSubmission,
+    sendContactConfirmation,
+    sendAdminNotification,
+    sendEmail,
+    addNewsletterSubscriber,
+    unsubscribeFromNewsletter,
+    getPendingForms,
+    updateFormStatus
+} from '../services/emailService.js';
 import { query } from '../config/database.js';
 import { authenticateToken, requireAdmin } from '../middleware/authMiddleware.js';
 
@@ -40,7 +52,7 @@ router.post('/contact', async (req, res) => {
 
         let savedForm;
         try {
-            savedForm = await emailService.saveFormSubmission(formData);
+            savedForm = await saveFormSubmission(formData);
         } catch (dbError) {
             console.error('Database error:', dbError);
             return res.status(500).json({
@@ -52,9 +64,9 @@ router.post('/contact', async (req, res) => {
         // محاولة إرسال الإيميلات
         try {
             // إرسال إيميل تأكيد للمستخدم
-            await emailService.sendContactConfirmation(formData);
+            await sendContactConfirmation(formData);
             // إرسال إشعار للمدير
-            await emailService.sendAdminNotification(formData);
+            await sendAdminNotification(formData);
         } catch (emailError) {
             // تسجيل الخطأ ولكن لا نعيد خطأ للمستخدم لأن الرسالة تم حفظها بنجاح
             console.error('Email sending error:', emailError);
@@ -110,7 +122,7 @@ router.post('/join-us', async (req, res) => {
             motivation
         };
 
-        const savedForm = await emailService.saveFormSubmission(formData);
+        const savedForm = await saveFormSubmission(formData);
 
         // إرسال إيميل تأكيد للمستخدم
         const welcomeSubject = 'شكراً لك على اهتمامك بالانضمام إلينا!';
@@ -132,10 +144,10 @@ router.post('/join-us', async (req, res) => {
       </div>
     `;
 
-        await emailService.sendEmail(email, first_name, welcomeSubject, welcomeContent, 'join_us_confirmation');
+        await sendEmail(email, first_name, welcomeSubject, welcomeContent, 'join_us_confirmation');
 
         // إرسال إشعار للمدير
-        await emailService.sendAdminNotification(formData);
+        await sendAdminNotification(formData);
 
         res.json({
             success: true,
@@ -163,21 +175,63 @@ router.post('/join-requests', async (req, res) => {
             country,
             age,
             interests,
-            motivation
+            motivation,
+            // الحقول الجديدة
+            country_of_residence,
+            nationality,
+            specialization,
+            other_interests,
+            occupation,
+            marital_status
         } = req.body;
 
-        if (!first_name || !last_name || !email || !country || !age || !motivation) {
+        // التحقق من الحقول المطلوبة
+        if (!first_name || !last_name || !email || !country || !age || !motivation ||
+            !country_of_residence || !nationality || !specialization || !occupation || !marital_status) {
             return res.status(400).json({
                 success: false,
-                message: 'جميع الحقول مطلوبة'
+                message: 'جميع الحقول المطلوبة يجب ملؤها'
+            });
+        }
+
+        // التحقق من الاهتمامات
+        if (!interests || !Array.isArray(interests) || interests.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'يجب اختيار اهتمام واحد على الأقل'
+            });
+        }
+
+        // التحقق من حد الاهتمامات الأقصى
+        if (interests.length > 5) {
+            return res.status(400).json({
+                success: false,
+                message: 'يمكن اختيار 5 اهتمامات كحد أقصى'
+            });
+        }
+
+        // التحقق من الحالة الاجتماعية
+        const validMaritalStatus = ['أعزب', 'متزوج', 'مطلق', 'أرمل'];
+        if (!validMaritalStatus.includes(marital_status)) {
+            return res.status(400).json({
+                success: false,
+                message: 'الحالة الاجتماعية غير صالحة'
             });
         }
 
         const result = await query(
-            `INSERT INTO join_requests (first_name, last_name, email, phone, country, age, motivation, created_at, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), 'pending')
-       RETURNING *`,
-            [first_name, last_name, email, phone, country, age, motivation]
+            `INSERT INTO join_requests (
+                first_name, last_name, email, phone, country, age, motivation,
+                country_of_residence, nationality, specialization,
+                interests, other_interests, occupation, marital_status,
+                created_at, status
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW(), 'pending')
+            RETURNING *`,
+            [
+                first_name, last_name, email, phone, country, age, motivation,
+                country_of_residence, nationality, specialization,
+                interests, other_interests, occupation, marital_status
+            ]
         );
 
         res.json({
@@ -217,7 +271,7 @@ router.post('/newsletter', async (req, res) => {
         }
 
         // إضافة المشترك
-        const subscriber = await emailService.addNewsletterSubscriber(email, first_name, last_name);
+        const subscriber = await addNewsletterSubscriber(email, first_name, last_name);
 
         // إرسال إيميل ترحيب
         const welcomeSubject = 'مرحباً بك في النشرة الإخبارية!';
@@ -237,7 +291,7 @@ router.post('/newsletter', async (req, res) => {
       </div>
     `;
 
-        await emailService.sendEmail(email, first_name, welcomeSubject, welcomeContent, 'newsletter_welcome');
+        await sendEmail(email, first_name, welcomeSubject, welcomeContent, 'newsletter_welcome');
 
         res.json({
             success: true,
@@ -265,7 +319,7 @@ router.post('/newsletter/unsubscribe', async (req, res) => {
             });
         }
 
-        const success = await emailService.unsubscribeFromNewsletter(email);
+        const success = await unsubscribeFromNewsletter(email);
 
         if (success) {
             res.json({
@@ -293,7 +347,7 @@ router.post('/newsletter/unsubscribe', async (req, res) => {
 // الحصول على جميع النماذج المعلقة (للمدير فقط)
 router.get('/pending', authenticateToken, requireAdmin, async (req, res) => {
     try {
-        const pendingForms = await emailService.getPendingForms();
+        const pendingForms = await getPendingForms();
 
         res.json({
             success: true,
@@ -315,7 +369,7 @@ router.patch('/:formId/status', authenticateToken, requireAdmin, async (req, res
         const { formId } = req.params;
         const { status, notes } = req.body;
 
-        const updatedForm = await emailService.updateFormStatus(formId, status, notes);
+        const updatedForm = await updateFormStatus(formId, status, notes);
 
         res.json({
             success: true,
@@ -423,7 +477,10 @@ router.get('/join-requests', authenticateToken, requireAdmin, async (req, res) =
         const offset = (page - 1) * limit;
 
         let queryStr = `
-            SELECT id, first_name, last_name, email, phone, country, age, motivation, created_at, status
+            SELECT id, first_name, last_name, email, phone, country, age, motivation,
+                   country_of_residence, nationality, specialization,
+                   interests, other_interests, occupation, marital_status,
+                   created_at, status
             FROM join_requests
         `;
 

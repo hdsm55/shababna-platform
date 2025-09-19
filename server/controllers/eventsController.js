@@ -1,6 +1,7 @@
 import { validationResult } from 'express-validator';
 import { getRow, getRows, query } from '../config/database.js';
 import { successResponse, errorResponse } from '../utils/response.js';
+import { sendAdminNotification } from '../services/emailService.js';
 
 // Get all events (public)
 export const getAllEvents = async (req, res) => {
@@ -177,7 +178,7 @@ export const createEvent = async (req, res) => {
         if (new Date(end_date) < new Date(start_date)) {
             return errorResponse(res, 'يجب أن يكون تاريخ النهاية بعد تاريخ البداية', 400);
         }
-        const finalImageUrl = image_url && image_url.trim() !== '' ? image_url : null;
+        const finalImageUrl = image_url && image_url.trim() !== '' ? image_url : '/images/events-default.jpg';
         const result = await query(
             `INSERT INTO events (title, description, start_date, end_date, location, max_attendees, attendees, category, image_url, status, created_at, updated_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())
@@ -216,7 +217,12 @@ export const updateEvent = async (req, res) => {
         Object.keys(req.body).forEach(key => {
             if (allowedFields.includes(key) && req.body[key] !== undefined) {
                 updateFields.push(`${key} = $${paramIndex}`);
-                values.push(req.body[key]);
+                // استخدام الصورة الافتراضية إذا لم يتم توفير صورة
+                if (key === 'image_url' && (!req.body[key] || req.body[key].trim() === '')) {
+                    values.push('/images/events-default.jpg');
+                } else {
+                    values.push(req.body[key]);
+                }
                 paramIndex++;
             }
         });
@@ -287,7 +293,11 @@ export const registerForEvent = async (req, res) => {
             [id, email]
         );
         if (existingRegistration) {
-            return res.status(400).json({ success: false, message: 'أنت مسجل مسبقاً في هذه الفعالية' });
+            return res.status(409).json({
+                success: false,
+                message: 'أنت مسجل مسبقاً في هذه الفعالية',
+                alreadyRegistered: true
+            });
         }
 
         // بدء المعاملة
@@ -314,6 +324,23 @@ export const registerForEvent = async (req, res) => {
             // جلب البيانات المحدثة
             const updatedEvent = await getRow('SELECT * FROM events WHERE id = $1', [id]);
             const newRegistration = await getRow('SELECT * FROM event_registrations WHERE id = $1', [result.rows[0].id]);
+
+            // إرسال إشعار للإدارة عند التسجيل في فعالية
+            try {
+                const adminNotificationData = {
+                    form_type: 'event_registration',
+                    name: `${first_name || 'غير محدد'} ${last_name || 'غير محدد'}`,
+                    email: email || 'غير محدد',
+                    phone: phone || 'غير محدد',
+                    subject: 'تسجيل جديد في فعالية',
+                    message: `تم تسجيل جديد في فعالية:\n\nاسم الفعالية: ${event.title}\nالمكان: ${event.location}\nالتاريخ: ${new Date(event.start_date).toLocaleString('ar-SA')}\n\nالمسجل:\nالاسم: ${first_name || 'غير محدد'} ${last_name || 'غير محدد'}\nالبريد الإلكتروني: ${email || 'غير محدد'}\nالهاتف: ${phone || 'غير محدد'}\n\nتاريخ التسجيل: ${new Date().toLocaleString('ar-SA')}`
+                };
+                await sendAdminNotification(adminNotificationData);
+                console.log('✅ تم إرسال إشعار تسجيل فعالية للإدارة');
+            } catch (emailError) {
+                console.error('❌ خطأ في إرسال إشعار تسجيل فعالية:', emailError);
+                // لا نعيد خطأ للمستخدم لأن التسجيل تم بنجاح
+            }
 
             return res.json({
                 success: true,
