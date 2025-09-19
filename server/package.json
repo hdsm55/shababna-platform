@@ -24,6 +24,7 @@
     "express-validator": "^7.0.1",
     "stripe": "^14.21.0",
     "iyzipay": "^2.0.48",
+    "resend": "^3.2.0",
     "nodemon": "^3.0.2"
   },
   "engines": {
