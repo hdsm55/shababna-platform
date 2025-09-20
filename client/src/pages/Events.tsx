@@ -351,6 +351,19 @@ const EventCard = memo(
       return colorMap[category] || 'bg-dark-100 text-dark-800';
     }, []);
 
+    const getEventImage = useCallback((category: string) => {
+      const imageMap: { [key: string]: string } = {
+        workshop: '/images/events-default.jpg',
+        conference: '/images/events-default.jpg',
+        networking: '/images/events-default.jpg',
+        seminar: '/images/events-default.jpg',
+        training: '/images/events-default.jpg',
+        تطوع: '/images/events-default.jpg',
+        قادمة: '/images/events-default.jpg',
+      };
+      return imageMap[category] || '/images/events-default.jpg';
+    }, []);
+
     const calculateDaysUntil = useCallback((dateString: string) => {
       const eventDate = new Date(dateString);
       const today = new Date();
@@ -374,12 +387,12 @@ const EventCard = memo(
           {/* Event Image */}
           <div className="relative h-48 overflow-hidden">
             <img
-              src={event.image_url || '/images/events-default.jpg'}
+              src={event.image_url || getEventImage(event.category)}
               alt={event.title}
               className="w-full h-full object-cover"
               loading="lazy"
               onError={(e) => {
-                e.currentTarget.src = '/images/events-default.jpg';
+                e.currentTarget.src = getEventImage(event.category);
               }}
             />
 

@@ -186,6 +186,21 @@ const Programs: React.FC = () => {
     return colorMap[category] || 'bg-gray-100 text-gray-800';
   };
 
+  const getProgramImage = (category: string) => {
+    const imageMap: { [key: string]: string } = {
+      education: '/images/programs-default.jpg',
+      health: '/images/programs-default.jpg',
+      environment: '/images/programs-default.jpg',
+      community: '/images/programs-default.jpg',
+      technology: '/images/programs-default.jpg',
+      'ريادة الأعمال': '/images/programs-default.jpg',
+      تطويرية: '/images/programs-default.jpg',
+      تجريبية: '/images/programs-default.jpg',
+      أعمال: '/images/programs-default.jpg',
+    };
+    return imageMap[category] || '/images/programs-default.jpg';
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('ar-SA', {
       style: 'currency',
@@ -444,14 +459,16 @@ const Programs: React.FC = () => {
                       <div className="relative h-56 overflow-hidden">
                         <img
                           src={
-                            program.image_url || '/images/programs-default.jpg'
+                            program.image_url ||
+                            getProgramImage(program.category)
                           }
                           alt={program.title}
                           className="w-full h-full object-cover"
                           loading="lazy"
                           onError={(e) => {
-                            e.currentTarget.src =
-                              '/images/programs-default.jpg';
+                            e.currentTarget.src = getProgramImage(
+                              program.category
+                            );
                           }}
                         />
 

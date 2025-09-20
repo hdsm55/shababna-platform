@@ -336,6 +336,21 @@ const LatestProgramsSection = memo(() => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  const getProgramImage = (category: string) => {
+    const imageMap: { [key: string]: string } = {
+      education: '/images/programs-default.jpg',
+      health: '/images/programs-default.jpg',
+      environment: '/images/programs-default.jpg',
+      community: '/images/programs-default.jpg',
+      technology: '/images/programs-default.jpg',
+      'ريادة الأعمال': '/images/programs-default.jpg',
+      تطويرية: '/images/programs-default.jpg',
+      تجريبية: '/images/programs-default.jpg',
+      أعمال: '/images/programs-default.jpg',
+    };
+    return imageMap[category] || '/images/programs-default.jpg';
+  };
+
   // تحسين الاستعلام - تقليل البيانات المطلوبة
   const {
     data: programsData,
@@ -414,12 +429,12 @@ const LatestProgramsSection = memo(() => {
               >
                 <div className="h-40 relative overflow-hidden">
                   <img
-                    src={program.image_url || '/images/programs-default.jpg'}
+                    src={program.image_url || getProgramImage(program.category)}
                     alt={program.title}
                     className="w-full h-full object-cover"
                     loading="lazy"
                     onError={(e) => {
-                      e.currentTarget.src = '/images/programs-default.jpg';
+                      e.currentTarget.src = getProgramImage(program.category);
                     }}
                   />
                   <div className="absolute inset-0 bg-dark-500/20" />
