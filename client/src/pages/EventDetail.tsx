@@ -13,7 +13,7 @@ import {
 } from '../components/common/UnifiedLoadingStates';
 import UnifiedAlert from '../components/common/UnifiedAlert';
 import { fetchEventById } from '../services/eventsApi';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Calendar,
   MapPin,
@@ -28,6 +28,7 @@ import {
   Award,
   Tag,
 } from 'lucide-react';
+import ReliableIcon from '../components/common/ReliableIcon';
 
 interface RegistrationForm {
   firstName: string;
@@ -49,7 +50,7 @@ const EventDetail: React.FC = () => {
     phone: '',
     message: '',
   });
-  const { success, error: showError } = useAlert();
+  const {} = useAlert();
   const { withButtonLoading } = useUnifiedLoading();
 
   // Local alert state for form notifications
@@ -134,17 +135,6 @@ const EventDetail: React.FC = () => {
       default:
         return 'غير محدد';
     }
-  };
-
-  const getCategoryIcon = (category: string) => {
-    const categoryMap: { [key: string]: string } = {
-      workshop: '🔧',
-      conference: '🎤',
-      networking: '🤝',
-      seminar: '📚',
-      training: '💡',
-    };
-    return categoryMap[category] || '🎯';
   };
 
   const getCategoryColor = (category: string) => {
@@ -307,8 +297,15 @@ const EventDetail: React.FC = () => {
                   alt={event.title}
                   className="w-full h-full object-cover"
                   loading="lazy"
+                  width={800}
+                  height={400}
+                  style={{ aspectRatio: '16/9' }}
+                  onLoad={(e) => {
+                    e.currentTarget.classList.add('loaded');
+                  }}
                   onError={(e) => {
                     e.currentTarget.src = '/images/events-default.jpg';
+                    e.currentTarget.classList.add('loaded');
                   }}
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-30"></div>

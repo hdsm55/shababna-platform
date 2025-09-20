@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <!-- Favicon - شعار الموقع -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="/images/logo.ico" />
     <link rel="icon" type="image/svg+xml" href="/images/logo.svg" />
     <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
@@ -16,14 +18,19 @@
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#27548A" />
 
-    <!-- CSP - Updated for development and production -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' 'sha256-kPx0AsF0oz2kKiZ875xSvv693TBHkQ/0SkMJZnnNpnQ='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' http://localhost:5000 http://127.0.0.1:5000 https://shababna-platform.onrender.com https://*.onrender.com https://*.render.com; object-src 'none'; base-uri 'self'; form-action 'self';" />
+    <!-- CSP - Optimized for production -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' http://localhost:5000 http://127.0.0.1:5000 https://shababna-backend.onrender.com https://*.onrender.com https://*.render.com; object-src 'none'; base-uri 'self'; form-action 'self';" />
 
     <title>شبابنا - Shababna Global</title>
     <link rel="manifest" href="/site.webmanifest" />
+    <!-- Font Optimization -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="https://fonts.gstatic.com/s/notosansarabic/v18/nKpt-iyowYvj7GO4Mu3G5ppTrV2pM_7.woff2" as="font" type="font/woff2" crossorigin>
   </head>
   <body>
     <div id="root"></div>

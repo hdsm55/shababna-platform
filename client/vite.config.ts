@@ -134,10 +134,12 @@ export default defineConfig({
     exclude: ['@tanstack/react-query-devtools'],
   },
 
-  // تحسينات PWA
+  // تحسينات PWA والأيقونات
   define: {
     __PWA_ENABLED__: JSON.stringify(true),
     __PWA_VERSION__: JSON.stringify('1.0.0'),
+    // ضمان تحميل الأيقونات
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
   },
 
   // تحسينات Worker

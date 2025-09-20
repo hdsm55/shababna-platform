@@ -25,7 +25,8 @@ export async function sendPasswordResetEmail(email, token, firstName = '') {
         const expirationTime = EMAIL_CONFIG.tokenTTLMinutes;
 
         // في وضع الاختبار، أرسل البريد إلى info@shaababna.com فقط
-        const isDevelopment = process.env.NODE_ENV === 'development';
+        // TODO: بعد التحقق من النطاق في Resend، قم بإزالة هذا الشرط
+        const isDevelopment = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'production';
         const recipientEmail = isDevelopment ? 'info@shaababna.com' : email;
 
         const emailData = {

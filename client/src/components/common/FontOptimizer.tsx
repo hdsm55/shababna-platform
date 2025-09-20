@@ -13,109 +13,26 @@ const FontOptimizer: React.FC<FontOptimizerProps> = ({ children }) => {
         document.documentElement.classList.add('fonts-loaded');
       });
 
-      // تحسين عرض الخطوط
-      const fontFaces = [
-        {
-          family: 'Inter',
-          weight: '400',
-          style: 'normal',
-          src: 'url("/fonts/Inter-Regular.woff2") format("woff2")',
-        },
-        {
-          family: 'Inter',
-          weight: '600',
-          style: 'normal',
-          src: 'url("/fonts/Inter-SemiBold.woff2") format("woff2")',
-        },
-        {
-          family: 'Inter',
-          weight: '700',
-          style: 'normal',
-          src: 'url("/fonts/Inter-Bold.woff2") format("woff2")',
-        },
-        {
-          family: 'Noto Sans Arabic',
-          weight: '400',
-          style: 'normal',
-          src: 'url("/fonts/NotoSansArabic-Regular.woff2") format("woff2")',
-        },
-        {
-          family: 'Noto Sans Arabic',
-          weight: '600',
-          style: 'normal',
-          src: 'url("/fonts/NotoSansArabic-SemiBold.woff2") format("woff2")',
-        },
-        {
-          family: 'Noto Sans Arabic',
-          weight: '700',
-          style: 'normal',
-          src: 'url("/fonts/NotoSansArabic-Bold.woff2") format("woff2")',
-        },
-      ];
+      // تحسين تحميل الخطوط من Google Fonts
+      console.log('🔤 بدء تحميل الخطوط...');
+      const startTime = performance.now();
 
-      // تطبيق Font Display Swap
-      fontFaces.forEach((fontFace) => {
-        const font = new FontFace(fontFace.family, fontFace.src, {
-          weight: fontFace.weight,
-          style: fontFace.style,
-          display: 'swap',
+      // مراقبة تحميل الخطوط
+      document.fonts.ready
+        .then(() => {
+          const endTime = performance.now();
+          console.log('✅ اكتمل تحميل الخطوط');
+          console.log(`🔤 وقت تحميل الخطوط: ${endTime.toFixed(2)} ms`);
+        })
+        .catch((error) => {
+          console.warn('⚠️ خطأ في تحميل الخطوط:', error);
         });
-
-        font
-          .load()
-          .then((loadedFont) => {
-            document.fonts.add(loadedFont);
-          })
-          .catch((error) => {
-            console.warn(`Failed to load font ${fontFace.family}:`, error);
-          });
-      });
     }
 
-    // تحسين تحميل الخطوط المخصصة
+    // تحسين تحميل الخطوط - تم إزالته لأن الخطوط تُحمّل من Google Fonts
     const preloadFonts = () => {
-      const fontLinks = [
-        {
-          href: '/fonts/Inter-Regular.woff2',
-          type: 'font/woff2',
-          crossOrigin: 'anonymous',
-        },
-        {
-          href: '/fonts/Inter-SemiBold.woff2',
-          type: 'font/woff2',
-          crossOrigin: 'anonymous',
-        },
-        {
-          href: '/fonts/Inter-Bold.woff2',
-          type: 'font/woff2',
-          crossOrigin: 'anonymous',
-        },
-        {
-          href: '/fonts/NotoSansArabic-Regular.woff2',
-          type: 'font/woff2',
-          crossOrigin: 'anonymous',
-        },
-        {
-          href: '/fonts/NotoSansArabic-SemiBold.woff2',
-          type: 'font/woff2',
-          crossOrigin: 'anonymous',
-        },
-        {
-          href: '/fonts/NotoSansArabic-Bold.woff2',
-          type: 'font/woff2',
-          crossOrigin: 'anonymous',
-        },
-      ];
-
-      fontLinks.forEach((font) => {
-        const link = document.createElement('link');
-        link.rel = 'preload';
-        link.href = font.href;
-        link.as = 'font';
-        link.type = font.type;
-        link.crossOrigin = font.crossOrigin;
-        document.head.appendChild(link);
-      });
+      // الخطوط تُحمّل من Google Fonts CDN في index.html
+      console.log('🔤 تم تحسين تحميل الخطوط من Google Fonts');
     };
 
     // تأخير تحميل الخطوط للصفحات غير المهمة
